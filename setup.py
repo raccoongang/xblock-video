@@ -35,6 +35,9 @@ setup(
     entry_points={
         'xblock.v1': [
             'video_xblock = video_xblock:VideoXBlock',
+        ],
+        'video_xblock.v1': [
+            'youtube-player = video_xblock:YoutubePlayer',
         ]
     },
     package_data=package_data("video_xblock", ["static", "public"]),

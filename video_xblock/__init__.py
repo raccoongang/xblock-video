@@ -1,1 +1,1 @@
-from .video_xblock import VideoXBlock
+from .video_xblock import *
