@@ -14,6 +14,7 @@ import logging
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, String
 from xblock.fragment import Fragment
+from xblock.plugin import Plugin
 from xblock.validation import ValidationMessage
 
 from django.template import Template, Context
@@ -38,8 +39,10 @@ class PlayerMissingError(Exception):
     pass
 
 
-class BaseVideoPlayer(object):
+class BaseVideoPlayer(Plugin):
     __metaclass__ = abc.ABCMeta
+
+    entry_point = 'video_xblock.v1'
 
     @abc.abstractproperty
     def url_regexes(self):
@@ -49,51 +52,10 @@ class BaseVideoPlayer(object):
     def render_player(self, context={}):
         return Fragment('<video />')
 
-    entry_point = 'video_xblock.v1'
-
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
         data = pkg_resources.resource_string(__name__, path)
         return data.decode("utf8")
-
-    @classmethod
-    def _load_class_entry_point(cls, entry_point):
-        """
-        Load `entry_point`, and set the `entry_point.name` as the
-        attribute `plugin_name` on the loaded object
-        """
-        class_ = entry_point.load()
-        setattr(class_, 'plugin_name', entry_point.name)
-        return class_
-
-    @classmethod
-    def load_players(cls, fail_silently=True):
-        """ Utility method to load all players listed as entry points """
-        all_classes = itertools.chain(
-            pkg_resources.iter_entry_points(cls.entry_point),
-            # (entry_point for identifier, entry_point in cls.extra_entry_points),
-        )
-        for class_ in all_classes:
-            try:
-                yield (class_.name, cls._load_class_entry_point(class_))
-            except Exception:  # pylint: disable=broad-except
-                if fail_silently:
-                    log.warning('Unable to load %s %r', cls.__name__, class_.name, exc_info=True)
-                else:
-                    raise
-
-    @classmethod
-    def load_player(cls, video_url):
-        """
-        Utility method to load a player from entry points which matches
-        the given video_url
-        """
-        for player_name, player_class in cls.load_players():
-            player = player_class()
-            if any(regex.search(video_url) for regex in player.url_regexes):
-                return player
-
-        return DummyPlayer()
 
 
 class DummyPlayer(BaseVideoPlayer):
@@ -151,6 +113,8 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         scope=Scope.content
     )
 
+    player_name = String(default='dummy-player')
+
     editable_fields = ('display_name', 'href')
 
     @property
@@ -177,12 +141,18 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
 
     def student_view(self, context=None):
         """
-        The primary view of the WistiaVideoXBlock, shown to students
+        The primary view of the VideoXBlock, shown to students
         when viewing courses.
         """
-        player = self.get_player(self.href)
+        player = self.get_player()
         return player.render_player({'url': self.href, 'autoplay': False})
 
-    def get_player(self, href):
-        player = BaseVideoPlayer.load_player(self.href)
-        return player
+    def clean_studio_edits(self, data):
+        for player_name, player_class in BaseVideoPlayer.load_classes():
+            player = player_class()
+            if any(regex.search(data['href']) for regex in player.url_regexes):
+                data['player_name'] = player_name
+
+    def get_player(self):
+        player = BaseVideoPlayer.load_class(self.player_name)
+        return player()
