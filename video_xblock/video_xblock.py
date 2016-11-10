@@ -45,39 +45,57 @@ class BaseVideoPlayer(Plugin):
     entry_point = 'video_xblock.v1'
 
     @abc.abstractproperty
-    def url_regexes(self):
-        return []
+    def url_re(self):
+        """
+        Regex (list) to match video url
+        """
+        return [] or re.RegexObject or ''
 
     @abc.abstractmethod
     def get_frag(self, context={}):
         return Fragment('<video />')
+
+    @abc.abstractmethod
+    def media_id(self, href):
+        """
+        Extracts Platform's media id from the video url.
+        E.g. https://example.wistia.com/medias/12345abcde -> 12345abcde
+        """
+
+        return ''
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
         data = pkg_resources.resource_string(__name__, path)
         return data.decode("utf8")
 
+    def match(self, href):
+        if isinstance(self.url_re, list):
+            return any(regex.search(href) for regex in self.url_re)
+        elif isinstance(self.url_re, re.RegexObject):
+            return self.url_re.search(href)
+        elif isinstance(self.url_re, basestring):
+            return re.search(self.url_re, href, re.I)
+
 
 class DummyPlayer(BaseVideoPlayer):
     @property
-    def url_regexes(self):
+    def url_re(self):
         return [re.compile(r'')]
 
     def get_frag(self, **context):
         return Fragment(u'[Here be Video]')
 
     def media_id(self, href):
-        return ''
+        return '<media_id>'
 
 
 class YoutubePlayer(BaseVideoPlayer):
-    @property
-    def url_regexes(self):
-        # http://regexr.com/3a2p0
-        return [re.compile(r'(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})')]
+    # http://regexr.com/3a2p0
+    url_re = re.compile(r'(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\?(?:\S*?&?v\=))|youtu\.be\/)(?P<media_id>[a-zA-Z0-9_-]{6,11})')
 
     def media_id(self, href):
-        return self.url_regexes[0].search(href).group(1)
+        return self.url_re.search(href).group('media_id')
 
     def get_frag(self, **context):
         html = Template(self.resource_string("static/html/youtube.html"))
@@ -101,12 +119,10 @@ class YoutubePlayer(BaseVideoPlayer):
 
 
 class BrightcovePlayer(BaseVideoPlayer):
-    @property
-    def url_regexes(self):
-        return [re.compile(r'https:\/\/studio.brightcove.com\/products\/videocloud\/media\/videos\/(\d+)')]
+    url_re = re.compile(r'https:\/\/studio.brightcove.com\/products\/videocloud\/media\/videos\/(?P<media_id>\d+)')
 
     def media_id(self, href):
-        return self.url_regexes[0].match(href).group(1)
+        return self.url_re.match(href).group('media_id')
 
     def get_frag(self, **context):
         html = Template(self.resource_string("static/html/brightcove.html"))
@@ -143,7 +159,8 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         scope=Scope.content,
     )
 
-    player_name = String(default='dummy-player',
+    player_name = String(
+        default='dummy-player',
         scope=Scope.content
     )
 
@@ -160,11 +177,17 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         return ''
 
     def validate_field_data(self, validation, data):
-        if data.href == '':# and not VIDEO_URL_RE.match(data.href):
-            validation.add(ValidationMessage(
-                ValidationMessage.ERROR,
-                _(u"Incorrect video url, please recheck")
-            ))
+        if data.href == '':
+            return
+        for player_name, player_class in BaseVideoPlayer.load_classes():
+            player = player_class()
+            if player.match(data.href):
+                return
+
+        validation.add(ValidationMessage(
+            ValidationMessage.ERROR,
+            _(u"Incorrect video url, please recheck")
+        ))
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
@@ -188,7 +211,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
             if player_name == 'dummy-player':
                 continue
             player = player_class()
-            if any(regex.search(data['href']) for regex in player.url_regexes):
+            if player.match(data['href']):
                 data['player_name'] = player_name
 
     def get_player(self):
