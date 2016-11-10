@@ -11,7 +11,7 @@ __pycache__/
 env/
 build/
 develop-eggs/
-#dist/
+dist/
 downloads/
 eggs/
 .eggs/
@@ -90,3 +90,4 @@ ENV/
 
 # Bower components
 bower_components/
+
