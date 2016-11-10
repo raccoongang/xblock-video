@@ -1,10 +1,13 @@
-# xblock-wistia
-XBlock to embed videos hosted on the Wistia video platform into your courses.
+# xblock-video
+XBlock to embed videos hosted on different video platform into your courses.
 
 ## Installation
 
 ```bash
-pip install -e "git+https://github.com/appsembler/xblock-wistia.git#egg=wistiavideo_xblock"
+sudo -sHu edxapp
+source ~/edxapp_env
+pip install xblock-utils==1.0.2
+pip install -e "git+https://github.com/raccoongang/xblock-video.git@767821d63aba3b4f9e2630120e3d480857b8cea3#egg=xblock-video==0.1"
 ```
 
 ## Enabling in Studio
@@ -14,13 +17,14 @@ settings:
 1. From the main page of a specific course, click on *Settings*,
    *Advanced Settings* in the top menu.
 1. Check for the *Advanced Module List* policy key, and add
-   `"wistiavideo"` in the policy value list.
-   ![Advanced Module List](doc/img/advanced_settings.png)
+   `"video_xblock"` in the policy value list.
+   ![Advanced Module List](https://placehold.it/350x150?text=Here+be+Screenshot)
 
 1. Click on the *Save changes* button.
 
 ## Usage
 
+### Wistia
 Before adding wistia xblock to your course you need to have video uploaded to the Wistia.
 
 You can get video url for the Xblock directly from your browser's address bar.
