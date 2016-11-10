@@ -38,6 +38,7 @@ setup(
         ],
         'video_xblock.v1': [
             'youtube-player = video_xblock:YoutubePlayer',
+            'dummy-player = video_xblock:DummyPlayer',
         ]
     },
     package_data=package_data("video_xblock", ["static", "public"]),

@@ -49,7 +49,7 @@ class BaseVideoPlayer(Plugin):
         return []
 
     @abc.abstractmethod
-    def render_player(self, context={}):
+    def get_frag(self, context={}):
         return Fragment('<video />')
 
     def resource_string(self, path):
@@ -61,9 +61,9 @@ class BaseVideoPlayer(Plugin):
 class DummyPlayer(BaseVideoPlayer):
     @property
     def url_regexes(self):
-        return [re.compile(r'.*')]
+        return [re.compile(r'')]
 
-    def render_player(self, context={}):
+    def get_frag(self, **context):
         return Fragment()
 
 
@@ -74,7 +74,7 @@ class YoutubePlayer(BaseVideoPlayer):
         # http://regexr.com/3a2p0
         return [re.compile(r'(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})')]
 
-    def render_player(self, context={}):
+    def get_frag(self, **context):
         html = Template(self.resource_string("static/html/youtube.html"))
         frag = Fragment(
             html_parser.unescape(
@@ -145,10 +145,13 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         when viewing courses.
         """
         player = self.get_player()
-        return player.render_player({'url': self.href, 'autoplay': False})
+        return player.get_frag(url=self.href, autoplay=False)
 
     def clean_studio_edits(self, data):
+        data['player_name'] = 'dummy-player'  # XXX: use field's default
         for player_name, player_class in BaseVideoPlayer.load_classes():
+            if player_name == 'dummy-player':
+                continue
             player = player_class()
             if any(regex.search(data['href']) for regex in player.url_regexes):
                 data['player_name'] = player_name
