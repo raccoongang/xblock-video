@@ -64,15 +64,20 @@ class DummyPlayer(BaseVideoPlayer):
         return [re.compile(r'')]
 
     def get_frag(self, **context):
-        return Fragment()
+        return Fragment(u'[Here be Video]')
+
+    def media_id(self, href):
+        return ''
 
 
 class YoutubePlayer(BaseVideoPlayer):
-
     @property
     def url_regexes(self):
         # http://regexr.com/3a2p0
         return [re.compile(r'(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\?(?:\S*?&?v\=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})')]
+
+    def media_id(self, href):
+        return self.url_regexes[0].search(href).group(1)
 
     def get_frag(self, **context):
         html = Template(self.resource_string("static/html/youtube.html"))
@@ -95,6 +100,24 @@ class YoutubePlayer(BaseVideoPlayer):
         return frag
 
 
+class BrightcovePlayer(BaseVideoPlayer):
+    @property
+    def url_regexes(self):
+        return [re.compile(r'https:\/\/studio.brightcove.com\/products\/videocloud\/media\/videos\/(\d+)')]
+
+    def media_id(self, href):
+        return self.url_regexes[0].match(href).group(1)
+
+    def get_frag(self, **context):
+        html = Template(self.resource_string("static/html/brightcove.html"))
+        frag = Fragment(
+            html_parser.unescape(
+                html.render(Context(context))
+            )
+        )
+        return frag
+
+
 class VideoXBlock(StudioEditableXBlockMixin, XBlock):
 
     icon_class = "video"
@@ -103,7 +126,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         default='Video',
         display_name=_('Component Display Name'),
         help=_('The name students see. This name appears in the course ribbon and as a header for the video.'),
-        scope=Scope.settings,
+        scope=Scope.content,
     )
 
     href = String(
@@ -113,9 +136,18 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         scope=Scope.content
     )
 
-    player_name = String(default='dummy-player')
+    account_id = String(
+        default='',
+        display_name=_('Account Id'),
+        help=_('Your Brightcove account id'),
+        scope=Scope.content,
+    )
 
-    editable_fields = ('display_name', 'href')
+    player_name = String(default='dummy-player',
+        scope=Scope.content
+    )
+
+    editable_fields = ('display_name', 'href', 'account_id')
 
     @property
     def media_id(self):
@@ -145,7 +177,10 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         when viewing courses.
         """
         player = self.get_player()
-        return player.get_frag(url=self.href, autoplay=False)
+        return player.get_frag(
+            url=self.href, autoplay=False, account_id=self.account_id,
+            video_id=player.media_id(self.href)
+        )
 
     def clean_studio_edits(self, data):
         data['player_name'] = 'dummy-player'  # XXX: use field's default

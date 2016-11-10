@@ -38,6 +38,7 @@ setup(
         ],
         'video_xblock.v1': [
             'youtube-player = video_xblock:YoutubePlayer',
+            'brightcove-player = video_xblock:BrightcovePlayer',
             'dummy-player = video_xblock:DummyPlayer',
         ]
     },
