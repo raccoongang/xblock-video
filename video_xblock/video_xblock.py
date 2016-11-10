@@ -11,6 +11,7 @@ import abc
 import itertools
 import logging
 
+from webob import Response
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, String
 from xblock.fragment import Fragment
@@ -32,12 +33,6 @@ log = logging.getLogger(__name__)
 # https://wistia.com/doc/construct-an-embed-code#the_regex
 VIDEO_URL_RE = re.compile(r'https?:\/\/(.+)?(wistia.com|wi.st)\/(medias|embed)\/.*')
 
-YOUTUBE_VIDEO_URL_RE = re.compile(r'https?:\/\/(.+)?(wistia.com|wi.st)\/(medias|embed)\/.*')
-
-
-class PlayerMissingError(Exception):
-    pass
-
 
 class BaseVideoPlayer(Plugin):
     __metaclass__ = abc.ABCMeta
@@ -52,7 +47,7 @@ class BaseVideoPlayer(Plugin):
         return [] or re.RegexObject or ''
 
     @abc.abstractmethod
-    def get_frag(self, context={}):
+    def get_frag(self, **context):
         return Fragment('<video />')
 
     @abc.abstractmethod
@@ -63,6 +58,12 @@ class BaseVideoPlayer(Plugin):
         """
 
         return ''
+
+    def get_player_html(self, **context):
+        frag = self.get_frag(**context)
+        return Response(
+            frag.head_html()+frag.body_html()+frag.foot_html(),
+            content_type='text/html')
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
@@ -199,11 +200,21 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         The primary view of the VideoXBlock, shown to students
         when viewing courses.
         """
-        player = self.get_player()
-        return player.get_frag(
-            url=self.href, autoplay=False, account_id=self.account_id,
-            video_id=player.media_id(self.href)
+        player_url = self.runtime.handler_url(self, 'render_player')
+        html = Template(self.resource_string('static/html/student_view.html'))
+        frag = Fragment(
+            html_parser.unescape(
+                html.render(Context({'player_url': player_url}))
+            )
         )
+        return frag
+
+    @XBlock.handler
+    def render_player(self, request, suffix=''):
+        player = self.get_player()
+        return player.get_player_html(
+            url=self.href, autoplay=False, account_id=self.account_id,
+            video_id=player.media_id(self.href))
 
     def clean_studio_edits(self, data):
         data['player_name'] = 'dummy-player'  # XXX: use field's default
