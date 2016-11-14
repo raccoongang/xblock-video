@@ -179,7 +179,7 @@ class WistiaPlayer(BaseVideoPlayer):
             'static/bower_components/video.js/dist/video.min.js'
         ))
         frag.add_javascript(self.resource_string(
-            'static/videojs-wistia/src/wistia.js'
+            'static/bower_components/videojs-wistia/src/wistia.js'
         ))
 
         return frag

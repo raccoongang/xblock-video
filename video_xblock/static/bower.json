@@ -3,7 +3,8 @@
   "version": "0.2-dev",
   "dependencies": {
     "video-js": "5.13.1",
-    "videojs-youtube": "2.1.1"
+    "videojs-youtube": "2.1.1",
+    "videojs-wistia": "1aa8ea2fa"
   },
   "private": true
 }
