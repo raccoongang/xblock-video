@@ -18,7 +18,7 @@ class YoutubePlayer(BaseVideoPlayer):
         return self.url_re.search(href).group('media_id')
 
     def get_frag(self, **context):
-        html = Template(self.resource_string("static/html/youtube.html"))
+        html = Template(self.resource_string("../static/html/youtube.html"))
         frag = Fragment(
             html_parser.unescape(
                 html.render(Context(context))
