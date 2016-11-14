@@ -1,30 +1,3 @@
-{% comment "RequireJS compatible player" %}
-<video id="newVideoXblockBrightcoveVideo"
-    data-video-id="{{ video_id }}"
-    data-account="{{ account_id }}"
-    data-player="default"
-    data-embed="default"
-    data-application-id
-    class="video-js"
-    controls></video>
-
-<script src="http://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.15/require.js"></script>
-<script>
-  require.config({
-    'paths': {
-      'bc': '//players.brightcove.net/{{ account_id }}/default_default/index.min'
-    },
-    timeout: 30
-  });
-  require(['bc'], function() {
-    var myPlayer = videojs.getPlayers().newVideoXblockBrightcoveVideo;
-    // myPlayer.on('loadstart', function(){
-    //   myPlayer.play();
-    // })
-  });
-</script>
-{% endcomment %}
-
 <div style="display: block; position: relative; max-width: 100%;"><div style="padding-top: 56.25%;">
     <video data-video-id="{{ video_id }}"
         data-account="{{ account_id }}"
@@ -34,5 +7,4 @@
         class="video-js"
         controls
         style="width: 100%; height: 100%; position: absolute; top: 0px; bottom: 0px; right: 0px; left: 0px;"></video>
-    <script src="//players.brightcove.net/{{ account_id }}/default_default/index.min.js"></script>
 </div></div>

@@ -1,4 +1,4 @@
-"""Setup for wistiavideo XBlock."""
+"""Setup for video XBlock."""
 
 import os
 from setuptools import setup
