@@ -44,7 +44,7 @@ class BaseVideoPlayer(Plugin):
         """
         Regex (list) to match video url
         """
-        return [] or re.RegexObject or ''
+        return [] or type(re.compile('') or ''
 
     @abc.abstractmethod
     def get_frag(self, **context):
@@ -73,7 +73,7 @@ class BaseVideoPlayer(Plugin):
     def match(self, href):
         if isinstance(self.url_re, list):
             return any(regex.search(href) for regex in self.url_re)
-        elif isinstance(self.url_re, re.RegexObject):
+        elif isinstance(self.url_re, type(re.compile('')):
             return self.url_re.search(href)
         elif isinstance(self.url_re, basestring):
             return re.search(self.url_re, href, re.I)
@@ -112,6 +112,9 @@ class YoutubePlayer(BaseVideoPlayer):
         frag.add_javascript(self.resource_string(
             'static/bower_components/video.js/dist/video.min.js'
         ))
+        # frag.add_javascript(self.resource_string(
+        #     'static/video-speed.js'
+        # ))
         frag.add_javascript(self.resource_string(
             'static/bower_components/videojs-youtube/dist/Youtube.min.js'
         ))
@@ -132,6 +135,32 @@ class BrightcovePlayer(BaseVideoPlayer):
                 html.render(Context(context))
             )
         )
+        return frag
+
+
+class WistiaPlayer(BaseVideoPlayer):
+    url_re = re.compile(r'https?:\/\/(.+)?(wistia.com|wi.st)\/(medias|embed)\/(?P<media_id>.*)')
+
+    def media_id(self, href):
+        return self.url_re.search(href).group('media_id')
+
+    def get_frag(self, **context):
+        html = Template(self.resource_string("static/html/wistiavideo.html"))
+        frag = Fragment(
+            html_parser.unescape(
+                html.render(Context(context))
+            )
+        )
+        frag.add_css(self.resource_string(
+            'static/bower_components/video.js/dist/video-js.min.css'
+        ))
+        frag.add_javascript(self.resource_string(
+            'static/bower_components/video.js/dist/video.min.js'
+        ))
+        frag.add_javascript(self.resource_string(
+            'static/videojs-wistia/src/wistia.js'
+        ))
+
         return frag
 
 
