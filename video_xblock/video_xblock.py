@@ -75,6 +75,7 @@ class BaseVideoPlayer(Plugin):
         data = pkg_resources.resource_string(__name__, path)
         return data.decode("utf8")
 
+
     @classmethod
     def match(cls, href):
         if isinstance(cls.url_re, list):
@@ -124,6 +125,9 @@ class YoutubePlayer(BaseVideoPlayer):
         frag.add_javascript(self.resource_string(
             'static/bower_components/video.js/dist/video.min.js'
         ))
+        # frag.add_javascript(self.resource_string(
+        #     'static/video-speed.js'
+        # ))
         frag.add_javascript(self.resource_string(
             'static/bower_components/videojs-youtube/dist/Youtube.min.js'
         ))
@@ -148,6 +152,36 @@ class BrightcovePlayer(BaseVideoPlayer):
                 html.render(Context(context))
             )
         )
+        return frag
+
+
+class WistiaPlayer(BaseVideoPlayer):
+    """
+    WistiaPlayer is used for videos hosted on the Wistia Video Cloud
+    """
+
+    url_re = re.compile(r'https?:\/\/(.+)?(wistia.com|wi.st)\/(medias|embed)\/(?P<media_id>.*)')
+
+    def media_id(self, href):
+        return self.url_re.search(href).group('media_id')
+
+    def get_frag(self, **context):
+        html = Template(self.resource_string("static/html/wistiavideo.html"))
+        frag = Fragment(
+            html_parser.unescape(
+                html.render(Context(context))
+            )
+        )
+        frag.add_css(self.resource_string(
+            'static/bower_components/video.js/dist/video-js.min.css'
+        ))
+        frag.add_javascript(self.resource_string(
+            'static/bower_components/video.js/dist/video.min.js'
+        ))
+        frag.add_javascript(self.resource_string(
+            'static/videojs-wistia/src/wistia.js'
+        ))
+
         return frag
 
 
