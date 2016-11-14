@@ -156,7 +156,7 @@ class BrightcovePlayer(BaseVideoPlayer):
 
 
 class WistiaPlayer(BaseVideoPlayer):
-        """
+    """
     WistiaPlayer is used for videos hosted on the Wistia Video Cloud
     """
 
