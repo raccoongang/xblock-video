@@ -125,9 +125,9 @@ class YoutubePlayer(BaseVideoPlayer):
         frag.add_javascript(self.resource_string(
             'static/bower_components/video.js/dist/video.min.js'
         ))
-        # frag.add_javascript(self.resource_string(
-        #     'static/video-speed.js'
-        # ))
+        frag.add_javascript(self.resource_string(
+            'static/video-speed.js'
+        ))
         frag.add_javascript(self.resource_string(
             'static/bower_components/videojs-youtube/dist/Youtube.min.js'
         ))
@@ -174,6 +174,9 @@ class WistiaPlayer(BaseVideoPlayer):
         )
         frag.add_css(self.resource_string(
             'static/bower_components/video.js/dist/video-js.min.css'
+        ))
+        frag.add_javascript(self.resource_string(
+            'static/video-speed.js'
         ))
         frag.add_javascript(self.resource_string(
             'static/bower_components/video.js/dist/video.min.js'
