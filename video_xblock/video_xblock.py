@@ -4,24 +4,19 @@ supported platforms into your course.
 All you need to provide is video url, this XBlock does the rest for you.
 """
 
-import abc
 import logging
 import pkg_resources
-import re
 
-from HTMLParser import HTMLParser
-from webob import Response
 from xblock.core import XBlock
 from xblock.fields import Scope, String
 from xblock.fragment import Fragment
-from xblock.plugin import Plugin
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 from django.template import Template, Context
 
+from backends.base import BaseVideoPlayer, html_parser
 
-html_parser = HTMLParser()
 
 _ = lambda text: text
 log = logging.getLogger(__name__)
