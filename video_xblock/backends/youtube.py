@@ -32,6 +32,9 @@ class YoutubePlayer(BaseVideoPlayer):
             '../static/bower_components/video.js/dist/video.min.js'
         ))
         frag.add_javascript(self.resource_string(
+            'static/video-speed.js'
+        ))
+        frag.add_javascript(self.resource_string(
             '../static/bower_components/videojs-youtube/dist/Youtube.min.js'
         ))
 
