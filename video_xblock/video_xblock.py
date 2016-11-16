@@ -122,6 +122,9 @@ class YoutubePlayer(BaseVideoPlayer):
         frag.add_css(self.resource_string(
             'static/bower_components/video.js/dist/video-js.min.css'
         ))
+        frag.add_css(self.resource_string(
+            'static/css/videojs.css'
+        ))
         frag.add_javascript(self.resource_string(
             'static/bower_components/video.js/dist/video.min.js'
         ))
