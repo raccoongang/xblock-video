@@ -37,10 +37,10 @@ setup(
             'video_xblock = video_xblock:VideoXBlock',
         ],
         'video_xblock.v1': [
-            'youtube-player = video_xblock:YoutubePlayer',
-            'wistia-player = video_xblock:WistiaPlayer',
-            'brightcove-player = video_xblock:BrightcovePlayer',
-            'dummy-player = video_xblock:DummyPlayer',
+            'youtube-player = video_xblock.backends.youtube:YoutubePlayer',
+            'wistia-player = video_xblock.backends.wistia:WistiaPlayer',
+            'brightcove-player = video_xblock.backends.brightcove:BrightcovePlayer',
+            'dummy-player = video_xblock.backends.dummy:DummyPlayer',
         ]
     },
     package_data=package_data("video_xblock", ["static", "public"]),

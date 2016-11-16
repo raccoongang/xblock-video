@@ -4,188 +4,22 @@ supported platforms into your course.
 All you need to provide is video url, this XBlock does the rest for you.
 """
 
-import abc
 import logging
 import pkg_resources
-import re
 
-from HTMLParser import HTMLParser
-from webob import Response
 from xblock.core import XBlock
 from xblock.fields import Scope, String
 from xblock.fragment import Fragment
-from xblock.plugin import Plugin
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 from django.template import Template, Context
 
+from backends.base import BaseVideoPlayer, html_parser
 
-html_parser = HTMLParser()
 
 _ = lambda text: text
 log = logging.getLogger(__name__)
-
-# From official Wistia documentation. May change in the future
-# https://wistia.com/doc/construct-an-embed-code#the_regex
-VIDEO_URL_RE = re.compile(r'https?:\/\/(.+)?(wistia.com|wi.st)\/(medias|embed)\/.*')
-
-
-class BaseVideoPlayer(Plugin):
-    __metaclass__ = abc.ABCMeta
-
-    entry_point = 'video_xblock.v1'
-
-    @abc.abstractproperty
-    def url_re(self):
-        """
-        Regex (list) to match video url
-        """
-        return [] or re.compile('') or ''
-
-    @abc.abstractmethod
-    def get_frag(self, **context):
-        """
-        Returns a Fragment required to render video player on the client side.
-        """
-        return Fragment('<video />')
-
-    @abc.abstractmethod
-    def media_id(self, href):
-        """
-        Extracts Platform's media id from the video url.
-        E.g. https://example.wistia.com/medias/12345abcde -> 12345abcde
-        """
-
-        return ''
-
-    def get_player_html(self, **context):
-        """
-        Renders self.get_frag as a html string and returns it as a Response.
-        This method is used by VideoXBlock.render_player()
-        """
-        frag = self.get_frag(**context)
-        return Response(
-            frag.head_html() + frag.body_html() + frag.foot_html(),
-            content_type='text/html'
-        )
-
-    def resource_string(self, path):
-        """Handy helper for getting resources from our kit."""
-        data = pkg_resources.resource_string(__name__, path)
-        return data.decode("utf8")
-
-
-    @classmethod
-    def match(cls, href):
-        if isinstance(cls.url_re, list):
-            return any(regex.search(href) for regex in cls.url_re)
-        elif isinstance(cls.url_re, type(re.compile(''))):
-            return cls.url_re.search(href)
-        elif isinstance(cls.url_re, basestring):
-            return re.search(cls.url_re, href, re.I)
-
-
-class DummyPlayer(BaseVideoPlayer):
-    """
-    DummyPlayer is used as a placeholder for those cases when appropriate
-    player cannot be displayed.
-    """
-    url_re = re.compile(r'')
-
-    def get_frag(self, **context):
-        return Fragment(u'[Here be Video]')
-
-    def media_id(self, href):
-        return '<media_id>'
-
-
-class YoutubePlayer(BaseVideoPlayer):
-    """
-    YoutubePlayer is used for videos hosted on the Youtube.com
-    """
-
-    # http://regexr.com/3a2p0
-    url_re = re.compile(r'(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\?(?:\S*?&?v\=))|youtu\.be\/)(?P<media_id>[a-zA-Z0-9_-]{6,11})')
-
-    def media_id(self, href):
-        return self.url_re.search(href).group('media_id')
-
-    def get_frag(self, **context):
-        html = Template(self.resource_string("static/html/youtube.html"))
-        frag = Fragment(
-            html_parser.unescape(
-                html.render(Context(context))
-            )
-        )
-
-        frag.add_css(self.resource_string(
-            'static/bower_components/video.js/dist/video-js.min.css'
-        ))
-        frag.add_css(self.resource_string(
-            'static/css/videojs.css'
-        ))
-        frag.add_javascript(self.resource_string(
-            'static/bower_components/video.js/dist/video.min.js'
-        ))
-        # frag.add_javascript(self.resource_string(
-        #     'static/video-speed.js'
-        # ))
-        frag.add_javascript(self.resource_string(
-            'static/bower_components/videojs-youtube/dist/Youtube.min.js'
-        ))
-
-        return frag
-
-
-class BrightcovePlayer(BaseVideoPlayer):
-    """
-    BrightcovePlayer is used for videos hosted on the Brightcove Video Cloud
-    """
-
-    url_re = re.compile(r'https:\/\/studio.brightcove.com\/products\/videocloud\/media\/videos\/(?P<media_id>\d+)')
-
-    def media_id(self, href):
-        return self.url_re.match(href).group('media_id')
-
-    def get_frag(self, **context):
-        html = Template(self.resource_string("static/html/brightcove.html"))
-        frag = Fragment(
-            html_parser.unescape(
-                html.render(Context(context))
-            )
-        )
-        return frag
-
-
-class WistiaPlayer(BaseVideoPlayer):
-    """
-    WistiaPlayer is used for videos hosted on the Wistia Video Cloud
-    """
-
-    url_re = re.compile(r'https?:\/\/(.+)?(wistia.com|wi.st)\/(medias|embed)\/(?P<media_id>.*)')
-
-    def media_id(self, href):
-        return self.url_re.search(href).group('media_id')
-
-    def get_frag(self, **context):
-        html = Template(self.resource_string("static/html/wistiavideo.html"))
-        frag = Fragment(
-            html_parser.unescape(
-                html.render(Context(context))
-            )
-        )
-        frag.add_css(self.resource_string(
-            'static/bower_components/video.js/dist/video-js.min.css'
-        ))
-        frag.add_javascript(self.resource_string(
-            'static/bower_components/video.js/dist/video.min.js'
-        ))
-        frag.add_javascript(self.resource_string(
-            'static/videojs-wistia/src/wistia.js'
-        ))
-
-        return frag
 
 
 class VideoXBlock(StudioEditableXBlockMixin, XBlock):
