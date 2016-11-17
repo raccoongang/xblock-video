@@ -49,7 +49,7 @@ class BaseVideoPlayer(Plugin):
         """
         frag = self.get_frag(**context)
         return Response(
-            frag.head_html() + frag.foot_html() + frag.body_html(),
+            frag.head_html() + frag.body_html() + frag.foot_html(),
             content_type='text/html'
         )
 
