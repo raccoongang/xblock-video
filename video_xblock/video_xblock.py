@@ -8,7 +8,7 @@ import logging
 import pkg_resources
 
 from xblock.core import XBlock
-from xblock.fields import Scope, String
+from xblock.fields import Scope, Boolean, Integer, Float, String
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
@@ -56,7 +56,45 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         scope=Scope.content
     )
 
+    # Playback state fields
+    current_time = Integer(  # Seconds played back from the start
+        default=0,
+        scope=Scope.user_state
+    )
+
+    playback_rate = Float(
+        default=1,
+        scope=Scope.preferences
+    )
+
+    volume = Float(
+        default=1,
+        scope=Scope.preferences
+    )
+
+    muted = Boolean(
+        default=False,
+        scope=Scope.preferences
+    )
+
     editable_fields = ('display_name', 'href', 'account_id')
+    player_state_fields = ('current_time', 'muted', 'playback_rate', 'volume')
+
+    @property
+    def player_state(self):
+        return {
+            'current_time': self.current_time,
+            'muted': self.muted,
+            'playback_rate': self.playback_rate,
+            'volume': self.volume
+        }
+
+    @player_state.setter
+    def player_state(self, state):
+        self.current_time = state.get('current_time', self.current_time)
+        self.muted = state.get('muted', self.muted)
+        self.playback_rate = state.get('playback_rate', self.playback_rate)
+        self.volume = state.get('volume', self.volume)
 
     def validate_field_data(self, validation, data):
         """
@@ -92,6 +130,8 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
                 html.render(Context({'player_url': player_url}))
             )
         )
+        frag.add_javascript(self.resource_string("static/js/video_xblock.js"))
+        frag.initialize_js('VideoXBlock')
         return frag
 
     @XBlock.handler
@@ -101,9 +141,25 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         video player.
         """
         player = self.get_player()
+        save_state_url = self.runtime.handler_url(self, 'save_player_state')
         return player.get_player_html(
             url=self.href, autoplay=False, account_id=self.account_id,
-            video_id=player.media_id(self.href))
+            video_id=player.media_id(self.href),
+            video_player_id='video_player_{}'.format(self.location.block_id),
+            save_state_url=save_state_url,
+            player_state=self.player_state
+        )
+
+    @XBlock.json_handler
+    def save_player_state(self, request, suffix=''):
+        player_state = {
+            'current_time': request['currentTime'],
+            'playback_rate': request['playbackRate'],
+            'volume': request['volume'],
+            'muted': request['muted']
+        }
+        self.player_state = player_state
+        return {'success': True}
 
     def clean_studio_edits(self, data):
         data['player_name'] = 'dummy-player'  # XXX: use field's default
