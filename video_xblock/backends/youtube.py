@@ -40,5 +40,11 @@ class YoutubePlayer(BaseVideoPlayer):
         frag.add_javascript(self.resource_string(
             '../static/bower_components/videojs-youtube/dist/Youtube.min.js'
         ))
+        frag.add_javascript(
+            html_parser.unescape(
+                Template(self.resource_string(
+                        '../static/js/player_state.js'
+                )).render(Context(context)))
+        )
 
         return frag
