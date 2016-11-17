@@ -1,14 +1,7 @@
 {# To avoid interferrence with other video players and JavaScript modules (e.g. RequireJS) we wrap video player's code inside an iframe. #}
-<script>
-  function resizeIframe(obj) {
-    obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
-  }
-</script>
 <iframe
     src="{{player_url}}"
     frameborder="0"
     width="648px"
     height="518px"
-    onload="resizeIframe(this)"
->
 </iframe>
