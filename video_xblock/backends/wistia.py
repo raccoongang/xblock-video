@@ -31,7 +31,7 @@ class WistiaPlayer(BaseVideoPlayer):
         frag.add_css(self.resource_string(
             '../static/css/videojs.css'
         ))
-        frag.add_javascript(self.resource_string(
+        frag.add_css(self.resource_string(
             '../static/wistia.css'
         ))
         frag.add_javascript(self.resource_string(
