@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css" media="all" />
 <video
   id="vid1"
   class="video-js vjs-default-skin"
@@ -5,7 +6,7 @@
   {% if autoplay %}
       autoplay
   {% endif %}
-  width="640" height="360"
-  data-setup='{ "techOrder": ["youtube"], "sources": [{ "type": "video/youtube", "src": "{{ url }}"}], "youtube": { "iv_load_policy": 1 }, "playbackRates": [0.5, 1, 1.5, 2] }'
+  width="640" height="480"
+  data-setup='{ "controlBar": {"volumeMenuButton": {"inline": false, "vertical": true}}, "techOrder": ["youtube"], "sources": [{ "type": "video/youtube", "src": "{{ url }}"}], "youtube": { "iv_load_policy": 1 }, "playbackRates": [0.5, 1, 1.5, 2] }'
 >
 </video>

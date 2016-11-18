@@ -23,4 +23,7 @@ class BrightcovePlayer(BaseVideoPlayer):
                 html.render(Context(context))
             )
         )
+        frag.add_css(self.resource_string(
+            '../static/css/brightcove.css'
+        ))
         return frag
