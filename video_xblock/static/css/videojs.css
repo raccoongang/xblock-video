@@ -198,6 +198,11 @@
     right: 4em;
     border-left: 1px dotted #4f595d;
 }
+.video-js .vjs-playback-rate {
+    position: absolute;
+    right: 6.5em;
+    border-left: 1px dotted #4f595d;
+}
 .video-js .roller {
     height: 5px;
     width: 5px;

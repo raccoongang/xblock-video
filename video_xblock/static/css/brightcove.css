@@ -269,7 +269,12 @@
 
 .video-js .vjs-volume-menu-button {
     position: absolute;
-    right: 4em;
+    right: 9em;
+    border-left: 1px dotted #4f595d;
+}
+.video-js .vjs-playback-rate {
+    position: absolute;
+    right: 3em;
     border-left: 1px dotted #4f595d;
 }
 
