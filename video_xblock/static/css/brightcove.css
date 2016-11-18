@@ -32,8 +32,8 @@
 .video-js .vjs-progress-control {
     position: absolute;
     width: 100%;
-    top: -.5em;
-    height: 5px;
+    top: -5px !important;
+    height: 5px !important;
     background: none !important;
 }
 
@@ -48,6 +48,10 @@
 .video-js .vjs-progress-holder .vjs-play-progress,
 .video-js .vjs-progress-holder .vjs-tooltip-progress-bar {
     height: 5px;
+    -webkit-transition: all .2s;
+    -moz-transition: all .2s;
+    -o-transition: all .2s;
+    transition: all .2s;
 }
 
 .video-js .vjs-progress-control:hover .vjs-progress-holder .vjs-load-progress,
@@ -86,6 +90,38 @@
     background-color: #8E3E63;
     color: #CB598D;
     width: 100%;
+}
+
+.vjs-volume-bar.vjs-slider-horizontal .vjs-volume-level {
+    position: relative;
+    height: 5px;
+}
+
+.vjs-volume-bar.vjs-slider-horizontal {
+    height: 5px !important;
+}
+
+.vjs-menu-button-inline .vjs-menu-content {
+    overflow: visible;
+}
+.vjs-menu-button-inline .vjs-menu {
+    top: 1px !important;
+}
+
+.vjs-volume-bar.vjs-slider-horizontal .vjs-volume-level:after {
+    content: '';
+    transform-origin: bottom left;
+    transition: all 0.2s;
+    transform: translateX(50%);
+    top: -3px;
+    right: 0;
+    height: 10px;
+    width: 10px;
+    border-radius: 4px;
+    background: #cb598d;
+    position: absolute;
+    visibility: visible;
+    display: block;
 }
 
 .video-js .vjs-control:focus, .video-js .vjs-control:focus, .video-js .vjs-control:hover {
@@ -258,4 +294,23 @@
 
 .video-js .vjs-progress-control:hover .vjs-progress-holder {
     font-size: 2em;
+}
+.vjs-play-progress.vjs-slider-bar.vjs-keep-tooltips-inside:after {
+    content: '';
+    transform-origin: bottom left;
+    transition: all 0.2s;
+    transform: translateX(50%);
+    top: 0;
+    right: 0;
+    height: 100%;
+    padding: 0;
+    width: 5px;
+    border-radius: 4px;
+    background: #cb598d;
+    position: absolute;
+    visibility: visible;
+    display: block;
+}
+.vjs-mouse.bc-player-default_default .vjs-progress-control:hover .vjs-play-progress.vjs-slider-bar.vjs-keep-tooltips-inside:after {
+    width: 10px;
 }
