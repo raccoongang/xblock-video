@@ -133,7 +133,8 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         html = Template(self.resource_string('static/html/student_view.html'))
         frag = Fragment(
             html_parser.unescape(
-                html.render(Context({'player_url': player_url}))
+                html.render(Context({'player_url': player_url,
+                                     'display_name': self.display_name}))
             )
         )
         frag.add_javascript(self.resource_string("static/js/video_xblock.js"))

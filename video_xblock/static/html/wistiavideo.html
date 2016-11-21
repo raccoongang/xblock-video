@@ -1,10 +1,11 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css" media="all" />
 <video
   id="{{ video_player_id }}"
   muted="muted"
   src=""
   class="video-js vjs-default-skin"
   controls
-  width="640" height="360"
-  data-setup='{ "techOrder": ["wistia"], "sources": [{ "type": "video/wistia", "src": "{{ url }}?controlsVisibleOnLoad=false" }], "playbackRates": [0.5, 1, 1.5, 2] }'
+  width="640" height="480"
+  data-setup='{ "controlBar": {"volumeMenuButton": {"inline": false, "vertical": true}},  "techOrder": ["wistia"], "sources": [{ "type": "video/wistia", "src": "{{ url }}?controlsVisibleOnLoad=false" }], "playbackRates": [0.5, 1, 1.5, 2] }'
 >
 </video>
