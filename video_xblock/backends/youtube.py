@@ -43,7 +43,7 @@ class YoutubePlayer(BaseVideoPlayer):
         frag.add_javascript(
             html_parser.unescape(
                 Template(self.resource_string(
-                        '../static/js/player_state.js'
+                    '../static/js/player_state.js'
                 )).render(Context(context)))
         )
 

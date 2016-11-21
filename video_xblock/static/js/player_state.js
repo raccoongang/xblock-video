@@ -1,5 +1,10 @@
 var domReady = function(callback) {
-    document.readyState === "interactive" || document.readyState === "complete" ? callback() : document.addEventListener("DOMContentLoaded", callback);
+  // Run a callback when DOM is fully loaded
+  if (document.readyState === "interactive" || document.readyState === "complete") {
+    callback();
+  } else {
+    document.addEventListener("DOMContentLoaded", callback);
+  }
 };
 
 var player_state = {
@@ -10,16 +15,18 @@ var player_state = {
 };
 
 var setInitialState = function(player, state) {
-	if (state.currentTime > 0) {
-		player.currentTime(state.currentTime);
-	};
-	player
-	  .volume(state.volume)
-	  .muted(state.muted)
-	  .playbackRate(state.playbackRate);
+  // Restore default or previously saved player state
+  if (state.currentTime > 0) {
+    player.currentTime(state.currentTime);
+  };
+  player
+    .volume(state.volume)
+    .muted(state.muted)
+    .playbackRate(state.playbackRate);
 };
 
 var saveState = function(){
+  // Save player staty by calling VideoXBlock.save_state() handler
   var player = this;
   var new_state = {
     'volume': player.volume(),
@@ -29,7 +36,7 @@ var saveState = function(){
   };
 
   if (JSON.stringify(new_state) !== JSON.stringify(player_state)) {
-	  console.log('Saving state');
+    console.log('Starting saving player state');
     player_state = new_state;
     parent.postMessage({'action': 'save_state', 'state': new_state}, document.origin)
   };

@@ -62,17 +62,17 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         scope=Scope.user_state
     )
 
-    playback_rate = Float(
+    playback_rate = Float(  # Video playback speed: 0.5, 1, 1.5, 2
         default=1,
         scope=Scope.preferences
     )
 
-    volume = Float(
+    volume = Float(  # Video volume: from 0 to 1
         default=1,
         scope=Scope.preferences
     )
 
-    muted = Boolean(
+    muted = Boolean(  # Video muted or not
         default=False,
         scope=Scope.preferences
     )
@@ -82,6 +82,9 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
 
     @property
     def player_state(self):
+        """
+        Returns video player state as a dictionary
+        """
         return {
             'current_time': self.current_time,
             'muted': self.muted,
@@ -91,6 +94,9 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
 
     @player_state.setter
     def player_state(self, state):
+        """
+        Seves video player state in xblock's fields
+        """
         self.current_time = state.get('current_time', self.current_time)
         self.muted = state.get('muted', self.muted)
         self.playback_rate = state.get('playback_rate', self.playback_rate)
@@ -152,6 +158,10 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
 
     @XBlock.json_handler
     def save_player_state(self, request, suffix=''):
+        """
+        XBlock handler to save playback player state.
+        Called by student_view's JavaScript
+        """
         player_state = {
             'current_time': request['currentTime'],
             'playback_rate': request['playbackRate'],
@@ -170,5 +180,8 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
                 data['player_name'] = player_name
 
     def get_player(self):
+        """
+        Helper method to load video player by entry-point label
+        """
         player = BaseVideoPlayer.load_class(self.player_name)
         return player()

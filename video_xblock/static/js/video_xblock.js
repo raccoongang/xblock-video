@@ -8,7 +8,12 @@ function VideoXBlock(runtime, element) {
       type: "POST",
       url: handlerUrl,
       data: JSON.stringify(state),
-      success: function(){console.log('State saved');}
+    })
+    .done(function() {
+      console.log('Player state saved successfully');
+    })
+    .fail(function() {
+      console.log("Failed to save player state");
     });
   };
 
@@ -19,9 +24,9 @@ function VideoXBlock(runtime, element) {
     {
       var origin = event.origin || event.originalEvent.origin; // For Chrome, the origin property is in the event.originalEvent object.
       if (origin !== document.origin)
+        // Discard a message received from another domain
         return;
-      console.log('Message received', event.data);
-      if (event.data.action == 'save_state') {
+      if (event.data && event.data.action === 'save_state') {
         saveState(event.data.state);
       }
     }

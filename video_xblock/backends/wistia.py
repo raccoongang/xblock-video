@@ -28,7 +28,7 @@ class WistiaPlayer(BaseVideoPlayer):
         frag.add_css(self.resource_string(
             '../static/bower_components/video.js/dist/video-js.min.css'
         ))
-        frag.add_javascript(self.resource_string(
+        frag.add_css(self.resource_string(
             '../static/wistia.css'
         ))
         frag.add_javascript(self.resource_string(
@@ -40,5 +40,11 @@ class WistiaPlayer(BaseVideoPlayer):
         frag.add_javascript(self.resource_string(
             '../static/bower_components/videojs-wistia-extra/src/wistia.js'
         ))
+        frag.add_javascript(
+            html_parser.unescape(
+                Template(self.resource_string(
+                    '../static/js/player_state.js'
+                )).render(Context(context)))
+        )
 
         return frag
