@@ -10,15 +10,16 @@
 </style>
 <div>
     <video data-video-id="{{ video_id }}"
-           data-account="{{ account_id }}"
-           data-player="default"
-           data-embed="default"
-           data-application-id
-           data-setup='{"playbackRates": [0.5, 1, 1.5, 2] }'
-           width="640"
-           height="480"
-           class="video-js"
-           controls
+        id="{{ video_player_id }}"
+        data-account="{{ account_id }}"
+        data-player="default"
+        data-embed="default"
+        data-application-id
+        data-setup='{"playbackRates": [0.5, 1, 1.5, 2] }'
+        width="640"
+        height="480"
+        class="video-js"
+        controls
     ></video>
     <script src="//players.brightcove.net/{{ account_id }}/default_default/index.min.js"></script>
 </div>
