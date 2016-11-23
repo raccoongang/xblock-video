@@ -316,6 +316,7 @@ body {
 }
 .vjs-playback-rate .vjs-playback-rate-value {
     top: 4px !important;
+    font-weight: bold;
 }
 .bc-player-default_default .vjs-menu-button-popup .vjs-menu .vjs-menu-item {
     font-weight: bold;
