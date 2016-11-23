@@ -1,3 +1,7 @@
+body {
+    margin: 0;
+}
+
 .w-control-bar {
   display: none !important;
 }
