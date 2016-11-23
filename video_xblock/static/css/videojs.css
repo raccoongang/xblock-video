@@ -2,36 +2,6 @@ body {
     margin: 0;
 }
 
-.video-js .vjs-big-play-button {
-    font-size: 22px;
-    line-height: 22px;
-    width: 68px;
-    height: 48px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    cursor: pointer;
-    opacity: 1;
-    background-color: #2B333F;
-    background-color: rgba(43, 51, 63, .7);
-    -webkit-border-radius: 12px;
-    -moz-border-radius: 12px;
-    border-radius: 12px;
-    font-family: FontAwesome;
-    -webkit-font-smoothing: antialiased;
-    margin: -29px 0 0 -34px;
-    top: 50%;
-    left: 50%;
-    border: none;
-}
-
-.video-js .vjs-big-play-button:after {
-    width: auto;
-    height: auto;
-    position: static;
-}
-
 .video-js .vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
     visibility: visible;
     opacity: 1;
@@ -126,6 +96,11 @@ body {
     width: 41px;
     z-index: 1;
     bottom: 27px;
+    font-weight: bold;
+}
+
+.vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+    bottom: 25px;
 }
 
 .video-js .vjs-duration,
@@ -140,9 +115,27 @@ body {
 .video-js .vjs-big-play-button {
     font-family: FontAwesome;
     -webkit-font-smoothing: antialiased;
-    font-size: 3em;
-    line-height: 1.35em;
+    font-size: 22px;
+    line-height: 22px;
+    border: none;
     padding: 0;
+    top: 50%;
+    left: 50%;
+    margin: -29px 0 0 -34px;
+    -webkit-font-smoothing: antialiased;
+    -webkit-border-radius: 12px;
+    -moz-border-radius: 12px;
+    border-radius: 12px;
+    width: 68px;
+    height: 48px;
+}
+.video-js .vjs-big-play-button:before {
+    width: auto;
+    height: auto;
+    top: 50%;
+    left: 50%;
+    margin: -11px 0 0 -8px;
+    position: absolute;
 }
 
 .video-js .vjs-mouse-display, .video-js .vjs-play-progress, .video-js .vjs-volume-level, .vjs-icon-circle,
