@@ -46,10 +46,15 @@ class BaseVideoPlayer(Plugin):
         """
         Renders self.get_frag as a html string and returns it as a Response.
         This method is used by VideoXBlock.render_player()
+
+        Rendering sequence is set to JS must be in the head tag and executed
+        before initializing video components.
         """
         frag = self.get_frag(**context)
         return Response(
-            frag.head_html() + frag.body_html() + frag.foot_html(),
+            u'<html><head>{}{}</head><body>{}</body></html>'.format(
+                frag.head_html(), frag.foot_html(), frag.body_html()
+            ),
             content_type='text/html'
         )
 
