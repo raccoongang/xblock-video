@@ -7,6 +7,8 @@ from webob import Response
 from xblock.fragment import Fragment
 from xblock.plugin import Plugin
 
+from django.template import Template, Context
+
 
 html_parser = HTMLParser()
 
@@ -51,9 +53,16 @@ class BaseVideoPlayer(Plugin):
         before initializing video components.
         """
         frag = self.get_frag(**context)
+        html = Template(self.resource_string("../static/html/base.html"))
         return Response(
-            u'<html><head>{}{}</head><body>{}</body></html>'.format(
-                frag.head_html(), frag.foot_html(), frag.body_html()
+            html_parser.unescape(
+                html.render(
+                    Context({
+                        'head': frag.head_html(),
+                        'foot': frag.foot_html(),
+                        'body': frag.body_html()
+                    })
+                )
             ),
             content_type='text/html'
         )
