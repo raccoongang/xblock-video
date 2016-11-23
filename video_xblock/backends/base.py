@@ -7,6 +7,8 @@ from webob import Response
 from xblock.fragment import Fragment
 from xblock.plugin import Plugin
 
+from django.template import Template, Context
+
 
 html_parser = HTMLParser()
 
@@ -46,10 +48,22 @@ class BaseVideoPlayer(Plugin):
         """
         Renders self.get_frag as a html string and returns it as a Response.
         This method is used by VideoXBlock.render_player()
+
+        Rendering sequence is set to JS must be in the head tag and executed
+        before initializing video components.
         """
         frag = self.get_frag(**context)
+        html = Template(self.resource_string("../static/html/base.html"))
         return Response(
-            frag.head_html() + frag.body_html() + frag.foot_html(),
+            html_parser.unescape(
+                html.render(
+                    Context({
+                        'head': frag.head_html(),
+                        'foot': frag.foot_html(),
+                        'body': frag.body_html()
+                    })
+                )
+            ),
             content_type='text/html'
         )
 
