@@ -271,6 +271,7 @@ body {
 }
 .vjs-playback-rate .vjs-playback-rate-value {
     top: 3px;
+    font-weight: bold;
 }
 .vjs-volume-bar.vjs-slider-vertical {
     height: 100px;
