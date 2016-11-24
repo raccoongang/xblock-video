@@ -1,7 +1,7 @@
 {# To avoid interferrence with other video players and JavaScript modules (e.g. RequireJS) we wrap video player's code inside an iframe. #}
 <h3 class="hd hd-2">{{display_name}}</h3>
 <iframe
-    src="{{player_url}}"
+    src="{{player_url}}#{{usage_id}}"
     frameborder="0"
     scrolling="no"
     allowfullscreen

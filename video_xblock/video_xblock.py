@@ -123,6 +123,17 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         data = pkg_resources.resource_string(__name__, path)
         return data.decode("utf8")
 
+    def render_resource(self, path, **context):
+        """
+        Renders static resource using provided context
+
+        Returns: django.utils.safestring.SafeText
+        """
+        html = Template(self.resource_string(path))
+        return html_parser.unescape(
+            html.render(Context(context))
+        )
+
     def student_view(self, context=None):
         """
         The primary view of the VideoXBlock, shown to students
@@ -130,11 +141,12 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         """
 
         player_url = self.runtime.handler_url(self, 'render_player')
-        html = Template(self.resource_string('static/html/student_view.html'))
         frag = Fragment(
-            html_parser.unescape(
-                html.render(Context({'player_url': player_url,
-                                     'display_name': self.display_name}))
+            self.render_resource(
+                'static/html/student_view.html',
+                player_url=player_url,
+                display_name=self.display_name,
+                usage_id=self.location.to_deprecated_string()
             )
         )
         frag.add_javascript(self.resource_string("static/js/video_xblock.js"))

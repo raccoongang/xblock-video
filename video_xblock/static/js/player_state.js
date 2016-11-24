@@ -14,6 +14,8 @@ var player_state = {
   'muted': {{ player_state.muted | yesno:"true,false" }},
 };
 
+var xblockUsageId = window.location.hash.slice(1);
+
 var setInitialState = function(player, state) {
   // Restore default or previously saved player state
   if (state.currentTime > 0) {
@@ -38,7 +40,7 @@ var saveState = function(){
   if (JSON.stringify(new_state) !== JSON.stringify(player_state)) {
     console.log('Starting saving player state');
     player_state = new_state;
-    parent.postMessage({'action': 'save_state', 'state': new_state}, document.origin)
+    parent.postMessage({'action': 'save_state', 'state': new_state, 'xblockUsageId': xblockUsageId}, document.origin)
   };
 };
 
