@@ -185,6 +185,9 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         return {'success': True}
 
     def clean_studio_edits(self, data):
+        """
+        Helper method for change player_name into data.
+        """
         data['player_name'] = 'dummy-player'  # XXX: use field's default
         for player_name, player_class in BaseVideoPlayer.load_classes():
             if player_name == 'dummy-player':

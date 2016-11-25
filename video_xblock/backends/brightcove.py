@@ -1,9 +1,8 @@
 import re
 
 from xblock.fragment import Fragment
-from django.template import Template, Context
 
-from video_xblock import BaseVideoPlayer, html_parser
+from video_xblock import BaseVideoPlayer
 
 
 class BrightcovePlayer(BaseVideoPlayer):
@@ -17,19 +16,15 @@ class BrightcovePlayer(BaseVideoPlayer):
         return self.url_re.match(href).group('media_id')
 
     def get_frag(self, **context):
-        html = Template(self.resource_string("../static/html/brightcove.html"))
         frag = Fragment(
-            html_parser.unescape(
-                html.render(Context(context))
-            )
+            self.render_resource('../static/html/brightcove.html', **context)
+        )
+        frag.add_css_url(
+            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'
         )
         frag.add_javascript(
-            html_parser.unescape(
-                Template(self.resource_string(
-                    '../static/js/player_state.js'
-                )).render(Context(context)))
+            self.render_resource('../static/js/player_state.js', **context)
         )
-
         frag.add_css(self.resource_string(
             '../static/css/brightcove.css'
         ))

@@ -327,3 +327,10 @@ body {
     background: rgba(115,133,159,.5);
     border-radius: 0;
 }
+/* styles for theme */
+.bc-player-default_default .vjs-big-play-button:active,
+.bc-player-default_default .vjs-big-play-button:focus,
+.bc-player-default_default:active .vjs-big-play-button,
+.bc-player-default_default:hover .vjs-big-play-button {
+    background-color: rgba(115, 133, 159, .5) !important;
+}
