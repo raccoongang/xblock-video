@@ -72,6 +72,17 @@ class BaseVideoPlayer(Plugin):
         data = pkg_resources.resource_string(__name__, path)
         return data.decode("utf8")
 
+    def render_resource(self, path, **context):
+        """
+        Renders static resource using provided context
+
+        Returns: django.utils.safestring.SafeText
+        """
+        html = Template(self.resource_string(path))
+        return html_parser.unescape(
+            html.render(Context(context))
+        )
+
     @classmethod
     def match(cls, href):
         if isinstance(cls.url_re, list):
