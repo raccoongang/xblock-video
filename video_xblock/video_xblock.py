@@ -186,7 +186,9 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
 
     def clean_studio_edits(self, data):
         """
-        Helper method for change player_name into data.
+        Given POST data dictionary 'data', clean the data before validating it.
+
+        Tries to detect player by submitted video url. If fails, it defaults to 'dummy-player'
         """
         data['player_name'] = 'dummy-player'  # XXX: use field's default
         for player_name, player_class in BaseVideoPlayer.load_classes():
