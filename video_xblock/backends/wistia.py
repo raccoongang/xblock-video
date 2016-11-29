@@ -1,3 +1,4 @@
+import json
 import re
 
 from video_xblock import BaseVideoPlayer
@@ -18,6 +19,21 @@ class WistiaPlayer(BaseVideoPlayer):
         return self.url_re.search(href).group('media_id')
 
     def get_frag(self, **context):
+        context['data_setup'] = json.dumps({
+            "controlBar": {
+                "volumeMenuButton": {
+                    "inline": False,
+                    "vertical": True
+                }
+            },
+            "techOrder": ["wistia"],
+            "sources": [{
+                "type": "video/wistia",
+                "src": context['url'] + "?controlsVisibleOnLoad=false"
+            }],
+            "playbackRates": [0.5, 1, 1.5, 2]
+        })
+
         frag = super(WistiaPlayer, self).get_frag(**context)
         frag.add_content(
             self.render_resource('../static/html/wistiavideo.html', **context)

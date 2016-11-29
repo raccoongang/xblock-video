@@ -1,3 +1,4 @@
+import json
 import re
 
 from video_xblock import BaseVideoPlayer
@@ -15,6 +16,22 @@ class YoutubePlayer(BaseVideoPlayer):
         return self.url_re.search(href).group('media_id')
 
     def get_frag(self, **context):
+        context['data_setup'] = json.dumps({
+            "controlBar": {
+                "volumeMenuButton": {
+                    "inline": False,
+                    "vertical": True
+                }
+            },
+            "techOrder": ["youtube"],
+            "sources": [{
+                "type": "video/youtube",
+                "src": context['url']
+            }],
+            "youtube": { "iv_load_policy": 1 },
+            "playbackRates": [0.5, 1, 1.5, 2]
+        })
+
         frag = super(YoutubePlayer, self).get_frag(**context)
         frag.add_content(
             self.render_resource('../static/html/youtube.html', **context)

@@ -2,10 +2,7 @@
   id="{{ video_player_id }}"
   class="video-js vjs-default-skin"
   controls
-  {% if autoplay %}
-      autoplay
-  {% endif %}
   width="829" height="511"
-  data-setup='{ "controlBar": {"volumeMenuButton": {"inline": false, "vertical": true}}, "techOrder": ["youtube"], "sources": [{ "type": "video/youtube", "src": "{{ url }}"}], "youtube": { "iv_load_policy": 1 }, "playbackRates": [0.5, 1, 1.5, 2] }'
+  data-setup='{{ data_setup }}'
 >
 </video>
