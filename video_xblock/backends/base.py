@@ -28,12 +28,31 @@ class BaseVideoPlayer(Plugin):
         """
         return [] or re.compile('') or ''
 
-    @abc.abstractmethod
     def get_frag(self, **context):
         """
         Returns a Fragment required to render video player on the client side.
         """
-        return Fragment('<video />')
+        frag = Fragment()
+        frag.add_css(self.resource_string(
+            '../static/bower_components/video.js/dist/video-js.min.css'
+        ))
+        frag.add_css(self.resource_string(
+            '../static/css/videojs.css'
+        ))
+        frag.add_css_url(
+            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'
+        )
+        frag.add_javascript(self.resource_string(
+            '../static/bower_components/video.js/dist/video.min.js'
+        ))
+        frag.add_javascript(self.resource_string(
+            '../static/js/video-speed.js'
+        ))
+        frag.add_javascript(
+            self.render_resource('../static/js/player_state.js', **context)
+        )
+
+        return frag
 
     @abc.abstractmethod
     def media_id(self, href):
