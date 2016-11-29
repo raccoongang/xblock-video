@@ -196,7 +196,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
 
         Tries to detect player by submitted video url. If fails, it defaults to 'dummy-player'
         """
-        data['player_name'] = 'dummy-player'  # XXX: use field's default
+        data['player_name'] = self.fields['player_name'].default
         for player_name, player_class in BaseVideoPlayer.load_classes():
             if player_name == 'dummy-player':
                 continue
