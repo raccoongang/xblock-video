@@ -72,17 +72,8 @@ class BaseVideoPlayer(Plugin):
         before initializing video components.
         """
         frag = self.get_frag(**context)
-        html = Template(self.resource_string("../static/html/base.html"))
         return Response(
-            html_parser.unescape(
-                html.render(
-                    Context({
-                        'head': frag.head_html(),
-                        'foot': frag.foot_html(),
-                        'body': frag.body_html()
-                    })
-                )
-            ),
+            self.render_resource('../static/html/base.html', frag=frag),
             content_type='text/html'
         )
 
