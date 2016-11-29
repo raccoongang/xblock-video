@@ -7,15 +7,25 @@ from video_xblock import BaseVideoPlayer
 
 class BrightcovePlayer(BaseVideoPlayer):
     """
-    BrightcovePlayer is used for videos hosted on the Brightcove Video Cloud
+    BrightcovePlayer is used for videos hosted on the Brightcove Video Cloud.
     """
 
     url_re = re.compile(r'https:\/\/studio.brightcove.com\/products\/videocloud\/media\/videos\/(?P<media_id>\d+)')
 
     def media_id(self, href):
+        """
+        Brightcove specific implementation of BaseVideoPlayer.media_id()
+        """
         return self.url_re.match(href).group('media_id')
 
     def get_frag(self, **context):
+        """
+        Compose an XBlock fragment with video player to be rendered in student view.
+
+        Brightcove backend is a special case and doesn't use vanila Video.js player.
+        Because of this it doesn't use `super.get_frag()`
+        """
+
         frag = Fragment(
             self.render_resource('../static/html/brightcove.html', **context)
         )

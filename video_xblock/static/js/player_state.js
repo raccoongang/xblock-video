@@ -1,5 +1,16 @@
+/**
+ * This part is responsible for loading and saving player state.
+ * State includes:
+ * - Current time
+ * - Playback rate
+ * - Volume
+ * - Muted
+ *
+ * State is loaded after VideoJs player is fully initialized.
+ * State is saved at certain events.
+ */
 var domReady = function(callback) {
-  // Run a callback when DOM is fully loaded
+  /** Run a callback when DOM is fully loaded */
   if (document.readyState === "interactive" || document.readyState === "complete") {
     callback();
   } else {
@@ -17,7 +28,7 @@ var player_state = {
 var xblockUsageId = window.location.hash.slice(1);
 
 var setInitialState = function(player, state) {
-  // Restore default or previously saved player state
+  /** Restore default or previously saved player state */
   if (state.currentTime > 0) {
     player.currentTime(state.currentTime);
   };
@@ -28,7 +39,10 @@ var setInitialState = function(player, state) {
 };
 
 var saveState = function(){
-  // Save player staty by calling VideoXBlock.save_state() handler
+  /**
+   * Save player stat by posting it in a message to parent frame.
+   * Parent frame passes it to a sever by calling VideoXBlock.save_state() handler
+   */
   var player = this;
   var new_state = {
     'volume': player.volume(),

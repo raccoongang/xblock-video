@@ -6,8 +6,7 @@ from video_xblock import BaseVideoPlayer
 
 class DummyPlayer(BaseVideoPlayer):
     """
-    DummyPlayer is used as a placeholder for those cases when appropriate
-    player cannot be displayed.
+    DummyPlayer is a placeholder for cases when appropriate player can't be displayed.
     """
     url_re = re.compile(r'')
 

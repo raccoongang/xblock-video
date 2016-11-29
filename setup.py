@@ -23,7 +23,7 @@ def package_data(pkg, roots):
 setup(
     name='video-xblock',
     version='0.1',
-    description='video XBlock',   # TODO: write a better description.
+    description='Video XBlock to embed videos hosted on different video platform into your courseware',
     license='GPL v3',
     packages=[
         'video_xblock',

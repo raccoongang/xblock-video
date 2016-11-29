@@ -7,17 +7,17 @@ function VideoXBlock(runtime, element) {
   window.videoXBlockListenerRegistered = window.videoXBlockListenerRegistered || false;
 
   function saveState(handlerUrl, state) {
-    // Saves video player satate by POSTing it to VideoXBlock handler
+    /** Save video player satate by POSTing it to VideoXBlock handler */
     $.ajax({
       type: "POST",
       url: handlerUrl,
       data: JSON.stringify(state),
     })
     .done(function() {
-      console.log('Player state saved successfully');
+      console.log('Player state saved successfully.');
     })
     .fail(function() {
-      console.log("Failed to save player state");
+      console.log('Failed to save player state.');
     });
   }
 
@@ -29,6 +29,11 @@ function VideoXBlock(runtime, element) {
   }
 
   function receiveMessage(event) {
+    /**
+     * Receive a message from child frames.
+     * Expects a specific type of messages containing video player state to be saved on a server.
+     * Pass the sate to `saveState()` for handling.
+     */
     var origin = event.origin || event.originalEvent.origin; // For Chrome, the origin property is in the event.originalEvent object.
     if (origin !== document.origin)
       // Discard a message received from another domain

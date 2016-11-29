@@ -57,24 +57,28 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
     )
 
     # Playback state fields
-    current_time = Integer(  # Seconds played back from the start
+    current_time = Integer(
         default=0,
-        scope=Scope.user_state
+        scope=Scope.user_state,
+        help='Seconds played back from the start'
     )
 
-    playback_rate = Float(  # Video playback speed: 0.5, 1, 1.5, 2
+    playback_rate = Float(
         default=1,
-        scope=Scope.preferences
+        scope=Scope.preferences,
+        help='Video playback speed: 0.5, 1, 1.5, 2'
     )
 
-    volume = Float(  # Video volume: from 0 to 1
+    volume = Float(
         default=1,
-        scope=Scope.preferences
+        scope=Scope.preferences,
+        help='Video volume: from 0 to 1'
     )
 
-    muted = Boolean(  # Video muted or not
+    muted = Boolean(
         default=False,
-        scope=Scope.preferences
+        scope=Scope.preferences,
+        help="Video muted or not"
     )
 
     editable_fields = ('display_name', 'href', 'account_id')
@@ -95,7 +99,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
     @player_state.setter
     def player_state(self, state):
         """
-        Seves video player state in xblock's fields
+        Ssves video player state passed in as a dict into xblock's fields
         """
         self.current_time = state.get('current_time', self.current_time)
         self.muted = state.get('muted', self.muted)
@@ -119,7 +123,9 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         ))
 
     def resource_string(self, path):
-        """Handy helper for getting resources from our kit."""
+        """
+        Handy helper for getting resources from our kit.
+        """
         data = pkg_resources.resource_string(__name__, path)
         return data.decode("utf8")
 

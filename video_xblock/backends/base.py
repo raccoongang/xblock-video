@@ -25,6 +25,8 @@ class BaseVideoPlayer(Plugin):
     def url_re(self):
         """
         Regex (list) to match video url
+
+        Can be a regex object, a list of regex objects or a string.
         """
         return [] or re.compile('') or ''
 
@@ -95,6 +97,11 @@ class BaseVideoPlayer(Plugin):
 
     @classmethod
     def match(cls, href):
+        """
+        Checks if provided video `href` can be rendered by a video backend.
+
+        `cls.url_re` attribute defined in subclassess are used for the check.
+        """
         if isinstance(cls.url_re, list):
             return any(regex.search(href) for regex in cls.url_re)
         elif isinstance(cls.url_re, type(re.compile(''))):

@@ -16,9 +16,17 @@ class WistiaPlayer(BaseVideoPlayer):
     )
 
     def media_id(self, href):
+        """
+        Wistia specific implementation of BaseVideoPlayer.media_id()
+        """
         return self.url_re.search(href).group('media_id')
 
     def get_frag(self, **context):
+        """
+        Compose an XBlock fragment with video player to be rendered in student view.
+
+        Extend general player fragment with Wistia specific context and JavaScript.
+        """
         context['data_setup'] = json.dumps({
             "controlBar": {
                 "volumeMenuButton": {
