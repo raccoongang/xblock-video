@@ -279,9 +279,6 @@ body {
 .vjs-volume-menu-button-vertical:hover .vjs-menu-content {
     height: 120px;
 }
-body {
-    margin: 0;
-}
 
 .w-control-bar {
   display: none !important;
