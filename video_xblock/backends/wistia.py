@@ -39,7 +39,7 @@ class WistiaPlayer(BaseVideoPlayer):
             '../static/js/video-speed.js'
         ))
         frag.add_javascript(self.resource_string(
-            '../static/bower_components/videojs-wistia-extra/src/wistia.js'
+            '../static/bower_components/videojs-wistia/src/wistia.js'
         ))
         frag.add_javascript(
             self.render_resource('../static/js/player_state.js', **context)

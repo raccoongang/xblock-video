@@ -3,8 +3,8 @@
   "version": "0.2-dev",
   "dependencies": {
     "video-js": "5.13.1",
-    "videojs-youtube": "2.1.1",
-    "videojs-wistia-extra": "*"
+    "videojs-youtube": "raccoongang/videojs-youtube#playback-rate-fix",
+    "videojs-wistia": "raccoongang/videojs-wistia#playback-toggle-fix"
   },
   "private": true
 }
