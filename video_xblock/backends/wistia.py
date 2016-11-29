@@ -18,7 +18,7 @@ class WistiaPlayer(BaseVideoPlayer):
         return self.url_re.search(href).group('media_id')
 
     def get_frag(self, **context):
-        frag = super(WistiaPlayer, self).get_frag()
+        frag = super(WistiaPlayer, self).get_frag(**context)
         frag.add_content(
             self.render_resource('../static/html/wistiavideo.html', **context)
         )
