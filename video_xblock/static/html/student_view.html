@@ -1,3 +1,4 @@
+{% load i18n %}
 {# To avoid interferrence with other video players and JavaScript modules (e.g. RequireJS) we wrap video player's code inside an iframe. #}
 <h3 class="hd hd-2">{{display_name}}</h3>
 <iframe
@@ -11,3 +12,58 @@
     height="600px"
 >
 </iframe>
+<ul class="wrapper-downloads-custom">
+    {% comment %}
+                    <!-- Button for download video -->
+        {% if download_video_link %}
+            <li class="video-sources video-download-button">
+                <a href="${download_video_link}">${_('Download video')}</a>
+            </li>
+        {% endif %}
+                    <!-- Button for download transcript -->
+        {% if track %}
+            <li class="video-tracks video-download-button">
+              {% if transcript_download_format %}
+                <a href="${track}">${_('Download transcript')}</a>
+                <div class="a11y-menu-container">
+                    <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}" role="button" aria-disabled="false">${'.' + transcript_download_format}</a>
+                    <ol class="a11y-menu-list" role="menu">
+                    {% for item in transcript_download_formats_list %}
+                      {% if item.value == transcript_download_format %}
+                      <li class="a11y-menu-item active">
+                      {% else %}
+                      <li class="a11y-menu-item">
+                      {% endif %}
+                      {# This is necessary so we don't scrape 'display_name' as a string. #}
+                      <% dname = item['display_name'] %>
+                          <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}" role="menuitem" aria-disabled="false">
+                            ${_(dname)}
+                          </a>
+                      </li>
+                    {% endfor %}
+                    </ol>
+                </div>
+              {% else %}
+                <a href="{{track}}" class="external-track">{% trans 'Download transcript' %}</a>
+              {% endif %}
+            </li>
+        {% endif %}
+
+    {% endcomment %}
+                    <!-- Button for download handout -->
+    {% if handout_file_path %}
+        <li class="video-handout video-download-button-custom">
+            <a href="#" class="download-handout">{% trans 'Download Handout' %}</a>
+            <span class="handout_path_file is-hidden">{{ handout_file_path }}</span>
+        </li>
+    {% endif %}
+                    <!-- Branding -->
+    {% comment %}
+        {% if branding_info %}
+          <li id="branding" class="branding">
+            <span class="host-tag">${branding_info['logo_tag']}</span>
+            <a href="{{branding_info}}" target="_blank" title="{{branding_info}}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
+          </li>
+        {% endif %}
+    {% endcomment %}
+</ul>
