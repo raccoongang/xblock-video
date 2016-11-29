@@ -6,7 +6,7 @@ XBlock to embed videos hosted on different video platform into your courses.
 ```bash
 sudo -sHu edxapp
 source ~/edxapp_env
-pip install xblock-utils==1.0.2
+pip install xblock-utils>=1.0.2,<1.1
 pip install -e "git+https://github.com/raccoongang/xblock-video.git@767821d63aba3b4f9e2630120e3d480857b8cea3#egg=xblock-video==0.1"
 cd video_xblock/static
 bower install
