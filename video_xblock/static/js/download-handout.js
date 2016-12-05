@@ -1,3 +1,10 @@
+/*
+ It was copied from https://github.com/edx/xblock-utils/blob/master/xblockutils/public/studio_edit.js.
+ Changed in rows:
+   170-175
+   178-194
+*/
+
 function VideoXblockStudioEdit(runtime, element) {
     "use strict";
 

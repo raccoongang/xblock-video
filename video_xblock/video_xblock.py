@@ -6,20 +6,21 @@ All you need to provide is video url, this XBlock does the rest for you.
 
 import logging
 import pkg_resources
+import base64
+from uuid import uuid1
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Boolean, Integer, Float, String
 from xblock.reference.plugins import Filesystem
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
+
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 from django.template import Template, Context
 from django.conf import settings
 
 from backends.base import BaseVideoPlayer, html_parser
-from uuid import uuid1
-import base64
 
 _ = lambda text: text
 log = logging.getLogger(__name__)
@@ -184,9 +185,10 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         Render a form for editing this XBlock
         """
         fragment = Fragment()
-        context = {'fields': [],
-                   'courseKey': self.location.course_key
-                   }
+        context = {
+            'fields': [],
+            'courseKey': self.location.course_key
+        }
         for field_name in self.editable_fields:
             field = self.fields[field_name]
             assert field.scope in (Scope.content, Scope.settings), (
@@ -259,9 +261,14 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         """
          Save file either local storage or Amazon S3 bucket and save a path to that file
 
-         if type of storage is s3fs: we get link with GET params, e.g
+        if type of storage is s3fs: we get link with GET params, e.g
             https://.../df924b40b8ac11e6a142080027880ca6.png?Signature=ZoKUlcIqfZIdSu1QvUmVe%2F9ly%2BE%3D&Expires=1480696395&AWSAccessKeyId=AKIAIVZILNCNLO4EDHRA
-            we have to cut it to avoid expire data in request
+        we have to cut it to avoid expire data in request
+
+        file_string:
+            sample of string which we got from ajax -
+            'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQCAwMDAgQDAwMEBAQEBQkGBQUFBQsICAYJDQsNDQ0LD...'
+
         """
         file_string = request.get('file')
         if file_string:
