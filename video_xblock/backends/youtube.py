@@ -28,8 +28,13 @@ class YoutubePlayer(BaseVideoPlayer):
                 "type": "video/youtube",
                 "src": context['url']
             }],
-            "youtube": { "iv_load_policy": 1 },
-            "playbackRates": [0.5, 1, 1.5, 2]
+            "youtube": {"iv_load_policy": 1},
+            "playbackRates": [0.5, 1, 1.5, 2],
+            "plugins": {
+                "videoJsResolutionSwitcher": {
+                    "dynamicLabel": True, "default": "low"
+                }
+            }
         })
 
         frag = super(YoutubePlayer, self).get_frag(**context)
@@ -37,6 +42,9 @@ class YoutubePlayer(BaseVideoPlayer):
             self.render_resource('../static/html/youtube.html', **context)
         )
 
+        frag.add_javascript(self.resource_string(
+            '../static/bower_components/videojs-resolution-switcher/lib/videojs-resolution-switcher.js'
+        ))
         frag.add_javascript(self.resource_string(
             '../static/bower_components/videojs-youtube/dist/Youtube.min.js'
         ))
