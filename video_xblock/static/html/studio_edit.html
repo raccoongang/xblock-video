@@ -1,8 +1,8 @@
-  {#
+  <!--
     It was copied from https://github.com/edx/xblock-utils/blob/master/xblockutils/templates/studio_edit.html.
     Changed in rows from 90-103
 
-  #}
+  -->
 {% load i18n %}
 <div class="editor-with-buttons">
   <div class="wrapper-comp-settings is-active editor-with-buttons" id="settings-tab">
@@ -117,10 +117,6 @@
         </li>
       {% endfor %}
     </ul>
-
-    <!--<form method="POST" action="/assets/{{ courseKey }}/" class="is-hidden" enctype="multipart/form-data">-->
-      <!--<input class="input-file-uploader" name="file" type="file" data-change-field-name="">-->
-    <!--</form>-->
   </div>
 
   <div class="xblock-actions">

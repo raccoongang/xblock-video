@@ -201,7 +201,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
                 context["fields"].append(field_info)
         fragment.content = self.render_resource('static/html/studio_edit.html', **context)
         fragment.add_css(self.resource_string("static/css/download-handout.css"))
-        fragment.add_javascript(self.resource_string("static/js/download-handout.js"))
+        fragment.add_javascript(self.resource_string("static/js/studio-edit.js"))
         fragment.initialize_js('VideoXblockStudioEdit')
         return fragment
 
