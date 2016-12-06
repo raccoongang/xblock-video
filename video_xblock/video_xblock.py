@@ -99,7 +99,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
     @player_state.setter
     def player_state(self, state):
         """
-        Ssves video player state passed in as a dict into xblock's fields
+        Saves video player state passed in as a dict into xblock's fields
         """
         self.current_time = state.get('current_time', self.current_time)
         self.muted = state.get('muted', self.muted)
@@ -156,7 +156,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
             )
         )
         frag.add_javascript(self.resource_string("static/js/video_xblock.js"))
-        frag.initialize_js('VideoXBlock')
+        frag.initialize_js('VideoXBlockStudentViewInit')
         return frag
 
     @XBlock.handler

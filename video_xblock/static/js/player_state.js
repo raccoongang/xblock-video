@@ -9,8 +9,9 @@
  * State is loaded after VideoJs player is fully initialized.
  * State is saved at certain events.
  */
+
+/** Run a callback when DOM is fully loaded */
 var domReady = function(callback) {
-  /** Run a callback when DOM is fully loaded */
   if (document.readyState === "interactive" || document.readyState === "complete") {
     callback();
   } else {
@@ -27,22 +28,22 @@ var player_state = {
 
 var xblockUsageId = window.location.hash.slice(1);
 
+/** Restore default or previously saved player state */
 var setInitialState = function(player, state) {
-  /** Restore default or previously saved player state */
   if (state.currentTime > 0) {
     player.currentTime(state.currentTime);
-  };
+  }
   player
     .volume(state.volume)
     .muted(state.muted)
     .playbackRate(state.playbackRate);
 };
 
+/**
+ * Save player stat by posting it in a message to parent frame.
+ * Parent frame passes it to a server by calling VideoXBlock.save_state() handler.
+ */
 var saveState = function(){
-  /**
-   * Save player stat by posting it in a message to parent frame.
-   * Parent frame passes it to a sever by calling VideoXBlock.save_state() handler
-   */
   var player = this;
   var new_state = {
     'volume': player.volume(),
@@ -54,8 +55,8 @@ var saveState = function(){
   if (JSON.stringify(new_state) !== JSON.stringify(player_state)) {
     console.log('Starting saving player state');
     player_state = new_state;
-    parent.postMessage({'action': 'save_state', 'state': new_state, 'xblockUsageId': xblockUsageId}, document.origin)
-  };
+    parent.postMessage({'action': 'save_state', 'state': new_state, 'xblockUsageId': xblockUsageId}, document.origin);
+  }
 };
 
 domReady(function() {
