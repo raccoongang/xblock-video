@@ -1,4 +1,4 @@
-{# To avoid interferrence with other video players and JavaScript modules (e.g. RequireJS in Studio) we wrap video player's code inside an iframe. #}
+{% load i18n %}
 <h3 class="hd hd-2">{{display_name}}</h3>
 <iframe
     src="{{player_url}}#{{usage_id}}"
@@ -11,3 +11,29 @@
     height="600px"
 >
 </iframe>
+<ul class="wrapper-downloads-custom">
+    <!--
+    Button for download video
+        <li class="video-sources video-download-button">
+            <a href="#">Download video</a>
+        </li>
+    Button for download transcript
+        <li class="video-tracks video-download-button">
+            <a href="#" class="external-track">Download transcript</a>
+        </li>
+    -->
+    <!-- Button for download handout -->
+    {% if handout_file_path %}
+        <li class="video-handout video-download-button-custom">
+            <a href="#" class="download-handout">{% trans 'Download Handout' %}</a>
+            <span class="handout_path_file is-hidden">{{ handout_file_path }}</span>
+        </li>
+    {% endif %}
+    <!--
+    Branding
+        <li id="branding" class="branding">
+            <span class="host-tag"></span>
+            <a href="#" target="_blank" title=""><img class="brand-logo" src="" alt="" /></a>
+        </li>
+    -->
+</ul>

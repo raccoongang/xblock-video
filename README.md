@@ -15,6 +15,28 @@ cd video_xblock/static
 bower install
 ```
 
+# settings for local storage
+
+```bash
+
+    "DJFS": {
+        "directory_root": "/edx/var/edxapp/django-pyfs/static/django-pyfs",
+        "type": "osfs",
+        "url_root": "/static/django-pyfs"
+    },
+```
+# for Amazon S3
+
+```bash
+    "DJFS": {
+        "type" : "s3fs",
+        "aws_access_key_id": "your-access-key-id",
+        "aws_secret_access_key": "your-secret-accesskey",
+        "bucket": "your-bucket-name",
+        "prefix": "options"
+    },
+```
+
 ## Enabling in Studio
 You can enable the Wistia xblock in studio through the advanced
 settings:

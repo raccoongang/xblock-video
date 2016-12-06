@@ -6,22 +6,27 @@ All you need to provide is video url, this XBlock does the rest for you.
 
 import logging
 import pkg_resources
+import base64
+from uuid import uuid1
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Boolean, Integer, Float, String
+from xblock.reference.plugins import Filesystem
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
+
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 from django.template import Template, Context
+from django.conf import settings
 
 from backends.base import BaseVideoPlayer, html_parser
-
 
 _ = lambda text: text
 log = logging.getLogger(__name__)
 
 
+@XBlock.wants('fs')
 class VideoXBlock(StudioEditableXBlockMixin, XBlock):
     """
     Main VideoXBlock class.
@@ -81,7 +86,20 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         help="Video muted or not"
     )
 
-    editable_fields = ('display_name', 'href', 'account_id')
+    handout = Filesystem(  # This field will not be displaying, so display_name and help here not matter
+        display_name='',
+        help='',
+        scope=Scope.content
+    )
+
+    handout_file_path = String(
+        display_name=_("Upload Handout"),
+        help=_("You can upload handout file for students"),
+        default='',
+        scope=Scope.content
+    )
+
+    editable_fields = ('display_name', 'href', 'account_id', 'handout_file_path')
     player_state_fields = ('current_time', 'muted', 'playback_rate', 'volume')
 
     @property
@@ -152,12 +170,40 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
                 'static/html/student_view.html',
                 player_url=player_url,
                 display_name=self.display_name,
-                usage_id=self.location.to_deprecated_string()
+                usage_id=self.location.to_deprecated_string(),
+                handout_file_path=self.handout_file_path
             )
         )
         frag.add_javascript(self.resource_string("static/js/video_xblock.js"))
+        frag.add_javascript(self.resource_string("static/js/download-handout-button.js"))
+        frag.add_css(self.resource_string("static/css/download-handout.css"))
         frag.initialize_js('VideoXBlockStudentViewInit')
         return frag
+
+    def studio_view(self, context):
+        """
+        Render a form for editing this XBlock
+        """
+        fragment = Fragment()
+        context = {
+            'fields': [],
+            'courseKey': self.location.course_key
+        }
+        for field_name in self.editable_fields:
+            field = self.fields[field_name]
+            assert field.scope in (Scope.content, Scope.settings), (
+                "Only Scope.content or Scope.settings fields can be used with "
+                "StudioEditableXBlockMixin. Other scopes are for user-specific data and are "
+                "not generally created/configured by content authors in Studio."
+            )
+            field_info = self._make_field_info(field_name, field)
+            if field_info is not None:
+                context["fields"].append(field_info)
+        fragment.content = self.render_resource('static/html/studio_edit.html', **context)
+        fragment.add_css(self.resource_string("static/css/download-handout.css"))
+        fragment.add_javascript(self.resource_string("static/js/studio-edit.js"))
+        fragment.initialize_js('VideoXblockStudioEdit')
+        return fragment
 
     @XBlock.handler
     def render_player(self, request, suffix=''):
@@ -209,3 +255,38 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         """
         player = BaseVideoPlayer.load_class(self.player_name)
         return player()
+
+    @XBlock.json_handler
+    def save_file(self, request, suffix=''):
+        """
+         Save file either local storage or Amazon S3 bucket and save a path to that file
+
+        if type of storage is s3fs: we get link with GET params, e.g
+            https://.../df924b40b8ac11e6a142080027880ca6.png?Signature=ZoKUlcIqfZIdSu1QvUmVe%2F9ly%2BE%3D&Expires=1480696395&AWSAccessKeyId=AKIAIVZILNCNLO4EDHRA
+        we have to cut it to avoid expire data in request
+
+        file_string:
+            sample of string which we got from ajax -
+            'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQCAwMDAgQDAwMEBAQEBQkGBQUFBQsICAYJDQsNDQ0LD...'
+
+        """
+        file_string = request.get('file')
+        if file_string:
+            file_suffix = file_string.split(';')[0].split('/')[-1]
+            filename = uuid1().hex
+            full_filename = '{}.{}'.format(filename, file_suffix)
+            with self.handout.open(full_filename, 'wb') as handout_file:
+                handout_file.write(base64.b64decode(file_string.split(',')[1]))
+                handout_file.close()
+            handout_file_path = self.handout.get_url(full_filename)
+            if settings.DJFS['type'] == 's3fs':
+                handout_file_path = handout_file_path.split('?')[0]
+
+            self.handout_file_path = handout_file_path
+        return {'result': 'success'}
+
+    def _make_field_info(self, field_name, field):
+        field_info = super(VideoXBlock, self)._make_field_info(field_name, field)
+        if field_name == 'handout_file_path':
+            field_info['type'] = 'file_uploader'
+        return field_info
