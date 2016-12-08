@@ -15,9 +15,9 @@ from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 from django.template import Template, Context
-from django.conf import settings
 
 from backends.base import BaseVideoPlayer, html_parser
+from . import settings
 
 
 _ = lambda text: text
@@ -94,8 +94,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         default='',
         scope=Scope.content,
         display_name=_('Upload transcript'),
-        help=_('Add transcripts in different languages. '
-               'Click below to specify a language and upload an .srt transcript file for that language.')
+        help=_('Add transcripts in different languages. Click below to specify a language and upload an .srt transcript file for that language.')
     )
 
     editable_fields = ('display_name', 'href', 'account_id', 'handout', 'transcripts')
