@@ -7,6 +7,7 @@ All you need to provide is video url, this XBlock does the rest for you.
 import logging
 import pkg_resources
 import json
+import os
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Boolean, Integer, Float, String
@@ -176,7 +177,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
                 player_url=player_url,
                 display_name=self.display_name,
                 usage_id=self.location.to_deprecated_string(),
-                handout=self.handout,
+                handout=self.get_url_for(self.handout),
                 handout_file_name=self.get_handout_file_name()
             )
         )
@@ -276,6 +277,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         if field_name == 'handout':
             info['type'] = 'file_uploader'
             info['file_name'] = self.get_handout_file_name()
+            info['value'] = self.get_url_for(self.handout)
         if field_name == 'transcripts':
             info['type'] = 'transcript_uploader'
         return info
@@ -288,3 +290,9 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         It returns only name of file with extension
         """
         return self.handout.split('@')[-1]
+
+    def get_url_for(self, field):
+        """
+        It return url for download of file, which is stored in db
+        """
+        return os.path.join('/', field)
