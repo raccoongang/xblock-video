@@ -1,5 +1,5 @@
 {% load i18n %}
-<div class="editor-with-buttons">
+<div class="editor-with-buttons xmodule_VideoDescriptor">
   <div class="wrapper-comp-settings is-active editor-with-buttons" id="settings-tab">
     <ul class="list-input settings-list">
       {% for field in fields %}
@@ -9,7 +9,7 @@
           data-default="{% if field.type == 'boolean' %}{{ field.default|yesno:'1,0' }}{% else %}{{ field.default|default_if_none:"" }}{% endif %}"
           data-cast="{{field.type}}"
         >
-          <div class='wrapper-comp-setting {% if field.type == "set" %}metadata-list-enum{% endif %}  {% if field.type == "file_uploader" %}file-uploader{% endif %}'>
+          <div class='wrapper-comp-setting {% if field.type == "set" %}metadata-list-enum{% endif %}  {% if field.type == "file_uploader" %}file-uploader{% endif %}{% if field.type == "transcript_uploader" %}metadata-video-translations{% endif %}'>
             <label class="label setting-label" for="xb-field-edit-{{field.name}}">{{field.display_name}}</label>
 
             {% if field.type == "boolean" %}
@@ -93,6 +93,45 @@
                 {% endif %}
               </div>
               <input type="hidden" class="field-data-control" data-field-name="{{field.name}}" id="metadata-file-uploader-{{ field.name }}" value="{{ field.value }}">
+
+            {% elif field.type == 'transcript_uploader' %}
+              <div class="wrapper-uploader-actions xblock-edit-settings wrapper-translations-settings">
+                  <ol class="list-settings lang-choiser">
+                    {% for transcript in transcripts %}
+                    <li class="list-settings-item">
+                      <select name="language" class="lang-select">
+                        <option></option>
+                        {% for language in languages %}
+                        <option value="{{ language.code }}" {% if language.code == transcript.lang %}selected{% endif %}>{{ language.label }}</option>
+                        {% endfor %}
+                      </select>
+                      <a href="#" class="remove-action remove-setting" data-value=""><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>
+                      <div class="list-settings-buttons">
+                        <a href="#" class="upload-setting upload-transcript" data-change-field-name="{{field.name}}" data-lang-code="{{ transcript.lang }}">{% trans "Upload" %}</a>
+                      </div>
+                    </li>
+                    {% endfor %}
+                    <li class="list-settings-item hidden">
+                      <select name="language" class="lang-select">
+                        <option></option>
+                        {% for language in languages %}
+                        <option value="{{ language.code }}">{{ language.label }}</option>
+                        {% endfor %}
+                      </select>
+                      <a href="#" class="remove-action remove-setting" data-value=""><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>
+                      <div class="list-settings-buttons">
+                        <a href="#" class="upload-setting upload-transcript hidden" data-change-field-name="{{field.name}}" data-lang-code="">{% trans "Upload" %}</a>
+                      </div>
+
+                    </li>
+
+                  </ol>
+                  <input type="hidden" class="field-data-control" data-field-name="{{field.name}}" id="metadata-transcript-uploader-{{ field.name }}" value='{{ field.value }}'>
+
+                <a href="#" class="add-transcript create-setting">
+                  <span class="icon fa fa-plus" aria-hidden="true"></span>{% trans 'Add' %}<span class="sr"></span>
+                </a>
+              </div>
                 <!-- End of Raccoongang addons -->
 
             {% else %}
@@ -112,8 +151,13 @@
       {% endfor %}
     </ul>
         <!-- Raccoongang addons -->
-    <form method="POST" action="/assets/{{ courseKey }}/" class="is-hidden" enctype="multipart/form-data">
+    <form method="POST" action="/assets/{{ courseKey }}/" class="file-uploader-form is-hidden" enctype="multipart/form-data">
       <input class="input-file-uploader" name="file" type="file" data-change-field-name="">
+    </form>
+
+
+    <form method="POST" action="/assets/{{ courseKey }}/" class="transcript-uploader-form is-hidden" enctype="multipart/form-data">
+      <input class="input-transcript-uploader" name="file" type="file" data-change-field-name="" data-lang-code="">
     </form>
         <!-- End of Raccoongang addons -->
   </div>

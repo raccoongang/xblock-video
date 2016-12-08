@@ -6,6 +6,7 @@ All you need to provide is video url, this XBlock does the rest for you.
 
 import logging
 import pkg_resources
+import json
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Boolean, Integer, Float, String
@@ -14,6 +15,7 @@ from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
 from django.template import Template, Context
+from django.conf import settings
 
 from backends.base import BaseVideoPlayer, html_parser
 
@@ -88,7 +90,15 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         help=_('You can upload handout file for students')
     )
 
-    editable_fields = ('display_name', 'href', 'account_id', 'handout')
+    transcripts = String(
+        default='',
+        scope=Scope.content,
+        display_name=_('Upload transcript'),
+        help=_('Add transcripts in different languages. '
+               'Click below to specify a language and upload an .srt transcript file for that language.')
+    )
+
+    editable_fields = ('display_name', 'href', 'account_id', 'handout', 'transcripts')
     player_state_fields = ('current_time', 'muted', 'playback_rate', 'volume')
 
     @property
@@ -174,9 +184,14 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         Render a form for editing this XBlock
         """
         fragment = Fragment()
+        languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES]
+        languages.sort(key=lambda l: l['label'])
+        transcripts = json.loads(self.transcripts) if self.transcripts else []
         context = {
             'fields': [],
-            'courseKey': self.location.course_key
+            'courseKey': self.location.course_key,
+            'languages': languages,
+            'transcripts': transcripts
         }
         # Build a list of all the fields that can be edited:
         for field_name in self.editable_fields:
@@ -191,6 +206,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
                 context["fields"].append(field_info)
         fragment.content = self.render_resource('static/html/studio_edit.html', **context)
         fragment.add_css(self.resource_string("static/css/handout.css"))
+        fragment.add_css(self.resource_string("static/css/transcripts.css"))
         fragment.add_javascript(self.resource_string("static/js/studio_edit.js"))
         fragment.initialize_js('StudioEditableXBlock')
         return fragment
@@ -254,6 +270,8 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         if field_name == 'handout':
             info['type'] = 'file_uploader'
             info['file_name'] = self.get_handout_file_name()
+        if field_name == 'transcripts':
+            info['type'] = 'transcript_uploader'
         return info
 
     def get_handout_file_name(self):
