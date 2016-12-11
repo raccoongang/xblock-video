@@ -174,7 +174,6 @@ function StudioEditableXBlock(runtime, element) {
 
     var languages = [];
     var $fileUploader = $('.input-file-uploader', element);
-    var $transcriptUploader = $('.input-transcript-uploader', element);
     var $langChoicer = $('.lang-choiser', element);
     var setLanguages = $('input[data-field-name="transcripts"]').val();
 
@@ -204,18 +203,18 @@ function StudioEditableXBlock(runtime, element) {
         event.preventDefault();
         event.stopPropagation();
         var $buttonBlock = $(event.currentTarget);
-        $transcriptUploader.data({
+        $fileUploader.data({
             'lang-code': $buttonBlock.data('lang-code'),
             'lang-label': $buttonBlock.data('lang-label'),
             'change-field-name': $buttonBlock.data('change-field-name')
         });
-        $transcriptUploader.attr({
+        $fileUploader.attr({
             'data-lang-code': $buttonBlock.data('lang-code'),
             'data-lang-label': $buttonBlock.data('lang-label'),
             'data-change-field-name': $buttonBlock.data('change-field-name')
         });
 
-        $transcriptUploader.click();
+        $fileUploader.click();
     };
 
     var languageChecker = function (event) {
@@ -258,31 +257,26 @@ function StudioEditableXBlock(runtime, element) {
         $('input[data-field-name="transcripts"]').val(JSON.stringify(languages)).change();
     };
 
-    $fileUploader.on('change', function(e) {
-        var fieldName = $(e.currentTarget).data('change-field-name');
-        $('.file-uploader-form', element).ajaxSubmit({
-            success: function(response, statusText, xhr, form) {
-                $('input[data-field-name=' + fieldName + ']').val(response['asset']['id']).change();
-            }
-        });
-    });
-
-    $transcriptUploader.on('change', function (event) {
+    $fileUploader.on('change', function(event) {
+        var fieldName = $(event.currentTarget).data('change-field-name');
         var lang = $(event.currentTarget).data('lang-code');
         var label = $(event.currentTarget).data('lang-label');
-        $('.transcript-uploader-form', element).ajaxSubmit({
+        $('.file-uploader-form', element).ajaxSubmit({
             success: function(response, statusText, xhr, form) {
-                pushLanguage(lang, label, '/' + response['asset']['id']);
-                $('input[data-field-name="transcripts"]').val(JSON.stringify(languages)).change();
+                if(lang == ""){
+                    $('input[data-field-name=' + fieldName + ']').val(response['asset']['id']).change();
+                } else {
+                    pushLanguage(lang, label, '/' + response['asset']['id']);
+                    $('input[data-field-name=' + fieldName + ']').val(JSON.stringify(languages)).change();
+                }
+                $(event.currentTarget).removeData();
+                $(event.currentTarget).attr({
+                    'data-change-field-name': '',
+                    'data-lang-code': '',
+                    'data-lang-label': ''
+                });
             }
-        })
-    });
-
-    $('.upload-action', element).on('click', function(e) {
-        e.preventDefault();
-        var fieldName = $(e.currentTarget).data('change-field-name');
-        $fileUploader.data('change-field-name', fieldName);
-        $fileUploader.click();
+        });
     });
 
     $('.add-transcript', element).on('click', function (event) {
@@ -297,7 +291,7 @@ function StudioEditableXBlock(runtime, element) {
 
     $('.lang-select').on('change', languageChecker);
 
-    $('.upload-transcript').on('click', clickUploader);
+    $('.upload-transcript, .upload-action', element).on('click', clickUploader);
 
     $(document).on('click', '.remove-action', function(event){
         event.preventDefault();

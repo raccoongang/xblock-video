@@ -303,4 +303,5 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         """
         It returns url for download of file, which is stored in db
         """
-        return os.path.join('/', field)
+        if field:
+            return os.path.join('/', field)
