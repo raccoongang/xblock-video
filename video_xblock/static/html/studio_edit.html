@@ -1,5 +1,5 @@
 {% load i18n %}
-<div class="editor-with-buttons xmodule_VideoDescriptor">
+<div class="editor-with-buttons">
   <div class="wrapper-comp-settings is-active editor-with-buttons" id="settings-tab">
     <ul class="list-input settings-list">
       {% for field in fields %}
@@ -102,12 +102,12 @@
                       <select name="language" class="lang-select">
                         <option></option>
                         {% for language in languages %}
-                        <option value="{{ language.code }}" {% if language.code == transcript.lang %}selected{% endif %}>{{ language.label }}</option>
+                        <option value="{{ language.code }}" {% if language.code == transcript.lang %}selected{% endif %} data-lang-label="{{ language.label }}">{{ language.label }}</option>
                         {% endfor %}
                       </select>
                       <a href="#" class="remove-action remove-setting" data-value=""><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>
                       <div class="list-settings-buttons">
-                        <a href="#" class="upload-setting upload-transcript" data-change-field-name="{{field.name}}" data-lang-code="{{ transcript.lang }}">{% trans "Upload" %}</a>
+                        <a href="#" class="upload-setting upload-transcript" data-change-field-name="{{field.name}}" data-lang-code="{{ transcript.lang }}" data-lang-label="{{ transcript.label }}">{% trans "Upload" %}</a>
                       </div>
                     </li>
                     {% endfor %}
@@ -115,12 +115,12 @@
                       <select name="language" class="lang-select">
                         <option></option>
                         {% for language in languages %}
-                        <option value="{{ language.code }}">{{ language.label }}</option>
+                        <option value="{{ language.code }}" data-lang-label="{{ language.label }}">{{ language.label }}</option>
                         {% endfor %}
                       </select>
                       <a href="#" class="remove-action remove-setting" data-value=""><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>
                       <div class="list-settings-buttons">
-                        <a href="#" class="upload-setting upload-transcript hidden" data-change-field-name="{{field.name}}" data-lang-code="">{% trans "Upload" %}</a>
+                        <a href="#" class="upload-setting upload-transcript hidden" data-change-field-name="{{field.name}}" data-lang-code="" data-lang-label="">{% trans "Upload" %}</a>
                       </div>
 
                     </li>
@@ -156,7 +156,7 @@
     </form>
 
     <form method="POST" action="/assets/{{ courseKey }}/" class="transcript-uploader-form is-hidden" enctype="multipart/form-data">
-      <input class="input-transcript-uploader" name="file" type="file" data-change-field-name="" data-lang-code="">
+      <input class="input-transcript-uploader" name="file" type="file" data-change-field-name="" data-lang-code="" data-lang-label="">
     </form>
         <!-- End of Raccoongang addons -->
   </div>

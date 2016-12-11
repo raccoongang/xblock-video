@@ -181,7 +181,7 @@ function StudioEditableXBlock(runtime, element) {
     if(setLanguages){
         languages = JSON.parse(setLanguages);
     }
-    var pushLanguage = function (lang, url){
+    var pushLanguage = function (lang, label, url){
         var langExists = false;
         for (var i=0; i < languages.length; i++){
             if (lang == languages[i].lang){
@@ -191,7 +191,8 @@ function StudioEditableXBlock(runtime, element) {
         if (!langExists){
             languages.push({
                 lang: lang,
-                url: url
+                url: url,
+                label: label
             })
         }
     };
@@ -207,9 +208,10 @@ function StudioEditableXBlock(runtime, element) {
 
     $transcriptUploader.on('change', function (event) {
         var lang = $(event.currentTarget).data('lang-code');
+        var label = $(event.currentTarget).data('lang-label');
         $('.transcript-uploader-form', element).ajaxSubmit({
             success: function(response, statusText, xhr, form) {
-                pushLanguage(lang, response['asset']['id']);
+                pushLanguage(lang, label, '/' + response['asset']['id']);
                 $('input[data-field-name="transcripts"]').val(JSON.stringify(languages)).change();
             }
         })
@@ -232,7 +234,9 @@ function StudioEditableXBlock(runtime, element) {
 
     $(document).on('change', '.lang-select', function (event) {
         event.stopPropagation();
-        var selectedLanguage = $(event.currentTarget).find('option:selected').val();
+        var $selectedOption = $(event.currentTarget).find('option:selected');
+        var selectedLanguage = $selectedOption.val();
+        var languageLabel = $selectedOption.data('lang-label');
         var $langSelectParent = $(event.currentTarget).parent('li');
         var $input = $('.upload-transcript', $langSelectParent);
         var oldLang = $input.data('lang-code');
@@ -240,15 +244,21 @@ function StudioEditableXBlock(runtime, element) {
             if(selectedLanguage != oldLang){
                 for(var i=0; i < languages.length; i++){
                     if(languages[i].lang == oldLang){
-                        languages[i].lang = selectedLanguage
+                        languages[i].lang = selectedLanguage;
+                        languages[i].label = languageLabel
                     }
                 }
             }
-            $input.data('lang-code', selectedLanguage);
-            $input.attr('data-lang-code', selectedLanguage);
+            $input.data({
+                'lang-code': selectedLanguage,
+                'lang-label': languageLabel
+            }).change();
             $input.removeClass('hidden');
         } else {
-            $input.data('lang-code', '').addClass('hidden');
+            $input.data({
+                'lang-code': '',
+                'lang-label': ''
+            }).addClass('hidden').change();
         }
         $('input[data-field-name="transcripts"]').val(JSON.stringify(languages)).change();
     });
@@ -257,8 +267,11 @@ function StudioEditableXBlock(runtime, element) {
         event.preventDefault();
         event.stopPropagation();
         var buttonBlock = $(event.currentTarget);
-        $transcriptUploader.attr('data-change-field-name', buttonBlock.data('change-field-name'));
-        $transcriptUploader.data('lang-code', buttonBlock.data('lang-code'));
+        $transcriptUploader.data({
+            'lang-code': buttonBlock.data('lang-code'),
+            'lang-label': buttonBlock.data('lang-label'),
+            'change-field-name': buttonBlock.data('change-field-name')
+        });
         $transcriptUploader.click();
     });
 
