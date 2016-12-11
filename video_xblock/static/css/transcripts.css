@@ -4,6 +4,6 @@
     min-width: 240px;
 }
 
-.hidden {
+.is-hidden {
     display: none !important;
 }

@@ -111,7 +111,7 @@
                       </div>
                     </li>
                     {% endfor %}
-                    <li class="list-settings-item hidden">
+                    <li class="list-settings-item is-hidden">
                       <select name="language" class="lang-select">
                         <option></option>
                         {% for language in languages %}
@@ -120,7 +120,7 @@
                       </select>
                       <a href="#" class="remove-action remove-setting" data-value=""><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>
                       <div class="list-settings-buttons">
-                        <a href="#" class="upload-setting upload-transcript hidden" data-change-field-name="{{field.name}}" data-lang-code="" data-lang-label="">{% trans "Upload" %}</a>
+                        <a href="#" class="upload-setting upload-transcript is-hidden" data-change-field-name="{{field.name}}" data-lang-code="" data-lang-label="">{% trans "Upload" %}</a>
                       </div>
 
                     </li>

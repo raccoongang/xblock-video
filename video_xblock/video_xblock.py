@@ -219,7 +219,9 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         fragment.add_css(self.resource_string("static/css/transcripts.css"))
         fragment.add_css(self.render_resource("static/css/studio-main-v1.css",
                                               path_to_images=path_to_images,
-                                              path_to_fonts=path_to_fonts))
+                                              path_to_fonts=path_to_fonts
+                                              )
+                         )
         fragment.add_javascript(self.resource_string("static/js/studio_edit.js"))
         fragment.initialize_js('StudioEditableXBlock')
         return fragment
@@ -299,6 +301,6 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
 
     def get_url_for(self, field):
         """
-        It return url for download of file, which is stored in db
+        It returns url for download of file, which is stored in db
         """
         return os.path.join('/', field)

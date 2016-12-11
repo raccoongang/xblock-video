@@ -197,6 +197,7 @@ function StudioEditableXBlock(runtime, element) {
                 label: label
             })
         }
+        $('.add-transcript').removeClass('is-disabled');
     };
 
     var clickUploader = function(event){
@@ -242,7 +243,7 @@ function StudioEditableXBlock(runtime, element) {
                 'data-lang-code': selectedLanguage,
                 'data-lang-label': languageLabel
             });
-            $input.removeClass('hidden');
+            $input.removeClass('is-hidden');
         } else {
             $input.data({
                 'lang-code': '',
@@ -252,7 +253,7 @@ function StudioEditableXBlock(runtime, element) {
                 'data-lang-code': '',
                 'data-lang-label': ''
             });
-            $input.addClass('hidden');
+            $input.addClass('is-hidden');
         }
         $('input[data-field-name="transcripts"]').val(JSON.stringify(languages)).change();
     };
@@ -286,9 +287,9 @@ function StudioEditableXBlock(runtime, element) {
 
     $('.add-transcript', element).on('click', function (event) {
         event.preventDefault();
-
+        $(event.currentTarget).addClass('is-disabled');
         var $choiserItem = $('.list-settings-item:hidden').clone();
-        $choiserItem.removeClass('hidden');
+        $choiserItem.removeClass('is-hidden');
         $choiserItem.appendTo($langChoicer);
         $('.upload-transcript', $choiserItem).on('click', clickUploader);
         $('.lang-select', $choiserItem).on('change', languageChecker);
