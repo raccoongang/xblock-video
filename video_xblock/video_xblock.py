@@ -305,3 +305,4 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         """
         if field:
             return os.path.join('/', field)
+        return ''
