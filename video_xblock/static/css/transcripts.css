@@ -7,3 +7,7 @@
 .is-hidden {
     display: none !important;
 }
+
+.status-upload {
+    color: green;
+}

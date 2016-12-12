@@ -172,25 +172,26 @@ function StudioEditableXBlock(runtime, element) {
 
     // Raccoongang addons
 
-    var languages = [];
+    var transcriptsValue = [];
     var $fileUploader = $('.input-file-uploader', element);
-    var $langChoicer = $('.lang-choiser', element);
-    var setLanguages = $('input[data-field-name="transcripts"]').val();
+    var $langChoiceItem = $('.language-transcript-selector', element);
+    var gotTranscriptsValue = $('input[data-field-name="transcripts"]').val();
 
-    if(setLanguages){
-        languages = JSON.parse(setLanguages);
+    if(gotTranscriptsValue){
+        transcriptsValue = JSON.parse(gotTranscriptsValue);
     }
     var pushLanguage = function (lang, label, url){
         var indexLanguage;
-        for (var i=0; i < languages.length; i++){
-            if (lang == languages[i].lang){
-                indexLanguage = i
+        for (var i=0; i < transcriptsValue.length; i++){
+            if (lang == transcriptsValue[i].lang){
+                indexLanguage = i;
+                break;
             }
         }
         if (indexLanguage !== undefined){
-            languages[indexLanguage].url = url
+            transcriptsValue[indexLanguage].url = url
         } else {
-            languages.push({
+            transcriptsValue.push({
                 lang: lang,
                 url: url,
                 label: label
@@ -203,15 +204,13 @@ function StudioEditableXBlock(runtime, element) {
         event.preventDefault();
         event.stopPropagation();
         var $buttonBlock = $(event.currentTarget);
-        $fileUploader.data({
-            'lang-code': $buttonBlock.data('lang-code'),
-            'lang-label': $buttonBlock.data('lang-label'),
-            'change-field-name': $buttonBlock.data('change-field-name')
-        });
+        var indexOfParentLi = $('.language-transcript-selector').children().index($buttonBlock.closest('li'));
         $fileUploader.attr({
-            'data-lang-code': $buttonBlock.data('lang-code'),
-            'data-lang-label': $buttonBlock.data('lang-label'),
-            'data-change-field-name': $buttonBlock.data('change-field-name')
+            'data-lang-code': $buttonBlock.attr('data-lang-code'),
+            'data-lang-label': $buttonBlock.attr('data-lang-label'),
+            'data-change-field-name': $buttonBlock.attr('data-change-field-name'),
+            'accept': $buttonBlock.attr('data-change-field-name') == 'transcripts' ? '.sjson, .srt, .vtt' : '',
+            'data-li-index': $buttonBlock.attr('data-change-field-name') == 'transcripts' ? indexOfParentLi : ''
         });
 
         $fileUploader.click();
@@ -221,60 +220,63 @@ function StudioEditableXBlock(runtime, element) {
         event.stopPropagation();
         var $selectedOption = $(event.currentTarget).find('option:selected');
         var selectedLanguage = $selectedOption.val();
-        var languageLabel = $selectedOption.data('lang-label');
+        var languageLabel = $selectedOption.attr('data-lang-label');
         var $langSelectParent = $(event.currentTarget).parent('li');
         var $input = $('.upload-transcript', $langSelectParent);
         var oldLang = $input.data('lang-code');
         if(selectedLanguage){
             if(selectedLanguage != oldLang){
-                for(var i=0; i < languages.length; i++){
-                    if(languages[i].lang == oldLang){
-                        languages[i].lang = selectedLanguage;
-                        languages[i].label = languageLabel
+                for(var i=0; i < transcriptsValue.length; i++){
+                    if(transcriptsValue[i].lang == oldLang){
+                        transcriptsValue[i].lang = selectedLanguage;
+                        transcriptsValue[i].label = languageLabel
                     }
                 }
             }
-            $input.data({
-                'lang-code': selectedLanguage,
-                'lang-label': languageLabel
-            });
             $input.attr({
                 'data-lang-code': selectedLanguage,
                 'data-lang-label': languageLabel
             });
             $input.removeClass('is-hidden');
         } else {
-            $input.data({
-                'lang-code': '',
-                'lang-label': ''
-            });
             $input.attr({
                 'data-lang-code': '',
                 'data-lang-label': ''
             });
             $input.addClass('is-hidden');
         }
-        $('input[data-field-name="transcripts"]').val(JSON.stringify(languages)).change();
+        $('input[data-field-name="transcripts"]').val(JSON.stringify(transcriptsValue)).change();
     };
 
     $fileUploader.on('change', function(event) {
-        var fieldName = $(event.currentTarget).data('change-field-name');
-        var lang = $(event.currentTarget).data('lang-code');
-        var label = $(event.currentTarget).data('lang-label');
+        console.log($(event.currentTarget).val());
+        var fieldName = $(event.currentTarget).attr('data-change-field-name');
+        var lang = $(event.currentTarget).attr('data-lang-code');
+        var label = $(event.currentTarget).attr('data-lang-label');
+        var currentLiIndex = $(event.currentTarget).attr('data-li-index');
+        var currentLiTag = $('.language-transcript-selector').children()[parseInt(currentLiIndex)];
+        $('.upload-setting', element).addClass('is-disabled');
         $('.file-uploader-form', element).ajaxSubmit({
             success: function(response, statusText, xhr, form) {
-                if(lang == ""){
+                if(fieldName == "handout"){
                     $('input[data-field-name=' + fieldName + ']').val(response['asset']['id']).change();
                 } else {
-                    pushLanguage(lang, label, '/' + response['asset']['id']);
-                    $('input[data-field-name=' + fieldName + ']').val(JSON.stringify(languages)).change();
+                    var url = '/' + response['asset']['id'];
+                    pushLanguage(lang, label, url);
+                    $('input[data-field-name=' + fieldName + ']').val(JSON.stringify(transcriptsValue)).change();
+                    $(currentLiTag).find('.upload-transcript').text('Replace');
+                    $(currentLiTag).find('.download-transcript').removeClass('is-hidden').attr('href', url);
                 }
-                $(event.currentTarget).removeData();
                 $(event.currentTarget).attr({
                     'data-change-field-name': '',
                     'data-lang-code': '',
                     'data-lang-label': ''
                 });
+                $('.status-upload', $(currentLiTag)).text('File uploaded successfully');
+                setTimeout(function(){
+                    $('.status-upload', $(currentLiTag)).hide()
+                }, 2000);
+                $('.upload-setting', element).removeClass('is-disabled');
             }
         });
     });
@@ -282,11 +284,10 @@ function StudioEditableXBlock(runtime, element) {
     $('.add-transcript', element).on('click', function (event) {
         event.preventDefault();
         $(event.currentTarget).addClass('is-disabled');
-        var $choiserItem = $('.list-settings-item:hidden').clone();
-        $choiserItem.removeClass('is-hidden');
-        $choiserItem.appendTo($langChoicer);
-        $('.upload-transcript', $choiserItem).on('click', clickUploader);
-        $('.lang-select', $choiserItem).on('change', languageChecker);
+        var $templateItem = $('.list-settings-item:hidden').clone();
+        $templateItem.removeClass('is-hidden').appendTo($langChoiceItem);
+        $('.upload-transcript', $templateItem).on('click', clickUploader);
+        $('.lang-select', $templateItem).on('change', languageChecker);
     });
 
     $('.lang-select').on('change', languageChecker);
@@ -298,18 +299,23 @@ function StudioEditableXBlock(runtime, element) {
         event.stopPropagation();
         var $currentBlock = $(event.currentTarget).closest('li');
         var lang = $currentBlock.find('option:selected').val();
-        for (var i=0; i < languages.length; i++){
-            if(lang == languages[i].lang){
-                languages.splice(i,1)
+        for (var i=0; i < transcriptsValue.length; i++){
+            if(lang == transcriptsValue[i].lang){
+                transcriptsValue.splice(i,1);
+                break;
             }
         }
-        if(!languages.length){
-            $currentBlock.parents('li').removeClass('is-set');
-            $currentBlock.parents('li').find('.setting-clear').removeClass('active').addClass('inactive');
+        if(!transcriptsValue.length){
+            $currentBlock.parents('li').removeClass('is-set').find('.setting-clear').removeClass('active').addClass('inactive');
         }
         $currentBlock.remove();
-        $('input[data-field-name="transcripts"]').val(JSON.stringify(languages)).change();
+        $('input[data-field-name="transcripts"]').val(JSON.stringify(transcriptsValue)).change();
 
+    });
+
+    $('.setting-clear').on('click', function (event){
+        var $currentBlock = $(event.currentTarget).closest('li');
+        $currentBlock.find('ol').find('li:visible').remove();
     });
     // End of Raccoongang addons
 }
