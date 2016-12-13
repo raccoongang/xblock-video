@@ -108,7 +108,7 @@
                       </select>
                       <a href="#" class="remove-action remove-setting" data-value=""><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>
                       <div class="list-settings-buttons">
-                        <a href="#" class="upload-setting upload-transcript" data-change-field-name="{{field.name}}" data-lang-code="{{ transcript.lang }}" data-lang-label="{{ transcript.label }}">{% trans "Replace" %}</a>
+                        <a href="#" class="upload-setting upload-transcript {% if not transcript.lang %}is-hidden{% endif %}" data-change-field-name="{{field.name}}" data-lang-code="{{ transcript.lang }}" data-lang-label="{{ transcript.label }}">{% trans "Replace" %}</a>
                         <a href="{{ transcript.url }}" class="download-transcript download-setting">Download</a>
                       </div>
                       <div class="status-upload"></div>
