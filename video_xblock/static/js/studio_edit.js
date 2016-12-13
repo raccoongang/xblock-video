@@ -250,6 +250,7 @@ function StudioEditableXBlock(runtime, element) {
             }
             $uploadButton.data('lang-code', selectedLanguage);
         } else if (selectedLanguage == '') {
+            $selectedOption.val($uploadButton.data('lang-code'));
             $('.remove-action', $langSelectParent).trigger('click');
         }
         $uploadButton.attr({
@@ -293,10 +294,11 @@ function StudioEditableXBlock(runtime, element) {
         if(!transcriptsValue.length){
             $currentBlock.parents('li').removeClass('is-set').find('.setting-clear').removeClass('active').addClass('inactive');
         }
-        $currentBlock.remove();
+        removeLanguage(lang);
         pushTranscriptsValue();
         $('.add-transcript', element).removeClass('is-disabled');
-        removeLanguage(lang);
+        $currentBlock.remove();
+        disableOption();
 
     };
 

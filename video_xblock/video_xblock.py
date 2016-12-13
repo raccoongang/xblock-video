@@ -177,7 +177,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
                 player_url=player_url,
                 display_name=self.display_name,
                 usage_id=self.location.to_deprecated_string(),
-                handout=self.get_url_for(self.handout),
+                handout=self.handout,
                 handout_file_name=self.get_handout_file_name()
             )
         )
