@@ -137,8 +137,9 @@ function StudioEditableXBlock(runtime, element) {
         });
     };
 
-    $('.save-button', element).bind('click', function(e) {
-        e.preventDefault();
+    // Raccoongang changes
+
+    var fillValues = function (e) {
         var values = {};
         var notSet = []; // List of field names that should be set to default values
         for (var i in fields) {
@@ -155,7 +156,27 @@ function StudioEditableXBlock(runtime, element) {
             }
         }
         studio_submit({values: values, defaults: notSet});
-    });
+    };
+
+    var validateTranscripts = function(e){
+        e.preventDefault();
+        var isValid = [];
+        var $visibleLangChoiceItems = $langChoiceItem.find('li:visible');
+        $visibleLangChoiceItems.each(function(idx, el){
+            var urls = $('.download-setting', $(el)).filter('.is-hidden');
+            if (urls.length){
+                $('.status-error', $(el))
+                    .text('Please upload the transcript file for this language or remove the language.')
+            } else {
+                isValid.push(1)
+            }
+        });
+        if (isValid.length == $visibleLangChoiceItems.length){
+            fillValues(e)
+        }
+    };
+
+    $('.save-button', element).bind('click', validateTranscripts);
 
     $(element).find('.cancel-button').bind('click', function(e) {
         // Remove TinyMCE instances to make sure jQuery does not try to access stale instances
@@ -170,6 +191,8 @@ function StudioEditableXBlock(runtime, element) {
         runtime.notify('cancel', {});
     });
 
+    // End of Raccoongang changes
+
     // Raccoongang addons
 
     var transcriptsValue = [];
@@ -178,7 +201,7 @@ function StudioEditableXBlock(runtime, element) {
     var $langChoiceItem = $('.language-transcript-selector', element);
     var gotTranscriptsValue = $('input[data-field-name="transcripts"]').val();
 
-    if(gotTranscriptsValue){
+    if (gotTranscriptsValue){
         transcriptsValue = JSON.parse(gotTranscriptsValue);
     }
 
@@ -189,7 +212,7 @@ function StudioEditableXBlock(runtime, element) {
     var disableOption = function(){
 
         $langChoiceItem.find('option').each(function(ind){
-            if(disabledLanguages.indexOf($(this).val()) > -1){
+            if (disabledLanguages.indexOf($(this).val()) > -1){
                 $(this).attr('disabled', true)
             } else {
                 $(this).attr('disabled', false)
@@ -226,7 +249,7 @@ function StudioEditableXBlock(runtime, element) {
             'data-lang-code': $buttonBlock.attr('data-lang-code'),
             'data-lang-label': $buttonBlock.attr('data-lang-label'),
             'data-change-field-name': $buttonBlock.attr('data-change-field-name'),
-            'accept': $buttonBlock.attr('data-change-field-name') == 'transcripts' ? '.sjson, .srt, .vtt' : '',
+            'accept': $buttonBlock.attr('data-change-field-name') == 'transcripts' ? '.srt, .vtt' : '',
             'data-li-index': $buttonBlock.attr('data-change-field-name') == 'transcripts' ? indexOfParentLi : ''
         });
 
@@ -241,10 +264,10 @@ function StudioEditableXBlock(runtime, element) {
         var $langSelectParent = $(event.currentTarget).parent('li');
         var $uploadButton = $('.upload-transcript', $langSelectParent);
         var oldLang = $uploadButton.data('lang-code');
-        if(selectedLanguage != oldLang && selectedLanguage != ''){
+        if (selectedLanguage != oldLang && selectedLanguage != ''){
             pushTranscript(selectedLanguage, languageLabel, '');
             disabledLanguages.push(selectedLanguage);
-            if(oldLang != ''){
+            if (oldLang != ''){
                 removeTranscript(oldLang);
                 removeLanguage(oldLang);
             }
@@ -269,7 +292,7 @@ function StudioEditableXBlock(runtime, element) {
 
     var removeTranscript = function(lang){
         for (var i=0; i < transcriptsValue.length; i++){
-            if(lang == transcriptsValue[i].lang){
+            if (lang == transcriptsValue[i].lang){
                 transcriptsValue.splice(i,1);
                 break;
             }
@@ -278,7 +301,7 @@ function StudioEditableXBlock(runtime, element) {
 
     var pushTranscriptsValue = function(){
         transcriptsValue.forEach(function (transcriptValue, index, array){
-            if(transcriptValue.lang == "" || transcriptValue.label == "" || transcriptValue.url == ""){
+            if (transcriptValue.lang == "" || transcriptValue.label == "" || transcriptValue.url == ""){
                 transcriptsValue.splice(index, 1);
             }
         });
@@ -291,7 +314,7 @@ function StudioEditableXBlock(runtime, element) {
         var $currentBlock = $(event.currentTarget).closest('li');
         var lang = $currentBlock.find('option:selected').val();
         removeTranscript(lang);
-        if(!transcriptsValue.length){
+        if (!transcriptsValue.length){
             $currentBlock.parents('li').removeClass('is-set').find('.setting-clear').removeClass('active').addClass('inactive');
         }
         removeLanguage(lang);
@@ -302,7 +325,44 @@ function StudioEditableXBlock(runtime, element) {
 
     };
 
+    var showUploadStatus = function($element, filename){
+        $('.status-error', $element).empty();
+        $('.status-upload', $element).text('File ' + '"' + filename + '"' + ' uploaded successfully').show();
+        setTimeout(function(){
+            $('.status-upload', $element).hide()
+        }, 5000);
+    };
+
+    var successHandler = function(response, statusText, xhr, fieldName, lang, label, currentLiTag) {
+        var url = '/' + response['asset']['id'];
+        var regExp = /.*@(.+\..+)/;
+        var filename = regExp.exec(url)[1];
+        if (fieldName == "handout"){
+            var $parentDiv = $('.file-uploader', element);
+            $('.download-setting', $parentDiv).attr({'href': url, 'download': filename}).removeClass('is-hidden');
+            $('a[data-change-field-name=' + fieldName + ']').text('Replace');
+            showUploadStatus($parentDiv, filename);
+            $('input[data-field-name=' + fieldName + ']').val(url).change();
+        } else {
+            pushTranscript(lang, label, url);
+            $('input[data-field-name=' + fieldName + ']').val(JSON.stringify(transcriptsValue)).change();
+            $(currentLiTag).find('.upload-transcript').text('Replace');
+            $(currentLiTag).find('.download-transcript')
+                .removeClass('is-hidden')
+                .attr({'href': url, 'download': filename});
+            showUploadStatus($(currentLiTag), filename);
+        }
+        $(event.currentTarget).attr({
+            'data-change-field-name': '',
+            'data-lang-code': '',
+            'data-lang-label': ''
+        });
+    };
+
     $fileUploader.on('change', function(event) {
+        if (!$fileUploader.val()){
+            return;
+        };
         var fieldName = $(event.currentTarget).attr('data-change-field-name');
         var lang = $(event.currentTarget).attr('data-lang-code');
         var label = $(event.currentTarget).attr('data-lang-label');
@@ -310,28 +370,14 @@ function StudioEditableXBlock(runtime, element) {
         var currentLiTag = $('.language-transcript-selector').children()[parseInt(currentLiIndex)];
         $('.upload-setting', element).addClass('is-disabled');
         $('.file-uploader-form', element).ajaxSubmit({
-            success: function(response, statusText, xhr, form) {
-                if(fieldName == "handout"){
-                    $('input[data-field-name=' + fieldName + ']').val(response['asset']['id']).change();
-                } else {
-                    var url = '/' + response['asset']['id'];
-                    pushTranscript(lang, label, url);
-                    $('input[data-field-name=' + fieldName + ']').val(JSON.stringify(transcriptsValue)).change();
-                    $(currentLiTag).find('.upload-transcript').text('Replace');
-                    $(currentLiTag).find('.download-transcript').removeClass('is-hidden').attr('href', url);
-                }
-                $(event.currentTarget).attr({
-                    'data-change-field-name': '',
-                    'data-lang-code': '',
-                    'data-lang-label': ''
-                });
-                $('.status-upload', $(currentLiTag)).text('File uploaded successfully').show();
-                setTimeout(function(){
-                    $('.status-upload', $(currentLiTag)).hide()
-                }, 2000);
-                $('.upload-setting', element).removeClass('is-disabled');
+            success: function(response, statusText, xhr){
+                successHandler(response, statusText, xhr, fieldName, lang, label, currentLiTag)
+            },
+            error: function(jqXHR, textStatus, errorThrown){
+                runtime.notify('error', {title: gettext("Unable to update settings"), message: textStatus});
             }
         });
+        $('.upload-setting', element).removeClass('is-disabled');
     });
 
     $('.add-transcript', element).on('click', function (event) {
@@ -352,6 +398,10 @@ function StudioEditableXBlock(runtime, element) {
 
     $('.setting-clear').on('click', function (event){
         var $currentBlock = $(event.currentTarget).closest('li');
+        if ($('.file-uploader', $currentBlock).length > 0){
+            $('.upload-setting', $currentBlock).text('Upload');
+            $('.download-setting', $currentBlock).addClass('is-hidden');
+        }
         $currentBlock.find('ol').find('li:visible').remove();
     });
     $().ready(function(){
