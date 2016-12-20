@@ -44,11 +44,20 @@ class BaseVideoPlayer(Plugin):
         frag.add_css_url(
             'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'
         )
+        frag.add_css(self.resource_string(
+            '../static/css/videojs-contextmenu-ui.css'
+        ))
         frag.add_javascript(self.resource_string(
             '../static/bower_components/video.js/dist/video.min.js'
         ))
         frag.add_javascript(self.resource_string(
             '../static/bower_components/videojs-transcript/dist/videojs-transcript.js'
+        ))
+        frag.add_javascript(self.resource_string(
+            '../static/bower_components/videojs-contextmenu/dist/videojs-contextmenu.min.js'
+        ))
+        frag.add_javascript(self.resource_string(
+            '../static/bower_components/videojs-contextmenu-ui/dist/videojs-contextmenu-ui.min.js'
         ))
         frag.add_javascript(self.resource_string(
             '../static/js/video-speed.js'
