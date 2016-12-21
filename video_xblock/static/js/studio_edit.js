@@ -10,7 +10,7 @@ function StudioEditableXBlock(runtime, element) {
         var $wrapper = $field.closest('li');
         var $resetButton = $wrapper.find('button.setting-clear');
         var type = $wrapper.data('cast');
-        var context_id = $wrapper.context.id;
+        var contextId = $wrapper.context.id;
         fields.push({
             name: $wrapper.data('field-name'),
             isSet: function() { return $wrapper.hasClass('is-set'); },
@@ -32,7 +32,7 @@ function StudioEditableXBlock(runtime, element) {
                         val = JSON.parse(val); // TODO: handle parse errors
                 }
                 if (type == 'string' && (
-                    context_id == 'xb-field-edit-start_time' || context_id == 'xb-field-edit-end_time')) {
+                    contextId == 'xb-field-edit-start_time' || contextId == 'xb-field-edit-end_time')) {
                     return parseRelativeTime(val);
                 }
                 return val;
@@ -420,10 +420,11 @@ function StudioEditableXBlock(runtime, element) {
         var maxTimeInSeconds = 86399;
         var pad = function (number) {
                 return (number < 10) ? "0" + number : number;
-            },
-            // Removes all white-spaces and splits by `:`.
-            list = value.replace(/\s+/g, '').split(':'),
-            seconds, date;
+            };
+        // Removes all white-spaces and splits by `:`.
+        var list = value.replace(/\s+/g, '').split(':');
+        var seconds;
+        var date;
 
         list = _.map(list, function (num) {
             return Math.max(0, parseInt(num, 10) || 0);
