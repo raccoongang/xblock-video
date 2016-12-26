@@ -98,10 +98,6 @@ domReady(function() {
       .on('play', saveState)
       .on('pause', saveState)
       .on('ended', saveState);
-
-
-
-
   });
 
 });
