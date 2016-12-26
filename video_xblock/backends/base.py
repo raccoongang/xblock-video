@@ -74,6 +74,8 @@ class BaseVideoPlayer(Plugin):
         frag.add_javascript(self.render_resource(
             '../static/js/videojs_event_plugin.js', **context
         ))
+        frag.add_javascript(self.resource_string('../static/js/caption-button.js'))
+        frag.add_javascript(self.resource_string('../static/js/transcript-button.js'))
 
         return frag
 

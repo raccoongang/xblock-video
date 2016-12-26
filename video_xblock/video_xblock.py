@@ -5,9 +5,7 @@ All you need to provide is video url, this XBlock does the rest for you.
 """
 
 import datetime
-import json
 import logging
-import os
 import pkg_resources
 import json
 import os
@@ -127,7 +125,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         default='',
         scope=Scope.content,
         display_name=_('Upload transcript'),
-        help=_('Add transcripts in different languages. Click below to specify a language and upload an .srt transcript file for that language.')
+        help=_('Add transcripts in different languages. Click below to specify a language and upload an .srt or .vtt transcript file for that language.')
     )
 
     editable_fields = ('display_name', 'href', 'start_time', 'end_time', 'account_id', 'handout', 'transcripts', 'player_id')
@@ -243,12 +241,12 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
 
         fragment.content = self.render_resource('static/html/studio_edit.html', **context)
         fragment.add_css(self.resource_string("static/css/handout.css"))
-        fragment.add_css(self.resource_string("static/css/transcripts.css"))
         fragment.add_css(self.render_resource("static/css/studio-main-v1.css",
             path_to_images=path_to_images,
             path_to_fonts=path_to_fonts
             )
         )
+        fragment.add_css(self.resource_string("static/css/transcripts.css"))
         fragment.add_javascript(self.resource_string("static/js/studio_edit.js"))
         fragment.initialize_js('StudioEditableXBlock')
         return fragment
@@ -268,7 +266,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
             save_state_url=save_state_url,
             player_state=self.player_state,
             start_time=int(self.start_time.total_seconds()),
-            end_time=int(self.end_time.total_seconds()),
+            end_time=int(self.end_time.total_seconds())
         )
 
     @XBlock.json_handler
