@@ -147,13 +147,13 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         }
 
     @staticmethod
-    def get_brightcove_js_url(data):
+    def get_brightcove_js_url(account_id, player_id):
         """
         Returns url to brightcove player js file considering account_id and player_id
         """
         return "https://players.brightcove.net/{account_id}/{player_id}_default/index.min.js".format(
-            account_id=data.account_id,
-            player_id=data.player_id
+            account_id=account_id,
+            player_id=player_id
         )
 
     @player_state.setter
@@ -173,7 +173,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         """
         if data.account_id and data.player_id:
             try:
-                r = requests.head(VideoXBlock.get_brightcove_js_url(data))
+                r = requests.head(VideoXBlock.get_brightcove_js_url(data.account_id, data.player_id))
                 if r.status_code != 200:
                     validation.add(ValidationMessage(
                         ValidationMessage.ERROR,
@@ -182,9 +182,8 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
             except requests.ConnectionError:
                 validation.add(ValidationMessage(
                     ValidationMessage.ERROR,
-                    _(u"Connection to https://www.brightcove.com error.")
+                    _(u"Can't validate submitted player id at the moment. Please try to save settings one more time.")
                 ))
-
 
         if data.href == '':
             return
@@ -293,7 +292,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
             player_state=self.player_state,
             start_time=int(self.start_time.total_seconds()),
             end_time=int(self.end_time.total_seconds()),
-            brightcove_js_url=VideoXBlock.get_brightcove_js_url(self)
+            brightcove_js_url=VideoXBlock.get_brightcove_js_url(self.account_id, self.player_id)
         )
 
     @XBlock.json_handler
