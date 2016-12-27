@@ -31,12 +31,12 @@ var xblockUsageId = window.location.hash.slice(1);
 /** Restore default or previously saved player state */
 var setInitialState = function (player, state) {
     var stateCurrentTime = state.currentTime;
-    var videoXblockState = localStorage.getItem('videoXblockState');
-    if (videoXblockState){
-        videoXblockState=JSON.parse(videoXblockState);
-        if (videoXblockState['{{ video_player_id }}'] && videoXblockState[
-            '{{ video_player_id }}'] > stateCurrentTime) {
-            stateCurrentTime = videoXblockState['{{ video_player_id }}'];
+    var playbackProgress = localStorage.getItem('playbackProgress');
+    if (playbackProgress){
+        playbackProgress=JSON.parse(playbackProgress);
+        if (playbackProgress['{{ video_player_id }}'] && 
+            playbackProgress['{{ video_player_id }}'] > stateCurrentTime) {
+            stateCurrentTime = playbackProgress['{{ video_player_id }}'];
         }
     }
     if (stateCurrentTime > 0) {
@@ -75,13 +75,13 @@ var saveState = function(){
  */
 var saveProgressToLocalStore = function(){
   var player = this;
-  var videoXblockState = localStorage.getItem('videoXblockState');
-  if(videoXblockState == undefined){
-      videoXblockState = '{}';
+  var playbackProgress = localStorage.getItem('playbackProgress');
+  if(playbackProgress == undefined){
+      playbackProgress = '{}';
   }
-  videoXblockState = JSON.parse(videoXblockState);
-  videoXblockState['{{ video_player_id }}'] = player.ended() ? 0 : Math.floor(player.currentTime());
-  localStorage.setItem('videoXblockState',JSON.stringify(videoXblockState));
+  playbackProgress = JSON.parse(playbackProgress);
+  playbackProgress['{{ video_player_id }}'] = player.ended() ? 0 : Math.floor(player.currentTime());
+  localStorage.setItem('playbackProgress',JSON.stringify(playbackProgress));
 };
 
 domReady(function() {
