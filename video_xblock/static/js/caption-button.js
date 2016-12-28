@@ -7,22 +7,22 @@ var Component = videojs.getComponent('Component');
 
 var ToggleButton = videojs.extend(Button, {
   constructor: function constructor(player, options) {
+    this._options = options;
     Button.call(this, player, options);
     this.on('click', this.onClick);
     this.createEl();
-    this.options = options;
   },
   styledSpan: function styledSpan() {
-    return this.options['style'];
+    return this._options['style'];
   },
   enabledEventName: function enabledEventName() {
-    return this.options['enabledEvent'];
+    return this._options['enabledEvent'];
   },
   disabledEventName: function disabledEventName() {
-    return this.options['disabledEvent'];
+    return this._options['disabledEvent'];
   },
   buildCSSClass: function buildCSSClass() {
-    return this.options['cssClasses'];
+    return this._options['cssClasses'];
   },
   createEl: function createEl() {
     var tag = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'button';
@@ -43,16 +43,8 @@ var ToggleButton = videojs.extend(Button, {
     var el = event.currentTarget;
     el.classList.toggle('vjs-control-enabled');
 
-    //var event = document.createEvent('Event');
     this.trigger(this.hasClass(el, 'vjs-control-enabled') ? this.enabledEventName() : this.disabledEventName());
 
-    // if (this.hasClass(el, 'vjs-control-enabled')) {
-    //   event.initEvent(this.enabledEventName(), true, true);
-    // } else {
-    //   event.initEvent(this.disabledEventName(), true, true);
-    // };
-
-    // this.trigger(event);
   },
 
 });
