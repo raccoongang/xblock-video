@@ -133,7 +133,7 @@
                 'action': 'analytics',
                 'event_data': data,
                 'xblockUsageId': xblockUsageId
-            }, document.origin);
+            }, document.location.protocol + "//" + document.location.host);
         };
 
         return this;
@@ -141,6 +141,9 @@
     }
 
     window.xblockEventPlugin = XBlockEventPlugin;
-    window.videojs.plugin('xblockEventPlugin', xblockEventPlugin);
+    // add plugin if player has already initialized
+    if (window.videojs) {
+        window.videojs.plugin('xblockEventPlugin', xblockEventPlugin);
+    }
 
 }).call(this);

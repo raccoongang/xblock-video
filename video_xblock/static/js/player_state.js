@@ -29,18 +29,27 @@ var player_state = {
 var xblockUsageId = window.location.hash.slice(1);
 
 /** Restore default or previously saved player state */
-var setInitialState = function(player, state) {
-  if (state.currentTime > 0) {
-    player.currentTime(state.currentTime);
-  }
-  player
-    .volume(state.volume)
-    .muted(state.muted)
-    .playbackRate(state.playbackRate);
+var setInitialState = function (player, state) {
+    var stateCurrentTime = state.currentTime;
+    var playbackProgress = localStorage.getItem('playbackProgress');
+    if (playbackProgress){
+        playbackProgress=JSON.parse(playbackProgress);
+        if (playbackProgress['{{ video_player_id }}'] && 
+            playbackProgress['{{ video_player_id }}'] > stateCurrentTime) {
+            stateCurrentTime = playbackProgress['{{ video_player_id }}'];
+        }
+    }
+    if (stateCurrentTime > 0) {
+        player.currentTime(stateCurrentTime);
+    }
+    player
+        .volume(state.volume)
+        .muted(state.muted)
+        .playbackRate(state.playbackRate);
 };
 
 /**
- * Save player stat by posting it in a message to parent frame.
+ * Save player state by posting it in a message to parent frame.
  * Parent frame passes it to a server by calling VideoXBlock.save_state() handler.
  */
 var saveState = function(){
@@ -55,8 +64,24 @@ var saveState = function(){
   if (JSON.stringify(new_state) !== JSON.stringify(player_state)) {
     console.log('Starting saving player state');
     player_state = new_state;
-    parent.postMessage({'action': 'save_state', 'state': new_state, 'xblockUsageId': xblockUsageId}, document.origin);
+      parent.postMessage({'action': 'save_state', 'state': new_state, 'xblockUsageId': xblockUsageId},
+          document.location.protocol + "//" + document.location.host);
   }
+};
+
+/**
+ *  Save player progress in browser's local storage.
+ *  We need it when user is switching between tabs.
+ */
+var saveProgressToLocalStore = function(){
+  var player = this;
+  var playbackProgress = localStorage.getItem('playbackProgress');
+  if(playbackProgress == undefined){
+      playbackProgress = '{}';
+  }
+  playbackProgress = JSON.parse(playbackProgress);
+  playbackProgress['{{ video_player_id }}'] = player.ended() ? 0 : Math.floor(player.currentTime());
+  localStorage.setItem('playbackProgress',JSON.stringify(playbackProgress));
 };
 
 domReady(function() {
@@ -67,10 +92,12 @@ domReady(function() {
     setInitialState(player, player_state);
 
     player
+      .on('timeupdate', saveProgressToLocalStore)
       .on('volumechange', saveState)
       .on('ratechange', saveState)
       .on('play', saveState)
       .on('pause', saveState)
       .on('ended', saveState);
   });
+
 });
