@@ -24,7 +24,7 @@ domReady(function() {
           };
 
         // Plugin resolution switcher doesn't add it's control to controlBar
-        controlBarActions.push('resolutionSwitcher');
+        // controlBarActions.push('resolutionSwitcher');
         // Swith off tabIndex for volumeMenuButton and free slot for volumeBar
         _player.controlBar.childNameIndex_.volumeMenuButton.el_.tabIndex = -1;
 

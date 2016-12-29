@@ -10,19 +10,17 @@ domReady(function() {
     var transcriptContainer = document.querySelector('#transcript');
     transcriptContainer.appendChild(transcript.el());
 
-    console.log(this);
     this.toggleButton({
-      style: "capt",
+      style: "icon fa fa-cc",
       enabledEvent: "captionenabled",
       disabledEvent: "captiondisabled",
       cssClasses: "vjs-custom-caption-button vjs-control",
     });
     this.toggleButton({
-      style: "trans",
+      style: "icon fa fa-quote-left",
       enabledEvent: "transcriptenabled",
       disabledEvent: "transcriptdisabled",
       cssClasses: "vjs-custom-transcript-button vjs-control",
     });
   });
 });
-// initialize video.js

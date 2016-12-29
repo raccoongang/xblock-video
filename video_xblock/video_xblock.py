@@ -8,6 +8,7 @@ import datetime
 import logging
 import pkg_resources
 import requests
+import json
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Boolean, Integer, Float, String
