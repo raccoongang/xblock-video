@@ -127,17 +127,21 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         default='',
         scope=Scope.content,
         display_name=_('Upload transcript'),
-        help=_('Add transcripts in different languages. Click below to specify a language and upload an .srt transcript file for that language.')
+        help=_('Add transcripts in different languages. Click below to specify a language and upload an .srt transcript'
+               ' file for that language.')
     )
 
     download_transcript_allowed = Boolean(
         default=False,
         scope=Scope.content,
         display_name=_('Download Transcript Allowed'),
-        help=_("Allow students to download the timed transcript. A link to download the file appears below the video. By default, the transcript is an .srt or .txt file. If you want to provide the transcript for download in a different format, upload a file by using the Upload Handout field.")
+        help=_("Allow students to download the timed transcript. A link to download the file appears below the video."
+               " By default, the transcript is an .srt or .txt file. If you want to provide the transcript for download"
+               " in a different format, upload a file by using the Upload Handout field.")
     )
 
-    editable_fields = ('display_name', 'href', 'start_time', 'end_time', 'account_id', 'player_id', 'handout', 'transcripts', 'download_transcript_allowed')
+    editable_fields = ('display_name', 'href', 'start_time', 'end_time', 'account_id', 'player_id', 'handout',
+                       'transcripts', 'download_transcript_allowed')
     player_state_fields = ('current_time', 'muted', 'playback_rate', 'volume')
 
     @property
