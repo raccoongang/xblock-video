@@ -3,4 +3,3 @@ python:
   - "2.7"
 script:
   - "pylint video_xblock"
-
