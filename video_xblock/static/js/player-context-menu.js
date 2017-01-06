@@ -60,17 +60,15 @@ domReady(function() {
     // Check conditions to be met for delegation of the popup submenu creation
     var menuItemClicked = matchesSelector(target, "li.vjs-menu-item");
     var noSubmenuClicked = !target.querySelector('.vjs-contextmenu-ui-submenu');
-    var menuItemsLabelsEqual = (labelElement === labelItem)
+    var menuItemsLabelsEqual = (labelElement === labelItem);
 
     // Wrap into conditional statement to avoid unnecessary variables initialization
     if (menuItemClicked && noSubmenuClicked) {
       var labelLength = labelElement.length;
-      // Check if the last character is an escaped one (line feed) which is the case for Microsoft Edge
-      if (labelElement.charCodeAt(labelLength-1) === 10) {
-        var labelElementSliced = [];
-        for (var i=0; i<labelLength-1; i++){
-          labelElementSliced += labelElement[i];
-        }
+      const lineFeedCode = 10;
+      // Check if the last character is an escaped one (line feed to get rid of) which is the case for Microsoft Edge
+      if (labelElement.charCodeAt(labelLength-1) === lineFeedCode) {
+        var labelElementSliced = labelElement.slice(0, -1);
         menuItemsLabelsEqual = (labelElementSliced === labelItem);
       }
     }
