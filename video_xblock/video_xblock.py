@@ -9,8 +9,7 @@ import json
 import logging
 import os
 import pkg_resources
-import json
-import os
+import requests
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Boolean, Integer, Float, String
@@ -61,7 +60,8 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
     player_id = String(
         default='default',
         display_name=_('Player Id'),
-        help=_('Your Brightcove player id. Use "Luna" theme for all your players'),
+        help=_('Your Brightcove player id. Use "Luna" theme for all your players. You can choose one of your players'
+               ' from a <a href="https://studio.brightcove.com/products/videocloud/players" target="_blank">list</a>.'),
         scope=Scope.content,
     )
 
@@ -116,6 +116,18 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         help=_("Video muted or not")
     )
 
+    transcripts_enabled = Boolean(
+        default=False,
+        scope=Scope.preferences,
+        help=_("Transcript is enabled or not")
+    )
+
+    captions_enabled = Boolean(
+        default=False,
+        scope=Scope.preferences,
+        help=_("Transcript is enabled or not")
+    )
+
     handout = String(
         default='',
         scope=Scope.content,
@@ -127,11 +139,31 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         default='',
         scope=Scope.content,
         display_name=_('Upload transcript'),
-        help=_('Add transcripts in different languages. Click below to specify a language and upload an .srt transcript file for that language.')
+        help=_(
+            'Add transcripts in different languages. Click below to specify a language and upload an .vtt transcript'
+            ' file for that language. You can convert .srt to .vtt <a href="https://atelier.u-sub.net/srt2vtt/">here</a>.'
+        )
     )
 
-    editable_fields = ('display_name', 'href', 'start_time', 'end_time', 'account_id', 'handout', 'transcripts', 'player_id')
-    player_state_fields = ('current_time', 'muted', 'playback_rate', 'volume')
+    download_transcript_allowed = Boolean(
+        default=False,
+        scope=Scope.content,
+        display_name=_('Download Transcript Allowed'),
+        help=_(
+            "Allow students to download the timed transcript. A link to download the file appears below the video."
+            " By default, the transcript is a .vtt file. If you want to provide the transcript for download"
+            " in a different format, upload a file by using the Upload Handout field."
+        )
+    )
+
+    editable_fields = (
+        'display_name', 'href', 'start_time', 'end_time', 'account_id',
+        'player_id', 'handout', 'transcripts', 'download_transcript_allowed'
+    )
+    player_state_fields = (
+        'current_time', 'muted', 'playback_rate', 'volume',
+        'transcripts_enabled', 'captions_enabled'
+    )
 
     @property
     def player_state(self):
@@ -144,7 +176,19 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
             'playback_rate': self.playback_rate,
             'volume': self.volume,
             'transcripts': json.loads(self.transcripts) if self.transcripts else [],
+            'transcripts_enabled': self.transcripts_enabled,
+            'captions_enabled': self.captions_enabled
         }
+
+    @staticmethod
+    def get_brightcove_js_url(account_id, player_id):
+        """
+        Returns url to brightcove player js file considering account_id and player_id
+        """
+        return "https://players.brightcove.net/{account_id}/{player_id}_default/index.min.js".format(
+            account_id=account_id,
+            player_id=player_id
+        )
 
     @player_state.setter
     def player_state(self, state):
@@ -156,11 +200,26 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
         self.playback_rate = state.get('playback_rate', self.playback_rate)
         self.volume = state.get('volume', self.volume)
         self.transcripts = state.get('transcripts', self.transcripts)
+        self.transcripts_enabled = state.get('transcripts_enabled', self.transcripts_enabled)
+        self.captions_enabled = state.get('captions_enabled', self.captions_enabled)
 
     def validate_field_data(self, validation, data):
         """
         Validate data submitted via xblock edit pop-up
         """
+        if data.account_id and data.player_id:
+            try:
+                r = requests.head(VideoXBlock.get_brightcove_js_url(data.account_id, data.player_id))
+                if r.status_code != 200:
+                    validation.add(ValidationMessage(
+                        ValidationMessage.ERROR,
+                        _(u"Invalid Player Id, please recheck")
+                    ))
+            except requests.ConnectionError:
+                validation.add(ValidationMessage(
+                    ValidationMessage.ERROR,
+                    _(u"Can't validate submitted player id at the moment. Please try to save settings one more time.")
+                ))
 
         if data.href == '':
             return
@@ -205,6 +264,8 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
                 display_name=self.display_name,
                 usage_id=self.location.to_deprecated_string(),
                 handout=self.handout,
+                transcripts=json.loads(self.transcripts) if self.transcripts else [],
+                download_transcript_allowed=self.download_transcript_allowed,
                 handout_file_name=self.get_handout_file_name()
             )
         )
@@ -269,6 +330,7 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
             player_state=self.player_state,
             start_time=int(self.start_time.total_seconds()),
             end_time=int(self.end_time.total_seconds()),
+            brightcove_js_url=VideoXBlock.get_brightcove_js_url(self.account_id, self.player_id)
         )
 
     @XBlock.json_handler
@@ -282,7 +344,9 @@ class VideoXBlock(StudioEditableXBlockMixin, XBlock):
             'playback_rate': request['playbackRate'],
             'volume': request['volume'],
             'muted': request['muted'],
-            'transcripts': self.transcripts
+            'transcripts': self.transcripts,
+            'transcripts_enabled': request['transcriptsEnabled'],
+            'captions_enabled': request['captionsEnabled']
         }
         self.player_state = player_state
         return {'success': True}

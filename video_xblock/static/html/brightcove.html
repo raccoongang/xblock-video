@@ -1,4 +1,4 @@
-<div>
+<div class="display-flex">
     <video data-video-id="{{ video_id }}"
         id="{{ video_player_id }}"
         data-account="{{ account_id }}"
@@ -9,6 +9,7 @@
         width="100%"
         height="560"
         class="video-js"
+        brightcove
         controls
     >
     <!-- height="560" it's height of iframe minus height of control bar -->
@@ -17,18 +18,6 @@
         {% if forloop.first %}default{% endif %}>
       {% endfor %}
     </video>
-    <script src="//players.brightcove.net/{{ account_id }}/{{ player_id }}_default/index.min.js"></script>
-    <script src="https://cdn.rawgit.com/walsh9/videojs-transcript/master/dist/videojs-transcript.min.js"></script>
-    <script>
-        var player = videojs('{{ video_player_id }}');
-        videojs.plugin('xblockEventPlugin', window.xblockEventPlugin);
-        player.xblockEventPlugin();
-        videojs.plugin('offset', window.vjsoffset);
-
-        player.offset({
-            "start": {{ start_time }}, // do not use quotes for this properties for correct plugin work
-            "end": {{ end_time }}
-        });
-    </script>
+    <script src="{{ brightcove_js_url }}"></script>
+    <div id="transcript"></div>
 </div>
-<div id="transcript"></div>

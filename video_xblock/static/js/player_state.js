@@ -24,23 +24,36 @@ var player_state = {
   'currentTime': {{ player_state.current_time }},
   'playbackRate': {{ player_state.playback_rate }},
   'muted': {{ player_state.muted | yesno:"true,false" }},
+  'transcriptsEnabled': {{ player_state.transcripts_enabled | yesno:"true,false" }},
+  'captionsEnabled': {{ player_state.captions_enabled | yesno:"true,false" }}
 };
 
 var xblockUsageId = window.location.hash.slice(1);
 
 /** Restore default or previously saved player state */
-var setInitialState = function(player, state) {
-  if (state.currentTime > 0) {
-    player.currentTime(state.currentTime);
-  }
-  player
-    .volume(state.volume)
-    .muted(state.muted)
-    .playbackRate(state.playbackRate);
+var setInitialState = function (player, state) {
+    var stateCurrentTime = state.currentTime;
+    var playbackProgress = localStorage.getItem('playbackProgress');
+    if (playbackProgress){
+        playbackProgress=JSON.parse(playbackProgress);
+        if (playbackProgress['{{ video_player_id }}'] && 
+            playbackProgress['{{ video_player_id }}'] > stateCurrentTime) {
+            stateCurrentTime = playbackProgress['{{ video_player_id }}'];
+        }
+    }
+    if (stateCurrentTime > 0) {
+        player.currentTime(stateCurrentTime);
+    }
+    player
+        .volume(state.volume)
+        .muted(state.muted)
+        .playbackRate(state.playbackRate);
+    player.transcriptsEnabled = state.transcriptsEnabled;
+    player.captionsEnabled = state.captionsEnabled;
 };
 
 /**
- * Save player stat by posting it in a message to parent frame.
+ * Save player state by posting it in a message to parent frame.
  * Parent frame passes it to a server by calling VideoXBlock.save_state() handler.
  */
 var saveState = function(){
@@ -50,6 +63,8 @@ var saveState = function(){
     'currentTime': player.ended()? 0 : Math.floor(player.currentTime()),
     'playbackRate': player.playbackRate(),
     'muted': player.muted(),
+    'transcriptsEnabled': player.transcriptsEnabled,
+    'captionsEnabled': player.captionsEnabled
   };
 
   if (JSON.stringify(new_state) !== JSON.stringify(player_state)) {
@@ -60,6 +75,21 @@ var saveState = function(){
   }
 };
 
+/**
+ *  Save player progress in browser's local storage.
+ *  We need it when user is switching between tabs.
+ */
+var saveProgressToLocalStore = function(){
+  var player = this;
+  var playbackProgress = localStorage.getItem('playbackProgress');
+  if(playbackProgress == undefined){
+      playbackProgress = '{}';
+  }
+  playbackProgress = JSON.parse(playbackProgress);
+  playbackProgress['{{ video_player_id }}'] = player.ended() ? 0 : Math.floor(player.currentTime());
+  localStorage.setItem('playbackProgress',JSON.stringify(playbackProgress));
+};
+
 domReady(function() {
   videojs('{{ video_player_id }}').ready(function() {
     var player = this;
@@ -68,10 +98,14 @@ domReady(function() {
     setInitialState(player, player_state);
 
     player
+      .on('timeupdate', saveProgressToLocalStore)
       .on('volumechange', saveState)
       .on('ratechange', saveState)
       .on('play', saveState)
       .on('pause', saveState)
-      .on('ended', saveState);
+      .on('ended', saveState)
+      .on('transcriptstatechanged', saveState)
+      .on('captionstatechanged', saveState);
   });
+
 });
