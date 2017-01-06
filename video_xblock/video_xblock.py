@@ -39,15 +39,20 @@ class TranscriptsMixin(XBlock):
     @staticmethod
     def convert_caps_to_vtt(caps):
         """
-        Utility method conoverts any supported transcripts into WebVTT format.
+        Utility method converts any supported transcripts into WebVTT format.
         Supported input formats: DFXP/TTML - SAMI - SCC - SRT - WebVTT
+
+        Arguments:
+            caps (unicode): Raw transcripts.
+        Returns:
+            unicode: Transcripts converted into WebVTT format.
         """
 
         reader = detect_format(caps)
         if reader:
             return WebVTTWriter().write(reader().read(caps))
         else:
-            raise Exception
+            return u''
 
     def route_transcripts(self, transcripts):
         """
@@ -55,17 +60,26 @@ class TranscriptsMixin(XBlock):
         """
 
         transcripts = json.loads(transcripts) if transcripts else []
-        for t in transcripts:
-            if not t['url'].endswith('.vtt'):
-                t['url'] = self.runtime.handler_url(
-                    self, 'srt_to_vtt', query=t['url']
+        for tran in transcripts:
+            if not tran['url'].endswith('.vtt'):
+                tran['url'] = self.runtime.handler_url(
+                    self, 'srt_to_vtt', query=tran['url']
                 )
-            yield t
+            yield tran
 
     @XBlock.handler
     def srt_to_vtt(self, request, suffix=''):
         """
-        Fetches raw transcripts, converts them into .vtt and returns back.
+        Fetches raw transcripts, converts them into WebVTT format and returns back.
+
+        Path to raw transcripts is passed in as `request.query_string`.
+
+        Arguments:
+            request (webob.Request): The request to handle
+            suffix (string): The remainder of the url, after the handler url prefix, if available
+
+        Returns:
+            webob.Response: WebVTT transcripts wrapped in Response object.
         """
         caps_path = request.query_string
         caps = requests.get(request.host_url + caps_path).text
@@ -195,7 +209,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         display_name=_('Download Transcript Allowed'),
         help=_(
             "Allow students to download the timed transcript. A link to download the file appears below the video."
-            " By default, the transcript is an .srt or .txt file. If you want to provide the transcript for download"
+            " By default, the transcript is an .vtt or .srt file. If you want to provide the transcript for download"
             " in a different format, upload a file by using the Upload Handout field."
         )
     )
