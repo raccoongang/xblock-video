@@ -6,11 +6,8 @@ cache: pip
 env:
   - TRAVIS_NODE_VERSION="6"
 
-install:
-  # Python test requirements
-  - pip install -r requirements.txt
-
-  # JavaScript eslint requirements
+before_install:
+  # Install latest stable NodeJS version. Required for eslint.
   - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install $TRAVIS_NODE_VERSION
 
 before_script:
