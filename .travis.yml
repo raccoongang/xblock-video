@@ -1,7 +1,11 @@
 language: python
 python:
   - "2.7"
+node_js:
+  - node
 cache: pip
+before_script:
+  - npm install
 script:
   - "pylint video_xblock"
   - "eslint video_xblock/static/js/"
