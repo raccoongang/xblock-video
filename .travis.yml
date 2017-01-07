@@ -3,14 +3,15 @@ python:
   - "2.7"
 cache: pip
 
+env:
+  - TRAVIS_NODE_VERSION="6"
+
 install:
   # Python test requirements
   - pip install -r requirements.txt
 
-  # JavaScript test requirements
-  - sudo npm cache clean -f
-  - sudo npm install -g n
-  - sudo n stable -g
+  # JavaScript eslint requirements
+  - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install $TRAVIS_NODE_VERSION
 
 before_script:
   - npm install
