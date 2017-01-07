@@ -3,14 +3,9 @@ python:
   - "2.7"
 cache: pip
 
-env:
-  - TRAVIS_NODE_VERSION="6"
-
 before_install:
   # Install latest stable NodeJS version. Required for eslint.
-  - . $HOME/.nvm/nvm.sh
   - nvm install stable
-  - nvm use stable
 
 before_script:
   - npm install
