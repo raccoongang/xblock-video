@@ -4,3 +4,4 @@ python:
 cache: pip
 script:
   - "pylint video_xblock"
+  - "eslint video_xblock/static/js/"
