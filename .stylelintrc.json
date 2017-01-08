@@ -1,0 +1,7 @@
+{
+    "extends": "stylelint-config-standard",
+    "rules": {
+        "indentation": 4,
+        "max-line-length": [100, {"ignore": ["comments"]}]
+    }
+}

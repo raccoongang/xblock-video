@@ -9,7 +9,9 @@ before_install:
 
 before_script:
   - npm install eslint@"^3.13.0" eslint-config-edx@"^1.2.1"
+  - npm install stylelint stylelint-config-standard
 
 script:
   - "pylint video_xblock"
   - "eslint video_xblock/static/js/"
+  - "stylelint video_xblock/static/css/*"
