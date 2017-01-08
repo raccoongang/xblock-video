@@ -8,7 +8,7 @@ before_install:
   - nvm install stable
 
 before_script:
-  - npm install
+  - npm install eslint@"^3.13.0" eslint-config-edx@"^1.2.1"
 
 script:
   - "pylint video_xblock"

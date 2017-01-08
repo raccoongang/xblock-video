@@ -1,11 +1,4 @@
 {
-  "name": "xblock-video",
-  "version": "0.0.1",
-  "devDependencies": {
-    "eslint": "^3.13.0",
-    "eslint-config-edx": "^1.2.1"
-  },
-  "eslintConfig": {
     "extends": "eslint-config-edx",
     "globals": {
         "videojs": true,
@@ -14,9 +7,9 @@
     "rules": {
         "no-underscore-dangle": [
             "error", {"allow": [
+                // VideoJS components' attributes
                 "childNameIndex_", "el_", "kind_", "labelEl_", "options_", "player_"
             ]}
         ]
     }
-  }
 }
