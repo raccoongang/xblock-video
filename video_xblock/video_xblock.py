@@ -324,6 +324,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         """
 
         player_url = self.runtime.handler_url(self, 'render_player')
+        transcript_download_link = self.get_transcript_download_link()
         frag = Fragment(
             self.render_resource(
                 'static/html/student_view.html',
@@ -333,8 +334,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 handout=self.handout,
                 transcripts=self.route_transcripts(self.transcripts),
                 download_transcript_allowed=self.download_transcript_allowed,
-                handout_file_name=self.get_handout_file_name(),
-                transcript_download_link=self.get_transcript_download_link()
+                handout_file_name=self.get_file_name_from_path(self.handout),
+                transcript_download_link=transcript_download_link,
+                transcript_file_name=self.get_file_name_from_path(transcript_download_link)
             )
         )
         frag.add_javascript(self.resource_string("static/js/video_xblock.js"))
@@ -475,20 +477,20 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         info = super(VideoXBlock, self)._make_field_info(field_name, field)
         if field_name == 'handout':
             info['type'] = 'file_uploader'
-            info['file_name'] = self.get_handout_file_name()
+            info['file_name'] = self.get_file_name_from_path(self.handout)
             info['value'] = self.get_path_for(self.handout)
         if field_name == 'transcripts':
             info['type'] = 'transcript_uploader'
         return info
 
-    def get_handout_file_name(self):
+    def get_file_name_from_path(self, field):
         """
-        Field handout look like this:
+        Path to mongoDB storage for a file look like this:
         asset-v1-RaccoonGang+1+2018+type@asset+block@<filename>
 
         It returns only name of file with extension
         """
-        return self.handout.split('@')[-1]
+        return field.split('@')[-1]
 
     def get_path_for(self, file_field):
         """
