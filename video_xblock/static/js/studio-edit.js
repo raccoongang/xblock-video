@@ -225,22 +225,29 @@ function StudioEditableXBlock(runtime, element) {
         })
     };
 
-    var pushTranscript = function (lang, label, url){
+    var pushTranscript = function (lang, label, url, oldLang, $uploadButton){
         var indexLanguage;
         for (var i=0; i < transcriptsValue.length; i++){
-            if (lang == transcriptsValue[i].lang){
+            if (oldLang == transcriptsValue[i].lang || lang == transcriptsValue[i].lang){
                 indexLanguage = i;
                 break;
             }
         }
         if (indexLanguage !== undefined){
-            transcriptsValue[indexLanguage].url = url
+            transcriptsValue[indexLanguage].lang = lang;
+            transcriptsValue[indexLanguage].label = label;
+            if (url) {
+              transcriptsValue[indexLanguage].url = url;
+            }
         } else {
             transcriptsValue.push({
                 lang: lang,
                 url: url,
                 label: label
-            })
+            });
+            if ($uploadButton) {
+              $uploadButton.removeClass('is-hidden');
+            }
         }
         $('.add-transcript').removeClass('is-disabled');
     };
@@ -270,10 +277,13 @@ function StudioEditableXBlock(runtime, element) {
         var $uploadButton = $('.upload-transcript', $langSelectParent);
         var oldLang = $uploadButton.data('lang-code');
         if (selectedLanguage != oldLang && selectedLanguage != ''){
-            pushTranscript(selectedLanguage, languageLabel, '');
+
+
+
+
+            pushTranscript(selectedLanguage, languageLabel, undefined, oldLang, $uploadButton);
             disabledLanguages.push(selectedLanguage);
             if (oldLang != ''){
-                removeTranscript(oldLang);
                 removeLanguage(oldLang);
             }
             $uploadButton.data('lang-code', selectedLanguage);
@@ -285,7 +295,6 @@ function StudioEditableXBlock(runtime, element) {
             'data-lang-code': selectedLanguage,
             'data-lang-label': languageLabel
         });
-        $uploadButton.removeClass('is-hidden').text('Upload');
         disableOption();
         pushTranscriptsValue();
     };
