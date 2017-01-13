@@ -61,8 +61,11 @@ function VideoXBlockStudentViewInit(runtime, element) {
   /** Updates transcript download url if it is enabled */
   function updateTranscriptDownloadUrl(downloadTranscriptUrl) {
     try {
-      var downloadTranscriptUrl = downloadTranscriptUrl ? downloadTranscriptUrl : '#';
-      document.getElementById('download-transcript-link').href = downloadTranscriptUrl;
+      var downloadTranscriptUrl = downloadTranscriptUrl;
+      var transcriptFileName = downloadTranscriptUrl.split('@').pop();
+      var downloadLinkEl = document.getElementById('download-transcript-link');
+      downloadLinkEl.href = downloadTranscriptUrl;
+      downloadLinkEl.download = transcriptFileName;
     } catch (err){}
   }
 }
