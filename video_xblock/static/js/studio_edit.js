@@ -36,6 +36,7 @@ function StudioEditableXBlock(runtime, element) {
                     contextId == 'xb-field-edit-start_time' || contextId == 'xb-field-edit-end_time')) {
                     return parseRelativeTime(val);
                 }
+                return val;
             },
             removeEditor: function() {
                 $field.tinymce().remove();
