@@ -1,3 +1,7 @@
+"""
+Wistia Video player plugin
+"""
+
 import json
 import re
 

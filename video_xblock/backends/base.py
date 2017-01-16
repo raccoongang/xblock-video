@@ -1,3 +1,7 @@
+"""
+Base Video player plugin
+"""
+
 import abc
 import pkg_resources
 import re
@@ -10,7 +14,7 @@ from xblock.plugin import Plugin
 from django.template import Template, Context
 
 
-html_parser = HTMLParser()
+html_parser = HTMLParser()  #pylint: disable=invalid-name
 
 
 class BaseVideoPlayer(Plugin):
