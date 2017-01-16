@@ -331,7 +331,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 'static/html/student_view.html',
                 player_url=player_url,
                 display_name=self.display_name,
-                usage_id=self.location.to_deprecated_string(),
+                usage_id=self.location.to_deprecated_string(),  # pylint: disable=no-member
                 handout=self.handout,
                 transcripts=self.route_transcripts(self.transcripts),
                 download_transcript_allowed=self.download_transcript_allowed,
@@ -356,7 +356,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
         context = {
             'fields': [],
-            'courseKey': self.location.course_key,
+            'courseKey': self.location.course_key,  # pylint: disable=no-member
             'languages': languages,
             'transcripts': transcripts,
             'download_transcript_handler_url': download_transcript_handler_url
@@ -396,7 +396,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         return player.get_player_html(
             url=self.href, autoplay=False, account_id=self.account_id, player_id=self.player_id,
             video_id=player.media_id(self.href),
-            video_player_id='video_player_{}'.format(self.location.block_id),
+            video_player_id='video_player_{}'.format(self.location.block_id),  # pylint: disable=no-member
             save_state_url=save_state_url,
             player_state=self.player_state,
             start_time=int(self.start_time.total_seconds()),
@@ -466,12 +466,12 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             # RelativeTime field doesn't supported by default.
             return {
                 'name': field_name,
-                'display_name': _(field.display_name) if field.display_name else "",
+                'display_name': _(field.display_name) if field.display_name else "",  # pylint: disable=translation-of-non-string
                 'is_set': field.is_set_on(self),
                 'default': field.default,
                 'value': field.read_from(self),
                 'has_values': False,
-                'help': _(field.help) if field.help else "",
+                'help': _(field.help) if field.help else "",  # pylint: disable=translation-of-non-string
                 'allow_reset': field.runtime_options.get('resettable_editor', True),
                 'list_values': None,
                 'has_list_values': False,
