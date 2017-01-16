@@ -1,4 +1,7 @@
 """
+Backend classes are responsible for video platform specific logic such as
+validation, interaction with the platform via API and player rendering to end user.
+
 Base Video player plugin
 """
 
