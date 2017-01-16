@@ -17,7 +17,7 @@ from xblock.fields import Scope, Boolean, Integer, Float, String
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
-from xmodule.fields import RelativeTime
+from xmodule.fields import RelativeTime  # pylint: disable=import-error
 
 from django.template import Template, Context
 from pycaption import detect_format, WebVTTWriter
