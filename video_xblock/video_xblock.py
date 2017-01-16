@@ -289,7 +289,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         if data.href == '':
             return
-        for _, player_class in BaseVideoPlayer.load_classes():
+        for _player_name, player_class in BaseVideoPlayer.load_classes():
             if player_class.match(data.href):
                 return
 
