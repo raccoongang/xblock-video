@@ -220,9 +220,20 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         )
     )
 
+    default_transcripts = String(
+        default='',
+        scope=Scope.content,
+        display_name=_('Default Transcript'),
+        help=_(
+            'Default transcripts are to be uploaded whether automatically from video platform or '
+            'manually if no transcripts were found there.'
+        )
+    )
+
     editable_fields = (
         'display_name', 'href', 'start_time', 'end_time', 'account_id',
-        'player_id', 'handout', 'transcripts', 'download_transcript_allowed'
+        'player_id', 'handout', 'transcripts', 'download_transcript_allowed',
+        'default_transcripts'
     )
     player_state_fields = (
         'current_time', 'muted', 'playback_rate', 'volume',
@@ -334,7 +345,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 transcripts=self.route_transcripts(self.transcripts),
                 download_transcript_allowed=self.download_transcript_allowed,
                 handout_file_name=self.get_handout_file_name(),
-                transcript_download_link=self.get_transcript_download_link()
+                transcript_download_link=self.get_transcript_download_link(),
             )
         )
         frag.add_javascript(self.resource_string("static/js/video_xblock.js"))
@@ -350,11 +361,26 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         languages = [{'label': label, 'code': lang} for lang, label in ALL_LANGUAGES]
         languages.sort(key=lambda l: l['label'])
         transcripts = json.loads(self.transcripts) if self.transcripts else []
+
+        # Fetch captions list (available transcripts list) from video platform API
+        player = self.get_player()
+        video_id = player.media_id(self.href)
+        default_transcripts = player.get_default_transcripts(video_id)
+        # Exclude enabled transcripts from the list of available ones
+        enabled_languages_codes = [t[u'lang'] for t in transcripts]
+        default_transcripts = [
+            dt for dt in default_transcripts
+            if (unicode(dt.get('lang')) not in enabled_languages_codes) and default_transcripts
+        ]
+        if default_transcripts:
+            default_transcripts.sort(key=lambda l: l['label'])
+
         context = {
             'fields': [],
             'courseKey': self.location.course_key,
             'languages': languages,
-            'transcripts': transcripts
+            'transcripts': transcripts,
+            'default_transcripts': default_transcripts
         }
         # Build a list of all the fields that can be edited:
         for field_name in self.editable_fields:
@@ -479,6 +505,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             info['value'] = self.get_path_for(self.handout)
         if field_name == 'transcripts':
             info['type'] = 'transcript_uploader'
+        if field_name == 'default_transcripts':
+            info['type'] = 'default_transcript_uploader'
         return info
 
     def get_handout_file_name(self):

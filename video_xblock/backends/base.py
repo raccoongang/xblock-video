@@ -30,6 +30,13 @@ class BaseVideoPlayer(Plugin):
         """
         return [] or re.compile('') or ''
 
+    @abc.abstractproperty
+    def captions_api(self):
+        """
+        Dictionary of url, request parameters, and response structure of video platform's captions API.
+        """
+        return {}
+
     def get_frag(self, **context):
         """
         Returns a Fragment required to render video player on the client side.
@@ -92,6 +99,45 @@ class BaseVideoPlayer(Plugin):
         """
 
         return ''
+
+    def fetch_default_transcripts_languages(self):
+        """
+        Fetches available transcripts languages from a video platform.
+
+        Returns:
+            list: List of pairs of codes and labels of captions' languages fetched from API.
+        """
+        return []
+
+    def get_default_transcripts(self, video_id):
+        """
+        Fetches transcripts list from a video platform.
+
+        Arguments:
+            video_id (str): video id fetched from href field of studio-edit modal.
+        Returns:
+            list: List of dicts of transcripts. Example:
+            [
+                {
+                    'lang': 'en',
+                    'label': 'English',
+                    'url': 'learning-services-media.brightcove.com/captions/bc_smart_ja.vtt'
+                },
+                # ...
+            ]
+        """
+        return []
+
+    def download_default_transcript(self, url):
+        """
+        Downloads default transcript from a video platform API and uploads it to the video xblock in WebVVT format.
+
+        Arguments:
+            url (str): transcript download url.
+        Returns:
+            None
+        """
+        return []
 
     def get_player_html(self, **context):
         """

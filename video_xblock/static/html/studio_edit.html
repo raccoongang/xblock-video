@@ -136,7 +136,46 @@
                   <span class="icon fa fa-plus" aria-hidden="true"></span>{% trans 'Add' %}<span class="sr"></span>
                 </a>
               </div>
-                <!-- End of Raccoongang addons -->
+
+            {% elif field.type == 'default_transcript_uploader' %}
+              <div class="default_transcripts_list">
+
+                <!-- TODO switch btn like in Wistia: https://olena-persianova.wistia.com/medias/jzmku8z83i# -->
+
+                {% if transcripts %}
+                  <div class="default_transcripts_section_label">Enabled transcripts</div>
+                  <!-- Display a list of transcripts from video xblock -->
+                    {% for transcript in transcripts %}
+                      <div class="default_transcripts_section">
+                        <div class="default_transcripts_label" value="{{ transcript.lang }}">
+                          {{ transcript.label }}
+                        </div>
+                        <div class="default_transcripts_actions">
+                          <a class="default_transcripts_upload_link">Download</a>
+                          <a class="default_transcripts_upload_link">Delete</a>
+                        </div>
+                      </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if default_transcripts %}
+                  <div class="default_transcripts_section_label">Available transcripts</div>
+                  <!-- Display a list of transcripts from video platform (API) -->
+                    {% for default_transcript in default_transcripts %}
+                      <div class="default_transcripts_section">
+                        <div class="default_transcripts_label" value="{{ default_transcript.code }}">
+                          {{ default_transcript.label }}
+                        </div>
+                        <div class="default_transcripts_actions">
+                          <a class="default_transcripts_upload_link" data-lang-label="{{ default_transcript.label }}" data-download-url="{{ default_transcript.url }}" >Upload</a>
+                        </div>
+                      </div>
+                    {% endfor %}
+                {% endif %}  <!-- TODO implement else case -->
+
+              </div>
+
+            <!-- End of Raccoongang addons -->
 
             {% else %}
               Unsupported field type. This setting cannot be edited.

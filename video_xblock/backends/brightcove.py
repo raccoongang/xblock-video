@@ -12,6 +12,18 @@ class BrightcovePlayer(BaseVideoPlayer):
 
     url_re = re.compile(r'https:\/\/studio.brightcove.com\/products\/videocloud\/media\/videos\/(?P<media_id>\d+)')
 
+    # Current api for requesting transcripts.
+    # For example: https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_ID}
+    # Docs on captions: https://docs.brightcove.com/en/video-cloud/cms-api/guides/webvtt.html
+    # Docs on auth: https://docs.brightcove.com/en/video-cloud/oauth-api/getting-started/oauth-api-overview.html
+    captions_api = {
+        'url': 'cms.api.brightcove.com/v1/accounts/{account_id}/videos/{media_id}',
+        'response': {
+            'language_code': 'srclang',  # no language_label translated in English may be fetched from API
+            'subs': 'src'  # f/e, "http://learning-services-media.brightcove.com/captions/bc_smart_ja.vtt"
+        }
+    }
+
     def media_id(self, href):
         """
         Brightcove specific implementation of BaseVideoPlayer.media_id()

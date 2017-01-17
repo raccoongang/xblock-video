@@ -60,3 +60,42 @@
   width: 80px !important;
   bottom: 2.5em;
 }
+
+.default_transcripts_list {
+    width: 70%;
+    display: inline-block;
+    min-width: 240px;
+}
+
+.default_transcripts_section {
+    margin: 0;
+    padding: 0;
+
+}
+
+.default_transcripts_section_label {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.default_transcripts_label {
+    display: inline-block;
+    font-size: 14px;
+    width: 80px;
+}
+
+.default_transcripts_actions {
+    text-align: right;
+    width: 225px;
+    display: inline-block;
+    font-size: 14px;
+}
+
+.default_transcripts_upload_link {
+    cursor: pointer;
+    margin-left: 8px;
+    text-decoration: none;
+    text-align: right;
+    font-size: 14px;
+}
