@@ -11,20 +11,19 @@ import os
 import pkg_resources
 import requests
 
-from io import StringIO
 from xblock.core import XBlock
 from xblock.fields import Scope, Boolean, Integer, Float, String
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
-from xmodule.fields import RelativeTime
+from xmodule.fields import RelativeTime  # pylint: disable=import-error
 
 from django.template import Template, Context
 from pycaption import detect_format, WebVTTWriter
 from webob import Response
 
-from backends.base import BaseVideoPlayer, html_parser
-from settings import ALL_LANGUAGES
+from backends.base import BaseVideoPlayer, html_parser  # pylint: disable=relative-import
+from settings import ALL_LANGUAGES  # pylint: disable=relative-import
 
 
 _ = lambda text: text
@@ -68,7 +67,7 @@ class TranscriptsMixin(XBlock):
             yield tran
 
     @XBlock.handler
-    def srt_to_vtt(self, request, suffix=''):
+    def srt_to_vtt(self, request, suffix=''):  # pylint: disable=unused-argument
         """
         Fetches raw transcripts, converts them into WebVTT format and returns back.
 
@@ -251,7 +250,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             'muted': self.muted,
             'playback_rate': self.playback_rate,
             'volume': self.volume,
-            'transcripts': self.route_transcripts(self.transcripts),
+            'transcripts': json.loads(self.transcripts) if self.transcripts else [],
             'transcripts_enabled': self.transcripts_enabled,
             'captions_enabled': self.captions_enabled,
             'captions_language': self.captions_language or course.language
@@ -287,8 +286,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         """
         if data.account_id and data.player_id:
             try:
-                r = requests.head(VideoXBlock.get_brightcove_js_url(data.account_id, data.player_id))
-                if r.status_code != 200:
+                response = requests.head(VideoXBlock.get_brightcove_js_url(data.account_id, data.player_id))
+                if response.status_code != 200:
                     validation.add(ValidationMessage(
                         ValidationMessage.ERROR,
                         _(u"Invalid Player Id, please recheck")
@@ -301,7 +300,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         if data.href == '':
             return
-        for player_name, player_class in BaseVideoPlayer.load_classes():
+        for _player_name, player_class in BaseVideoPlayer.load_classes():
             if player_class.match(data.href):
                 return
 
@@ -328,24 +327,27 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             html.render(Context(context))
         )
 
-    def student_view(self, context=None):
+    def student_view(self, context=None):  # pylint: disable=unused-argument
         """
         The primary view of the VideoXBlock, shown to students
         when viewing courses.
         """
 
         player_url = self.runtime.handler_url(self, 'render_player')
+        transcript_download_link = self.get_transcript_download_link()
+        download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
         frag = Fragment(
             self.render_resource(
                 'static/html/student_view.html',
                 player_url=player_url,
                 display_name=self.display_name,
-                usage_id=self.location.to_deprecated_string(),
+                usage_id=self.location.to_deprecated_string(),  # pylint: disable=no-member
                 handout=self.handout,
                 transcripts=self.route_transcripts(self.transcripts),
                 download_transcript_allowed=self.download_transcript_allowed,
-                handout_file_name=self.get_handout_file_name(),
-                transcript_download_link=self.get_transcript_download_link(),
+                handout_file_name=self.get_file_name_from_path(self.handout),
+                transcript_download_link=transcript_download_link,
+                download_transcript_handler_url=download_transcript_handler_url
             )
         )
         frag.add_javascript(self.resource_string("static/js/video_xblock.js"))
@@ -353,7 +355,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         frag.initialize_js('VideoXBlockStudentViewInit')
         return frag
 
-    def studio_view(self, context):
+    def studio_view(self, context):  # pylint: disable=unused-argument
         """
         Render a form for editing this XBlock
         """
@@ -361,6 +363,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         languages = [{'label': label, 'code': lang} for lang, label in ALL_LANGUAGES]
         languages.sort(key=lambda l: l['label'])
         transcripts = json.loads(self.transcripts) if self.transcripts else []
+        download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
 
         # Fetch captions list (available transcripts list) from video platform API
         player = self.get_player()
@@ -377,9 +380,10 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         context = {
             'fields': [],
-            'courseKey': self.location.course_key,
+            'courseKey': self.location.course_key,  # pylint: disable=no-member
             'languages': languages,
             'transcripts': transcripts,
+            'download_transcript_handler_url': download_transcript_handler_url,
             'default_transcripts': default_transcripts
         }
         # Build a list of all the fields that can be edited:
@@ -398,12 +402,12 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         fragment.add_css(self.resource_string("static/css/handout.css"))
         fragment.add_css(self.resource_string("static/css/transcripts.css"))
         fragment.add_css(self.resource_string("static/css/studio-edit.css"))
-        fragment.add_javascript(self.resource_string("static/js/studio_edit.js"))
+        fragment.add_javascript(self.resource_string("static/js/studio-edit.js"))
         fragment.initialize_js('StudioEditableXBlock')
         return fragment
 
     @XBlock.handler
-    def render_player(self, request, suffix=''):
+    def render_player(self, request, suffix=''):  # pylint: disable=unused-argument
         """
         student_view() loads this handler as an iframe to display actual
         video player.
@@ -417,7 +421,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         return player.get_player_html(
             url=self.href, autoplay=False, account_id=self.account_id, player_id=self.player_id,
             video_id=player.media_id(self.href),
-            video_player_id='video_player_{}'.format(self.location.block_id),
+            video_player_id='video_player_{}'.format(self.location.block_id),  # pylint: disable=no-member
             save_state_url=save_state_url,
             player_state=self.player_state,
             start_time=int(self.start_time.total_seconds()),
@@ -427,7 +431,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         )
 
     @XBlock.json_handler
-    def save_player_state(self, request, suffix=''):
+    def save_player_state(self, request, suffix=''):  # pylint: disable=unused-argument
         """
         XBlock handler to save playback player state.
         Called by student_view's JavaScript
@@ -446,13 +450,13 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         return {'success': True}
 
     @XBlock.json_handler
-    def publish_event(self, data, suffix=''):
+    def publish_event(self, data, suffix=''):  # pylint: disable=unused-argument
         """
         Handler to publish XBlock event from frontend.
         Called by student_view's JavaScript
         """
         try:
-            eventType = data.pop('eventType')
+            eventType = data.pop('eventType')  # pylint: disable=invalid-name
         except KeyError:
             return {'result': 'error', 'message': 'Missing eventType in JSON data'}
 
@@ -487,12 +491,12 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             # RelativeTime field doesn't supported by default.
             return {
                 'name': field_name,
-                'display_name': _(field.display_name) if field.display_name else "",
+                'display_name': _(field.display_name) if field.display_name else "",  # pylint: disable=translation-of-non-string
                 'is_set': field.is_set_on(self),
                 'default': field.default,
                 'value': field.read_from(self),
                 'has_values': False,
-                'help': _(field.help) if field.help else "",
+                'help': _(field.help) if field.help else "",  # pylint: disable=translation-of-non-string
                 'allow_reset': field.runtime_options.get('resettable_editor', True),
                 'list_values': None,
                 'has_list_values': False,
@@ -501,7 +505,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         info = super(VideoXBlock, self)._make_field_info(field_name, field)
         if field_name == 'handout':
             info['type'] = 'file_uploader'
-            info['file_name'] = self.get_handout_file_name()
+            info['file_name'] = self.get_file_name_from_path(self.handout)
             info['value'] = self.get_path_for(self.handout)
         if field_name == 'transcripts':
             info['type'] = 'transcript_uploader'
@@ -509,14 +513,19 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             info['type'] = 'default_transcript_uploader'
         return info
 
-    def get_handout_file_name(self):
+    def get_file_name_from_path(self, field):
         """
-        Field handout look like this:
-        asset-v1-RaccoonGang+1+2018+type@asset+block@<filename>
+        Helper for getting filename from string with path to mongoDB storage.
+        Example of string:
+            asset-v1-RaccoonGang+1+2018+type@asset+block@<filename>
 
-        It returns only name of file with extension
+        Args:
+            field: The path to file.
+
+        Returns:
+            The name of file with an extension.
         """
-        return self.handout.split('@')[-1]
+        return field.split('@')[-1]
 
     def get_path_for(self, file_field):
         """
@@ -537,3 +546,21 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             if transcript.get('lang') == self.captions_language:
                 return transcript.get('url')
         return '#'
+
+    @XBlock.handler
+    def download_transcript(self, request, suffix=''):  # pylint: disable=unused-argument
+        """
+        Function for downloading a transcripts.
+        Returns:
+            The file with the correct name
+        """
+        trans_path = self.get_path_for(request.query_string)
+        result = requests.get(request.host_url + request.query_string).text
+        filename = self.get_file_name_from_path(trans_path)
+        response = Response(result)
+        headerlist = [
+            ('Content-Type', 'text/plain'),
+            ('Content-Disposition', 'attachment; filename={}'.format(filename))
+        ]
+        response.headerlist = headerlist
+        return response
