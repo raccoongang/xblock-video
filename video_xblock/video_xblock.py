@@ -216,17 +216,19 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             "Allow students to download the timed transcript. A link to download the file appears below the video."
             " By default, the transcript is an .vtt or .srt file. If you want to provide the transcript for download"
             " in a different format, upload a file by using the Upload Handout field."
-        )
+        ),
+        resettable_editor=False
     )
 
     default_transcripts = String(
         default='',
         scope=Scope.content,
-        display_name=_('Default Transcript'),
+        display_name=_('Default Timed Transcript'),
         help=_(
             'Default transcripts are to be uploaded whether automatically from video platform or '
             'manually if no transcripts were found there.'
-        )
+        ),
+        resettable_editor=False
     )
 
     editable_fields = (

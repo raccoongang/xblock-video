@@ -37,7 +37,6 @@ class BaseVideoPlayer(Plugin):
         """
         return [] or re.compile('') or ''
 
-    @abc.abstractproperty
     def captions_api(self):
         """
         Dictionary of url, request parameters, and response structure of video platform's captions API.
@@ -99,7 +98,7 @@ class BaseVideoPlayer(Plugin):
         return frag
 
     @abc.abstractmethod
-    def media_id(self, href):
+    def media_id(self, href):  # pylint: disable=unused-argument
         """
         Extracts Platform's media id from the video url.
         E.g. https://example.wistia.com/medias/12345abcde -> 12345abcde
@@ -107,21 +106,23 @@ class BaseVideoPlayer(Plugin):
 
         return ''
 
-    def fetch_default_transcripts_languages(self):
+    def fetch_default_transcripts_languages(self, video_id):  # pylint: disable=unused-argument
         """
         Fetches available transcripts languages from a video platform.
 
+        Arguments:
+            video_id (str): media id fetched from href field of studio-edit modal.
         Returns:
             list: List of pairs of codes and labels of captions' languages fetched from API.
         """
         return []
 
-    def get_default_transcripts(self, video_id):
+    def get_default_transcripts(self, video_id):  # pylint: disable=unused-argument
         """
         Fetches transcripts list from a video platform.
 
         Arguments:
-            video_id (str): video id fetched from href field of studio-edit modal.
+            video_id (str): media id fetched from href field of studio-edit modal.
         Returns:
             list: List of dicts of transcripts. Example:
             [
@@ -135,7 +136,7 @@ class BaseVideoPlayer(Plugin):
         """
         return []
 
-    def download_default_transcript(self, url):
+    def download_default_transcript(self, url):  # pylint: disable=unused-argument
         """
         Downloads default transcript from a video platform API and uploads it to the video xblock in WebVVT format.
 

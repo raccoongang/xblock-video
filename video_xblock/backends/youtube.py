@@ -108,7 +108,6 @@ class YoutubePlayer(BaseVideoPlayer):
 
         Reference: https://git.io/vMoCA
         """
-        # TODO consider refactoring (names to be fetched one by one)
         utf8_parser = etree.XMLParser(encoding='utf-8')
         transcripts_param = {'type': 'list', 'v': self.captions_api['params']['v']}
 
@@ -144,7 +143,6 @@ class YoutubePlayer(BaseVideoPlayer):
                 url=self.captions_api['url'],
                 params=urllib.urlencode(self.captions_api['params'])
             )
-            # self.download_default_transcript(transcript_url)  # debug
             # Delete region subtags; reference: https://github.com/edx/edx-platform/blob/master/lms/envs/common.py#L862
             # FIXME for Chinese language: zh_HANS, zh_HANT, zh (see settings.ALL_LANGUAGES)
             lang_code = lang_code[0:2]
@@ -163,38 +161,3 @@ class YoutubePlayer(BaseVideoPlayer):
             default_transcripts.append(default_transcript)
 
         return default_transcripts
-
-    def download_default_transcript(self, url):
-        """
-        Download default transcript and upload to video xblock in WebVVT format.
-
-        """
-        utf8_parser = etree.XMLParser(encoding='utf-8')
-        data = requests.get(url)
-
-        if data.status_code != 200 or not data.text:
-            msg = "Can't receive transcripts from Youtube for {video_id}. Status code: {status_code}.".format(
-                video_id=self.captions_api['params']['v'],
-                status_code=data.status_code
-            )
-            print(msg)  # debug
-            return {}   # TODO implement: raise GetTranscriptsFromYouTubeException(msg)
-
-        # Fetch transcripts; reference: https://git.io/vMoEc
-        sub_starts, sub_ends, sub_texts = [], [], []
-        xmltree = etree.fromstring(data.content, parser=utf8_parser)
-        for element in xmltree:
-            if element.tag == "text":
-                start = float(element.get("start"))
-                duration = float(element.get("dur", 0))  # dur is not mandatory
-                text = element.text
-                end = start + duration
-                if text:
-                    # Start and end should be ints representing the millisecond timestamp.
-                    sub_starts.append(int(start * 1000))
-                    sub_ends.append(int((end + 0.0001) * 1000))
-                    sub_texts.append(text.replace('\n', ' '))
-
-        # print('-------------------------------------------------------')
-        # print({'start': sub_starts, 'end': sub_ends, 'text': sub_texts})
-        return {'start': sub_starts, 'end': sub_ends, 'text': sub_texts}
