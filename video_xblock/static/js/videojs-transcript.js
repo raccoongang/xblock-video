@@ -1,22 +1,22 @@
 domReady(function() {
   videojs('{{ video_player_id }}').ready(function() {
 
-    var tracks = this.textTracks();
+    var tracks = this.textTracks().tracks_;
     var enableTrack = false;
-    for (var i = 0; i < tracks.length; i++) {
-      var track = tracks[i];
+    var player = this;
+    tracks.forEach(function (track, ind, arr) {
       if (track.kind === 'captions') {
-        if (track.language === this.captionsLanguage) {
+        if (track.language === player.captionsLanguage) {
           track.mode = 'showing';
           enableTrack = true;
         } else {
           track.mode = 'disabled';
         }
-      };
-    };
-    if (!enableTrack && track.kind === 'captions') {
-      tracks[0].mode = 'showing';
-    }
+        if (!enableTrack && ind === arr.length - 1) {
+          track.mode = 'showing';
+        }
+      }
+    });
 
     // fire up the plugin
     var transcript = this.transcript({
@@ -35,12 +35,12 @@ domReady(function() {
     transcriptContainer.appendChild(transcript.el());
 
     this.on('transcriptenabled', function(){
-      transcriptContainer.classList.toggle('is-hidden');
+      transcriptContainer.classList.remove('is-hidden');
       this.transcriptsEnabled = true;
       this.trigger('transcriptstatechanged');
     });
     this.on('transcriptdisabled', function(){
-      transcriptContainer.classList.toggle('is-hidden');
+      transcriptContainer.classList.add('is-hidden');
       this.transcriptsEnabled = false;
       this.trigger('transcriptstatechanged');
     });

@@ -47,7 +47,7 @@ function VideoXBlockStudentViewInit(runtime, element) {
       // Discard a message received from another domain
       return;
     try {
-      if (event.data.action === "saveState") {
+      if (event.data.action === "downloadTranscriptChanged") {
         updateTranscriptDownloadUrl(event.data.downloadTranscriptUrl);
       };
 
@@ -61,9 +61,15 @@ function VideoXBlockStudentViewInit(runtime, element) {
   };
   /** Updates transcript download url if it is enabled */
   function updateTranscriptDownloadUrl(downloadTranscriptUrl) {
-    try {
-      var downloadLinkEl = document.getElementById('download-transcript-link');
-      downloadLinkEl.href = downloadTranscriptHandlerUrl + '?' + downloadTranscriptUrl;
-    } catch (err){}
+    var downloadLinkEl = document.getElementById('download-transcript-link');
+    if (downloadLinkEl) {
+      if (downloadTranscriptUrl) {
+        downloadLinkEl.href = downloadTranscriptHandlerUrl + '?' + downloadTranscriptUrl;
+        downloadLinkEl.classList.remove('is-disabled');
+      } else {
+        downloadLinkEl.href = '#';
+        downloadLinkEl.classList.add('is-disabled');
+      }
+    }
   }
 }

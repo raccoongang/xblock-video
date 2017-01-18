@@ -35,17 +35,21 @@ domReady(function() {
       });
       el.classList.add('vjs-selected');
 
-      var tracks = this.player_.textTracks();
-      for (var i = 0; i < tracks.length; i++) {
-        var track = tracks[i];
+      var tracks = this.player_.textTracks().tracks_;
+      var player = this.player_;
+      tracks.forEach(function (track){
         if (track.kind === 'captions') {
-          this.player_.captionsLanguage = el.dataset.lang;
-          track.mode = track.language === this.player_.captionsLanguage ? 'showing': 'disabled';
+          player.captionsLanguage = el.dataset.lang;
+          if (track.language === player.captionsLanguage){
+            track.mode = 'showing';
+          } else {
+            track.mode = 'disabled';
+          }
         }
-      }
+      });
       this.player_.trigger('captionstrackchange');
       this.player_.trigger('subtitlestrackchange');
-      this.player_.trigger('currentlanguagechanged');
+      this.player_.trigger('changedownloadtranscripturl');
     }
   });
 

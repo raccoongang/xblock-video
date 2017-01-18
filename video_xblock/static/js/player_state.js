@@ -30,25 +30,6 @@ var player_state = {
 };
 
 var xblockUsageId = window.location.hash.slice(1);
-var transcripts = {
-  {% for transcript in player_state.transcripts %}
-   '{{transcript.lang}}': {
-          'label': '{{transcript.label}}',
-          'url': '{{transcript.url}}',
-   },
-  {% endfor %}
-};
-
-/** Get transcript url for current caption language */
-var getDownloadTranscriptUrl = function (player){
-  var downloadTranscriptUrl;
-  if (transcripts[player.captionsLanguage]){
-    downloadTranscriptUrl = transcripts[player.captionsLanguage].url;
-  } else {
-    downloadTranscriptUrl = '#';
-  };
-  return downloadTranscriptUrl;
-}
 
 /** Restore default or previously saved player state */
 var setInitialState = function (player, state) {
@@ -56,7 +37,7 @@ var setInitialState = function (player, state) {
     var playbackProgress = localStorage.getItem('playbackProgress');
     if (playbackProgress){
         playbackProgress=JSON.parse(playbackProgress);
-        if (playbackProgress['{{ video_player_id }}'] && 
+        if (playbackProgress['{{ video_player_id }}'] &&
             playbackProgress['{{ video_player_id }}'] > stateCurrentTime) {
             stateCurrentTime = playbackProgress['{{ video_player_id }}'];
         }
@@ -71,10 +52,6 @@ var setInitialState = function (player, state) {
     player.transcriptsEnabled = state.transcriptsEnabled;
     player.captionsEnabled = state.captionsEnabled;
     player.captionsLanguage = state.captionsLanguage;
-    // To switch off transcripts and captions state if doesn`t have transcripts with current captions language
-    if (!transcripts[player.captionsLanguage]){
-      player.captionsEnabled = player.transcriptsEnabled = false;
-    };
 };
 
 /**
@@ -98,8 +75,7 @@ var saveState = function(){
     parent.postMessage({
       'action': 'saveState',
       'info': new_state,
-      'xblockUsageId': xblockUsageId,
-      'downloadTranscriptUrl': getDownloadTranscriptUrl(player)
+      'xblockUsageId': xblockUsageId
       },
       document.location.protocol + "//" + document.location.host
     );
@@ -137,7 +113,6 @@ domReady(function() {
       .on('ended', saveState)
       .on('transcriptstatechanged', saveState)
       .on('captionstatechanged', saveState)
-      .on('currentlanguagechanged', saveState);
   });
 
 });
