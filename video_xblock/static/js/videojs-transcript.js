@@ -31,7 +31,7 @@ domReady(function() {
         // Show or hide the transcripts block depending on the transcript state
         if (!this.transcriptsEnabled) {
             transcriptContainer.className += ' is-hidden';
-        };
+        }
         transcriptContainer.appendChild(transcript.el());
 
         this.on('transcriptenabled', function() {
@@ -52,7 +52,7 @@ domReady(function() {
             Array.from(captionContainer).forEach(function(caption) {
                 caption.className += ' is-hidden';
             });
-        };
+        }
 
         this.on('captionenabled', function() {
             Array.from(captionContainer).forEach(function(caption) {
@@ -72,7 +72,7 @@ domReady(function() {
         var cssClasses = 'vjs-custom-caption-button vjs-menu-button vjs-menu-button-popup vjs-control vjs-button';
         if (this.captionsEnabled) {
             cssClasses += ' vjs-control-enabled';
-        };
+        }
         this.toggleButton({
             style: 'fa-cc',
             enabledEvent: 'captionenabled',
@@ -82,7 +82,7 @@ domReady(function() {
         cssClasses = 'vjs-custom-transcript-button vjs-menu-button vjs-menu-button-popup vjs-control vjs-button';
         if (this.transcriptsEnabled) {
             cssClasses += ' vjs-control-enabled';
-        };
+        }
         this.toggleButton({
             style: 'fa-quote-left',
             enabledEvent: 'transcriptenabled',
