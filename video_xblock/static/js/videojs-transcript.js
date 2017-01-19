@@ -75,8 +75,8 @@ domReady(function() {
     };
     this.toggleButton({
       style: 'fa-cc',
-      enabledEvent: 'captionenabled,
-      disabledEvent: 'captiondisabled,
+      enabledEvent: 'captionenabled',
+      disabledEvent: 'captiondisabled',
       cssClasses: cssClasses,
     });
     cssClasses = 'vjs-custom-transcript-button vjs-menu-button vjs-menu-button-popup vjs-control vjs-button';

@@ -24,15 +24,14 @@ var player_state = {
   volume: {{ player_state.volume }},
   currentTime: {{ player_state.current_time }},
   playbackRate: {{ player_state.playback_rate }},
-  muted: {{ player_state.muted | yesno:"true,false" }},
-  transcriptsEnabled: {{ player_state.transcripts_enabled | yesno:"true,false" }},
-  captionsEnabled: {{ player_state.captions_enabled | yesno:"true,false" }},
+  muted: {{ player_state.muted | yesno:'true,false' }},
+  transcriptsEnabled: {{ player_state.transcripts_enabled | yesno:'true,false' }},
+  captionsEnabled: {{ player_state.captions_enabled | yesno:'true,false' }},
   captionsLanguage: '{{ player_state.captions_language }}',
 };
 
 var xblockUsageId = window.location.hash.slice(1);
 
-/* eslint-disable */
 var transcripts = {
   {% for transcript in player_state.transcripts %}
    '{{transcript.lang}}': {
@@ -41,7 +40,7 @@ var transcripts = {
    },
   {% endfor %}
 };
-/* eslint-disable */
+/* eslint-enable */
 
 /** Get transcript url for current caption language */
 var getDownloadTranscriptUrl = function (player) {

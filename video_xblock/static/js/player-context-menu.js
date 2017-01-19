@@ -58,7 +58,7 @@ domReady(function() {
     docfrag.appendChild(ulSubMenu);
 
     // Check conditions to be met for delegation of the popup submenu creation
-    var menuItemClicked = matchesSelector(target, "li.vjs-menu-item");
+    var menuItemClicked = matchesSelector(target, 'li.vjs-menu-item');
     var noSubmenuClicked = !target.querySelector('.vjs-contextmenu-ui-submenu');
     var menuItemsLabelsEqual = (labelElement === labelItem);
 

@@ -26,7 +26,7 @@ function StudioEditableXBlock(runtime, element) {
             val: function() {
                 var val = $field.val();
                 // Cast values to the appropriate type so that we send nice clean JSON over the wire:
-                if (type == 'boolean') {
+                if (type == 'boolean') {  // eslint-disable-line
                     return (val == 'true' || val == '1');  // eslint-disable-line
                 }
                 if (type == 'integer') {  // eslint-disable-line
@@ -41,7 +41,7 @@ function StudioEditableXBlock(runtime, element) {
                         val = null;
                     } else {
                         val = JSON.parse(val); // TODO: handle parse errors
-                    };
+                    }
                     return val;
                 }
                 /* eslint-disable */
