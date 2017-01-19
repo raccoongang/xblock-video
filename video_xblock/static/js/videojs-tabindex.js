@@ -1,8 +1,8 @@
 /**
  * This part is responsible for the order tabindex.
- * 
+ *
  * Determine and call the function orderTabIndex.
- * 
+ *
  * orderTabIndex - is function what rearrange controlBar elements
  * in right order
  */
@@ -28,12 +28,12 @@ domReady(function() {
             'captionsButton'
           ];
         var controlsMap = {
-            'progressControl': controlBar.progressControl.seekBar.el_,
-            'playToggle': controlBar.playToggle.el_,
-            'captionsButton': controlBar.captionsButton.el_,
-            'volumeMenuButton': controlBar.volumeMenuButton.volumeBar.el_,
-            'fullscreenToggle': controlBar.fullscreenToggle.el_,
-            'playbackRateMenuButton': controlBar.playbackRateMenuButton.el_
+            progressControl: controlBar.progressControl.seekBar.el_,
+            playToggle: controlBar.playToggle.el_,
+            captionsButton: controlBar.captionsButton.el_,
+            volumeMenuButton: controlBar.volumeMenuButton.volumeBar.el_,
+            fullscreenToggle: controlBar.fullscreenToggle.el_,
+            playbackRateMenuButton: controlBar.playbackRateMenuButton.el_
           };
 
         // Switch off tabIndex for volumeMenuButton and free slot for volumeBar

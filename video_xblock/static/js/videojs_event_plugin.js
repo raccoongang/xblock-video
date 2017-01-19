@@ -11,7 +11,7 @@
  */
 (function () {
 
-    "use strict";
+    'use strict';
     /**
      * Videojs plugin.
      * Listens for events and send them to parent frame to be logged in Open edX tracking log
@@ -134,10 +134,10 @@
             data = data || {};
             data['eventType'] = 'xblock-video.' + eventName;
             parent.postMessage({
-                'action': 'analytics',
-                'info': data,
-                'xblockUsageId': xblockUsageId
-            }, document.location.protocol + "//" + document.location.host);
+                action: 'analytics',
+                info: data,
+                xblockUsageId: xblockUsageId
+            }, document.location.protocol + '//' + document.location.host);
         };
 
         return this;

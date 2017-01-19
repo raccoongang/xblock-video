@@ -13,7 +13,7 @@
  */
 domReady(function() {
 
-  var videoPlayer = document.getElementById("{{ video_player_id }}");
+  var videoPlayer = document.getElementById('{{ video_player_id }}');
   var dataSetup = JSON.parse(videoPlayer.getAttribute('data-setup'));
   var playbackRates = dataSetup.playbackRates;
   var docfrag = document.createDocumentFragment();
@@ -74,7 +74,7 @@ domReady(function() {
     }
 
     // Create nested submenu
-    if (menuItemClicked && noSubmenuClicked && menuItemsLabelsEqual){
+    if (menuItemClicked && noSubmenuClicked && menuItemsLabelsEqual) {
       target.appendChild(docfrag);
     }
   }
@@ -84,7 +84,7 @@ domReady(function() {
 
   // Create context menu options
   var content = [{
-    id: "play",
+    id: 'play',
     label: 'Play',
     listener: function () {
       var item = getItem('play');
@@ -96,7 +96,7 @@ domReady(function() {
         item.label = 'Play';
       }
     }}, {
-    id: "mute",
+    id: 'mute',
     label: 'Mute',
     listener: function () {
       var item = getItem('mute');
@@ -108,7 +108,7 @@ domReady(function() {
         item.label = 'Unmute';
       }
     }}, {
-    id: "fullscreen",
+    id: 'fullscreen',
     label: 'Fill browser',
     listener: function () {
       var item = getItem('fullscreen');
@@ -121,7 +121,7 @@ domReady(function() {
       }
     }}, {
     // Nested submenu creation is delegated to the player
-    id: "speed",
+    id: 'speed',
     label: 'Speed'
     }
   ];

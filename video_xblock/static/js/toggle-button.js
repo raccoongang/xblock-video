@@ -20,8 +20,8 @@ domReady(function() {
       return this.options_['disabledEvent'];
     },
     createEl: function createEl(type, props, attributes) {
-      props = props || {};
       var el = MenuItem.prototype.createEl.call(this, arguments.tag, props, attributes);
+      props = props || {};
       el.setAttribute('role', 'menuitem');
       el.setAttribute('aria-live', 'polite');
       el.setAttribute('data-lang', this.options_.track.language);
@@ -137,7 +137,7 @@ domReady(function() {
 
   });
 
-  var toggleButton = function(options){
+  var toggleButton = function(options) {
     if (this.tagAttributes.brightcove !== undefined) {
       this.controlBar.customControlSpacer.addChild('ToggleButton', options);
     } else {

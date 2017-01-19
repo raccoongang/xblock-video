@@ -8,7 +8,7 @@
 
 (function () {
 
-    "use strict";
+    'use strict';
     function videoJSSpeedHandler(options) {
 
         var playbackRateMenuButton = videojs.getComponent('PlaybackRateMenuButton');
@@ -40,7 +40,7 @@
          *
          * @method updateLabel
          */
-        playbackRateMenuButtonExtended.prototype.updateLabel = function(event){
+        playbackRateMenuButtonExtended.prototype.updateLabel = function(event) {
             var speed = this.player().playbackRate() || 1;
             this.labelEl_.innerHTML = speed + 'x';
         };
@@ -51,7 +51,7 @@
          *
          * @method handleClick
          */
-        playbackRateMenuButtonExtended.prototype.handleClick = function(event){
+        playbackRateMenuButtonExtended.prototype.handleClick = function(event) {
             // FIXME for Brightcove
             return false;
         };

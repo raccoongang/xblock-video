@@ -17,7 +17,7 @@ function VideoXBlockStudentViewInit(runtime, element) {
   /** Send data to server by POSTing it to appropriate VideoXBlock handler */
   function sendData(handlerUrl, data) {
     $.ajax({
-      type: "POST",
+      type: 'POST',
       url: handlerUrl,
       data: JSON.stringify(data)
     })
@@ -32,7 +32,7 @@ function VideoXBlockStudentViewInit(runtime, element) {
   if (!window.videoXBlockListenerRegistered) {
     // Make sure we register event listener only once even if there are more than
     // one VideoXBlock on a page
-    window.addEventListener("message", receiveMessage, false);
+    window.addEventListener('message', receiveMessage, false);
     window.videoXBlockListenerRegistered = true;
   }
 
@@ -43,11 +43,11 @@ function VideoXBlockStudentViewInit(runtime, element) {
    */
   function receiveMessage(event) {
     var origin = event.origin || event.originalEvent.origin; // For Chrome, the origin property is in the event.originalEvent object.
-    if (origin !== document.location.protocol + "//" + document.location.host)
+    if (origin !== document.location.protocol + ''//' + document.location.host)
       // Discard a message received from another domain
       return;
     try {
-      if (event.data.action === "saveState") {
+      if (event.data.action === 'saveState') {
         updateTranscriptDownloadUrl(event.data.downloadTranscriptUrl);
       };
 
@@ -55,7 +55,7 @@ function VideoXBlockStudentViewInit(runtime, element) {
       if (url) {
         sendData(url, event.data.info);
       }
-    } catch (err){
+    } catch (err) {
       console.log(err)
     }
   };

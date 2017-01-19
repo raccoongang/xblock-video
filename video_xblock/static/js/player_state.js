@@ -19,17 +19,20 @@ var domReady = function(callback) {
   }
 };
 
+/* eslint-disable */
 var player_state = {
-  'volume': {{ player_state.volume }},
-  'currentTime': {{ player_state.current_time }},
-  'playbackRate': {{ player_state.playback_rate }},
-  'muted': {{ player_state.muted | yesno:"true,false" }},
-  'transcriptsEnabled': {{ player_state.transcripts_enabled | yesno:"true,false" }},
-  'captionsEnabled': {{ player_state.captions_enabled | yesno:"true,false" }},
-  'captionsLanguage': '{{ player_state.captions_language }}',
+  volume: {{ player_state.volume }},
+  currentTime: {{ player_state.current_time }},
+  playbackRate: {{ player_state.playback_rate }},
+  muted: {{ player_state.muted | yesno:"true,false" }},
+  transcriptsEnabled: {{ player_state.transcripts_enabled | yesno:"true,false" }},
+  captionsEnabled: {{ player_state.captions_enabled | yesno:"true,false" }},
+  captionsLanguage: '{{ player_state.captions_language }}',
 };
 
 var xblockUsageId = window.location.hash.slice(1);
+
+/* eslint-disable */
 var transcripts = {
   {% for transcript in player_state.transcripts %}
    '{{transcript.lang}}': {
@@ -38,11 +41,12 @@ var transcripts = {
    },
   {% endfor %}
 };
+/* eslint-disable */
 
 /** Get transcript url for current caption language */
-var getDownloadTranscriptUrl = function (player){
+var getDownloadTranscriptUrl = function (player) {
   var downloadTranscriptUrl;
-  if (transcripts[player.captionsLanguage]){
+  if (transcripts[player.captionsLanguage]) {
     downloadTranscriptUrl = transcripts[player.captionsLanguage].url;
   } else {
     downloadTranscriptUrl = '#';
@@ -56,7 +60,7 @@ var setInitialState = function (player, state) {
     var playbackProgress = localStorage.getItem('playbackProgress');
     if (playbackProgress){
         playbackProgress=JSON.parse(playbackProgress);
-        if (playbackProgress['{{ video_player_id }}'] && 
+        if (playbackProgress['{{ video_player_id }}'] &&
             playbackProgress['{{ video_player_id }}'] > stateCurrentTime) {
             stateCurrentTime = playbackProgress['{{ video_player_id }}'];
         }
@@ -72,7 +76,7 @@ var setInitialState = function (player, state) {
     player.captionsEnabled = state.captionsEnabled;
     player.captionsLanguage = state.captionsLanguage;
     // To switch off transcripts and captions state if doesn`t have transcripts with current captions language
-    if (!transcripts[player.captionsLanguage]){
+    if (!transcripts[player.captionsLanguage]) {
       player.captionsEnabled = player.transcriptsEnabled = false;
     };
 };
@@ -84,22 +88,22 @@ var setInitialState = function (player, state) {
 var saveState = function(){
   var player = this;
   var new_state = {
-    'volume': player.volume(),
-    'currentTime': player.ended()? 0 : Math.floor(player.currentTime()),
-    'playbackRate': player.playbackRate(),
-    'muted': player.muted(),
-    'transcriptsEnabled': player.transcriptsEnabled,
-    'captionsEnabled': player.captionsEnabled,
-    'captionsLanguage': player.captionsLanguage
+    volume: player.volume(),
+    currentTime: player.ended()? 0 : Math.floor(player.currentTime()),
+    playbackRate: player.playbackRate(),
+    muted: player.muted(),
+    transcriptsEnabled: player.transcriptsEnabled,
+    captionsEnabled: player.captionsEnabled,
+    captionsLanguage: player.captionsLanguage
   };
   if (JSON.stringify(new_state) !== JSON.stringify(player_state)) {
     console.log('Starting saving player state');
     player_state = new_state;
     parent.postMessage({
-      'action': 'saveState',
-      'info': new_state,
-      'xblockUsageId': xblockUsageId,
-      'downloadTranscriptUrl': getDownloadTranscriptUrl(player)
+      action: 'saveState',
+      info: new_state,
+      xblockUsageId: xblockUsageId,
+      downloadTranscriptUrl: getDownloadTranscriptUrl(player)
       },
       document.location.protocol + "//" + document.location.host
     );
@@ -122,7 +126,7 @@ var saveProgressToLocalStore = function(){
 };
 
 domReady(function() {
-  videojs('{{ video_player_id }}').ready(function() {
+  videojs('{{ video_player_id }}').ready(function() {  // eslint-disable-line
     var player = this;
 
     // Restore default or previously saved player state
