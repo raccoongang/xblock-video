@@ -125,7 +125,7 @@ var saveProgressToLocalStore = function(){
 };
 
 domReady(function() {
-  videojs('{{ video_player_id }}').ready(function() {  // eslint-disable-line
+    videojs('{{ video_player_id }}').ready(function() {
     var player = this;
 
     // Restore default or previously saved player state
