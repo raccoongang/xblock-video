@@ -13,11 +13,12 @@ domReady(function() {
         /** Order tabIndex in player control */
         var orderTabIndex = function orderTabIndex(_player) {
             var controlBar;
-            if (_player.tagAttributes.brightcove === undefined){
+            if (_player.tagAttributes.brightcove === undefined) {
                 controlBar = _player.controlBar.childNameIndex_;
             } else {
                 controlBar = _player.controlBar;
             }
+            /* eslint-disable vars-on-top */
             var controlBarActions = Object.keys(controlBar);
             var controlsTabOrder = [
                 'progressControl',
@@ -35,12 +36,13 @@ domReady(function() {
                 fullscreenToggle: controlBar.fullscreenToggle.el_,
                 playbackRateMenuButton: controlBar.playbackRateMenuButton.el_
             };
+            /* eslint-enable vars-on-top */
 
             // Switch off tabIndex for volumeMenuButton and free slot for volumeBar
             controlBar.volumeMenuButton.el_.tabIndex = -1;
 
             controlBarActions.forEach(function(action) {
-                var el = controlsMap[action] || controlBar[action].el_;
+                var el = controlsMap[action] || controlBar[action].el_;  // eslint-disable vars-on-top
                 if (el) {
                     var index = controlsTabOrder.indexOf(action);
                     el.tabIndex = index === -1 ? -1 : index + 1;

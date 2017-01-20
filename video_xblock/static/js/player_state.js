@@ -20,6 +20,7 @@ var domReady = function(callback) {
 };
 
 /* eslint-disable */
+
 var player_state = {
   volume: {{ player_state.volume }},
   currentTime: {{ player_state.current_time }},
@@ -40,6 +41,7 @@ var transcripts = {
    },
   {% endfor %}
 };
+
 /* eslint-enable */
 
 /** Get transcript url for current caption language */

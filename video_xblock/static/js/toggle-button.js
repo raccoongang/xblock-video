@@ -22,7 +22,7 @@ domReady(function() {
         },
         createEl: function createEl(type, props, attributes) {
             var el = MenuItem.prototype.createEl.call(this, arguments.tag, props, attributes);
-            props = props || {};
+            props = props || {};  // eslint-disable-no-param-reassign
             el.setAttribute('role', 'menuitem');
             el.setAttribute('aria-live', 'polite');
             el.setAttribute('data-lang', this.options_.track.language);
@@ -37,8 +37,8 @@ domReady(function() {
             });
             el.classList.add('vjs-selected');
 
-            for (var i = 0; i < tracks.length; i++) {
-                var track = tracks[i];
+            for (var i = 0; i < tracks.length; i++) {  // eslint-disable vars-on-top
+                var track = tracks[i];                 // eslint-disable vars-on-top
                 if (track.kind === 'captions') {
                     this.player_.captionsLanguage = el.dataset.lang;
                     if (track.language === this.player_.captionsLanguage) {
@@ -71,7 +71,7 @@ domReady(function() {
                 this.menu = this.player_.singleton_menu;
             }
             // This variable uses in videojs library
-            this.enabled_ = true;  // eslint-disable-no-underscore-dangle
+            this.enabled_ = true;  // eslint-disable no-underscore-dangle
             this.el_.setAttribute('aria-haspopup', 'true');
             this.el_.setAttribute('role', 'menuitem');
 
@@ -93,18 +93,18 @@ domReady(function() {
             if (!tracks) {
                 return items;
             }
-            for (var i = 0; i < tracks.length; i++) {
-                var track = tracks[i];
+            for (var i = 0; i < tracks.length; i++) {  // eslint-disable vars-on-top
+                var track = tracks[i];                 // eslint-disable vars-on-top
                 // only add tracks that are of the appropriate kind and have a label
                 if (track.kind === this.kind_) {
-                items.push(new ToggleMenuItem(this.player_, {
-                    // MenuItem is selectable
-                    track: track,
-                    label: track.label,
-                    enabledEvent: this.enabledEventName(),
-                    disabledEvent: this.disabledEventName()
-                }));
-            }
+                    items.push(new ToggleMenuItem(this.player_, {
+                        // MenuItem is selectable
+                        track: track,
+                        label: track.label,
+                        enabledEvent: this.enabledEventName(),
+                        disabledEvent: this.disabledEventName()
+                    }));
+                }
             }
             return items;
         },
@@ -123,9 +123,9 @@ domReady(function() {
         },
         createEl: function createEl(props, attributes) {
             var el = MenuButton.prototype.createEl.call(this, arguments.tag, props, attributes);
-            props = props || {};
-            props.className = this.buildCSSClass() + ' icon fa ' + this.styledSpan();
-            props.tabIndex = 0;
+            props = props || {};  // eslint-disable no-param-reassign
+            props.className = this.buildCSSClass() + ' icon fa ' + this.styledSpan();  // eslint-disable no-param-reassign
+            props.tabIndex = 0;  // eslint-disable no-param-reassign
             el.setAttribute('role', 'menuitem');
             el.setAttribute('aria-live', 'polite');
             el.classList += ' icon fa ' + this.styledSpan();
@@ -138,7 +138,7 @@ domReady(function() {
             var eventName = this.hasClass('vjs-control-enabled') ? this.enabledEventName() : this.disabledEventName();
             el.classList.toggle('vjs-control-enabled');
             this.player_.trigger(eventName);
-        },
+        }
     });
 
     var toggleButton = function(options) {

@@ -1,16 +1,17 @@
 
 /** Javascript for VideoXBlock.student_view() */
 function VideoXBlockStudentViewInit(runtime, element) {
+    'use strict';
     var stateHandlerUrl = runtime.handlerUrl(element, 'save_player_state');
     var eventHandlerUrl = runtime.handlerUrl(element, 'publish_event');
     var downloadTranscriptHandlerUrl = runtime.handlerUrl(element, 'download_transcript');
     var usageId = element.attributes['data-usage-id'].value;
+    window.videoXBlockState = window.videoXBlockState || {};
     var handlers = window.videoXBlockState.handlers = window.videoXBlockState.handlers || {
         saveState: {},
         analytics: {}
     };
 
-    window.videoXBlockState = window.videoXBlockState || {};
     handlers.saveState[usageId] = stateHandlerUrl;
     handlers.analytics[usageId] = eventHandlerUrl;
 
@@ -22,17 +23,17 @@ function VideoXBlockStudentViewInit(runtime, element) {
             data: JSON.stringify(data)
         })
         .done(function() {
-            console.log('Data processed successfully.');
+            console.log('Data processed successfully.');  // eslint-disable no-console
         })
         .fail(function() {
-            console.log('Failed to process data');
+            console.log('Failed to process data');  // eslint-disable no-console
         });
     }
 
     if (!window.videoXBlockListenerRegistered) {
         // Make sure we register event listener only once even if there are more than
         // one VideoXBlock on a page
-        window.addEventListener('message', receiveMessage, false);
+        window.addEventListener('message', receiveMessage, false);  // eslint-disable no-use-before-define
         window.videoXBlockListenerRegistered = true;
     }
 
@@ -42,28 +43,31 @@ function VideoXBlockStudentViewInit(runtime, element) {
         * Pass the sate to `saveState()` for handling.
     */
     function receiveMessage(event) {
-        var origin = event.origin || event.originalEvent.origin; // For Chrome, the origin property is in the event.originalEvent object.
+        // For Chrome, the origin property is in the event.originalEvent object.
+        var origin = event.origin || event.originalEvent.origin;
         if (origin !== document.location.protocol + '//' + document.location.host) {
             // Discard a message received from another domain
             return;
         }
         try {
-            var url = handlers[event.data.action][event.data.xblockUsageId];
+            var url = handlers[event.data.action][event.data.xblockUsageId];  // eslint-disable vars-on-top
             if (event.data.action === 'saveState') {
-                updateTranscriptDownloadUrl(event.data.downloadTranscriptUrl);
+                updateTranscriptDownloadUrl(event.data.downloadTranscriptUrl);  // eslint-disable no-use-before-define
             }
             if (url) {
                 sendData(url, event.data.info);
             }
         } catch (err) {
-            console.log(err)
+            console.log(err)  // eslint-disable no-console
         }
-    };
+    }
     /** Updates transcript download url if it is enabled */
     function updateTranscriptDownloadUrl(downloadTranscriptUrl) {
         try {
-            var downloadLinkEl = document.getElementById('download-transcript-link');
+            var downloadLinkEl = document.getElementById('download-transcript-link');  // eslint-disable vars-on-top
             downloadLinkEl.href = downloadTranscriptHandlerUrl + '?' + downloadTranscriptUrl;
-        } catch (err){}
+        } catch (err) {
+            console.log(err)  // eslint-disable no-console
+        }
     }
 }

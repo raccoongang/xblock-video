@@ -26,7 +26,7 @@
          */
         var playbackRateMenuButtonExtended = videojs.extend(playbackRateMenuButton, {
             /** @constructor */
-            constructor: function(player, options) {
+            constructor: function(player, options) {  // eslint-disable no-shadow
                 playbackRateMenuButton.call(this, player, options);
                 this.on('ratechange', this.updateLabel);
                 this.on('click', this.handleClick);
@@ -71,5 +71,4 @@
     // Export plugin to the root
     window.videoJSSpeedHandler = videoJSSpeedHandler;
     window.videojs.plugin('videoJSSpeedHandler', videoJSSpeedHandler);
-
 }).call(this);

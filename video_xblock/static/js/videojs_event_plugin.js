@@ -16,8 +16,7 @@
      * Listens for events and send them to parent frame to be logged in Open edX tracking log
      * @param {Object} options - Plugin options passed in at initialization time.
      */
-    function XBlockEventPlugin(options) {
-
+    function XBlockEventPlugin() {
         var previousTime = 0;
         var currentTime = 0;
 
@@ -97,7 +96,7 @@
             this.log('closed_captions.hidden', {current_time: this.currentTime()});
         };
         this.logEvent = function(eventType) {
-            if (this.events.indexOf(eventType) == -1 || typeof this[eventType] !== 'function') { // eslint-disable-eqeqeq
+            if (this.events.indexOf(eventType) == -1 || typeof this[eventType] !== 'function') { //eslint-disable eqeqeq
                 return;
             }
             this[eventType]();
@@ -131,22 +130,20 @@
          onShowLanguageMenu, onHideLanguageMenu, onShowTranscript, onHideTranscript, onShowCaptions, onHideCaptions
          */
         this.log = function(eventName, data) {
-            data = data || {};
-            data.eventType = 'xblock-video.' + eventName;
+        var xblockUsageId = window.location.hash.slice(1);
+            data = data || {};  //  eslint-disable no-param-reassign
+            data.eventType = 'xblock-video.' + eventName;  //  eslint-disable no-param-reassign
             parent.postMessage({
                 action: 'analytics',
                 info: data,
                 xblockUsageId: xblockUsageId
             }, document.location.protocol + '//' + document.location.host);
         };
-
         return this;
-
     }
-
     window.xblockEventPlugin = XBlockEventPlugin;
     // add plugin if player has already initialized
     if (window.videojs) {
-        window.videojs.plugin('xblockEventPlugin', xblockEventPlugin);  // eslint-disable-no-undef
+        window.videojs.plugin('xblockEventPlugin', xblockEventPlugin);  // eslint-disable no-undef
     }
 }).call(this);

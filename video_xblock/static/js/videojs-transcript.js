@@ -1,10 +1,20 @@
 domReady(function() {
     videojs('{{ video_player_id }}').ready(function() {
-
+        'use strict';
         var tracks = this.textTracks();
         var enableTrack = false;
-        for (var i = 0; i < tracks.length; i++) {
-            var track = tracks[i];
+        var cssClasses = 'vjs-custom-caption-button vjs-menu-button vjs-menu-button-popup vjs-control vjs-button';
+        // fire up the plugin
+        var transcript = this.transcript({
+            showTrackSelector: false,
+            showTitle: false,
+            followPlayerTrack: true
+        });
+        // attach the widget to the page
+        var transcriptContainer = document.getElementById('transcript');
+        var captionContainer = document.getElementsByClassName('vjs-text-track-display');
+        for (var i = 0; i < tracks.length; i++) {  //  eslint-disable vars-on-top
+            var track = tracks[i];                 //  eslint-disable vars-on-top
             if (track.kind === 'captions') {
                 if (track.language === this.captionsLanguage) {
                     track.mode = 'showing';
@@ -12,22 +22,11 @@ domReady(function() {
                 } else {
                     track.mode = 'disabled';
                 }
+                if (!enableTrack && i == tracks.length -1) {
+                    tracks[0].mode = 'showing';
+                }
             }
         }
-        if (!enableTrack && track.kind === 'captions') {
-            tracks[0].mode = 'showing';
-        }
-
-        // fire up the plugin
-        var transcript = this.transcript({
-            showTrackSelector: false,
-            showTitle: false,
-            followPlayerTrack: true
-        });
-
-        // attach the widget to the page
-        var transcriptContainer = document.getElementById('transcript');
-
         // Show or hide the transcripts block depending on the transcript state
         if (!this.transcriptsEnabled) {
             transcriptContainer.className += ' is-hidden';
@@ -44,9 +43,6 @@ domReady(function() {
             this.transcriptsEnabled = false;
             this.trigger('transcriptstatechanged');
         });
-
-        var captionContainer = document.getElementsByClassName('vjs-text-track-display');
-
         // Show or hide the captions block depending on the caption state
         if (!this.captionsEnabled) {
             Array.from(captionContainer).forEach(function(caption) {
@@ -68,8 +64,6 @@ domReady(function() {
             this.captionsEnabled = false;
             this.trigger('captionstatechanged');
         });
-
-        var cssClasses = 'vjs-custom-caption-button vjs-menu-button vjs-menu-button-popup vjs-control vjs-button';
         if (this.captionsEnabled) {
             cssClasses += ' vjs-control-enabled';
         }
