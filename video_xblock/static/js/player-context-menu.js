@@ -25,7 +25,7 @@ domReady(function() {
     * Source: https://gist.github.com/dalgard/7817372
     */
     function matchesSelector(domElement, selector) {
-        var matchesSelector =              // eslint-disable no-shadow
+        var matchesSelector =              // eslint-disable-line no-shadow
             domElement.matches ||
             domElement.matchesSelector ||
             domElement.webkitMatchesSelector ||
@@ -50,12 +50,12 @@ domReady(function() {
         var ulSubMenu = document.createElement('ul');
         // Wrap into conditional statement to avoid unnecessary variables initialization
         if (menuItemClicked && noSubmenuClicked) {
-            var labelLength = labelElement.length;
-            var lineFeedCode = 10;
+            var labelLength = labelElement.length;   // eslint-disable-line vars-on-top
+            var lineFeedCode = 10;                   // eslint-disable-line vars-on-top
             // Check if the last character is an escaped one (line feed to get rid of)
             // which is the case for Microsoft Edge
-            if (labelElement.charCodeAt(labelLength-1) === lineFeedCode) {
-                var labelElementSliced = labelElement.slice(0, -1);
+            if (labelElement.charCodeAt(labelLength - 1) === lineFeedCode) {
+                var labelElementSliced = labelElement.slice(0, -1);        // eslint-disable-line vars-on-top
                 menuItemsLabelsEqual = (labelElementSliced === labelItem);
             }
         }
@@ -81,12 +81,12 @@ domReady(function() {
     videoPlayer.addEventListener('mouseover', createNestedContextSubMenu);
 
     // Create context menu options
-    var content = [
+    var content = [                         // eslint-disable-line vars-on-top
         {
             id: 'play',
             label: 'Play',
-            listener: function () {
-                var item = getItem('play');
+            listener: function() {
+                var item = getItem('play');  // eslint-disable-line no-use-before-define
                 if (player.paused()) {
                     player.play();
                     item.label = 'Pause';
@@ -98,7 +98,7 @@ domReady(function() {
         }, {
             id: 'mute',
             label: 'Mute',
-            listener: function () {
+            listener: function() {
                 var item = getItem('mute');  // eslint-disable-line no-use-before-define
                 if (player.muted()) {
                     player.muted(false);
@@ -111,7 +111,7 @@ domReady(function() {
         }, {
             id: 'fullscreen',
             label: 'Fill browser',
-            listener: function () {
+            listener: function() {
                 var item = getItem('fullscreen');  // eslint-disable-line no-use-before-define
                 if (player.isFullscreen()) {
                     player.exitFullscreen();
