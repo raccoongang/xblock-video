@@ -12,7 +12,7 @@
  * Initialise player context menu with nested elements.
  */
 domReady(function() {
-
+    'use strict';
     var videoPlayer = document.getElementById('{{ video_player_id }}');
     var dataSetup = JSON.parse(videoPlayer.getAttribute('data-setup'));
     var playbackRates = dataSetup.playbackRates;
@@ -24,15 +24,15 @@ domReady(function() {
     * Cross-browser wrapper for element.matches
     * Source: https://gist.github.com/dalgard/7817372
     */
-    function matchesSelector(dom_element, selector) {
-        var matchesSelector =
-            dom_element.matches ||
-            dom_element.matchesSelector ||
-            dom_element.webkitMatchesSelector ||
-            dom_element.mozMatchesSelector ||
-            dom_element.msMatchesSelector ||
-            dom_element.oMatchesSelector;
-        return matchesSelector.call(dom_element, selector);
+    function matchesSelector(domElement, selector) {
+        var matchesSelector =              // eslint-disable no-shadow
+            domElement.matches ||
+            domElement.matchesSelector ||
+            domElement.webkitMatchesSelector ||
+            domElement.mozMatchesSelector ||
+            domElement.msMatchesSelector ||
+            domElement.oMatchesSelector;
+        return matchesSelector.call(domElement, selector);
     }
 
     /**
@@ -41,10 +41,24 @@ domReady(function() {
     function createNestedContextSubMenu(e) {
         var target = e.target;
         var labelElement = target.innerText;
-        var labelItem = getItem('speed').label;
-
+        var labelItem = getItem('speed').label; // eslint-disable no-use-before-define
+        // Check conditions to be met for delegation of the popup submenu creation
+        var menuItemClicked = matchesSelector(target, 'li.vjs-menu-item');
+        var noSubmenuClicked = !target.querySelector('.vjs-contextmenu-ui-submenu');
+        var menuItemsLabelsEqual = (labelElement === labelItem);
         // Generate nested submenu elements as document fragment
         var ulSubMenu = document.createElement('ul');
+        // Wrap into conditional statement to avoid unnecessary variables initialization
+        if (menuItemClicked && noSubmenuClicked) {
+            var labelLength = labelElement.length;
+            var lineFeedCode = 10;
+            // Check if the last character is an escaped one (line feed to get rid of)
+            // which is the case for Microsoft Edge
+            if (labelElement.charCodeAt(labelLength-1) === lineFeedCode) {
+                var labelElementSliced = labelElement.slice(0, -1);
+                menuItemsLabelsEqual = (labelElementSliced === labelItem);
+            }
+        }
         ulSubMenu.className = 'vjs-contextmenu-ui-submenu';
         playbackRates.forEach(function(rate) {
             var liSubMenu = document.createElement('li');
@@ -56,22 +70,6 @@ domReady(function() {
             };
         });
         docfrag.appendChild(ulSubMenu);
-
-        // Check conditions to be met for delegation of the popup submenu creation
-        var menuItemClicked = matchesSelector(target, 'li.vjs-menu-item');
-        var noSubmenuClicked = !target.querySelector('.vjs-contextmenu-ui-submenu');
-        var menuItemsLabelsEqual = (labelElement === labelItem);
-
-        // Wrap into conditional statement to avoid unnecessary variables initialization
-        if (menuItemClicked && noSubmenuClicked) {
-            var labelLength = labelElement.length;
-            var lineFeedCode = 10;
-            // Check if the last character is an escaped one (line feed to get rid of) which is the case for Microsoft Edge
-            if (labelElement.charCodeAt(labelLength-1) === lineFeedCode) {
-                var labelElementSliced = labelElement.slice(0, -1);
-                menuItemsLabelsEqual = (labelElementSliced === labelItem);
-            }
-        }
 
         // Create nested submenu
         if (menuItemClicked && noSubmenuClicked && menuItemsLabelsEqual) {
@@ -99,26 +97,26 @@ domReady(function() {
         id: 'mute',
         label: 'Mute',
         listener: function () {
-            var item = getItem('mute');
-        if (player.muted()){
-            player.muted(false);
-            item.label = 'Mute';
-        } else {
-            player.muted(true);
-            item.label = 'Unmute';
-        }
+            var item = getItem('mute');  // eslint-disable no-use-before-define
+            if (player.muted()) {
+                player.muted(false);
+                item.label = 'Mute';
+            } else {
+                player.muted(true);
+                item.label = 'Unmute';
+            }
         }}, {
         id: 'fullscreen',
         label: 'Fill browser',
         listener: function () {
-        var item = getItem('fullscreen');
-        if (player.isFullscreen()){
-            player.exitFullscreen();
-            item.label = 'Fill browser';
-        } else {
-            player.requestFullscreen();
-            item.label = 'Unfill browser';
-        }
+            var item = getItem('fullscreen');  // eslint-disable no-use-before-define
+            if (player.isFullscreen()) {
+                player.exitFullscreen();
+                item.label = 'Fill browser';
+            } else {
+                player.requestFullscreen();
+                item.label = 'Unfill browser';
+            }
         }}, {
         // Nested submenu creation is delegated to the player
         id: 'speed',
@@ -130,7 +128,7 @@ domReady(function() {
     player.contextmenuUI({content: content});
 
     // Update context menu labels
-    var getItem = (function(contextmenuUI) {
+    var getItem = (function(contextmenuUI) {  // eslint-disable vars-on-top
         var hash = {};
         contextmenuUI.content.forEach(function(item) {
             hash[item.id] = item;
@@ -139,5 +137,4 @@ domReady(function() {
             return hash[id];
         };
     }(player.contextmenuUI));
-
 });
