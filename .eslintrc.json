@@ -11,7 +11,7 @@
                 "childNameIndex_", "el_", "kind_", "labelEl_", "options_", "player_"
             ]}
         ],
-        "require-jsdoc": ["error", {
+        "require-jsdoc": [2, {
             "require": {
                 "FunctionDeclaration": true,
                 "MethodDefinition": true,
