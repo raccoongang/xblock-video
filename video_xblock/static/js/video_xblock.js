@@ -10,7 +10,7 @@ function VideoXBlockStudentViewInit(runtime, element) {
     var handlers = window.videoXBlockState.handlers = window.videoXBlockState.handlers || {
         saveState: {},
         analytics: {}
-    };
+    }; // eslint-disable-line vars-on-top
 
     handlers.saveState[usageId] = stateHandlerUrl;
     handlers.analytics[usageId] = eventHandlerUrl;
@@ -52,7 +52,9 @@ function VideoXBlockStudentViewInit(runtime, element) {
         try {
             var url = handlers[event.data.action][event.data.xblockUsageId];  // eslint-disable-line vars-on-top
             if (event.data.action === 'saveState') {
-                updateTranscriptDownloadUrl(event.data.downloadTranscriptUrl);  // eslint-disable-line no-use-before-define
+                updateTranscriptDownloadUrl(
+                    event.data.downloadTranscriptUrl
+                ); // eslint-disable-line no-use-before-define
             }
             if (url) {
                 sendData(url, event.data.info);
@@ -64,10 +66,10 @@ function VideoXBlockStudentViewInit(runtime, element) {
     /** Updates transcript download url if it is enabled */
     function updateTranscriptDownloadUrl(downloadTranscriptUrl) {
         try {
-            var downloadLinkEl = document.getElementById('download-transcript-link');  // eslint-disable-line vars-on-top
+            var downloadLinkEl = document.getElementById('download-transcript-link'); // eslint-disable-line vars-on-top
             downloadLinkEl.href = downloadTranscriptHandlerUrl + '?' + downloadTranscriptUrl;
         } catch (err) {
-            console.log(err)  // eslint-disable-line no-console
+            console.log(err);  // eslint-disable-line no-console
         }
     }
 }

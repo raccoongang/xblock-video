@@ -124,7 +124,8 @@ domReady(function() {
         createEl: function createEl(props, attributes) {
             var el = MenuButton.prototype.createEl.call(this, arguments.tag, props, attributes);
             props = props || {};  // eslint-disable-line no-param-reassign
-            props.className = this.buildCSSClass() + ' icon fa ' + this.styledSpan();  // eslint-disable-line no-param-reassign
+            props.className = this.buildCSSClass() +
+                ' icon fa ' + this.styledSpan();  // eslint-disable-line no-param-reassign
             props.tabIndex = 0;  // eslint-disable-line no-param-reassign
             el.setAttribute('role', 'menuitem');
             el.setAttribute('aria-live', 'polite');

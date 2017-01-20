@@ -26,7 +26,7 @@
          */
         var playbackRateMenuButtonExtended = videojs.extend(playbackRateMenuButton, {
             /** @constructor */
-            constructor: function(player, options) {  // eslint-disable no-shadow
+            constructor: function(player, options) {  // eslint-disable-line no-shadow
                 playbackRateMenuButton.call(this, player, options);
                 this.on('ratechange', this.updateLabel);
                 this.on('click', this.handleClick);

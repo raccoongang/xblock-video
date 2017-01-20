@@ -65,7 +65,12 @@ domReady(function() {
     // Wrap into conditional statement to avoid unnecessary variables initialization
     if (menuItemClicked && noSubmenuClicked) {
       var labelLength = labelElement.length;
-      const lineFeedCode = 10;  // eslint-disable-line
+
+      /* eslint-disable */
+
+      const lineFeedCode = 10;
+
+      /* eslint-enable */
       // Check if the last character is an escaped one (line feed to get rid of) which is the case for Microsoft Edge
       if (labelElement.charCodeAt(labelLength-1) === lineFeedCode) {
         var labelElementSliced = labelElement.slice(0, -1);

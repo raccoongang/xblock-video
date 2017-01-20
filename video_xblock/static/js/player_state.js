@@ -18,6 +18,7 @@ var domReady = function(callback) {
     document.addEventListener("DOMContentLoaded", callback);
   }
 };
+/* eslint-disable */
 
 var player_state = {
   volume: {{ player_state.volume }},
@@ -27,7 +28,7 @@ var player_state = {
   transcriptsEnabled: {{ player_state.transcripts_enabled | yesno:'true,false' }},
   captionsEnabled: {{ player_state.captions_enabled | yesno:'true,false' }},
   captionsLanguage: '{{ player_state.captions_language }}',
-};  // eslint-disable-line
+};
 
 var xblockUsageId = window.location.hash.slice(1);
 
@@ -38,7 +39,9 @@ var transcripts = {
           'url': '{{transcript.url}}',
    },
   {% endfor %}
-}; // eslint-disable-line
+};
+
+/* eslint-enable */
 
 /** Get transcript url for current caption language */
 var getDownloadTranscriptUrl = function (player) {

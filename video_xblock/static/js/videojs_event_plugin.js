@@ -96,39 +96,40 @@
             this.log('closed_captions.hidden', {current_time: this.currentTime()});
         };
         this.logEvent = function(eventType) {
-            if (this.events.indexOf(eventType) == -1 || typeof this[eventType] !== 'function') { // eslint-disable-line eqeqeq
+            if (this.events.indexOf(eventType) == -1 ||
+                typeof this[eventType] !== 'function') { // eslint-disable-line eqeqeq
                 return;
             }
             this[eventType]();
         };
         this.ready(function() {
-            this.logEvent('onReady')
+            this.logEvent('onReady');
         })
             .on('timeupdate', function() {
                 previousTime = currentTime;
                 currentTime = this.currentTime();
             })
             .on('ratechange', function() {
-                this.logEvent('onSpeedChange')
+                this.logEvent('onSpeedChange');
             })
             .on('play', function() {
-              this.logEvent('onPlay');
+                this.logEvent('onPlay');
             })
             .on('pause', function() {
-                this.logEvent('onPause')
+                this.logEvent('onPause');
             })
             .on('ended', function() {
-                this.logEvent('onEnded')
+                this.logEvent('onEnded');
             })
             .on('seeked', function() {
-                this.logEvent('onSeek')
+                this.logEvent('onSeek');
             });
 
         /* TODO Add following events forwarding to Open edX when respective features are implemented
          onShowLanguageMenu, onHideLanguageMenu, onShowTranscript, onHideTranscript, onShowCaptions, onHideCaptions
          */
         this.log = function(eventName, data) {
-        var xblockUsageId = window.location.hash.slice(1);
+            var xblockUsageId = window.location.hash.slice(1);
             data = data || {};  //  eslint-disable-line no-param-reassign
             data.eventType = 'xblock-video.' + eventName;  //  eslint-disable-line no-param-reassign
             parent.postMessage({

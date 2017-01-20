@@ -42,9 +42,9 @@ domReady(function() {
             controlBar.volumeMenuButton.el_.tabIndex = -1;
 
             controlBarActions.forEach(function(action) {
-                var el = controlsMap[action] || controlBar[action].el_;  // eslint-disable vars-on-top
+                var el = controlsMap[action] || controlBar[action].el_;  // eslint-disable-line vars-on-top
                 if (el) {
-                    var index = controlsTabOrder.indexOf(action);
+                    var index = controlsTabOrder.indexOf(action);  // eslint-disable-line vars-on-top
                     el.tabIndex = index === -1 ? -1 : index + 1;
                 }
             });

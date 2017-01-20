@@ -1,6 +1,6 @@
 domReady(function() {
+    'use strict';
     videojs('{{ video_player_id }}').ready(function() {
-        'use strict';
         var tracks = this.textTracks();
         var enableTrack = false;
         var cssClasses = 'vjs-custom-caption-button vjs-menu-button vjs-menu-button-popup vjs-control vjs-button';
@@ -13,8 +13,8 @@ domReady(function() {
         // attach the widget to the page
         var transcriptContainer = document.getElementById('transcript');
         var captionContainer = document.getElementsByClassName('vjs-text-track-display');
-        for (var i = 0; i < tracks.length; i++) {  //  eslint-disable vars-on-top
-            var track = tracks[i];                 //  eslint-disable vars-on-top
+        for (var i = 0; i < tracks.length; i++) {  //  eslint-disable-line vars-on-top
+            var track = tracks[i];                 //  eslint-disable-line vars-on-top
             if (track.kind === 'captions') {
                 if (track.language === this.captionsLanguage) {
                     track.mode = 'showing';
@@ -22,7 +22,7 @@ domReady(function() {
                 } else {
                     track.mode = 'disabled';
                 }
-                if (!enableTrack && i == tracks.length -1) {
+                if (!enableTrack && i === tracks.length - 1) {
                     tracks[0].mode = 'showing';
                 }
             }
@@ -46,7 +46,7 @@ domReady(function() {
         // Show or hide the captions block depending on the caption state
         if (!this.captionsEnabled) {
             Array.from(captionContainer).forEach(function(caption) {
-                caption.className += ' is-hidden';
+                caption.className += ' is-hidden';  // eslint-disable-line no-param-reassign
             });
         }
 
@@ -71,7 +71,7 @@ domReady(function() {
             style: 'fa-cc',
             enabledEvent: 'captionenabled',
             disabledEvent: 'captiondisabled',
-            cssClasses: cssClasses,
+            cssClasses: cssClasses
         });
         cssClasses = 'vjs-custom-transcript-button vjs-menu-button vjs-menu-button-popup vjs-control vjs-button';
         if (this.transcriptsEnabled) {
@@ -81,7 +81,7 @@ domReady(function() {
             style: 'fa-quote-left',
             enabledEvent: 'transcriptenabled',
             disabledEvent: 'transcriptdisabled',
-            cssClasses: cssClasses,
+            cssClasses: cssClasses
         });
     });
 });
