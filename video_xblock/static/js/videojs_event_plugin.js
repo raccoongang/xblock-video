@@ -96,12 +96,11 @@
             this.log('closed_captions.hidden', {current_time: this.currentTime()});
         };
         this.logEvent = function(eventType) {
-            if (this.events.indexOf(eventType) == -1 || typeof this[eventType] !== 'function') { //eslint-disable eqeqeq
+            if (this.events.indexOf(eventType) == -1 || typeof this[eventType] !== 'function') { // eslint-disable-line eqeqeq
                 return;
             }
             this[eventType]();
         };
-        /* eslint-disable */
         this.ready(function() {
             this.logEvent('onReady')
         })
@@ -124,15 +123,14 @@
             .on('seeked', function() {
                 this.logEvent('onSeek')
             });
-        /* eslint-enable */
 
         /* TODO Add following events forwarding to Open edX when respective features are implemented
          onShowLanguageMenu, onHideLanguageMenu, onShowTranscript, onHideTranscript, onShowCaptions, onHideCaptions
          */
         this.log = function(eventName, data) {
         var xblockUsageId = window.location.hash.slice(1);
-            data = data || {};  //  eslint-disable no-param-reassign
-            data.eventType = 'xblock-video.' + eventName;  //  eslint-disable no-param-reassign
+            data = data || {};  //  eslint-disable-line no-param-reassign
+            data.eventType = 'xblock-video.' + eventName;  //  eslint-disable-line no-param-reassign
             parent.postMessage({
                 action: 'analytics',
                 info: data,
@@ -144,6 +142,6 @@
     window.xblockEventPlugin = XBlockEventPlugin;
     // add plugin if player has already initialized
     if (window.videojs) {
-        window.videojs.plugin('xblockEventPlugin', xblockEventPlugin);  // eslint-disable no-undef
+        window.videojs.plugin('xblockEventPlugin', xblockEventPlugin);  // eslint-disable-line no-undef
     }
 }).call(this);

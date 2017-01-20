@@ -23,17 +23,17 @@ function VideoXBlockStudentViewInit(runtime, element) {
             data: JSON.stringify(data)
         })
         .done(function() {
-            console.log('Data processed successfully.');  // eslint-disable no-console
+            console.log('Data processed successfully.');  // eslint-disable-line no-console
         })
         .fail(function() {
-            console.log('Failed to process data');  // eslint-disable no-console
+            console.log('Failed to process data');  // eslint-disable-line no-console
         });
     }
 
     if (!window.videoXBlockListenerRegistered) {
         // Make sure we register event listener only once even if there are more than
         // one VideoXBlock on a page
-        window.addEventListener('message', receiveMessage, false);  // eslint-disable no-use-before-define
+        window.addEventListener('message', receiveMessage, false);  // eslint-disable-line no-use-before-define
         window.videoXBlockListenerRegistered = true;
     }
 
@@ -50,24 +50,24 @@ function VideoXBlockStudentViewInit(runtime, element) {
             return;
         }
         try {
-            var url = handlers[event.data.action][event.data.xblockUsageId];  // eslint-disable vars-on-top
+            var url = handlers[event.data.action][event.data.xblockUsageId];  // eslint-disable-line vars-on-top
             if (event.data.action === 'saveState') {
-                updateTranscriptDownloadUrl(event.data.downloadTranscriptUrl);  // eslint-disable no-use-before-define
+                updateTranscriptDownloadUrl(event.data.downloadTranscriptUrl);  // eslint-disable-line no-use-before-define
             }
             if (url) {
                 sendData(url, event.data.info);
             }
         } catch (err) {
-            console.log(err)  // eslint-disable no-console
+            console.log(err)  // eslint-disable-line no-console
         }
     }
     /** Updates transcript download url if it is enabled */
     function updateTranscriptDownloadUrl(downloadTranscriptUrl) {
         try {
-            var downloadLinkEl = document.getElementById('download-transcript-link');  // eslint-disable vars-on-top
+            var downloadLinkEl = document.getElementById('download-transcript-link');  // eslint-disable-line vars-on-top
             downloadLinkEl.href = downloadTranscriptHandlerUrl + '?' + downloadTranscriptUrl;
         } catch (err) {
-            console.log(err)  // eslint-disable no-console
+            console.log(err)  // eslint-disable-line no-console
         }
     }
 }
