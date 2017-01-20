@@ -96,8 +96,8 @@
             this.log('closed_captions.hidden', {current_time: this.currentTime()});
         };
         this.logEvent = function(eventType) {
-            if (this.events.indexOf(eventType) == -1 ||
-                typeof this[eventType] !== 'function') { // eslint-disable-line eqeqeq
+            if (this.events.indexOf(eventType) == -1 ||  // eslint-disable-line eqeqeq
+                typeof this[eventType] !== 'function') {
                 return;
             }
             this[eventType]();

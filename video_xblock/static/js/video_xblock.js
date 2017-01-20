@@ -7,10 +7,11 @@ function VideoXBlockStudentViewInit(runtime, element) {
     var downloadTranscriptHandlerUrl = runtime.handlerUrl(element, 'download_transcript');
     var usageId = element.attributes['data-usage-id'].value;
     window.videoXBlockState = window.videoXBlockState || {};
-    var handlers = window.videoXBlockState.handlers = window.videoXBlockState.handlers || {
-        saveState: {},
-        analytics: {}
-    }; // eslint-disable-line vars-on-top
+    var handlers = window.videoXBlockState.handlers =  // eslint-disable-line vars-on-top
+        window.videoXBlockState.handlers || {
+            saveState: {},
+            analytics: {}
+        };
 
     handlers.saveState[usageId] = stateHandlerUrl;
     handlers.analytics[usageId] = eventHandlerUrl;
@@ -52,15 +53,15 @@ function VideoXBlockStudentViewInit(runtime, element) {
         try {
             var url = handlers[event.data.action][event.data.xblockUsageId];  // eslint-disable-line vars-on-top
             if (event.data.action === 'saveState') {
-                updateTranscriptDownloadUrl(
+                updateTranscriptDownloadUrl(  // eslint-disable-line no-use-before-define
                     event.data.downloadTranscriptUrl
-                ); // eslint-disable-line no-use-before-define
+                );
             }
             if (url) {
                 sendData(url, event.data.info);
             }
         } catch (err) {
-            console.log(err)  // eslint-disable-line no-console
+            console.log(err);  // eslint-disable-line no-console
         }
     }
     /** Updates transcript download url if it is enabled */
