@@ -18,7 +18,7 @@ var domReady = function(callback) {
     document.addEventListener("DOMContentLoaded", callback);
   }
 };
-/* eslint-disable */
+/*eslint-disable */
 
 var player_state = {
   volume: {{ player_state.volume }},  // eslint-disable-line
@@ -41,7 +41,7 @@ var transcripts = {
   {% endfor %}                                      // eslint-disable-line
 };
 
-/* eslint-enable */
+/*eslint-enable */
 
 /** Get transcript url for current caption language */
 var getDownloadTranscriptUrl = function (player) {
