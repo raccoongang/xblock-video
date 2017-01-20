@@ -19,15 +19,15 @@ var domReady = function(callback) {
   }
 };
 
-var player_state = {  // eslint-disable-line
-  volume: {{ player_state.volume }}, // eslint-disable-line
-  currentTime: {{ player_state.current_time }}, // eslint-disable-line
-  playbackRate: {{ player_state.playback_rate }}, // eslint-disable-line
-  muted: {{ player_state.muted | yesno:'true,false' }}, // eslint-disable-line
-  transcriptsEnabled: {{ player_state.transcripts_enabled | yesno:'true,false' }}, // eslint-disable-line
-  captionsEnabled: {{ player_state.captions_enabled | yesno:'true,false' }}, // eslint-disable-line
-  captionsLanguage: '{{ player_state.captions_language }}' // eslint-disable-line
-}; // eslint-disable-line
+var player_state = {
+  volume: {{ player_state.volume }},
+  currentTime: {{ player_state.current_time }},
+  playbackRate: {{ player_state.playback_rate }},
+  muted: {{ player_state.muted | yesno:'true,false' }},
+  transcriptsEnabled: {{ player_state.transcripts_enabled | yesno:'true,false' }},
+  captionsEnabled: {{ player_state.captions_enabled | yesno:'true,false' }},
+  captionsLanguage: '{{ player_state.captions_language }}'
+};
 
 var xblockUsageId = window.location.hash.slice(1);
 
