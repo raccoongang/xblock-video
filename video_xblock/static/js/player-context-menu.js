@@ -41,7 +41,7 @@ domReady(function() {
     function createNestedContextSubMenu(e) {
         var target = e.target;
         var labelElement = target.innerText;
-        var labelItem = getItem('speed').label; // eslint-disable no-use-before-define
+        var labelItem = getItem('speed').label; // eslint-disable-line no-use-before-define
         // Check conditions to be met for delegation of the popup submenu creation
         var menuItemClicked = matchesSelector(target, 'li.vjs-menu-item');
         var noSubmenuClicked = !target.querySelector('.vjs-contextmenu-ui-submenu');
@@ -81,46 +81,50 @@ domReady(function() {
     videoPlayer.addEventListener('mouseover', createNestedContextSubMenu);
 
     // Create context menu options
-    var content = [{
-        id: 'play',
-        label: 'Play',
-        listener: function () {
-            var item = getItem('play');
-            if (player.paused()) {
-            player.play();
-            item.label = 'Pause';
-        } else {
-            player.pause();
-            item.label = 'Play';
-        }
-        }}, {
-        id: 'mute',
-        label: 'Mute',
-        listener: function () {
-            var item = getItem('mute');  // eslint-disable no-use-before-define
-            if (player.muted()) {
-                player.muted(false);
-                item.label = 'Mute';
-            } else {
-                player.muted(true);
-                item.label = 'Unmute';
+    var content = [
+        {
+            id: 'play',
+            label: 'Play',
+            listener: function () {
+                var item = getItem('play');
+                if (player.paused()) {
+                    player.play();
+                    item.label = 'Pause';
+                } else {
+                    player.pause();
+                    item.label = 'Play';
+                }
             }
-        }}, {
-        id: 'fullscreen',
-        label: 'Fill browser',
-        listener: function () {
-            var item = getItem('fullscreen');  // eslint-disable no-use-before-define
-            if (player.isFullscreen()) {
-                player.exitFullscreen();
-                item.label = 'Fill browser';
-            } else {
-                player.requestFullscreen();
-                item.label = 'Unfill browser';
+        }, {
+            id: 'mute',
+            label: 'Mute',
+            listener: function () {
+                var item = getItem('mute');  // eslint-disable-line no-use-before-define
+                if (player.muted()) {
+                    player.muted(false);
+                    item.label = 'Mute';
+                } else {
+                    player.muted(true);
+                    item.label = 'Unmute';
+                }
             }
-        }}, {
-        // Nested submenu creation is delegated to the player
-        id: 'speed',
-        label: 'Speed'
+        }, {
+            id: 'fullscreen',
+            label: 'Fill browser',
+            listener: function () {
+                var item = getItem('fullscreen');  // eslint-disable-line no-use-before-define
+                if (player.isFullscreen()) {
+                    player.exitFullscreen();
+                    item.label = 'Fill browser';
+                } else {
+                    player.requestFullscreen();
+                    item.label = 'Unfill browser';
+                }
+            }
+        }, {
+            // Nested submenu creation is delegated to the player
+            id: 'speed',
+            label: 'Speed'
         }
     ];
 
@@ -128,7 +132,7 @@ domReady(function() {
     player.contextmenuUI({content: content});
 
     // Update context menu labels
-    var getItem = (function(contextmenuUI) {  // eslint-disable vars-on-top
+    var getItem = (function(contextmenuUI) {  // eslint-disable-line vars-on-top
         var hash = {};
         contextmenuUI.content.forEach(function(item) {
             hash[item.id] = item;
