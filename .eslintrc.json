@@ -6,12 +6,12 @@
     },
     "rules": {
         "no-underscore-dangle": [
-            2, {"allow": [
+            "error", {"allow": [
                 // VideoJS components' attributes
                 "childNameIndex_", "el_", "kind_", "labelEl_", "options_", "player_"
             ]}
         ],
-        "require-jsdoc": [2, {
+        "require-jsdoc": ["error", {
             "require": {
                 "FunctionDeclaration": true,
                 "MethodDefinition": true,
