@@ -4,4 +4,5 @@ django==1.8.12
 edx-lint==0.5.1
 pycaption<1.0 # The latest Python 2.7 compatible version
 pylint==1.4.5
+mock==1.0.1
 requests==2.9.1

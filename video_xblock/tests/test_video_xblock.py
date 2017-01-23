@@ -1,3 +1,6 @@
+"""
+Test cases for video_xblock
+"""
 import mock
 import datetime
 import json
@@ -16,14 +19,19 @@ _ = lambda text: text
 
 
 class VideoXBlockTests(unittest.TestCase):
+    """
+    Test cases for video_xblock
+    """
     def setUp(self):
         """
         Creates a XBlock VideoXBlock for testing purpose.
         """
-        runtime = TestRuntime()
+        result = super(VideoXBlockTests, self).setUp()
+        runtime = TestRuntime() # pylint: disable=abstract-class-instantiated
         self.block = VideoXBlock(runtime, DictFieldData({
             'account_id': 'account_id',
         }), mock.Mock())
+        return result
 
     def test_fields_xblock(self):
         self.assertEqual(self.block.display_name, _('Video'))
@@ -86,7 +94,7 @@ class VideoXBlockTests(unittest.TestCase):
         factory = RequestFactory()
         request = factory.post('', json.dumps(data), content_type='application/json')
         response = self.block.save_player_state(request)
-        self.assertEqual('{"success": true}', response.body)
+        self.assertEqual('{"success": true}', response.body) # pylint: disable=no-member
         self.assertDictEqual(self.block.player_state, {
             'current_time':data['currentTime'],
             'muted': data['muted'],
@@ -99,7 +107,10 @@ class VideoXBlockTests(unittest.TestCase):
         })
 
 
-class MockCourse:
+class MockCourse(object):
+    """
+    Mock Course object with required parameters
+    """
     def __init__(self, course_id):
         self.course_id = course_id
         self.language = 'en'
