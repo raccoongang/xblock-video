@@ -8,7 +8,6 @@ import requests
 import urllib
 from lxml import etree
 
-from django.conf import settings
 from video_xblock import BaseVideoPlayer
 
 
@@ -99,7 +98,7 @@ class YoutubePlayer(BaseVideoPlayer):
         if data.status_code == 200 and data.text:
             youtube_data = etree.fromstring(data.content, parser=utf8_parser)
             available_languages = [
-                [el.get('lang_code'), el.get('lang_translated')]  # TODO consider usage of self.captions_api['response']
+                [el.get('lang_code'), el.get('lang_translated')]
                 for el in youtube_data if el.tag == 'track'
             ]
             return available_languages
@@ -151,16 +150,7 @@ class YoutubePlayer(BaseVideoPlayer):
                 url=self.captions_api['url'],
                 params=urllib.urlencode(self.captions_api['params'])
             )
-            # Delete region subtags; reference: https://github.com/edx/edx-platform/blob/master/lms/envs/common.py#L862
-            # FIXME for Chinese language: zh_HANS, zh_HANT, zh (see settings.ALL_LANGUAGES)
-            lang_code = lang_code[0:2]
-            # Check on consistency with pre-configured ALL_LANGUAGES
-            if lang_code not in [al[0] for al in settings.ALL_LANGUAGES]:
-                raise Exception('Not all the languages of transcripts fetched from video platform are '
-                                'consistent with pre-configured ALL_LANGUAGES')
-
-            lang_label = [al[1] for al in settings.ALL_LANGUAGES if al[0] == lang_code][0]
-
+            lang_code, lang_label = self.get_transcript_language_parameters(lang_code)
             default_transcript = {
                 'lang': lang_code,
                 'label': lang_label,

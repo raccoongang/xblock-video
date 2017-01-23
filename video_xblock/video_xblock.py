@@ -357,6 +357,20 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         frag.initialize_js('VideoXBlockStudentViewInit')
         return frag
 
+    @staticmethod
+    def update_default_transcripts(default_transcripts, transcripts):
+        """
+        Exclude enabled transcripts (fetched from API) from the list of available ones (fetched from video xblock)
+        """
+        enabled_languages_codes = [t[u'lang'] for t in transcripts]
+        default_transcripts = [
+            dt for dt in default_transcripts
+            if (unicode(dt.get('lang')) not in enabled_languages_codes) and default_transcripts
+        ]
+        if default_transcripts:
+            default_transcripts.sort(key=lambda l: l['label'])
+        return default_transcripts
+
     def studio_view(self, context):  # pylint: disable=unused-argument
         """
         Render a form for editing this XBlock
@@ -371,14 +385,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         player = self.get_player()
         video_id = player.media_id(self.href)
         default_transcripts = player.get_default_transcripts(video_id)
-        # Exclude enabled transcripts from the list of available ones
-        enabled_languages_codes = [t[u'lang'] for t in transcripts]
-        default_transcripts = [
-            dt for dt in default_transcripts
-            if (unicode(dt.get('lang')) not in enabled_languages_codes) and default_transcripts
-        ]
-        if default_transcripts:
-            default_transcripts.sort(key=lambda l: l['label'])
+        default_transcripts = self.update_default_transcripts(default_transcripts, transcripts)
 
         context = {
             'fields': [],

@@ -14,6 +14,7 @@ from webob import Response
 from xblock.fragment import Fragment
 from xblock.plugin import Plugin
 
+from django.conf import settings
 from django.template import Template, Context
 
 
@@ -146,6 +147,28 @@ class BaseVideoPlayer(Plugin):
             None
         """
         return []
+
+    @staticmethod
+    def get_transcript_language_parameters(lang_code):
+        """
+        Gets the parameters of a transcript's language, having checked on consistency with settings.
+
+        Arguments:
+            lang_code (str): raw language code of a transcript, fetched from the external sources.
+        Returns:
+            lang_code (str): pre-configured language code, e.g., 'br'
+            lang_label (str): pre-configured language label, e.g., 'Breton'
+        """
+        # Delete region subtags; reference: https://github.com/edx/edx-platform/blob/master/lms/envs/common.py#L862
+        lang_code = lang_code if (lang_code == 'zh_HANS' or lang_code == 'zh_HANT') else lang_code[0:2]
+        # Check on consistency with the pre-configured ALL_LANGUAGES
+        if lang_code not in [language[0] for language in settings.ALL_LANGUAGES]:
+            raise Exception('Not all the languages of transcripts fetched from video platform are '
+                            'consistent with the pre-configured ALL_LANGUAGES')
+
+        lang_label = [language[1] for language in settings.ALL_LANGUAGES if language[0] == lang_code][0]
+
+        return lang_code, lang_label
 
     def get_player_html(self, **context):
         """
