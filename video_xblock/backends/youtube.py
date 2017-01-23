@@ -82,6 +82,14 @@ class YoutubePlayer(BaseVideoPlayer):
         return frag
 
     def fetch_default_transcripts_languages(self, video_id):
+        """
+        Fetches available transcripts languages from a Youtube server.
+
+        Arguments:
+            video_id (str): media id fetched from href field of studio-edit modal.
+        Returns:
+            list: List of pairs of codes and labels of captions' languages fetched from API.
+        """
         utf8_parser = etree.XMLParser(encoding='utf-8')
         # This is to update self.captions_api with a video id.
         self.captions_api['params']['v'] = video_id
@@ -91,7 +99,7 @@ class YoutubePlayer(BaseVideoPlayer):
         if data.status_code == 200 and data.text:
             youtube_data = etree.fromstring(data.content, parser=utf8_parser)
             available_languages = [
-                [el.get('lang_code'), el.get('lang_translated')]
+                [el.get('lang_code'), el.get('lang_translated')]  # TODO consider usage of self.captions_api['response']
                 for el in youtube_data if el.tag == 'track'
             ]
             return available_languages

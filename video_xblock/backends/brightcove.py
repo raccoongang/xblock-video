@@ -24,7 +24,7 @@ class BrightcovePlayer(BaseVideoPlayer):
         'url': 'cms.api.brightcove.com/v1/accounts/{account_id}/videos/{media_id}',
         'response': {
             'language_code': 'srclang',  # no language_label translated in English may be fetched from API
-            'subs': 'src'  # f/e, "http://learning-services-media.brightcove.com/captions/bc_smart_ja.vtt"
+            'subs': 'src'  # e.g., "http://learning-services-media.brightcove.com/captions/bc_smart_ja.vtt"
         }
     }
 
