@@ -367,8 +367,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             dt for dt in default_transcripts
             if (unicode(dt.get('lang')) not in enabled_languages_codes) and default_transcripts
         ]
-        if default_transcripts:
-            default_transcripts.sort(key=lambda l: l['label'])
         return default_transcripts
 
     def studio_view(self, context):  # pylint: disable=unused-argument
@@ -386,6 +384,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         video_id = player.media_id(self.href)
         default_transcripts = player.get_default_transcripts(video_id)
         default_transcripts = self.update_default_transcripts(default_transcripts, transcripts)
+        if default_transcripts:
+            default_transcripts.sort(key=lambda l: l['label'])
 
         context = {
             'fields': [],
@@ -497,8 +497,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         Overrides and extends data of built-in method
         """
         if field_name in ('start_time', 'end_time'):
-            # RelativeTime field doesn't supported by default.
-            return {
+            # RelativeTime field isn't supported by default.
+            info = {
                 'name': field_name,
                 'display_name': _(field.display_name) if field.display_name else "",  # pylint: disable=translation-of-non-string
                 'is_set': field.is_set_on(self),
@@ -511,15 +511,16 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 'has_list_values': False,
                 'type': 'string',
             }
-        info = super(VideoXBlock, self)._make_field_info(field_name, field)
-        if field_name == 'handout':
-            info['type'] = 'file_uploader'
-            info['file_name'] = self.get_file_name_from_path(self.handout)
-            info['value'] = self.get_path_for(self.handout)
-        if field_name == 'transcripts':
-            info['type'] = 'transcript_uploader'
-        if field_name == 'default_transcripts':
-            info['type'] = 'default_transcript_uploader'
+        else:
+            info = super(VideoXBlock, self)._make_field_info(field_name, field)
+            if field_name == 'handout':
+                info['type'] = 'file_uploader'
+                info['file_name'] = self.get_file_name_from_path(self.handout)
+                info['value'] = self.get_path_for(self.handout)
+            elif field_name == 'transcripts':
+                info['type'] = 'transcript_uploader'
+            elif field_name == 'default_transcripts':
+                info['type'] = 'default_transcript_uploader'
         return info
 
     def get_file_name_from_path(self, field):

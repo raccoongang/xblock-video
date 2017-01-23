@@ -127,6 +127,7 @@
     background-color: #ccc;
     -webkit-transition: .4s;
     -moz-transition: .4s;
+    -o-transition: .4s;
     transition: .4s;
     border-radius: 34px;
 }
@@ -141,6 +142,7 @@
     background-color: white;
     -webkit-transition: .4s;
     -moz-transition: .4s;
+    -o-transition: .4s;
     transition: .4s;
     border-radius: 50%;
 }
@@ -153,6 +155,7 @@
     -webkit-transform: translateX(23px);
     -ms-transform: translateX(23px);
     -moz-transform: translateX(23px);
+    -o-transform: translateX(23px);
     transform: translateX(23px);
 }
 
