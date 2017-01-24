@@ -6,6 +6,7 @@ before_install:
   # Install latest stable NodeJS version. Required for eslint.
   - nvm install stable
   - pip install -r test_requirements.txt
+  - pip install -e common/lib/xmodule
 
 insall:
   # Install required package.
