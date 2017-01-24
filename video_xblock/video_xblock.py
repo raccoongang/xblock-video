@@ -16,7 +16,7 @@ from xblock.fields import Scope, Boolean, Integer, Float, String
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
-from xmodule.fields import RelativeTime  # pylint: disable=import-error
+from .fields import RelativeTime
 
 from django.template import Template, Context
 from pycaption import detect_format, WebVTTWriter
@@ -371,7 +371,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         }
         # Build a list of all the fields that can be edited:
         for field_name in self.editable_fields:
-            field = self.fields[field_name]  # pylint: disable=unsubscriptable-object
+            field = self.fields[field_name]  # pylint: disable=bad-option-value
             assert field.scope in (Scope.content, Scope.settings), (
                 "Only Scope.content or Scope.settings fields can be used with "
                 "StudioEditableXBlockMixin. Other scopes are for user-specific data and are "
@@ -383,7 +383,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         fragment.content = self.render_resource('static/html/studio_edit.html', **context)
         fragment.add_css(self.resource_string("static/css/handout.css"))
-        fragment.add_css(self.resource_string("static/css/transcripts.css"))
+        fragment.add_css(self.resource_string("static/css/transcripts-upload.css"))
         fragment.add_css(self.resource_string("static/css/studio-edit.css"))
         fragment.add_javascript(self.resource_string("static/js/studio-edit.js"))
         fragment.initialize_js('StudioEditableXBlock')
@@ -407,8 +407,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             video_player_id='video_player_{}'.format(self.location.block_id),  # pylint: disable=no-member
             save_state_url=save_state_url,
             player_state=self.player_state,
-            start_time=int(self.start_time.total_seconds()),
-            end_time=int(self.end_time.total_seconds()),
+            start_time=int(self.start_time.total_seconds()), # pylint: disable=no-member
+            end_time=int(self.end_time.total_seconds()), # pylint: disable=no-member
             brightcove_js_url=VideoXBlock.get_brightcove_js_url(self.account_id, self.player_id),
             transcripts=transcripts
         )
@@ -452,7 +452,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         Tries to detect player by submitted video url. If fails, it defaults to 'dummy-player'
         """
-        data['player_name'] = self.fields['player_name'].default  # pylint: disable=unsubscriptable-object
+        data['player_name'] = self.fields['player_name'].default  # pylint: disable=bad-option-value
         for player_name, player_class in BaseVideoPlayer.load_classes():
             if player_name == 'dummy-player':
                 continue
