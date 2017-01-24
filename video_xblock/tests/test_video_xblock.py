@@ -53,6 +53,9 @@ class VideoXBlockTests(unittest.TestCase):
         self.assertEqual(self.block.download_transcript_allowed, False)
 
     def test_player_state(self):
+        """
+        Test player state property
+        """
         self.block.course_id = 'test:course:id'
         self.block.runtime.modulestore = mock.Mock(get_course=MockCourse)
         self.assertDictEqual(
@@ -70,6 +73,9 @@ class VideoXBlockTests(unittest.TestCase):
         )
 
     def test_get_brightcove_js_url(self):
+        """
+        Test brightcove.js url generation
+        """
         self.assertEqual(
             VideoXBlock.get_brightcove_js_url(self.block.account_id, self.block.player_id),
             "https://players.brightcove.net/{account_id}/{player_id}_default/index.min.js".format(
@@ -79,6 +85,9 @@ class VideoXBlockTests(unittest.TestCase):
         )
 
     def test_save_player_state(self):
+        """
+        Test player state saving
+        """
         self.block.course_id = 'test:course:id'
         self.block.runtime.modulestore = mock.Mock(get_course=MockCourse)
         data = {
