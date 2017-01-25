@@ -85,9 +85,6 @@ class BrightcovePlayer(BaseVideoPlayer):
         frag.add_css(
             self.resource_string('../static/css/brightcove.css')
         )
-        frag.add_css(
-            self.resource_string('../static/css/transcripts.css')
-        )
         return frag
 
     @staticmethod

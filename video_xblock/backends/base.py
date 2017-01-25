@@ -6,10 +6,10 @@ Base Video player plugin
 """
 
 import abc
-import pkg_resources
 import re
-
 from HTMLParser import HTMLParser
+
+import pkg_resources
 from webob import Response
 from xblock.fragment import Fragment
 from xblock.plugin import Plugin
@@ -64,9 +64,6 @@ class BaseVideoPlayer(Plugin):
         frag.add_javascript(self.resource_string(
             '../static/bower_components/video.js/dist/video.min.js'
         ))
-        frag.add_javascript(self.render_resource(
-            '../static/js/videojs-speed-handler.js', **context
-        ))
         frag.add_javascript(self.resource_string(
             '../static/bower_components/videojs-contextmenu/dist/videojs-contextmenu.min.js'
         ))
@@ -79,9 +76,15 @@ class BaseVideoPlayer(Plugin):
         frag.add_javascript(
             self.render_resource('../static/js/player_state.js', **context)
         )
+        frag.add_javascript(self.render_resource(
+            '../static/js/videojs-speed-handler.js', **context
+        ))
         if context['player_state']['transcripts']:
             frag.add_javascript(self.resource_string(
                 '../static/bower_components/videojs-transcript/dist/videojs-transcript.js'
+            ))
+            frag.add_javascript(self.render_resource(
+                '../static/js/transcript-download.js', **context
             ))
             frag.add_javascript(
                 self.render_resource('../static/js/videojs-transcript.js', **context)
@@ -147,7 +150,7 @@ class BaseVideoPlayer(Plugin):
         if isinstance(cls.url_re, list):
             return any(regex.search(href) for regex in cls.url_re)
         elif isinstance(cls.url_re, type(re.compile(''))):
-            return cls.url_re.search(href)
+            return cls.url_re.search(href)  # pylint: disable=no-member
         elif isinstance(cls.url_re, basestring):
             return re.search(cls.url_re, href, re.I)
 

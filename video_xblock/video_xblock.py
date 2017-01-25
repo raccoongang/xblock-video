@@ -16,7 +16,7 @@ from xblock.fields import Scope, Boolean, Integer, Float, String, Dict
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
-from xmodule.fields import RelativeTime  # pylint: disable=import-error
+from .fields import RelativeTime
 
 from django.template import Template, Context
 from pycaption import detect_format, WebVTTWriter
@@ -225,19 +225,19 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
     captions_language = String(
         default='',
         scope=Scope.preferences,
-        help="ISO code current language for captions and transcripts"
+        help="ISO code for the current language for captions and transcripts"
     )
 
     transcripts_enabled = Boolean(
         default=False,
         scope=Scope.preferences,
-        help="Transcripts is enabled or not"
+        help="Transcripts are enabled or not"
     )
 
     captions_enabled = Boolean(
         default=False,
         scope=Scope.preferences,
-        help="Captions is enabled or not"
+        help="Captions are enabled or not"
     )
 
     access_token = String(
@@ -263,15 +263,21 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         Returns video player state as a dictionary
         """
         course = self.runtime.modulestore.get_course(self.course_id)
+        transcripts = json.loads(self.transcripts) if self.transcripts else []
+        transcripts_object = {
+            trans['lang']: {'url': trans['url'], 'label': trans['label']}
+            for trans in transcripts
+        }
         return {
             'current_time': self.current_time,
             'muted': self.muted,
             'playback_rate': self.playback_rate,
             'volume': self.volume,
-            'transcripts': json.loads(self.transcripts) if self.transcripts else [],
+            'transcripts': transcripts,
             'transcripts_enabled': self.transcripts_enabled,
             'captions_enabled': self.captions_enabled,
-            'captions_language': self.captions_language or course.language
+            'captions_language': self.captions_language or course.language,
+            'transcripts_object': json.dumps(transcripts_object)
         }
 
     @staticmethod
@@ -352,8 +358,11 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         """
 
         player_url = self.runtime.handler_url(self, 'render_player')
-        transcript_download_link = self.get_transcript_download_link()
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
+        transcript_download_link = self.get_transcript_download_link()
+        full_transcript_download_link = ''
+        if transcript_download_link:
+            full_transcript_download_link = download_transcript_handler_url + transcript_download_link
         frag = Fragment(
             self.render_resource(
                 'static/html/student_view.html',
@@ -364,8 +373,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 transcripts=self.route_transcripts(self.transcripts),
                 download_transcript_allowed=self.download_transcript_allowed,
                 handout_file_name=self.get_file_name_from_path(self.handout),
-                transcript_download_link=transcript_download_link,
-                download_transcript_handler_url=download_transcript_handler_url
+                transcript_download_link=full_transcript_download_link
+
             )
         )
         frag.add_javascript(self.resource_string("static/js/video_xblock.js"))
@@ -437,7 +446,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         # Build a list of all the fields that can be edited:
         for field_name in self.editable_fields:
-            field = self.fields[field_name]
+            field = self.fields[field_name]  # pylint: disable=bad-option-value
             assert field.scope in (Scope.content, Scope.settings), (
                 "Only Scope.content or Scope.settings fields can be used with "
                 "StudioEditableXBlockMixin. Other scopes are for user-specific data and are "
@@ -449,7 +458,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         fragment.content = self.render_resource('static/html/studio_edit.html', **context)
         fragment.add_css(self.resource_string("static/css/handout.css"))
-        fragment.add_css(self.resource_string("static/css/transcripts.css"))
+        fragment.add_css(self.resource_string("static/css/transcripts-upload.css"))
         fragment.add_css(self.resource_string("static/css/studio-edit.css"))
         fragment.add_javascript(self.resource_string("static/js/studio-edit.js"))
         fragment.initialize_js('StudioEditableXBlock')
@@ -473,8 +482,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             video_player_id='video_player_{}'.format(self.location.block_id),  # pylint: disable=no-member
             save_state_url=save_state_url,
             player_state=self.player_state,
-            start_time=int(self.start_time.total_seconds()),  # pylint: disable=no-member
-            end_time=int(self.end_time.total_seconds()),  # pylint: disable=no-member
+            start_time=int(self.start_time.total_seconds()), # pylint: disable=no-member
+            end_time=int(self.end_time.total_seconds()), # pylint: disable=no-member
             brightcove_js_url=VideoXBlock.get_brightcove_js_url(self.account_id, self.player_id),
             transcripts=transcripts
         )
@@ -518,7 +527,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         Tries to detect player by submitted video url. If fails, it defaults to 'dummy-player'
         """
-        data['player_name'] = self.fields['player_name'].default
+        data['player_name'] = self.fields['player_name'].default  # pylint: disable=bad-option-value
         for player_name, player_class in BaseVideoPlayer.load_classes():
             if player_name == 'dummy-player':
                 continue
@@ -540,12 +549,12 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             # RelativeTime field isn't supported by default.
             info = {
                 'name': field_name,
-                'display_name': _(field.display_name) if field.display_name else "",  # pylint: disable=translation-of-non-string
+                'display_name': field.display_name if field.display_name else "",
                 'is_set': field.is_set_on(self),
                 'default': field.default,
                 'value': field.read_from(self),
                 'has_values': False,
-                'help': _(field.help) if field.help else "",  # pylint: disable=translation-of-non-string
+                'help': field.help if field.help else "",
                 'allow_reset': field.runtime_options.get('resettable_editor', True),
                 'list_values': None,
                 'has_list_values': False,
@@ -597,7 +606,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         for transcript in transcripts:
             if transcript.get('lang') == self.captions_language:
                 return transcript.get('url')
-        return '#'
+        return ''
 
     @XBlock.handler
     def download_transcript(self, request, suffix=''):  # pylint: disable=unused-argument
