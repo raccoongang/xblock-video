@@ -95,7 +95,6 @@ class BrightcovePlayer(BaseVideoPlayer):
 
         """
         headers = {'Authorization': 'BC_TOKEN {}'.format(token)}
-        # TODO implement application name (optional): --data 'name=videoxblock&maximum_scope=...'
         data = [{
             "identity": {
                 "type": "video-cloud-account",
@@ -161,7 +160,6 @@ class BrightcovePlayer(BaseVideoPlayer):
             access token (str), and
             error_status_message (str) for verbosity.
         """
-        # TODO implement validation in JS (kwargs)
         token, account_id = kwargs['token'], kwargs['account_id']
         client_secret, client_id, error_message = self.get_client_credentials(token, account_id)
         error_status_message = ''

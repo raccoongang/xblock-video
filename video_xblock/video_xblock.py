@@ -12,7 +12,7 @@ import pkg_resources
 import requests
 
 from xblock.core import XBlock
-from xblock.fields import Scope, Boolean, Integer, Float, String, Dict
+from xblock.fields import Scope, Boolean, Integer, Float, String
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
@@ -637,7 +637,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         """
 
         if str(data) != self.token:
-            # TODO: generate message on a new token saving
             self.token = str(data)
         token = self.token
 
