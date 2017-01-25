@@ -13,16 +13,29 @@
 }
 
 .upload-transcript,
-.download-setting {
+.download-setting,
+#video-api-authenticate {
   display: inline-block;
   width: 46%;
   border: 1px solid #009fe6;
+  background-color: #fff;
   border-radius: 5px;
   padding: 6px 0;
   text-align: center;
   margin-right: 2%;
   font-weight: 600;
   font-size: 1.2rem;
+}
+
+#video-api-authenticate {
+  margin-top: 10px;
+  width: 92%;
+  padding: 10px;
+}
+
+.token {
+  margin-left: 27px;
+  width: 100%;
 }
 
 .download-setting {
@@ -45,7 +58,8 @@
 }
 
 .upload-transcript:hover,
- .add-transcript:hover {
+.add-transcript:hover,
+#video-api-authenticate:hover {
   border: 1px solid #009fe6;
   background-color: #009fe6;
   color: #fff;
@@ -69,7 +83,7 @@
 }
 
 
-.default-transcripts-list {
+.custom-field-list {
     width: 70%;
     display: inline-block;
     min-width: 240px;
@@ -80,14 +94,13 @@
     padding: 0;
 }
 
-.default-transcripts-section-label {
-    display: block;
+.custom-field-section-label {
+    display: inline-block;
     font-size: 14px;
     font-weight: bold;
 }
 
-.default-transcripts-section-label.main-section-label {
-    display: inline-block;
+.custom-field-section-label.main-section-label {
     margin-bottom: 20px;
 }
 
@@ -178,3 +191,18 @@
     text-indent: 0;
     list-style: none;
 }
+
+.field-elements-wrapper {
+    width: 70%;
+    display: inline-block;
+    min-width: 240px;
+}
+
+.api-authenticate .status-success {
+    color: green;
+}
+
+.api-authenticate .status-error {
+    color: red;
+}
+

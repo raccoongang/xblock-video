@@ -138,9 +138,9 @@
               </div>
 
             {% elif field.type == 'default_transcript_uploader' %}
-              <div class="default-transcripts-list">
+              <div class="custom-field-list">
 
-                <div class="default-transcripts-section-label main-section-label">Show default transcripts</div>
+                <div class="custom-field-section-label main-section-label">Show default transcripts</div>
                    <input type="checkbox" class="default-transcripts-switch-input" id="default-transcript-onoff-switch">
                    <label class="default-transcripts-switch" for="default-transcript-onoff-switch">
                      <div class="default-transcripts-slider"></div>
@@ -148,7 +148,7 @@
 
                 <div class="default-transcripts-wrapper">
                 {% if transcripts  %}
-                  <div class="default-transcripts-section-label">Enabled transcripts</div>
+                  <div class="custom-field-section-label">Enabled transcripts</div>
                   <!-- Display a list of transcripts fetched from a video xblock -->
                     {% for transcript in transcripts %}
                       <div class="default-transcripts-section">
@@ -163,7 +163,7 @@
                     {% endfor %}
                 {% endif %}
 
-                <div class="default-transcripts-section-label">Available transcripts</div>
+                <div class="custom-field-section-label">Available transcripts</div>
                 {% if default_transcripts %}
                   <!-- Display a list of transcripts fetched from a video platform (API) -->
                     {% for default_transcript in default_transcripts %}
@@ -192,6 +192,25 @@
                 {% endif %}
                 </div>
               </div>
+
+            {% elif field.type == 'token_authorization' %}
+              <div class="custom-field-list">
+                  <div class="custom-field-section-label">Client Token</div>
+                  <input
+                    type="text"
+                    class="field-data-control token"
+                    id="xb-field-edit-{{field.name}}"
+                    value="{{field.value|default_if_none:""}}"
+                  >
+                  <div class="field-elements-wrapper">
+                    <button id="video-api-authenticate">
+                      <span aria-hidden="true"></span>{% trans 'Connect to video platform' %}<span class="sr"></span>
+                    </button>
+                  </div>
+                  <div class="api-authenticate status-error"></div>
+                  <div class="api-authenticate status-success"></div>
+              </div>
+
 
             <!-- End of Raccoongang addons -->
 

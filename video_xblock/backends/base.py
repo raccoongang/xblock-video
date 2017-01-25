@@ -107,67 +107,6 @@ class BaseVideoPlayer(Plugin):
 
         return ''
 
-    def fetch_default_transcripts_languages(self, video_id):  # pylint: disable=unused-argument
-        """
-        Fetches available transcripts languages from a video platform.
-
-        Arguments:
-            video_id (str): media id fetched from href field of studio-edit modal.
-        Returns:
-            list: List of pairs of codes and labels of captions' languages fetched from API.
-        """
-        return []
-
-    def get_default_transcripts(self, video_id):  # pylint: disable=unused-argument
-        """
-        Fetches transcripts list from a video platform.
-
-        Arguments:
-            video_id (str): media id fetched from href field of studio-edit modal.
-        Returns:
-            list: List of dicts of transcripts. Example:
-            [
-                {
-                    'lang': 'en',
-                    'label': 'English',
-                    'url': 'learning-services-media.brightcove.com/captions/bc_smart_ja.vtt'
-                },
-                # ...
-            ]
-        """
-        return []
-
-    def download_default_transcript(self, url):  # pylint: disable=unused-argument
-        """
-        Downloads default transcript from a video platform API and uploads it to the video xblock in WebVVT format.
-
-        Arguments:
-            url (str): transcript download url.
-        Returns:
-            None
-        """
-        return []
-
-    @staticmethod
-    def get_transcript_language_parameters(lang_code):
-        """
-        Gets the parameters of a transcript's language, having checked on consistency with settings.
-
-        Arguments:
-            lang_code (str): raw language code of a transcript, fetched from the external sources.
-        Returns:
-            lang_code (str): pre-configured language code, e.g., 'br'
-            lang_label (str): pre-configured language label, e.g., 'Breton'
-        """
-        # Delete region subtags; reference: https://github.com/edx/edx-platform/blob/master/lms/envs/common.py#L862
-        lang_code = lang_code[0:2]
-        # Check on consistency with the pre-configured ALL_LANGUAGES
-        if lang_code not in [language[0] for language in settings.ALL_LANGUAGES]:
-            raise Exception('Not all the languages of transcripts fetched from video platform are '
-                            'consistent with the pre-configured ALL_LANGUAGES')
-        lang_label = [language[1] for language in settings.ALL_LANGUAGES if language[0] == lang_code][0]
-        return lang_code, lang_label
-
     def get_player_html(self, **context):
         """
         Renders self.get_frag as a html string and returns it as a Response.
@@ -217,3 +156,77 @@ class BaseVideoPlayer(Plugin):
         Helper for adding javascript code inside <body> section.
         """
         return '<script>' + self.render_resource(path, **context) + '</script>'
+
+
+    def fetch_default_transcripts_languages(self, video_id):  # pylint: disable=unused-argument
+        """
+        Fetches available transcripts languages from a video platform.
+
+        Arguments:
+            video_id (str): media id fetched from href field of studio-edit modal.
+        Returns:
+            list: List of pairs of codes and labels of captions' languages fetched from API.
+        """
+        return []
+
+    def get_default_transcripts(self, video_id):  # pylint: disable=unused-argument
+        """
+        Fetches transcripts list from a video platform.
+
+        Arguments:
+            video_id (str): media id fetched from href field of studio-edit modal.
+        Returns:
+            list: List of dicts of transcripts. Example:
+            [
+                {
+                    'lang': 'en',
+                    'label': 'English',
+                    'url': 'learning-services-media.brightcove.com/captions/bc_smart_ja.vtt'
+                },
+                # ...
+            ]
+        """
+        return []
+
+    def download_default_transcript(self, url):  # pylint: disable=unused-argument
+        """
+        Downloads default transcript from a video platform API and uploads it to the video xblock in WebVVT format.
+
+        Arguments:
+            url (str): transcript download url.
+        Returns:
+            None
+        """
+        return []
+
+    @staticmethod
+    def get_transcript_language_parameters(lang_code):
+        """
+        Gets the parameters of a transcript's language, having checked on consistency with settings.
+
+        Arguments:
+            lang_code (str): raw language code of a transcript, fetched from the external sources.
+        Returns:
+            lang_code (str): pre-configured language code, e.g. 'br'
+            lang_label (str): pre-configured language label, e.g. 'Breton'
+        """
+        # Delete region subtags; reference: https://github.com/edx/edx-platform/blob/master/lms/envs/common.py#L862
+        lang_code = lang_code[0:2]
+        # Check on consistency with the pre-configured ALL_LANGUAGES
+        if lang_code not in [language[0] for language in settings.ALL_LANGUAGES]:
+            raise Exception('Not all the languages of transcripts fetched from video platform are '
+                            'consistent with the pre-configured ALL_LANGUAGES')
+        lang_label = [language[1] for language in settings.ALL_LANGUAGES if language[0] == lang_code][0]
+        return lang_code, lang_label
+
+    def authenticate_api(self, **kwargs):  # pylint: disable=unused-argument
+        """
+        Authenticates to a video platform's API in order to perform authorized requests.
+
+        Arguments:
+            kwargs (dict): platform-specific predefined client parameters, required to get credentials and access token.
+        Returns:
+            access token (str), and
+            error_status_message (str) for verbosity.
+        """
+        return '', ''

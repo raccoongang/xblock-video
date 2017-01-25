@@ -22,7 +22,7 @@ class WistiaPlayer(BaseVideoPlayer):
     # Current api (v1) for requesting transcripts.
     # For example: https://api.wistia.com/v1/medias/jzmku8z83i/captions.json
     # Docs on captions: https://wistia.com/doc/data-api#captions
-    # Docs on auth: https://wistia.com/doc/data-api#authentication
+    # Docs on auth: https://wistia.com/doc/data-api#authentication, https://wistia.com/doc/oauth2
     captions_api = {
         'url': 'api.wistia.com/v1/medias/{media_id}/captions.json?api_password={token}',
         'response': {

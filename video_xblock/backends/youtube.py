@@ -21,7 +21,7 @@ class YoutubePlayer(BaseVideoPlayer):
         r'(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\?(?:\S*?&?v\=))|youtu\.be\/)(?P<media_id>[a-zA-Z0-9_-]{6,11})'
     )
 
-    # API (YouTube API v2.0) for requesting transcripts.
+    # YouTube API for requesting transcripts.
     # For example: http://video.google.com/timedtext?lang=en&v=QLQ-85Td2Gs
     captions_api = {
         'url': 'video.google.com/timedtext',

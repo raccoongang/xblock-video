@@ -205,8 +205,10 @@ function StudioEditableXBlock(runtime, element) {
     var disabledLanguages = [];
     var $fileUploader = $('.input-file-uploader', element);
     var $langChoiceItem = $('.language-transcript-selector', element);
+    var $videoApiAuthenticator = $('#video-api-authenticate', element);
     var gotTranscriptsValue = $('input[data-field-name="transcripts"]').val();
     var downloadTranscriptHandlerUrl = runtime.handlerUrl(element, 'download_transcript');
+    var authenticateVideoApiHandlerUrl = runtime.handlerUrl(element, 'authenticate_video_api');
 
     if (gotTranscriptsValue){
         transcriptsValue = JSON.parse(gotTranscriptsValue);
@@ -214,6 +216,48 @@ function StudioEditableXBlock(runtime, element) {
 
     transcriptsValue.forEach(function(transcriptValue, index, array) {
         disabledLanguages.push(transcriptValue.lang)
+    });
+
+    var showAuthenticateSuccessStatus = function(message){
+        $('.api-authenticate.status-error').empty();
+        $('.api-authenticate.status-success').text(message).show();
+        setTimeout(function(){
+            $('.api-authenticate.status-success').hide()
+        }, 5000);
+        console.log(message);
+    };
+
+    var showAuthenticateErrorStatus = function(message){
+        $('.api-authenticate.status-success').empty();
+        $('.api-authenticate.status-error').text(message).show();
+        setTimeout(function(){
+            $('.api-authenticate.status-error').hide()
+        }, 5000);
+        console.log(message);
+    };
+
+    function authenticateVideoApi(data) {
+        $.ajax({
+            type: "POST",
+            url: authenticateVideoApiHandlerUrl,
+            data: JSON.stringify(data)
+        })
+        .done(function() {
+            var message = gettext("Successfully processed data to authenticate to the video API.");
+            showAuthenticateSuccessStatus(message);
+        })
+        .fail(function() {
+            var message = 'Failed to authenticate to the video API.';
+            console.log(message);
+            showAuthenticateErrorStatus(message);
+        })
+    }
+
+    $videoApiAuthenticator.on('click', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var $data = $('.token', element).val();
+        authenticateVideoApi($data);
     });
 
     var disableOption = function(){

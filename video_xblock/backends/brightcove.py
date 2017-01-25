@@ -3,6 +3,9 @@ Brightcove Video player plugin
 """
 
 import re
+import base64
+import json
+import requests
 
 from xblock.fragment import Fragment
 
@@ -22,6 +25,9 @@ class BrightcovePlayer(BaseVideoPlayer):
     # Docs on auth: https://docs.brightcove.com/en/video-cloud/oauth-api/getting-started/oauth-api-overview.html
     captions_api = {
         'url': 'cms.api.brightcove.com/v1/accounts/{account_id}/videos/{media_id}',
+        'authorised_request_header': {
+            'Authorization': 'Bearer {access_token}'
+        },
         'response': {
             'language_code': 'srclang',  # no language_label translated in English may be fetched from API
             'subs': 'src'  # e.g., "http://learning-services-media.brightcove.com/captions/bc_smart_ja.vtt"
@@ -83,3 +89,88 @@ class BrightcovePlayer(BaseVideoPlayer):
             self.resource_string('../static/css/transcripts.css')
         )
         return frag
+
+    @staticmethod
+    def get_client_credentials(token, account_id):
+        """
+        Gets client credentials, given a client token and an account_id.
+        Reference: https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html
+
+        """
+        headers = {'Authorization': 'BC_TOKEN {}'.format(token)}
+        # TODO implement application name (optional): --data 'name=videoxblock&maximum_scope=...'
+        data = [{
+            "identity": {
+                "type": "video-cloud-account",
+                "account-id": account_id
+            },
+            "operations": [
+                "video-cloud/video/update"
+            ]
+        }]
+        payload = {'maximum_scope': json.dumps(data)}
+        url = 'https://oauth.brightcove.com/v4/client_credentials'
+        response = requests.post(url, data=payload, headers=headers)
+        response_data = json.loads(unicode(response.content))
+
+        if response.status_code == 201 and response.text:
+            client_secret = response_data.get('client_secret')
+            client_id = response_data.get('client_id')
+            error_message = ''
+        else:
+            error_message = "Authentication failed: no client credentials have been retrieved. " \
+                            "Response: {}".format(response.text)
+            client_secret, client_id = '', ''
+
+        return client_secret, client_id, error_message
+
+    @staticmethod
+    def get_access_token(client_id, client_secret):
+        """
+        Gets access token from a Brightcove API to perform authorized requests.
+        Reference: https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-token.html
+
+        """
+        # Authorization header: the entire {client_id}:{client_secret} string must be Base64-encoded
+        client_credentials_encoded = base64.b64encode('{client_id}:{client_secret}'.format(
+            client_id=client_id,
+            client_secret=client_secret))
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Basic {}'.format(client_credentials_encoded)
+        }
+        data = {'grant_type': 'client_credentials'}
+        url = 'https://oauth.brightcove.com/v3/access_token'
+        response = requests.post(url, data=data, headers=headers)
+        response_data = json.loads(unicode(response.content))
+
+        if response.status_code == 200 and response.text:
+            access_token = response_data.get('access_token')
+            error_message = ''
+        else:
+            access_token = ''
+            error_message = "Authentication failed: no access token has been fetched. " \
+                            "Response: {}".format(response.text)
+
+        return access_token, error_message
+
+    def authenticate_api(self, **kwargs):
+        """
+        Authenticates to a Brightcove API in order to perform authorized requests.
+
+        Arguments:
+            kwargs (dict): token and account_id key-value pairs.
+        Returns:
+            access token (str), and
+            error_status_message (str) for verbosity.
+        """
+        # TODO implement validation in JS (kwargs)
+        token, account_id = kwargs['token'], kwargs['account_id']
+        client_secret, client_id, error_message = self.get_client_credentials(token, account_id)
+        error_status_message = ''
+        if error_message:
+            error_status_message = error_message
+        access_token, error_message = self.get_access_token(client_id, client_secret)
+        if error_message:
+            error_status_message = error_message
+        return access_token, error_status_message
