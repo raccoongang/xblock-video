@@ -612,7 +612,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             ('Content-Disposition', 'attachment; filename={}'.format(filename))
         ]
         response.headerlist = headerlist
-        return responsecurrent_time = Integer
+        return response
 
     def authenticate_video_api(self, token):
         """
@@ -650,14 +650,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             self.token = str(data)
         token = self.token
         response, auth_data = self.authenticate_video_api(token)
-        # TODO consider moving to backend; ..Differences in the metadata below are explained by ...
-        # Access token is generated in Brightcove only.
-        if auth_data.get('access_token'):
-            self.metadata['access_token'] = auth_data.get('access_token')
-            self.metadata['client_secret'] = auth_data.get('client_secret')
-            self.metadata['client_id'] = auth_data.get('client_id')
-        # Token is stored in metadata for Wistia player only.
-        if auth_data.get('token'):
-            self.metadata['token'] = auth_data.get('token')
-
+        for key in auth_data:
+            self.metadata[key] = auth_data[key]
         return response
