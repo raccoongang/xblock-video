@@ -24,5 +24,6 @@ script:
   - "pylint video_xblock"
   - "eslint video_xblock/static/js/"
   - "nosetests video_xblock --with-coverage --cover-package=video_xblock"
+  - "karma start video_xblock_karma.conf.js"
 after_success:
   - coveralls
