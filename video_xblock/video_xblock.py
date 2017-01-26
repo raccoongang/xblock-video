@@ -12,7 +12,7 @@ import pkg_resources
 import requests
 
 from xblock.core import XBlock
-from xblock.fields import Scope, Boolean, Integer, Float, String, Dict
+from xblock.fields import Scope, Boolean, Float, String, Dict
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
@@ -205,7 +205,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
     )
 
     # Playback state fields
-    current_time = Integer(
+    current_time = Float(
         default=0,
         scope=Scope.user_state,
         help='Seconds played back after the start'
@@ -612,7 +612,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             ('Content-Disposition', 'attachment; filename={}'.format(filename))
         ]
         response.headerlist = headerlist
-        return response
+        return responsecurrent_time = Integer
 
     def authenticate_video_api(self, token):
         """
