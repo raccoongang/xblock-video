@@ -94,6 +94,12 @@ class YoutubePlayer(BaseVideoPlayer):
         customised_editable_fields = tuple(editable_fields)
         return message, customised_editable_fields
 
+    def authenticate_api(self, **kwargs):
+        """
+        Current Youtube captions API doesn't require authentication, but this may change.
+        """
+        return {}, ''
+
     def fetch_default_transcripts_languages(self, video_id):
         """
         Fetches available transcripts languages from a Youtube server.

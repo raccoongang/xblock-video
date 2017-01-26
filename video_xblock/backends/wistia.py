@@ -112,7 +112,8 @@ class WistiaPlayer(BaseVideoPlayer):
         Arguments:
             kwargs (dict): Wistia public token key-value pair.
         Returns:
-            access token (str), which equals to a public token for Wistia, and
+            auth_data (dict): public token, provided by a user, is to be stored in Wistia's player metadata,
+                since no access token should be generated
             error_status_message (str) for the sake of verbosity.
         """
 
@@ -121,14 +122,14 @@ class WistiaPlayer(BaseVideoPlayer):
         self.captions_api['auth_sample_url'] = url
         # TODO consider (status 400)
         response = requests.post('https://' + url)
-        access_token, error_message = '', ''
+        # TODO add handling of the case: token  === 'default'
+        auth_data, error_message = {}, ''
         # TODO handle: If this video does not exist, the response will be an empty HTTP 404 Not Found.
         # Reference: https://wistia.com/doc/data-api#captions_index
         if response.status_code is not 200:
             error_message = "Authentication failed. Response: {}".format(unicode(response.text))
-        else:
-            access_token = token  # TODO: consider: get rid of (and update docstring accordingly)
-        return access_token, error_message
+        auth_data['token'] = token
+        return auth_data, error_message
 
     def get_default_transcripts(self, **kwargs):
         """

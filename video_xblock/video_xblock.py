@@ -197,6 +197,13 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         resettable_editor=False
     )
 
+    metadata = Dict(
+        default={},
+        display_name=_('Metadata'),
+        help=_('This field stores different metadata, e.g. authentication data.'),
+        scope=Scope.content
+    )
+
     # Playback state fields
     current_time = Integer(
         default=0,
@@ -238,13 +245,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         default=False,
         scope=Scope.preferences,
         help="Captions are enabled or not"
-    )
-
-    access_token = String(
-        default='default',
-        display_name=_('Video API Token'),
-        help=_("Access_token, provided by a video platform's API."),
-        scope=Scope.content
     )
 
     editable_fields = (
@@ -386,31 +386,34 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         Render a form for editing this XBlock
         """
         fragment = Fragment()
+        player = self.get_player()
         languages = [{'label': label, 'code': lang} for lang, label in ALL_LANGUAGES]
         languages.sort(key=lambda l: l['label'])
         transcripts = json.loads(self.transcripts) if self.transcripts else []
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
 
-        # Fetch captions list (available transcripts list) from video platform API
-        # TODO move to base backend as per PR code review
-        player = self.get_player()
+        # Authenticate to API of the player video platform.
+        # Note that there is no need to authenticate to Youtube API (no auth_data may be got),
+        # whilst for Wistia, a sample authorised request is to be made to ensure authentication succeeded,
+        # since it is needed for the auth status message generation and the player's state update with auth status.
+        # TODO pass message to the context (message is a dict)
+        message, auth_data = self.authenticate_video_api(self.token)
+        if auth_data:
+            player.populate_metadata_authentication(
+                metadata_field=self.metadata,
+                auth_data=auth_data)
+
+        # Fetch captions list (available/default transcripts list) from video platform API
         video_id = player.media_id(self.href)
+        # Store parameters necessary to make requests to API.
         kwargs = {'video_id': video_id}
-
-        # TODO add handling of the case: token  === 'default'
-        # TODO add handling of the case: access_token  === 'default'
-        # TODO pass message to the context
-        if str(self.player_name) == 'brightcove-player':
-            message, access_token = self.authenticate_video_api(self.token)  # message - dict
-            self.access_token = access_token
-            kwargs['access_token'] = self.access_token
+        for k in self.metadata:
+            kwargs[k] = self.metadata[k]
+        # For a Brightcove player only
+        if self.account_id is not self.fields['account_id'].default:
             kwargs['account_id'] = self.account_id
-        elif str(self.player_name) == 'wistia-player':
-            # TODO consider: Need(?) to authenticate to Wistia in order to generate status message
-            # message = self.authenticate_video_api(self.token)  # dict
-            kwargs['token'] = self.token
-
         default_transcripts = player.get_default_transcripts(**kwargs)
+        # Exclude enabled transcripts (fetched from video xblock) from the list of available ones.
         default_transcripts = player.filter_default_transcripts(default_transcripts, transcripts)
         if default_transcripts:
             default_transcripts.sort(key=lambda l: l['label'])
@@ -425,7 +428,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         }
 
         # Customize display of the particular xblock fields per each video platform.
-        token_help_message, customised_editable_fields = player.customize_xblock_fields_display(self.editable_fields)
+        token_help_message, customised_editable_fields = \
+            player.customize_xblock_fields_display(self.editable_fields)
         self.fields['token'].help = _(token_help_message,)
         self.editable_fields = customised_editable_fields
 
@@ -618,20 +622,20 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             token (str): client token provided by a user.
         Returns:
             response (dict): status message for template rendering, and
-            access_token (str): token to be supplied to the authorised API requests.
+            auth_data (dict): tokens and credentials, necessary to perform authorised API requests.
         """
         kwargs = {'token': token}
         if str(self.player_name) == 'brightcove-player':
             account_id = int(self.account_id)
             kwargs['account_id'] = account_id
         player = self.get_player()
-        access_token, error_status_message = player.authenticate_api(**kwargs)
+        auth_data, error_status_message = player.authenticate_api(**kwargs)
         if error_status_message:
             response = {'status_message': error_status_message}
         else:
             success_status_message = 'Successfully authenticated to a video platform\'s API.'
             response = {'status_message': success_status_message}
-        return response, access_token
+        return response, auth_data
 
     @XBlock.json_handler
     def authenticate_video_api_handler(self, data, suffix=''):  # pylint: disable=unused-argument
@@ -645,6 +649,15 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         if str(data) != self.token:
             self.token = str(data)
         token = self.token
-        response, access_token = self.authenticate_video_api(token)
-        self.access_token = access_token
+        response, auth_data = self.authenticate_video_api(token)
+        # TODO consider moving to backend; ..Differences in the metadata below are explained by ...
+        # Access token is generated in Brightcove only.
+        if auth_data.get('access_token'):
+            self.metadata['access_token'] = auth_data.get('access_token')
+            self.metadata['client_secret'] = auth_data.get('client_secret')
+            self.metadata['client_id'] = auth_data.get('client_id')
+        # Token is stored in metadata for Wistia player only.
+        if auth_data.get('token'):
+            self.metadata['token'] = auth_data.get('token')
+
         return response

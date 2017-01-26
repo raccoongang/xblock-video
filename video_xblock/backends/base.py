@@ -191,6 +191,27 @@ class BaseVideoPlayer(Plugin):
         """
         return []
 
+    @abc.abstractmethod
+    def authenticate_api(self, **kwargs):
+        """
+        Authenticates to a video platform's API in order to perform authorized requests.
+
+        Arguments:
+            kwargs (dict): platform-specific predefined client parameters, required to get credentials / tokens.
+        Returns:
+            auth_data (dict): tokens and credentials, necessary to perform authorised API requests, and
+            error_status_message (str) for the sake of verbosity.
+        """
+        return {}, ''
+
+    @staticmethod
+    def populate_metadata_authentication(metadata_field, auth_data):
+        """
+        Populate video xblock's metadata field with authentication data (tokens, credentials).
+        """
+        for key in auth_data:
+            metadata_field[key] = auth_data[key]
+
     @staticmethod
     def get_transcript_language_parameters(lang_code):
         """

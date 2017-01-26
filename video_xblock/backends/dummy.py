@@ -28,3 +28,6 @@ class DummyPlayer(BaseVideoPlayer):
 
     def customize_xblock_fields_display(self):
         pass
+
+    def authenticate_api(self, **kwargs):
+        return {}, ''

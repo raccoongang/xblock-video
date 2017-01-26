@@ -98,6 +98,34 @@ class BrightcovePlayer(BaseVideoPlayer):
                   'on the video platform.'
         return message, editable_fields
 
+    def authenticate_api(self, **kwargs):
+        """
+        Authenticates to a Brightcove API in order to perform authorized requests.
+
+        Arguments:
+            kwargs (dict): token and account_id key-value pairs
+                as a platform-specific predefined client parameters, required to get credentials and access token.
+        Returns:
+            auth_data (dict): tokens and credentials, necessary to perform authorised API requests, and
+            error_status_message (str) for verbosity.
+        """
+        token, account_id = kwargs.get('token'), kwargs.get('account_id')
+        client_secret, client_id, error_message = self.get_client_credentials(token, account_id)
+        error_status_message = ''
+        if error_message:
+            error_status_message = error_message
+        access_token, error_message = self.get_access_token(client_id, client_secret)
+        if error_message:
+            error_status_message = error_message
+        # TODO add handling of the case: token  === 'default'
+        # TODO add handling of the case: access_token  === 'default'
+        auth_data = {
+            'client_secret': client_secret,
+            'client_id': client_id,
+            'access_token': access_token,
+        }
+        return auth_data, error_status_message
+
     def get_default_transcripts(self, **kwargs):
         """
         Fetches transcripts list from a video platform.
@@ -117,7 +145,7 @@ class BrightcovePlayer(BaseVideoPlayer):
             ]
         """
         video_id = kwargs.get('video_id')
-        account_id = kwargs.get('account_id')
+        account_id = kwargs.get('account_id')  # TODO add handling: default account_id
         access_token = kwargs.get('access_token')
 
         url = self.captions_api['url'].format(account_id=account_id, media_id=video_id)
@@ -219,24 +247,3 @@ class BrightcovePlayer(BaseVideoPlayer):
                             "Response: {}".format(response.text)
 
         return access_token, error_message
-
-    def authenticate_api(self, **kwargs):
-        """
-        Authenticates to a Brightcove API in order to perform authorized requests.
-
-        Arguments:
-            kwargs (dict): token and account_id key-value pairs
-                as a platform-specific predefined client parameters, required to get credentials and access token.
-        Returns:
-            access token (str), and
-            error_status_message (str) for verbosity.
-        """
-        token, account_id = kwargs.get('token'), kwargs.get('account_id')
-        client_secret, client_id, error_message = self.get_client_credentials(token, account_id)
-        error_status_message = ''
-        if error_message:
-            error_status_message = error_message
-        access_token, error_message = self.get_access_token(client_id, client_secret)
-        if error_message:
-            error_status_message = error_message
-        return access_token, error_status_message
