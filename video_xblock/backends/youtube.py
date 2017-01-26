@@ -80,6 +80,20 @@ class YoutubePlayer(BaseVideoPlayer):
 
         return frag
 
+    @staticmethod
+    def customize_xblock_fields_display(editable_fields):
+        """
+        Customises display of studio editor fields per a video platform.
+        Authentication to API is not required for Youtube.
+        """
+        message = 'This field is to be disabled.'
+        editable_fields = list(editable_fields)
+        editable_fields.remove('account_id')
+        editable_fields.remove('player_id')
+        editable_fields.remove('token')
+        customised_editable_fields = tuple(editable_fields)
+        return message, customised_editable_fields
+
     def fetch_default_transcripts_languages(self, video_id):
         """
         Fetches available transcripts languages from a Youtube server.
@@ -130,11 +144,12 @@ class YoutubePlayer(BaseVideoPlayer):
 
         return []
 
-    def get_default_transcripts(self, video_id):
+    def get_default_transcripts(self, **kwargs):
         """
         Fetches transcripts list from a video platform.
         """
         # Fetch available transcripts' languages from API
+        video_id = kwargs.get('video_id')
         available_languages = self.fetch_default_transcripts_languages(video_id)
 
         # Get transcript name if any
@@ -159,3 +174,7 @@ class YoutubePlayer(BaseVideoPlayer):
             default_transcripts.append(default_transcript)
 
         return default_transcripts
+
+    def download_default_transcript(self, url):  # pylint: disable=unused-argument
+        # TODO: implement
+        return []

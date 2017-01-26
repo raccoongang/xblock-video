@@ -7,9 +7,9 @@ Base Video player plugin
 
 import abc
 import re
-from HTMLParser import HTMLParser
-
 import pkg_resources
+
+from HTMLParser import HTMLParser
 from webob import Response
 from xblock.fragment import Fragment
 from xblock.plugin import Plugin
@@ -38,6 +38,7 @@ class BaseVideoPlayer(Plugin):
         """
         return [] or re.compile('') or ''
 
+    @abc.abstractproperty
     def captions_api(self):
         """
         Dictionary of url, request parameters, and response structure of video platform's captions API.
@@ -107,8 +108,15 @@ class BaseVideoPlayer(Plugin):
         Extracts Platform's media id from the video url.
         E.g. https://example.wistia.com/medias/12345abcde -> 12345abcde
         """
-
         return ''
+
+    @abc.abstractmethod
+    def customize_xblock_fields_display(self, editable_fields):  # pylint: disable=unused-argument
+        """
+        Customises display of studio editor fields per a video platform.
+        E.g. 'account_id' should be displayed for Brightcove only.
+        """
+        pass
 
     def get_player_html(self, **context):
         """
@@ -160,24 +168,16 @@ class BaseVideoPlayer(Plugin):
         """
         return '<script>' + self.render_resource(path, **context) + '</script>'
 
-
-    def fetch_default_transcripts_languages(self, video_id):  # pylint: disable=unused-argument
-        """
-        Fetches available transcripts languages from a video platform.
-
-        Arguments:
-            video_id (str): media id fetched from href field of studio-edit modal.
-        Returns:
-            list: List of pairs of codes and labels of captions' languages fetched from API.
-        """
-        return []
-
-    def get_default_transcripts(self, video_id):  # pylint: disable=unused-argument
+    @abc.abstractmethod
+    def get_default_transcripts(self, **kwargs):  # pylint: disable=unused-argument
         """
         Fetches transcripts list from a video platform.
 
         Arguments:
             video_id (str): media id fetched from href field of studio-edit modal.
+        Arguments:
+            kwargs (dict): key-value pairs of API-specific identifiers (account_id, video_id, etc.) and tokens,
+                necessary for API calls.
         Returns:
             list: List of dicts of transcripts. Example:
             [
@@ -188,17 +188,6 @@ class BaseVideoPlayer(Plugin):
                 },
                 # ...
             ]
-        """
-        return []
-
-    def download_default_transcript(self, url):  # pylint: disable=unused-argument
-        """
-        Downloads default transcript from a video platform API and uploads it to the video xblock in WebVVT format.
-
-        Arguments:
-            url (str): transcript download url.
-        Returns:
-            None
         """
         return []
 
@@ -222,14 +211,14 @@ class BaseVideoPlayer(Plugin):
         lang_label = [language[1] for language in settings.ALL_LANGUAGES if language[0] == lang_code][0]
         return lang_code, lang_label
 
-    def authenticate_api(self, **kwargs):  # pylint: disable=unused-argument
+    @staticmethod
+    def filter_default_transcripts(default_transcripts, transcripts):
         """
-        Authenticates to a video platform's API in order to perform authorized requests.
-
-        Arguments:
-            kwargs (dict): platform-specific predefined client parameters, required to get credentials and access token.
-        Returns:
-            access token (str), and
-            error_status_message (str) for verbosity.
+        Exclude enabled transcripts (fetched from API) from the list of available ones (fetched from video xblock)
         """
-        return '', ''
+        enabled_languages_codes = [t[u'lang'] for t in transcripts]
+        default_transcripts = [
+            dt for dt in default_transcripts
+            if (unicode(dt.get('lang')) not in enabled_languages_codes) and default_transcripts
+        ]
+        return default_transcripts

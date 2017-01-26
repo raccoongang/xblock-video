@@ -12,7 +12,7 @@ import pkg_resources
 import requests
 
 from xblock.core import XBlock
-from xblock.fields import Scope, Boolean, Integer, Float, String
+from xblock.fields import Scope, Boolean, Integer, Float, String, Dict
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
@@ -374,25 +374,12 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 download_transcript_allowed=self.download_transcript_allowed,
                 handout_file_name=self.get_file_name_from_path(self.handout),
                 transcript_download_link=full_transcript_download_link
-
             )
         )
         frag.add_javascript(self.resource_string("static/js/video_xblock.js"))
         frag.add_css(self.resource_string("static/css/handout.css"))
         frag.initialize_js('VideoXBlockStudentViewInit')
         return frag
-
-    @staticmethod
-    def update_default_transcripts(default_transcripts, transcripts):
-        """
-        Exclude enabled transcripts (fetched from API) from the list of available ones (fetched from video xblock)
-        """
-        enabled_languages_codes = [t[u'lang'] for t in transcripts]
-        default_transcripts = [
-            dt for dt in default_transcripts
-            if (unicode(dt.get('lang')) not in enabled_languages_codes) and default_transcripts
-        ]
-        return default_transcripts
 
     def studio_view(self, context):  # pylint: disable=unused-argument
         """
@@ -405,10 +392,26 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
 
         # Fetch captions list (available transcripts list) from video platform API
+        # TODO move to base backend as per PR code review
         player = self.get_player()
         video_id = player.media_id(self.href)
-        default_transcripts = player.get_default_transcripts(video_id)
-        default_transcripts = self.update_default_transcripts(default_transcripts, transcripts)
+        kwargs = {'video_id': video_id}
+
+        # TODO add handling of the case: token  === 'default'
+        # TODO add handling of the case: access_token  === 'default'
+        # TODO pass message to the context
+        if str(self.player_name) == 'brightcove-player':
+            message, access_token = self.authenticate_video_api(self.token)  # message - dict
+            self.access_token = access_token
+            kwargs['access_token'] = self.access_token
+            kwargs['account_id'] = self.account_id
+        elif str(self.player_name) == 'wistia-player':
+            # TODO consider: Need(?) to authenticate to Wistia in order to generate status message
+            # message = self.authenticate_video_api(self.token)  # dict
+            kwargs['token'] = self.token
+
+        default_transcripts = player.get_default_transcripts(**kwargs)
+        default_transcripts = player.filter_default_transcripts(default_transcripts, transcripts)
         if default_transcripts:
             default_transcripts.sort(key=lambda l: l['label'])
 
@@ -422,27 +425,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         }
 
         # Customize display of the particular xblock fields per each video platform.
-        if str(self.player_name) == 'brightcove-player':
-            self.fields['token'].help = _(
-                'You can generate a client token following the guide of '
-                '<a href="https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html" '
-                'target="_blank">Brightcove</a>.', )
-        elif str(self.player_name) == 'wistia-player':
-            self.fields['token'].help = _(
-                'You can get a public client token following the guide of '
-                '<a href="https://wistia.com/doc/data-api" '
-                'target="_blank">Wistia</a>.', )
-            editable_fields = list(self.editable_fields)
-            editable_fields.remove('account_id')
-            editable_fields.remove('player_id')
-            self.editable_fields = tuple(editable_fields)
-        elif str(self.player_name) == 'youtube-player':
-            editable_fields = list(self.editable_fields)
-            editable_fields.remove('account_id')
-            editable_fields.remove('player_id')
-            # Authentication to API is not required for Youtube.
-            editable_fields.remove('token')
-            self.editable_fields = tuple(editable_fields)
+        token_help_message, customised_editable_fields = player.customize_xblock_fields_display(self.editable_fields)
+        self.fields['token'].help = _(token_help_message,)
+        self.editable_fields = customised_editable_fields
 
         # Build a list of all the fields that can be edited:
         for field_name in self.editable_fields:
@@ -582,7 +567,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         Args:
             field: The path to file.
-
         Returns:
             The name of file with an extension.
         """
@@ -626,20 +610,16 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         response.headerlist = headerlist
         return response
 
-    @XBlock.json_handler
-    def authenticate_video_api(self, data, suffix=''):  # pylint: disable=unused-argument
+    def authenticate_video_api(self, token):
         """
-        XBlock handler to authenticate to a video platform's API.
-        Called by studio_view's JavaScript.
+        Authenticates to a video platform's API.
 
+        Args:
+            token (str): client token provided by a user.
         Returns:
-            access token (str) to be supplied to the Authorization header of the authorised requests to the API.
+            response (dict): status message for template rendering, and
+            access_token (str): token to be supplied to the authorised API requests.
         """
-
-        if str(data) != self.token:
-            self.token = str(data)
-        token = self.token
-
         kwargs = {'token': token}
         if str(self.player_name) == 'brightcove-player':
             account_id = int(self.account_id)
@@ -649,7 +629,22 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         if error_status_message:
             response = {'status_message': error_status_message}
         else:
-            self.access_token = access_token
-            success_status_message = 'Successfully fetched access token from a video platform\'s API.'
+            success_status_message = 'Successfully authenticated to a video platform\'s API.'
             response = {'status_message': success_status_message}
+        return response, access_token
+
+    @XBlock.json_handler
+    def authenticate_video_api_handler(self, data, suffix=''):  # pylint: disable=unused-argument
+        """
+        XBlock handler to authenticate to a video platform's API.
+        Called by studio_view's JavaScript.
+
+        Returns:
+            response (dict): status message.
+        """
+        if str(data) != self.token:
+            self.token = str(data)
+        token = self.token
+        response, access_token = self.authenticate_video_api(token)
+        self.access_token = access_token
         return response

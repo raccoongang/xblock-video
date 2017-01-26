@@ -223,7 +223,7 @@ function StudioEditableXBlock(runtime, element) {
     var $videoApiAuthenticator = $('#video-api-authenticate', element);
     var gotTranscriptsValue = $('input[data-field-name="transcripts"]').val();
     var downloadTranscriptHandlerUrl = runtime.handlerUrl(element, 'download_transcript');
-    var authenticateVideoApiHandlerUrl = runtime.handlerUrl(element, 'authenticate_video_api');
+    var authenticateVideoApiHandlerUrl = runtime.handlerUrl(element, 'authenticate_video_api_handler');
 
     if (gotTranscriptsValue){
         transcriptsValue = JSON.parse(gotTranscriptsValue);
