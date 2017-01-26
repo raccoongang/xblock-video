@@ -6,13 +6,15 @@ before_install:
   # Install latest stable NodeJS version. Required for eslint.
   - nvm install stable
   - pip install -r test_requirements.txt
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
 
 insall:
   # Install required package.
   - pip install -r requirements.txt
 
 before_script:
-  - npm install eslint eslint-config-edx
+  - npm install eslint eslint-config-edx karma karma-jasmine karma-phantomjs-launcher karma-coverage
 
 script:
   - "pylint video_xblock"

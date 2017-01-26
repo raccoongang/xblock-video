@@ -19,23 +19,23 @@ var domReady = function(callback) {
     }
 };
 var player_state = {
-    volume: {{ player_state.volume }},
-    currentTime: {{ player_state.current_time }},
-    playbackRate: {{ player_state.playback_rate }},
-    muted: {{ player_state.muted | yesno:'true,false' }},
-    transcriptsEnabled: {{ player_state.transcripts_enabled | yesno:'true,false' }},
-    captionsEnabled: {{ player_state.captions_enabled | yesno:'true,false' }},
+    volume: '{{ player_state.volume }}',
+    currentTime: '{{ player_state.current_time }}',
+    playbackRate: '{{ player_state.playback_rate }}',
+    muted: '{{ player_state.muted | yesno:"true,false" }}',
+    transcriptsEnabled: '{{ player_state.transcripts_enabled | yesno:"true,false" }}',
+    captionsEnabled: '{{ player_state.captions_enabled | yesno:"true,false" }}',
     captionsLanguage: '{{ player_state.captions_language }}'
 };
 var xblockUsageId = window.location.hash.slice(1);
-var transcripts = { // eslint-disable-line
-    {% for transcript in player_state.transcripts %} // eslint-disable-line
-        '{{transcript.lang}}': { // eslint-disable-line
-            'label': '{{transcript.label}}', // eslint-disable-line
-            'url': '{{transcript.url}}', // eslint-disable-line
-        }, // eslint-disable-line
-    {% endfor %} // eslint-disable-line
-}; // eslint-disable-line
+var transcripts = {
+    //{% for transcript in player_state.transcripts %}
+        '{{transcript.lang}}': {
+            'label': '{{transcript.label}}',
+            'url': '{{transcript.url}}',
+        },
+    //{% endfor %}
+};
 
 /** Get transcript url for current caption language */
 var getDownloadTranscriptUrl = function(player) {
