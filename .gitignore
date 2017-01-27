@@ -39,9 +39,10 @@ htmlcov/
 .tox/
 .coverage
 .coverage.*
+coverage/
 .cache
 nosetests.xml
-coverage.xml
+coverage*.xml
 *,cover
 .hypothesis/
 
