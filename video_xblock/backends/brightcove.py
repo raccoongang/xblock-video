@@ -210,7 +210,6 @@ class BrightcovePlayer(BaseVideoPlayer):
         video_id = kwargs.get('video_id')
         account_id = kwargs.get('account_id')  # TODO add handling: default account_id
         access_token = kwargs.get('access_token')
-
         url = self.captions_api['url'].format(account_id=account_id, media_id=video_id)
         authorisation_bearer = self.captions_api['authorised_request_header']['Authorization'].\
             format(access_token=access_token)
@@ -228,8 +227,12 @@ class BrightcovePlayer(BaseVideoPlayer):
                       'Error: {}'.format(str(exception))
             return default_transcripts, message
 
-        if data.status_code == 200 and text.get('text_tracks'):
+        if data.status_code == 200 and text:
             captions_data = text.get('text_tracks')
+            # Handle empty response (no subs uploaded on a platform)
+            if not captions_data:
+                message = 'For now, video platform doesn\'t have any timed transcript for this video.'
+                return default_transcripts, message
             transcripts_data = [
                 [el.get('src'), el.get('srclang')]
                 for el in captions_data
@@ -243,9 +246,6 @@ class BrightcovePlayer(BaseVideoPlayer):
                     'url': transcript_url,
                 }
                 default_transcripts.append(default_transcript)
-        # Handle empty response (no subs uploaded on a platform)
-        elif not text.get('text_tracks'):
-            message = 'For now, video platform doesn\'t have any timed transcript for this video.'
         # Permission denied; authentication message should be already generated.
         elif data.status_code == 401:
             message = ''
