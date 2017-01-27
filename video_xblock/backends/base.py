@@ -189,8 +189,6 @@ class BaseVideoPlayer(Plugin):
         Fetches transcripts list from a video platform.
 
         Arguments:
-            video_id (str): media id fetched from href field of studio-edit modal.
-        Arguments:
             kwargs (dict): key-value pairs of API-specific identifiers (account_id, video_id, etc.) and tokens,
                 necessary for API calls.
         Returns:
