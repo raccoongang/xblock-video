@@ -16,14 +16,14 @@ from xblock.fields import Scope, Boolean, Float, String, Dict
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
-from .fields import RelativeTime
 
 from django.template import Template, Context
 from pycaption import detect_format, WebVTTWriter
 from webob import Response
 
-from backends.base import BaseVideoPlayer, html_parser  # pylint: disable=relative-import
-from settings import ALL_LANGUAGES  # pylint: disable=relative-import
+from .backends.base import BaseVideoPlayer, html_parser  # pylint: disable=relative-import
+from .settings import ALL_LANGUAGES  # pylint: disable=relative-import
+from .fields import RelativeTime
 
 
 _ = lambda text: text
@@ -435,7 +435,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         # Build a list of all the fields that can be edited:
         for field_name in self.editable_fields:
-            field = self.fields[field_name]  # pylint: disable=bad-option-value
+            field = self.fields[field_name]  # pylint: disable=unsubscriptable-object
             assert field.scope in (Scope.content, Scope.settings), (
                 "Only Scope.content or Scope.settings fields can be used with "
                 "StudioEditableXBlockMixin. Other scopes are for user-specific data and are "
@@ -516,7 +516,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         Tries to detect player by submitted video url. If fails, it defaults to 'dummy-player'
         """
-        data['player_name'] = self.fields['player_name'].default  # pylint: disable=bad-option-value
+        data['player_name'] = self.fields['player_name'].default  # pylint: disable=unsubscriptable-object
         for player_name, player_class in BaseVideoPlayer.load_classes():
             if player_name == 'dummy-player':
                 continue
