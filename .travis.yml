@@ -17,6 +17,9 @@ before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
   - npm install jasmine-core karma karma-jasmine karma-phantomjs-launcher karma-coverage karma-coveralls karma-chrome-launcher
+  - cd video_xblcok/static/
+  - bower install
+  - cd ../../
 
 before_script:
   - npm install eslint eslint-config-edx
