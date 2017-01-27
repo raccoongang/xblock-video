@@ -18,6 +18,7 @@ before_install:
   - sh -e /etc/init.d/xvfb start
   - npm install jasmine-core karma karma-jasmine karma-phantomjs-launcher karma-coverage karma-coveralls karma-chrome-launcher
   - cd video_xblock/static/
+  - npm install -g bower
   - bower install
   - cd ../../
 
