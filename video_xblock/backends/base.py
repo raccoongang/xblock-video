@@ -121,8 +121,9 @@ class BaseVideoPlayer(Plugin):
         """
         return ''
 
+    @staticmethod
     @abc.abstractmethod
-    def customize_xblock_fields_display(self, editable_fields):  # pylint: disable=unused-argument
+    def customize_xblock_fields_display(editable_fields):  # pylint: disable=unused-argument
         """
         Customises display of studio editor fields per a video platform.
         E.g. 'account_id' should be displayed for Brightcove only.

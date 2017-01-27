@@ -119,7 +119,7 @@ class WistiaPlayer(BaseVideoPlayer):
                 since no access token should be generated
             error_status_message (str) for the sake of verbosity.
         """
-        token, media_id = kwargs.get('token'), kwargs.get('video_id')
+        token, media_id = kwargs.get('token'), kwargs.get('video_id')  # pylint: disable=unused-variable
         auth_data, error_message = {}, ''
         auth_data['token'] = token
         # TODO fix call to a sample url (now getting 404)
@@ -162,9 +162,10 @@ class WistiaPlayer(BaseVideoPlayer):
         try:
             data = requests.get('https://' + url)
             wistia_data = json.loads(data.text)
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException as exception:
             # Probably, current API has changed
-            message = 'No timed transcript may be fetched from a video platform. Error: '.format(str(e))
+            exception_message = str(exception)
+            message = 'No timed transcript may be fetched from a video platform. Error: '.format(exception_message)
             return default_transcripts, message
 
         if data.status_code == 200 and wistia_data:
@@ -178,10 +179,10 @@ class WistiaPlayer(BaseVideoPlayer):
                 # Convert from ISO-639-2 to ISO-639-1; reference: https://pythonhosted.org/babelfish/
                 try:
                     lang_code = babelfish.Language(lang_code).alpha2
-                except:
+                except ValueError:
                     # In case of B or T codes, e.g. 'fre'.
                     # Reference: https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
-                    lang_code = babelfish.Language.fromalpha3b(lang_code).alpha2
+                    lang_code = babelfish.Language.fromalpha3b(lang_code).alpha2   # pylint: disable=no-member
                 lang_label = self.get_transcript_language_parameters(lang_code)[1]
                 transcript_url = 'default_url_to_be_replaced'
                 default_transcript = {

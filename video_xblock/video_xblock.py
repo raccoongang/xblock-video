@@ -398,7 +398,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         # Note that there is no need to authenticate to Youtube API,
         # whilst for Wistia, a sample authorised request is to be made to ensure authentication succeeded,
         # since it is needed for the auth status message generation and the player's state update with auth status.
-        auth_data, auth_error_message = self.authenticate_video_api()
+        auth_data, auth_error_message = self.authenticate_video_api()  # pylint: disable=unused-argument
 
         # Fetch captions list (available/default transcripts list) from video platform API
         video_id = player.media_id(self.href)
@@ -430,7 +430,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         # Customize display of the particular xblock fields per each video platform.
         token_help_message, customised_editable_fields = \
             player.customize_xblock_fields_display(self.editable_fields)
-        self.fields['token'].help = _(token_help_message,)
+        self.fields['token'].help = _(token_help_message,)  # pylint: disable=translation-of-non-string
         self.editable_fields = customised_editable_fields
 
         # Build a list of all the fields that can be edited:
@@ -683,5 +683,5 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             self.metadata['client_secret'] = ''  # Brightcove API
         # Clear metadata (only backend-specific parameters are to be stored)
         irrelevant_fields = [key for key in self.metadata if key not in player.metadata_fields]
-        for ik in irrelevant_fields:
-            del self.metadata[ik]
+        for key in irrelevant_fields:
+            del self.metadata[key]
