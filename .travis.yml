@@ -16,9 +16,10 @@ before_install:
   - pip install -r test_requirements.txt
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
+  - npm install jasmine-core karma karma-jasmine karma-phantomjs-launcher karma-coverage
 
 before_script:
-  - npm install eslint eslint-config-edx karma karma-jasmine karma-phantomjs-launcher karma-coverage
+  - npm install eslint eslint-config-edx
 
 script:
   - "pylint video_xblock"
