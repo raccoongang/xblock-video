@@ -20,6 +20,7 @@ class YoutubePlayer(BaseVideoPlayer):
     url_re = re.compile(
         r'(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\?(?:\S*?&?v\=))|youtu\.be\/)(?P<media_id>[a-zA-Z0-9_-]{6,11})'
     )
+    metadata_fields = []
 
     # YouTube API for requesting transcripts.
     # For example: http://video.google.com/timedtext?lang=en&v=QLQ-85Td2Gs
@@ -108,48 +109,40 @@ class YoutubePlayer(BaseVideoPlayer):
         Arguments:
             video_id (str): media id fetched from href field of studio-edit modal.
         Returns:
-            list: List of pairs of codes and labels of captions' languages fetched from API.
+            list: List of pairs of codes and labels of captions' languages fetched from API,
+                together with transcripts' names if any.
+                If the transcript name is not empty on youtube server we have to pass
+                name param in url in order to get transcript.
+                Example: http://video.google.com/timedtext?lang=en&v={video_id}&name={transcript_name}
+                Reference: https://git.io/vMoCA
         """
         utf8_parser = etree.XMLParser(encoding='utf-8')
         # This is to update self.captions_api with a video id.
         self.captions_api['params']['v'] = video_id
         transcripts_param = {'type': 'list', 'v': self.captions_api['params']['v']}
-        data = requests.get('http://' + self.captions_api['url'], params=transcripts_param)
+        available_languages = []
+        message = ''
+
+        try:
+            data = requests.get('http://' + self.captions_api['url'], params=transcripts_param)
+        except requests.exceptions.RequestException as e:
+            # Probably, current API has changed
+            message = 'No timed transcript may be fetched from a video platform. Error: '.format(str(e))
+            return available_languages, message
 
         if data.status_code == 200 and data.text:
             youtube_data = etree.fromstring(data.content, parser=utf8_parser)
+            empty_subs = False if [el.get('transcript_list') for el in youtube_data] else True
             available_languages = [
-                [el.get('lang_code'), el.get('lang_translated')]
+                [el.get('lang_code'), el.get('lang_translated'), el.get('name')]
                 for el in youtube_data if el.tag == 'track'
             ]
-            return available_languages
+            if empty_subs:
+                message = 'For now, video platform doesn\'t have any timed transcript for this video.'
+        else:
+            message = 'No timed transcript may be fetched from a video platform.'
 
-        return []
-
-    def fetch_default_transcripts_names(self):
-        """
-        Fetches available transcripts' names from a Youtube server.
-
-        If the transcript name is not empty on youtube server we have to pass
-        name param in url in order to get transcript.
-        Example: http://video.google.com/timedtext?lang=en&v={video_id}&name={transcript_name}
-
-        Reference: https://git.io/vMoCA
-        """
-        utf8_parser = etree.XMLParser(encoding='utf-8')
-        transcripts_param = {'type': 'list', 'v': self.captions_api['params']['v']}
-
-        data = requests.get('http://' + self.captions_api['url'], params=transcripts_param)
-
-        if data.status_code == 200 and data.text:
-            data = etree.fromstring(data.content, parser=utf8_parser)
-            transcripts_names = [
-                el.get('name')
-                for el in data if el.tag == 'track'
-            ]
-            return transcripts_names
-
-        return []
+        return available_languages, message
 
     def get_default_transcripts(self, **kwargs):
         """
@@ -157,21 +150,17 @@ class YoutubePlayer(BaseVideoPlayer):
         """
         # Fetch available transcripts' languages from API
         video_id = kwargs.get('video_id')
-        available_languages = self.fetch_default_transcripts_languages(video_id)
-
-        # Get transcript name if any
-        transcripts_names = self.fetch_default_transcripts_names()
+        available_languages, message = self.fetch_default_transcripts_languages(video_id)
 
         default_transcripts = []
-        for i, lang_available in enumerate(available_languages):
-            transcript_name = transcripts_names[i]
-            lang_code = lang_available[0]
+        for lang_code, lang_translated, transcript_name in available_languages:
             self.captions_api['params']['lang'] = lang_code
             self.captions_api['params']['name'] = transcript_name
             transcript_url = 'http://{url}?{params}'.format(
                 url=self.captions_api['url'],
                 params=urllib.urlencode(self.captions_api['params'])
             )
+            # Update default transcripts languages parameters in accordance with pre-configured language settings
             lang_code, lang_label = self.get_transcript_language_parameters(lang_code)
             default_transcript = {
                 'lang': lang_code,
@@ -180,8 +169,42 @@ class YoutubePlayer(BaseVideoPlayer):
             }
             default_transcripts.append(default_transcript)
 
-        return default_transcripts
+        return default_transcripts, message
 
-    def download_default_transcript(self, url):  # pylint: disable=unused-argument
-        # TODO: implement
-        return []
+    def download_default_transcript(self, url):
+        """
+        Download default transcript and upload to video xblock in WebVVT format.
+
+        Reference: https://git.io/vMK6W
+
+        """
+        utf8_parser = etree.XMLParser(encoding='utf-8')
+        data = requests.get(url)
+
+        sub_dict, message = {}, ''
+        if data.status_code != 200 or not data.text:
+            message = "Can't receive transcripts from Youtube for {video_id}. Status code: {status_code}.".format(
+                video_id=self.captions_api['params']['v'],
+                status_code=data.status_code
+            )
+
+        # Fetch transcripts; reference: https://git.io/vMoEc
+        sub_starts, sub_ends, sub_texts = [], [], []
+        xmltree = etree.fromstring(data.content, parser=utf8_parser)
+        for element in xmltree:
+            if element.tag == "text":
+                start = float(element.get("start"))
+                duration = float(element.get("dur", 0))  # dur is not mandatory
+                text = element.text
+                end = start + duration
+                if text:
+                    # Start and end should be ints representing the millisecond timestamp.
+                    sub_starts.append(int(start * 1000))
+                    sub_ends.append(int((end + 0.0001) * 1000))
+                    sub_texts.append(text.replace('\n', ' '))
+
+        sub_dict = {'start': sub_starts, 'end': sub_ends, 'text': sub_texts}
+        # TODO implement conversion of sub_dict to WebVVT format
+        # TODO implement upload to video xblock
+
+        return sub_dict, message

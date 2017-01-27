@@ -200,7 +200,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
     metadata = Dict(
         default={},
         display_name=_('Metadata'),
-        help=_('This field stores different metadata, e.g. authentication data.'),
+        help=_('This field stores different metadata, e.g. authentication data. '
+               'If new metadata item is designed, this is to add an appropriate key to backend\'s '
+               '`metadata_fields` property.'),
         scope=Scope.content
     )
 
@@ -392,16 +394,11 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         transcripts = json.loads(self.transcripts) if self.transcripts else []
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
 
-        # Authenticate to API of the player video platform.
-        # Note that there is no need to authenticate to Youtube API (no auth_data may be got),
+        # Authenticate to API of the player video platform and update metadata with auth information.
+        # Note that there is no need to authenticate to Youtube API,
         # whilst for Wistia, a sample authorised request is to be made to ensure authentication succeeded,
         # since it is needed for the auth status message generation and the player's state update with auth status.
-        # TODO pass message to the context (message is a dict)
-        message, auth_data = self.authenticate_video_api(self.token)
-        if auth_data:
-            player.populate_metadata_authentication(
-                metadata_field=self.metadata,
-                auth_data=auth_data)
+        auth_data, auth_error_message = self.authenticate_video_api()
 
         # Fetch captions list (available/default transcripts list) from video platform API
         video_id = player.media_id(self.href)
@@ -412,11 +409,12 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         # For a Brightcove player only
         if self.account_id is not self.fields['account_id'].default:
             kwargs['account_id'] = self.account_id
-        default_transcripts = player.get_default_transcripts(**kwargs)
+
+        self.default_transcripts, transcripts_autoupload_message = player.get_default_transcripts(**kwargs)
         # Exclude enabled transcripts (fetched from video xblock) from the list of available ones.
-        default_transcripts = player.filter_default_transcripts(default_transcripts, transcripts)
-        if default_transcripts:
-            default_transcripts.sort(key=lambda l: l['label'])
+        self.default_transcripts = player.filter_default_transcripts(self.default_transcripts, transcripts)
+        if self.default_transcripts:
+            self.default_transcripts.sort(key=lambda l: l['label'])
 
         context = {
             'fields': [],
@@ -424,7 +422,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             'languages': languages,
             'transcripts': transcripts,
             'download_transcript_handler_url': download_transcript_handler_url,
-            'default_transcripts': default_transcripts
+            'default_transcripts': self.default_transcripts,
+            'auth_error_message': auth_error_message,
+            'transcripts_autoupload_message': transcripts_autoupload_message
         }
 
         # Customize display of the particular xblock fields per each video platform.
@@ -614,28 +614,39 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         response.headerlist = headerlist
         return response
 
-    def authenticate_video_api(self, token):
+    def authenticate_video_api(self, token=''):
         """
         Authenticates to a video platform's API.
 
-        Args:
-            token (str): client token provided by a user.
+        Arguments:
+            token (str): token provided by a user before the save button was clicked (for handlers).
+
         Returns:
-            response (dict): status message for template rendering, and
+            error_message (dict): status message for template rendering, and
             auth_data (dict): tokens and credentials, necessary to perform authorised API requests.
         """
-        kwargs = {'token': token}
-        if str(self.player_name) == 'brightcove-player':
-            account_id = int(self.account_id)
-            kwargs['account_id'] = account_id
-        player = self.get_player()
-        auth_data, error_status_message = player.authenticate_api(**kwargs)
-        if error_status_message:
-            response = {'status_message': error_status_message}
+
+        # TODO consider: move kwargs population to specific backends
+        # Handles a case where no token was provided by a user
+        if self.token == self.fields['token'].default and str(self.player_name) != 'youtube-player':
+            error_message = 'In order to authenticate to a video platform\'s API, please provide a Video API Token.'
+            return {}, error_message
+        if token:
+            kwargs = {'token': token}
         else:
-            success_status_message = 'Successfully authenticated to a video platform\'s API.'
-            response = {'status_message': success_status_message}
-        return response, auth_data
+            kwargs = {'token': self.token}
+        # Handles a case where no account_id was provided by a user
+        if str(self.player_name) == 'brightcove-player':
+            if self.account_id == self.fields['account_id'].default:
+                error_message = 'In order to authenticate to a video platform\'s API, please provide an Account Id.'
+                return {}, error_message
+            kwargs['account_id'] = self.account_id
+
+        player = self.get_player()
+        auth_data, error_message = player.authenticate_api(**kwargs)
+        # Metadata is to be updated on each authentication effort.
+        self.update_metadata_authentication(auth_data=auth_data, player=player)
+        return auth_data, error_message
 
     @XBlock.json_handler
     def authenticate_video_api_handler(self, data, suffix=''):  # pylint: disable=unused-argument
@@ -646,10 +657,31 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         Returns:
             response (dict): status message.
         """
+        # Fetch a token provided by a user before the save button was clicked.
         if str(data) != self.token:
-            self.token = str(data)
-        token = self.token
-        response, auth_data = self.authenticate_video_api(token)
+            token = str(data)
+        else:
+            token = ''
+        auth_data, error_message = self.authenticate_video_api(token)
+        response = {'error_message': error_message}
+        return response
+
+    def update_metadata_authentication(self, auth_data, player):
+        """
+        Update video xblock's metadata field with video platform's API authentication data
+        (in particular, tokens and credentials).
+        """
+        # In case of successful authentication:
         for key in auth_data:
             self.metadata[key] = auth_data[key]
-        return response
+        # If the last authentication effort was not successful, metadata should be updated as well.
+        # Since video xblock metadata may store various information, this is to update the auth data only.
+        if not auth_data:
+            self.metadata['token'] = ''          # Wistia API
+            self.metadata['access_token'] = ''   # Brightcove API
+            self.metadata['client_id'] = ''      # Brightcove API
+            self.metadata['client_secret'] = ''  # Brightcove API
+        # Clear metadata (only backend-specific parameters are to be stored)
+        irrelevant_fields = [key for key in self.metadata if key not in player.metadata_fields]
+        for ik in irrelevant_fields:
+            del self.metadata[ik]

@@ -179,7 +179,7 @@
     display: block;
 }
 
-.default-transcripts-status .status-error {
+.default-transcripts-status.status-error {
     color: #b20610;
     font-weight: 600;
     margin: 0;
@@ -198,11 +198,11 @@
     min-width: 240px;
 }
 
-.api-authenticate .status-success {
-    color: green;
+.api-authenticate.status-success {
+    color: #51c67b;
 }
 
-.api-authenticate .status-error {
-    color: red;
+.api-authenticate.status-error {
+    color: #b20610;
 }
 

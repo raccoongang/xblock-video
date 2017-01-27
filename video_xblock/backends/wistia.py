@@ -20,6 +20,8 @@ class WistiaPlayer(BaseVideoPlayer):
     url_re = re.compile(
         r'https?:\/\/(.+)?(wistia.com|wi.st)\/(medias|embed)\/(?P<media_id>.*)'
     )
+    # Token field is stored in metadata only if authentication was successful
+    metadata_fields = ['token', ]
 
     # Current api (v1) for requesting transcripts.
     # For example: https://api.wistia.com/v1/medias/jzmku8z83i/captions.json
@@ -117,19 +119,15 @@ class WistiaPlayer(BaseVideoPlayer):
                 since no access token should be generated
             error_status_message (str) for the sake of verbosity.
         """
-
         token, media_id = kwargs.get('token'), kwargs.get('video_id')
-        url = self.captions_api.get('auth_sample_url').format(token=token)
-        self.captions_api['auth_sample_url'] = url
-        # TODO consider (status 400)
-        response = requests.post('https://' + url)
-        # TODO add handling of the case: token  === 'default'
         auth_data, error_message = {}, ''
-        # TODO handle: If this video does not exist, the response will be an empty HTTP 404 Not Found.
-        # Reference: https://wistia.com/doc/data-api#captions_index
-        if response.status_code is not 200:
-            error_message = "Authentication failed. Response: {}".format(unicode(response.text))
         auth_data['token'] = token
+        # TODO fix call to a sample url (now getting 404)
+        # url = self.captions_api.get('auth_sample_url').format(token=str(token))
+        # response = requests.post('https://' + url)
+        # if response.status_code is not 200 and \
+        #         json.loads(response.text).get('code') == 'unauthorized_credentials':
+        #     error_message = "Authentication failed. Response: {}".format(str(response.text))
         return auth_data, error_message
 
     def get_default_transcripts(self, **kwargs):
@@ -156,48 +154,52 @@ class WistiaPlayer(BaseVideoPlayer):
         """
         video_id = kwargs.get('video_id')
         token = kwargs.get('token')
-
         url = self.captions_api['url'].format(token=token, media_id=video_id)
-        self.captions_api['url'] = url
+        default_transcripts = []
+        message = ''
 
         # Fetch available transcripts' languages (codes and English labels), and assign its' urls.
         try:
             data = requests.get('https://' + url)
-        except requests.exceptions.RequestException as e:
-            return []
-
-        transcripts_data = []
-        # TODO handle: If captions do not exist for this video, the response will be an empty JSON array.
-        # Reference: https://wistia.com/doc/data-api#captions_index
-        if data.status_code == 200 and data.text:
             wistia_data = json.loads(data.text)
+        except requests.exceptions.RequestException as e:
+            # Probably, current API has changed
+            message = 'No timed transcript may be fetched from a video platform. Error: '.format(str(e))
+            return default_transcripts, message
+
+        if data.status_code == 200 and wistia_data:
             transcripts_data = [
                 [el.get('language'), el.get('english_name')]
-                for el in wistia_data
-                ]
+                for el in wistia_data]
+            # Populate default_transcripts
+            for lang_code, lang_label in transcripts_data:
+                # lang_code, fetched from Wistia API, is a 3 character language code as specified by ISO-639-2.
+                # Reference: https://wistia.com/doc/data-api#captions_show
+                # Convert from ISO-639-2 to ISO-639-1; reference: https://pythonhosted.org/babelfish/
+                try:
+                    lang_code = babelfish.Language(lang_code).alpha2
+                except:
+                    # In case of B or T codes, e.g. 'fre'.
+                    # Reference: https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
+                    lang_code = babelfish.Language.fromalpha3b(lang_code).alpha2
+                lang_label = self.get_transcript_language_parameters(lang_code)[1]
+                transcript_url = 'default_url_to_be_replaced'
+                default_transcript = {
+                    'lang': lang_code,
+                    'label': lang_label,
+                    'url': transcript_url,
+                }
+                default_transcripts.append(default_transcript)
+        # If captions do not exist for a video, the response will be an empty JSON array.
+        # Reference: https://wistia.com/doc/data-api#captions_index
+        elif data.status_code == 200 and not wistia_data:
+            message = 'For now, video platform doesn\'t have any timed transcript for this video.'
+        # If a video does not exist, the response will be an empty HTTP 404 Not Found.
+        # Reference: https://wistia.com/doc/data-api#captions_index
+        elif data.status_code == 404:
+            message = "Wistia video {video_id} doesn't exist.".format(video_id=str(video_id))
 
-        # Populate default_transcripts
-        default_transcripts = []
-        for lang_code, lang_label in transcripts_data:
-            # lang_code, fetched from Wistia API, is a 3 character language code as specified by ISO-639-2.
-            # Reference: https://wistia.com/doc/data-api#captions_show
-            # Convert from ISO-639-2 to ISO-639-1; reference: https://pythonhosted.org/babelfish/
-            try:
-                lang_code = babelfish.Language(lang_code).alpha2
-            except:
-                # In case of B or T codes, e.g. 'fre'. Reference: https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
-                lang_code = babelfish.Language.fromalpha3b(lang_code).alpha2
-            lang_label = self.get_transcript_language_parameters(lang_code)[1]
-
-            transcript_url = 'default_url_to_be_replaced'
-            default_transcript = {
-                'lang': lang_code,
-                'label': lang_label,
-                'url': transcript_url,
-            }
-            default_transcripts.append(default_transcript)
-
-        return default_transcripts
+        return default_transcripts, message
 
     def download_default_transcript(self, url):  # pylint: disable=unused-argument
         # TODO: implement

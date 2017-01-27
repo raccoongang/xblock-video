@@ -186,7 +186,8 @@
                     No timed transcript
                   </div>
                   <div class="tip setting-help">
-                    For now, video platform doesn't have a timed transcript for this video.
+                    {{ auth_error_message }}
+                    {{ transcripts_autoupload_message }}
                     You can add transcripts using the Upload Transcript field.
                   </div>
                 {% endif %}

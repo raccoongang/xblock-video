@@ -18,6 +18,7 @@ class BrightcovePlayer(BaseVideoPlayer):
     """
 
     url_re = re.compile(r'https:\/\/studio.brightcove.com\/products\/videocloud\/media\/videos\/(?P<media_id>\d+)')
+    metadata_fields = ['access_token', 'client_id', 'client_secret', ]
 
     # Current api for requesting transcripts.
     # For example: https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_ID}
@@ -98,104 +99,17 @@ class BrightcovePlayer(BaseVideoPlayer):
                   'on the video platform.'
         return message, editable_fields
 
-    def authenticate_api(self, **kwargs):
-        """
-        Authenticates to a Brightcove API in order to perform authorized requests.
-
-        Arguments:
-            kwargs (dict): token and account_id key-value pairs
-                as a platform-specific predefined client parameters, required to get credentials and access token.
-        Returns:
-            auth_data (dict): tokens and credentials, necessary to perform authorised API requests, and
-            error_status_message (str) for verbosity.
-        """
-        token, account_id = kwargs.get('token'), kwargs.get('account_id')
-        client_secret, client_id, error_message = self.get_client_credentials(token, account_id)
-        error_status_message = ''
-        if error_message:
-            error_status_message = error_message
-        access_token, error_message = self.get_access_token(client_id, client_secret)
-        if error_message:
-            error_status_message = error_message
-        # TODO add handling of the case: token  === 'default'
-        # TODO add handling of the case: access_token  === 'default'
-        auth_data = {
-            'client_secret': client_secret,
-            'client_id': client_id,
-            'access_token': access_token,
-        }
-        return auth_data, error_status_message
-
-    def get_default_transcripts(self, **kwargs):
-        """
-        Fetches transcripts list from a video platform.
-
-        Arguments:
-            kwargs (dict): key-value pairs with account_id and video_id (both fetched from href field of studio editor),
-                           and access_token (fetched from Brightcove API).
-        Returns:
-            list: List of dicts of transcripts. Example:
-            [
-                {
-                    'lang': 'en',
-                    'label': 'English',
-                    'url': 'learning-services-media.brightcove.com/captions/bc_smart_ja.vtt'
-                },
-                # ...
-            ]
-        """
-        video_id = kwargs.get('video_id')
-        account_id = kwargs.get('account_id')  # TODO add handling: default account_id
-        access_token = kwargs.get('access_token')
-
-        url = self.captions_api['url'].format(account_id=account_id, media_id=video_id)
-        self.captions_api['url'] = url
-
-        authorisation_header = self.captions_api['authorised_request_header']['Authorization'].\
-            format(access_token=access_token)
-        self.captions_api['authorised_request_header']['Authorization'] = authorisation_header
-        headers = self.captions_api['authorised_request_header']
-
-        # Fetch available transcripts' languages and urls
-        try:
-            data = requests.get('https://' + url, headers=headers)
-        except requests.exceptions.RequestException as e:
-            return []
-
-        transcripts_data = []
-        if data.status_code == 200 and data.text:
-            text = json.loads(data.text)
-            brightcove_data = text.get('text_tracks')
-            transcripts_data = [
-                [el.get('src'), el.get('srclang')]
-                for el in brightcove_data
-                ]
-
-        # Populate default_transcripts
-        default_transcripts = []
-        for transcript_url, lang_code in transcripts_data:
-            lang_label = self.get_transcript_language_parameters(lang_code)[1]
-            default_transcript = {
-                'lang': lang_code,
-                'label': lang_label,
-                'url': transcript_url,
-            }
-            default_transcripts.append(default_transcript)
-
-        return default_transcripts
-
     @staticmethod
     def get_client_credentials(token, account_id):
         """
         Gets client credentials, given a client token and an account_id.
         Reference: https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html
-
         """
         headers = {'Authorization': 'BC_TOKEN {}'.format(token)}
         data = [{
             "identity": {
                 "type": "video-cloud-account",
-                "account-id": account_id
+                "account-id": int(account_id)
             },
             "operations": [
                 "video-cloud/video/update"
@@ -204,18 +118,17 @@ class BrightcovePlayer(BaseVideoPlayer):
         payload = {'maximum_scope': json.dumps(data)}
         url = 'https://oauth.brightcove.com/v4/client_credentials'
         response = requests.post(url, data=payload, headers=headers)
-        response_data = json.loads(unicode(response.content))
-
-        # New resource must has been created (check on 201 status).
-        # TODO is no response.text fetched, then no transcripts are present (it's not an error -> handle differently).
-        if response.status_code == 201 and response.text:
+        response_data = json.loads(response.text)
+        # New resource must have been created.
+        if response.status_code == 201 and response_data:
             client_secret = response_data.get('client_secret')
             client_id = response_data.get('client_id')
             error_message = ''
         else:
-            error_message = "Authentication failed: no client credentials have been retrieved. " \
-                            "Response: {}".format(response.text)
             client_secret, client_id = '', ''
+            # For dev purposes, response_data.get('error_description') may also be considered.
+            error_message = "Authentication to Brightcove API failed: no client credentials have been retrieved.\n" \
+                            "Please ensure you have provided an appropriate BC token, using Video API Token field."
         return client_secret, client_id, error_message
 
     @staticmethod
@@ -236,14 +149,121 @@ class BrightcovePlayer(BaseVideoPlayer):
         data = {'grant_type': 'client_credentials'}
         url = 'https://oauth.brightcove.com/v3/access_token'
         response = requests.post(url, data=data, headers=headers)
-        response_data = json.loads(unicode(response.content))
+        response_data = json.loads(response.text)
 
         if response.status_code == 200 and response.text:
             access_token = response_data.get('access_token')
             error_message = ''
         else:
             access_token = ''
-            error_message = "Authentication failed: no access token has been fetched. " \
-                            "Response: {}".format(response.text)
+            # Probably something is wrong with Brightcove API, as all the data has been provided by a user, and
+            # credentials (client_id and client_secret) have been previously fetched.
+            # For dev purposes, response_data.get('error_description') may also be considered.
+            error_message = "Authentication failed: no access token has been fetched.\n" \
+                            "Please try again later."
 
         return access_token, error_message
+
+    def authenticate_api(self, **kwargs):
+        """
+        Authenticates to a Brightcove API in order to perform authorized requests.
+        Possible errors: https://docs.brightcove.com/en/perform/oauth-api/reference/error-messages.html
+
+        Arguments:
+            kwargs (dict): token and account_id key-value pairs
+                as a platform-specific predefined client parameters, required to get credentials and access token.
+        Returns:
+            auth_data (dict): tokens and credentials, necessary to perform authorised API requests, and
+            error_status_message (str) for verbosity.
+        """
+        token, account_id = kwargs.get('token'), kwargs.get('account_id')
+        client_secret, client_id, error_message = self.get_client_credentials(token, account_id)
+        if error_message:
+            return {}, error_message
+        access_token, error_message = self.get_access_token(client_id, client_secret)
+        auth_data = {
+            'client_secret': client_secret,
+            'client_id': client_id,
+            'access_token': access_token,
+        }
+        return auth_data, error_message
+
+    def get_default_transcripts(self, **kwargs):
+        """
+        Fetches transcripts list from a video platform.
+
+        Arguments:
+            kwargs (dict): key-value pairs with account_id and video_id (both fetched from href field of studio editor),
+                           and access_token (fetched from Brightcove API).
+        Returns:
+            default_transcripts (list): list of dicts of transcripts. Example:
+                [
+                    {
+                        'lang': 'en',
+                        'label': 'English',
+                        'url': 'learning-services-media.brightcove.com/captions/bc_smart_ja.vtt'
+                    },
+                    # ...
+                ]
+            message (str): message for a user on default transcripts fetching.
+        """
+        video_id = kwargs.get('video_id')
+        account_id = kwargs.get('account_id')  # TODO add handling: default account_id
+        access_token = kwargs.get('access_token')
+
+        url = self.captions_api['url'].format(account_id=account_id, media_id=video_id)
+        authorisation_bearer = self.captions_api['authorised_request_header']['Authorization'].\
+            format(access_token=access_token)
+        headers = {'Authorization': authorisation_bearer}
+        default_transcripts = []
+        message = ''
+
+        # Fetch available transcripts' languages and urls if authentication succeeded.
+        try:
+            data = requests.get('https://' + url, headers=headers)
+            text = json.loads(data.text)
+        except requests.exceptions.RequestException as e:
+            # Probably, current API has changed
+            message = 'No timed transcript may be fetched from a video platform. Error: '.format(str(e))
+            return default_transcripts, message
+
+        if data.status_code == 200 and text.get('text_tracks'):
+            captions_data = text.get('text_tracks')
+            transcripts_data = [
+                [el.get('src'), el.get('srclang')]
+                for el in captions_data
+                ]
+            # Populate default_transcripts
+            for transcript_url, lang_code in transcripts_data:
+                lang_label = self.get_transcript_language_parameters(lang_code)[1]
+                default_transcript = {
+                    'lang': lang_code,
+                    'label': lang_label,
+                    'url': transcript_url,
+                }
+                default_transcripts.append(default_transcript)
+        # Handle empty response (no subs uploaded on a platform)
+        elif not text.get('text_tracks'):
+            message = 'For now, video platform doesn\'t have any timed transcript for this video.'
+        # Permission denied; authentication message should be already generated.
+        elif data.status_code == 401:
+            message = ''
+        else:
+            try:
+                message = str(text[0].get('message'))
+            except:
+                message = 'No timed transcript may be fetched from a video platform. API response status: {}'.\
+                    format(str(data.status_code))
+        return default_transcripts, message
+
+    def download_default_transcript(self, url):  # pylint: disable=unused-argument
+        # TODO: implement
+        """
+        Downloads default transcript from a video platform API and uploads it to the video xblock in WebVVT format.
+
+        Arguments:
+            url (str): transcript download url.
+        Returns:
+            None
+        """
+        return []

@@ -45,6 +45,17 @@ class BaseVideoPlayer(Plugin):
         """
         return {}
 
+    @abc.abstractproperty
+    def metadata_fields(self):
+        """
+        To keep xblock metadata field clean on it's each update,
+        only backend-specific parameters should be stored in the field.
+
+        Note: this is to add each new key (str) to be stored in metadata
+        to the list being returned here.
+        """
+        return []
+
     def get_frag(self, **context):
         """
         Returns a Fragment required to render video player on the client side.
@@ -115,8 +126,12 @@ class BaseVideoPlayer(Plugin):
         """
         Customises display of studio editor fields per a video platform.
         E.g. 'account_id' should be displayed for Brightcove only.
+
+        Returns:
+            client_token_help_message (str)
+            editable_fields (tuple)
         """
-        pass
+        return '', ()
 
     def get_player_html(self, **context):
         """
@@ -188,8 +203,9 @@ class BaseVideoPlayer(Plugin):
                 },
                 # ...
             ]
+            str: message for a user on default transcripts fetching.
         """
-        return []
+        return [], ''
 
     @abc.abstractmethod
     def authenticate_api(self, **kwargs):
@@ -204,13 +220,17 @@ class BaseVideoPlayer(Plugin):
         """
         return {}, ''
 
-    @staticmethod
-    def populate_metadata_authentication(metadata_field, auth_data):
+    @abc.abstractmethod
+    def download_default_transcript(self, url):  # pylint: disable=unused-argument
         """
-        Populate video xblock's metadata field with authentication data (tokens, credentials).
+        Downloads default transcript from a video platform API and uploads it to the video xblock.
+
+        Arguments:
+            url (str): transcript download url.
+        Returns:
+            None
         """
-        for key in auth_data:
-            metadata_field[key] = auth_data[key]
+        return []
 
     @staticmethod
     def get_transcript_language_parameters(lang_code):
