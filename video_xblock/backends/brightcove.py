@@ -224,8 +224,8 @@ class BrightcovePlayer(BaseVideoPlayer):
             text = json.loads(data.text)
         except requests.exceptions.RequestException as exception:
             # Probably, current API has changed
-            exception_message = str(exception)
-            message = 'No timed transcript may be fetched from a video platform. Error: '.format(exception_message)
+            message = 'No timed transcript may be fetched from a video platform. ' \
+                      'Error: {}'.format(str(exception))
             return default_transcripts, message
 
         if data.status_code == 200 and text.get('text_tracks'):

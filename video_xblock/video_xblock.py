@@ -398,7 +398,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         # Note that there is no need to authenticate to Youtube API,
         # whilst for Wistia, a sample authorised request is to be made to ensure authentication succeeded,
         # since it is needed for the auth status message generation and the player's state update with auth status.
-        auth_data, auth_error_message = self.authenticate_video_api()  # pylint: disable=unused-argument
+        auth_data, auth_error_message = self.authenticate_video_api()  # pylint: disable=unused-variable
 
         # Fetch captions list (available/default transcripts list) from video platform API
         video_id = player.media_id(self.href)
@@ -662,7 +662,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             token = str(data)
         else:
             token = ''
-        auth_data, error_message = self.authenticate_video_api(token)
+        auth_data, error_message = self.authenticate_video_api(token)  # pylint: disable=unused-variable
         response = {'error_message': error_message}
         return response
 

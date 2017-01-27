@@ -127,8 +127,8 @@ class YoutubePlayer(BaseVideoPlayer):
             data = requests.get('http://' + self.captions_api['url'], params=transcripts_param)
         except requests.exceptions.RequestException as exception:
             # Probably, current API has changed
-            exception_message = str(exception)
-            message = 'No timed transcript may be fetched from a video platform. Error: '.format(exception_message)
+            message = 'No timed transcript may be fetched from a video platform. ' \
+                      'Error: {}'.format(str(exception))
             return available_languages, message
 
         if data.status_code == 200 and data.text:

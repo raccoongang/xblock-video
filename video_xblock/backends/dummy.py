@@ -30,7 +30,8 @@ class DummyPlayer(BaseVideoPlayer):
     def download_default_transcript(self, url):  # pylint: disable=unused-argument
         return []
 
-    def customize_xblock_fields_display(self, editable_fields):
+    @staticmethod
+    def customize_xblock_fields_display(editable_fields):
         return '', editable_fields
 
     def authenticate_api(self, **kwargs):  # pylint: disable=unused-argument
