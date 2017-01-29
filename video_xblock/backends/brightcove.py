@@ -96,7 +96,7 @@ class BrightcovePlayer(BaseVideoPlayer):
         message = 'You can generate a BC token following the guide of ' \
                   '<a href="https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html" ' \
                   'target="_blank">Brightcove</a>. Please ensure appropriate operations scope has been set ' \
-                  'on the video platform.'
+                  'on the video platform, and a BC token is valid.'
         return message, editable_fields
 
     @staticmethod
@@ -128,7 +128,7 @@ class BrightcovePlayer(BaseVideoPlayer):
             client_secret, client_id = '', ''
             # For dev purposes, response_data.get('error_description') may also be considered.
             error_message = "Authentication to Brightcove API failed: no client credentials have been retrieved.\n" \
-                            "Please ensure you have provided an appropriate BC token, using Video API Token field."
+                            "Please ensure you have provided a valid BC token, using Video API Token field."
         return client_secret, client_id, error_message
 
     @staticmethod

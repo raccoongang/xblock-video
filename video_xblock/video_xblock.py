@@ -183,8 +183,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         scope=Scope.content,
         display_name=_('Default Timed Transcript'),
         help=_(
-            'Default transcripts are to be uploaded whether automatically from video platform or '
-            'manually if no transcripts were found there.'
+            'Default transcripts are uploaded automatically from a video platform '
+            'to the list of available transcripts.'
         ),
         resettable_editor=False
     )
