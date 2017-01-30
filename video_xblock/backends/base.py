@@ -48,6 +48,8 @@ class BaseVideoPlayer(Plugin):
     @abc.abstractproperty
     def metadata_fields(self):
         """
+        List of keys (str) to be stored in the metadata xblock field.
+        
         To keep xblock metadata field clean on it's each update,
         only backend-specific parameters should be stored in the field.
 
@@ -227,9 +229,9 @@ class BaseVideoPlayer(Plugin):
         Arguments:
             url (str): transcript download url.
         Returns:
-            None
+            unicode: Transcripts in WebVTT or SRT format.
         """
-        return []
+        return u''
 
     @staticmethod
     def get_transcript_language_parameters(lang_code):
