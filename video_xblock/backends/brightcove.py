@@ -260,11 +260,11 @@ class BrightcovePlayer(BaseVideoPlayer):
     def download_default_transcript(self, url):  # pylint: disable=unused-argument
         # TODO: implement
         """
-        Downloads default transcript from a video platform API and uploads it to the video xblock in WebVVT format.
+        Downloads default transcript from a video platform API in WebVVT format.
 
         Arguments:
             url (str): transcript download url.
         Returns:
-            None
+            unicode: Transcripts in WebVTT format.
         """
-        return []
+        return u''

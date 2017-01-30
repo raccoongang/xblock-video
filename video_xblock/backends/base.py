@@ -49,7 +49,7 @@ class BaseVideoPlayer(Plugin):
     def metadata_fields(self):
         """
         List of keys (str) to be stored in the metadata xblock field.
-        
+
         To keep xblock metadata field clean on it's each update,
         only backend-specific parameters should be stored in the field.
 

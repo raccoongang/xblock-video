@@ -174,7 +174,7 @@ class YoutubePlayer(BaseVideoPlayer):
 
     def download_default_transcript(self, url):
         """
-        Download default transcript and upload to video xblock in WebVVT format.
+        Downloads default transcript in WebVVT format.
 
         Reference: https://git.io/vMK6W
 
@@ -206,6 +206,5 @@ class YoutubePlayer(BaseVideoPlayer):
 
         sub_dict = {'start': sub_starts, 'end': sub_ends, 'text': sub_texts}
         # TODO implement conversion of sub_dict to WebVVT format
-        # TODO implement upload to video xblock
 
-        return sub_dict, message
+        return u''

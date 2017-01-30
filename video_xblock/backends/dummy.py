@@ -28,7 +28,7 @@ class DummyPlayer(BaseVideoPlayer):
         return [], ''
 
     def download_default_transcript(self, url):  # pylint: disable=unused-argument
-        return []
+        return u''
 
     @staticmethod
     def customize_xblock_fields_display(editable_fields):
