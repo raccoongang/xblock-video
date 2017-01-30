@@ -220,7 +220,7 @@ class BaseVideoPlayer(Plugin):
         return {}, ''
 
     @abc.abstractmethod
-    def download_default_transcript(self, url):  # pylint: disable=unused-argument
+    def upload_default_transcript(self, url):  # pylint: disable=unused-argument
         """
         Downloads default transcript from a video platform API and uploads it to the video xblock.
 
