@@ -663,7 +663,11 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         else:
             token = ''
         auth_data, error_message = self.authenticate_video_api(token)  # pylint: disable=unused-variable
-        response = {'error_message': error_message}
+        if error_message:
+            response = {'error_message': error_message}
+        else:
+            success_message = 'Successfully authenticated to the video platform.'
+            response = {'success_message': success_message}
         return response
 
     def update_metadata_authentication(self, auth_data, player):
