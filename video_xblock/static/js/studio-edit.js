@@ -8,6 +8,27 @@
 function StudioEditableXBlock(runtime, element) {
     'use strict';
 
+    /** This function is used for Brightcove HLS debugging */
+    var loadBackendAdvancedSettings = function loadBackendAdvancedSettings() {
+        // var handlerUrl = runtime.handlerUrl(element, 'dispatch', 'get_video_tech_info');
+        var handlerUrl = runtime.handlerUrl(element, 'dispatch', 'ensure_ingest_profiles');
+        console.log('loadBackendAdvancedSettings', handlerUrl);
+        $.ajax({
+            type: 'POST',
+            url: handlerUrl,
+            data: JSON.stringify({}),
+            // dataType: 'json',
+            // global: false,  // Disable Studio's error handling that conflicts with studio's notify('save') and notify('cancel') :-/
+        }).success(function(response) {
+            $('#backend-advanced-settings').html(JSON.stringify(response));
+        });
+
+    };
+
+    $("#settings-tab").ready(function() {
+        loadBackendAdvancedSettings();
+    });
+
     var fields = [];
     // Studio includes a copy of tinyMCE and its jQuery plugin
     var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');

@@ -21,6 +21,38 @@ from django.template import Template, Context
 html_parser = HTMLParser()  #pylint: disable=invalid-name
 
 
+class ApiClientError(Exception):
+    pass
+
+
+class BaseApiClient(object):
+    """
+    Low level video platform API client. Abstracts API interaction details like
+    requests composition, API credentials handling.
+
+    Subclass your platform specific API client from this base class.
+    """
+
+    @abc.abstractmethod
+    def get(self, url, headers=None, can_retry=True):
+        """
+        Issues REST GET request to a given URL.
+        Can throw ApiClientError or it's subclass.
+
+        Returns:
+            Response in python native data format.
+        """
+
+    @abc.abstractmethod
+    def post(self, url, payload, headers=None, can_retry=True):
+        """
+        Issues REST POST request to a given URL.
+        Can throw ApiClientError or it's subclass.
+
+        Returns:
+            Response in python native data format.
+        """
+
 class BaseVideoPlayer(Plugin):
     """
     Inherit your video player class from this class
@@ -28,6 +60,9 @@ class BaseVideoPlayer(Plugin):
     __metaclass__ = abc.ABCMeta
 
     entry_point = 'video_xblock.v1'
+
+    def __init__(self, xblock):
+        self.xblock = xblock
 
     @abc.abstractproperty
     def url_re(self):
