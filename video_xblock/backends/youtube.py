@@ -182,7 +182,7 @@ class YoutubePlayer(BaseVideoPlayer):
         utf8_parser = etree.XMLParser(encoding='utf-8')
         data = requests.get(url)
 
-        sub_dict, message = {}, ''
+        sub_dict, message = {}, ''  # pylint: disable=unused-argument
         if data.status_code != 200 or not data.text:
             message = "Can't receive transcripts from Youtube for {video_id}. Status code: {status_code}.".format(
                 video_id=self.captions_api['params']['v'],
@@ -204,7 +204,7 @@ class YoutubePlayer(BaseVideoPlayer):
                     sub_ends.append(int((end + 0.0001) * 1000))
                     sub_texts.append(text.replace('\n', ' '))
 
-        sub_dict = {'start': sub_starts, 'end': sub_ends, 'text': sub_texts}
+        sub_dict = {'start': sub_starts, 'end': sub_ends, 'text': sub_texts}  # pylint: disable=unused-argument
         # TODO implement conversion of sub_dict to WebVVT format
 
         return u''
