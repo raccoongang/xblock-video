@@ -16,7 +16,8 @@ before_install:
   - pip install -r test_requirements.txt
 
 before_script:
-  - npm install eslint eslint-config-edx
+  # Install eslint, eslint-config-edx and their dependencies
+  - npm install "eslint@^2.12.0" eslint-config-edx "eslint-plugin-dollar-sign@0.0.5" "eslint-plugin-import@^1.9.2"
 
 script:
   - "make quality"
