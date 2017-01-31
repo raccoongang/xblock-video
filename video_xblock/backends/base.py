@@ -8,6 +8,7 @@ Base Video player plugin
 import abc
 import re
 import pkg_resources
+import requests
 
 from HTMLParser import HTMLParser
 from webob import Response
