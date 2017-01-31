@@ -248,7 +248,6 @@ function StudioEditableXBlock(runtime, element) {
                 $(error_selector).hide()
             }, 5000);
         }
-        console.log(message);
     };
 
     function authenticateVideoApi(data) {

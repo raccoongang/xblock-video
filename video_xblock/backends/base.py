@@ -8,6 +8,7 @@ Base Video player plugin
 import abc
 import re
 import pkg_resources
+import requests
 
 from HTMLParser import HTMLParser
 from webob import Response
@@ -18,7 +19,7 @@ from django.conf import settings
 from django.template import Template, Context
 
 
-html_parser = HTMLParser()  #pylint: disable=invalid-name
+html_parser = HTMLParser()  # pylint: disable=invalid-name
 
 
 class BaseVideoPlayer(Plugin):
