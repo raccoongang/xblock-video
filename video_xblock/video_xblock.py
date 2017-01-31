@@ -685,21 +685,3 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         irrelevant_fields = [key for key in self.metadata if key not in player.metadata_fields]
         for key in irrelevant_fields:
             del self.metadata[key]
-
-    @XBlock.handler
-    def upload_default_transcript_handler(self, request, suffix=''):  # pylint: disable=unused-argument
-        """
-        Function for fetching a transcript from a video platform's API and uploading it to a video xblock.
-        Returns:
-            The file with the correct name
-        """
-        trans_path = self.get_path_for(request.query_string)
-        result = requests.get(request.host_url + request.query_string).text
-        filename = self.get_file_name_from_path(trans_path)
-        response = Response(result)
-        headerlist = [
-            ('Content-Type', 'text/plain'),
-            ('Content-Disposition', 'attachment; filename={}'.format(filename))
-        ]
-        response.headerlist = headerlist
-        return response
