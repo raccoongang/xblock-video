@@ -98,7 +98,7 @@ class WistiaPlayer(BaseVideoPlayer):
         """
         Customises display of studio editor fields per a video platform.
         """
-        message = 'You can get a public token following the guide of ' \
+        message = 'You can get a master token following the guide of ' \
                   '<a href="https://wistia.com/doc/data-api" target="_blank">Wistia</a>. ' \
                   'Please ensure appropriate operations scope has been set on the video platform.'
         editable_fields = list(editable_fields)
@@ -113,9 +113,9 @@ class WistiaPlayer(BaseVideoPlayer):
         Reference: https://wistia.com/doc/data-api#authentication
 
         Arguments:
-            kwargs (dict): Wistia public token key-value pair.
+            kwargs (dict): Wistia master token key-value pair.
         Returns:
-            auth_data (dict): public token, provided by a user, is to be stored in Wistia's player metadata,
+            auth_data (dict): master token, provided by a user, is to be stored in Wistia's player metadata,
                 since no access token should be generated
             error_status_message (str) for the sake of verbosity.
         """
