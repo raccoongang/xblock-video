@@ -626,7 +626,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             auth_data (dict): tokens and credentials, necessary to perform authorised API requests.
         """
 
-        # TODO consider: move kwargs population to specific backends
+        # TODO consider: move auth fields validation and kwargs population to specific backends
         # Handles a case where no token was provided by a user
         if self.token == self.fields['token'].default and str(self.player_name) != 'youtube-player':
             error_message = 'In order to authenticate to a video platform\'s API, please provide a Video API Token.'
@@ -643,7 +643,19 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             kwargs['account_id'] = self.account_id
 
         player = self.get_player()
-        auth_data, error_message = player.authenticate_api(**kwargs)
+        if str(self.player_name) == 'brightcove-player' and not self.metadata.get('access_token'):
+            auth_data, error_message = player.authenticate_api(**kwargs)
+        elif str(self.player_name) == 'brightcove-player' and self.metadata.get('access_token'):
+            auth_data = {
+                'client_secret': self.metadata.get('client_secret'),
+                'client_id': self.metadata.get('client_id'),
+                'access_token': self.metadata.get('access_token')
+            }
+            error_message = ''
+        elif str(self.player_name) == 'wistia-player':
+            auth_data, error_message = player.authenticate_api(**kwargs)
+        else:
+            auth_data, error_message = {}, ''
         # Metadata is to be updated on each authentication effort.
         self.update_metadata_authentication(auth_data=auth_data, player=player)
         return auth_data, error_message
