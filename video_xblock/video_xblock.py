@@ -614,6 +614,27 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         response.headerlist = headerlist
         return response
 
+    @XBlock.json_handler
+    def dispatch(self, request, suffix):
+        return self.get_player().dispatch(request, suffix)
+
+    @XBlock.handler
+    def ui_dispatch(self, request, suffix):
+        """
+        Dispatcher for a requests sent by dynamic Front-end components.
+
+        Typical use case: Front-end wants to check with backend if it's ok to show
+        certain part of UI.
+        """
+
+        if suffix == 'get-metadata':
+            resp = {
+                'success': True,
+                'data': {'metadata': self.metadata}
+            }
+        response = Response(json.dumps(resp), content_type='application/json')
+        return response
+
     def authenticate_video_api(self, token=''):
         """
         Authenticates to a video platform's API.
@@ -643,13 +664,12 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             kwargs['account_id'] = self.account_id
 
         player = self.get_player()
-        if str(self.player_name) == 'brightcove-player' and not self.metadata.get('access_token'):
+        if str(self.player_name) == 'brightcove-player' and not self.metadata.get('client_id'):
             auth_data, error_message = player.authenticate_api(**kwargs)
-        elif str(self.player_name) == 'brightcove-player' and self.metadata.get('access_token'):
+        elif str(self.player_name) == 'brightcove-player' and self.metadata.get('client_id'):
             auth_data = {
                 'client_secret': self.metadata.get('client_secret'),
                 'client_id': self.metadata.get('client_id'),
-                'access_token': self.metadata.get('access_token')
             }
             error_message = ''
         else:
@@ -688,6 +708,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         """
         # In case of successful authentication:
         for key in auth_data:
+            if key not in player.metadata_fields:
+                # Only backend-specific parameters are to be stored
+                continue
             self.metadata[key] = auth_data[key]
         # If the last authentication effort was not successful, metadata should be updated as well.
         # Since video xblock metadata may store various information, this is to update the auth data only.
@@ -696,7 +719,3 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             self.metadata['access_token'] = ''   # Brightcove API
             self.metadata['client_id'] = ''      # Brightcove API
             self.metadata['client_secret'] = ''  # Brightcove API
-        # Clear metadata (only backend-specific parameters are to be stored)
-        irrelevant_fields = [key for key in self.metadata if key not in player.metadata_fields]
-        for key in irrelevant_fields:
-            del self.metadata[key]

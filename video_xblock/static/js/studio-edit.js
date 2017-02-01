@@ -11,9 +11,11 @@ function StudioEditableXBlock(runtime, element) {
     /** This function is used for Brightcove HLS debugging */
     var loadBackendAdvancedSettings = function loadBackendAdvancedSettings() {
         // var handlerUrl = runtime.handlerUrl(element, 'dispatch', 'get_video_tech_info');
+        // var handlerUrl = runtime.handlerUrl(element, 'ui_dispatch', 'get-metadata');
         var handlerUrl = runtime.handlerUrl(element, 'dispatch', 'ensure_ingest_profiles');
-        console.log('loadBackendAdvancedSettings', handlerUrl);
+        debugger;
         $.ajax({
+            // type: 'GET',
             type: 'POST',
             url: handlerUrl,
             data: JSON.stringify({}),
@@ -223,11 +225,11 @@ function StudioEditableXBlock(runtime, element) {
                 $('.status-error', $(el))
                     .text('Please upload the transcript file for this language or remove the language.')
             } else {
-                isValid.push(1)
+                isValid.push(1);
             }
         });
         if (isValid.length == $visibleLangChoiceItems.length) {
-            fillValues(e)
+            fillValues(e);
         }
     };
 
