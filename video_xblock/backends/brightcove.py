@@ -214,9 +214,11 @@ class BrightcoveHlsMixin(object):
         info = {
             'auto_quality': 'off',
             'encryption': 'off',
+            'renditions_count': len(renditions),
         }
         hls_renditions_count = sum(_['hls'] is not None for _ in renditions)
         drm_renditions_count = sum(_['drm'] is not None for _ in renditions)
+
         if hls_renditions_count == len(renditions):
             info['auto_quality'] = 'on'
         elif hls_renditions_count > 0:
@@ -335,6 +337,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             return self.get_ingest_profiles(self.xblock.account_id)
         elif suffix == 'ensure_ingest_profiles':
             return self.ensure_ingest_profiles(self.xblock.account_id)
+        return {'success': False, 'message': 'Unknown method'}
 
     @staticmethod
     def customize_xblock_fields_display(editable_fields):

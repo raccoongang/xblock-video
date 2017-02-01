@@ -24,9 +24,22 @@ function StudioEditableXBlock(runtime, element) {
         });
 
     };
+    var bcLoadVideoTechInfo = function bcLoadVideoTechInfo() {
+        $.ajax({
+            // type: 'GET',
+            type: 'POST',
+            url: runtime.handlerUrl(element, 'dispatch', 'get_video_tech_info'),
+            data: JSON.stringify({}),
+            // dataType: 'json',
+            // global: false,  // Disable Studio's error handling that conflicts with studio's notify('save') and notify('cancel') :-/
+        }).success(function(response) {
+            $('#brightcove-video-tech-info').html(JSON.stringify(response));
+        });
+
+    };
 
     $("#settings-tab").ready(function() {
-        loadBackendAdvancedSettings();
+        bcLoadVideoTechInfo();
     });
 
     var fields = [];
