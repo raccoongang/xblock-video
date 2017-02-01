@@ -114,7 +114,7 @@ class BrightcoveApiClient(object):
             headers_.update(headers)
 
         resp = requests.post(url, data=payload.encode('utf-8'), headers=headers_)
-        if resp.status_code == 200:
+        if resp.status_code in (200, 201):
             return resp.json()
         elif resp.status_code == 401 and can_retry:
             self.access_token = self._refresh_access_token()
@@ -126,14 +126,16 @@ class BrightcoveApiClient(object):
 class BrightcoveHlsMixin(object):
     HLS_DI_PROFILE = {
         'name': 'Open edX Video XBlock HLS ingest profile',
+        'short_name': 'auto_quality',
         'path': '../static/json/brightcove-ingest-profile-hlse.tmpl.json',
         'description': (
             'This profile is used by Open edX Video XBlock to enable auto-quality feature. '
             'Uploaded {:%Y-%m-%d %H:%M}'.format(datetime.now())
         )
     }
-    HLSE_DI_PROFILE_NAME = {
+    HLSE_DI_PROFILE = {
         'name': 'Open edX Video XBlock HLS with encryption ingest profile',
+        'short_name': 'encryption',
         'path': '../static/json/brightcove-ingest-profile-hlse.tmpl.json',
         'description': (
             'This profile is used by Open edX Video XBlock to enable video content protection. '
@@ -164,12 +166,12 @@ class BrightcoveHlsMixin(object):
 
     def upload_ingest_profile(self, account_id, ingest_profile):
         url = 'https://ingestion.api.brightcove.com/v1/accounts/{}/profiles'.format(account_id)
-        ingest_profile = self.render_resource(
+        profile = self.render_resource(
             ingest_profile['path'], name=ingest_profile['name'],
             account_id=account_id, description=ingest_profile['description']
         )
-        resp = self.api_client.post(url, payload=ingest_profile)
-        import ipdb; ipdb.set_trace()  # breakpoint 2b4fcc42 //
+        resp = self.api_client.post(url, payload=json.dumps(json.loads(profile)))
+        self.xblock.metadata[ingest_profile['short_name']+'_profile_id'] = resp['id']
         return resp
 
     def start_retranscode_job(self, account_id, video_id, ingest_profile):
