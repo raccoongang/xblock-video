@@ -407,7 +407,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         for k in self.metadata:
             kwargs[k] = self.metadata[k]
         # For a Brightcove player only
-        if self.account_id is not self.fields['account_id'].default:
+        if self.account_id is not self.fields['account_id'].default:  # pylint: disable=unsubscriptable-object
             kwargs['account_id'] = self.account_id
 
         self.default_transcripts, transcripts_autoupload_message = player.get_default_transcripts(**kwargs)
@@ -430,7 +430,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         # Customize display of the particular xblock fields per each video platform.
         token_help_message, customised_editable_fields = \
             player.customize_xblock_fields_display(self.editable_fields)
-        self.fields['token'].help = _(token_help_message,)  # pylint: disable=translation-of-non-string
+        self.fields['token'].help = token_help_message  # pylint: disable=unsubscriptable-object
         self.editable_fields = customised_editable_fields
 
         # Build a list of all the fields that can be edited:
@@ -628,7 +628,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         # TODO consider: move auth fields validation and kwargs population to specific backends
         # Handles a case where no token was provided by a user
-        if self.token == self.fields['token'].default and str(self.player_name) != 'youtube-player':
+        if self.token == self.fields['token'].default and str(self.player_name) != 'youtube-player':  # pylint: disable=unsubscriptable-object
             error_message = 'In order to authenticate to a video platform\'s API, please provide a Video API Token.'
             return {}, error_message
         if token:
@@ -637,7 +637,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             kwargs = {'token': self.token}
         # Handles a case where no account_id was provided by a user
         if str(self.player_name) == 'brightcove-player':
-            if self.account_id == self.fields['account_id'].default:
+            if self.account_id == self.fields['account_id'].default:  # pylint: disable=unsubscriptable-object
                 error_message = 'In order to authenticate to a video platform\'s API, please provide an Account Id.'
                 return {}, error_message
             kwargs['account_id'] = self.account_id

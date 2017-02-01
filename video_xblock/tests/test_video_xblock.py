@@ -3,8 +3,9 @@ Test cases for video_xblock
 """
 import datetime
 import json
-import mock
 import unittest
+
+import mock
 
 from django.test import RequestFactory
 from django.conf import settings
