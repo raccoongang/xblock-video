@@ -21,8 +21,8 @@ from django.template import Template, Context
 from pycaption import detect_format, WebVTTWriter
 from webob import Response
 
-from .backends.base import BaseVideoPlayer, html_parser  # pylint: disable=relative-import
-from .settings import ALL_LANGUAGES  # pylint: disable=relative-import
+from .backends.base import BaseVideoPlayer, html_parser
+from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
 
 
