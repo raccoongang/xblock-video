@@ -122,12 +122,11 @@ class WistiaPlayer(BaseVideoPlayer):
         token, media_id = kwargs.get('token'), kwargs.get('video_id')  # pylint: disable=unused-variable
         auth_data, error_message = {}, ''
         auth_data['token'] = token
-        # TODO fix call to a sample url (now getting 404)
-        # url = self.captions_api.get('auth_sample_url').format(token=str(token))
-        # response = requests.post('https://' + url)
-        # if response.status_code is not 200 and \
-        #         json.loads(response.text).get('code') == 'unauthorized_credentials':
-        #     error_message = "Authentication failed. Response: {}".format(str(response.text))
+        url = self.captions_api.get('auth_sample_url').format(token=str(token))
+        response = requests.get('https://' + url)
+        if response.status_code == 401:
+            error_message = "Authentication failed. " \
+                            "Please ensure you have provided a valid master token, using Video API Token field."
         return auth_data, error_message
 
     def get_default_transcripts(self, **kwargs):

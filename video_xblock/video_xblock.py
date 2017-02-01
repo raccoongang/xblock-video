@@ -398,7 +398,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         # Note that there is no need to authenticate to Youtube API,
         # whilst for Wistia, a sample authorised request is to be made to ensure authentication succeeded,
         # since it is needed for the auth status message generation and the player's state update with auth status.
-        # auth_data, auth_error_message = self.authenticate_video_api()  # pylint: disable=unused-variable
+        auth_data, auth_error_message = self.authenticate_video_api()  # pylint: disable=unused-variable
 
         # Fetch captions list (available/default transcripts list) from video platform API
         video_id = player.media_id(self.href)
@@ -423,7 +423,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             'transcripts': transcripts,
             'download_transcript_handler_url': download_transcript_handler_url,
             'default_transcripts': self.default_transcripts,
-            'auth_error_message': 'auth_error_message',
+            'auth_error_message': auth_error_message,
             'transcripts_autoupload_message': transcripts_autoupload_message
         }
 
@@ -452,10 +452,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         fragment.add_javascript(self.resource_string("static/js/studio-edit.js"))
         fragment.initialize_js('StudioEditableXBlock')
         return fragment
-
-    @XBlock.json_handler
-    def dispatch(self, request, suffix):
-        return self.player.dispatch(request, suffix)
 
     @XBlock.handler
     def render_player(self, request, suffix=''):  # pylint: disable=unused-argument
@@ -630,9 +626,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             auth_data (dict): tokens and credentials, necessary to perform authorised API requests.
         """
 
-        # TODO consider: move kwargs population to specific backends
+        # TODO consider: move auth fields validation and kwargs population to specific backends
         # Handles a case where no token was provided by a user
-        if token == self.fields['token'].default and str(self.player_name) != 'youtube-player':  # TODO: check backend type, not player_name.
+        if self.token == self.fields['token'].default and str(self.player_name) != 'youtube-player':
             error_message = 'In order to authenticate to a video platform\'s API, please provide a Video API Token.'
             return {}, error_message
         if token:
@@ -647,7 +643,18 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             kwargs['account_id'] = self.account_id
 
         player = self.get_player()
-        auth_data, error_message = player.authenticate_api(**kwargs)
+        if str(self.player_name) == 'brightcove-player' and not self.metadata.get('access_token'):
+            auth_data, error_message = player.authenticate_api(**kwargs)
+        elif str(self.player_name) == 'brightcove-player' and self.metadata.get('access_token'):
+            auth_data = {
+                'client_secret': self.metadata.get('client_secret'),
+                'client_id': self.metadata.get('client_id'),
+                'access_token': self.metadata.get('access_token')
+            }
+            error_message = ''
+        else:
+            auth_data, error_message = player.authenticate_api(**kwargs)
+
         # Metadata is to be updated on each authentication effort.
         self.update_metadata_authentication(auth_data=auth_data, player=player)
         return auth_data, error_message
