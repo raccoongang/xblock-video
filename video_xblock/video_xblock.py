@@ -652,10 +652,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 'access_token': self.metadata.get('access_token')
             }
             error_message = ''
-        elif str(self.player_name) == 'wistia-player':
-            auth_data, error_message = player.authenticate_api(**kwargs)
         else:
-            auth_data, error_message = {}, ''
+            auth_data, error_message = player.authenticate_api(**kwargs)
+
         # Metadata is to be updated on each authentication effort.
         self.update_metadata_authentication(auth_data=auth_data, player=player)
         return auth_data, error_message
