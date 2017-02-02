@@ -9,6 +9,7 @@ import abc
 import re
 from HTMLParser import HTMLParser
 import pkg_resources
+import requests
 
 from webob import Response
 from xblock.fragment import Fragment
@@ -52,6 +53,7 @@ class BaseApiClient(object):
         Returns:
             Response in python native data format.
         """
+
 
 class BaseVideoPlayer(Plugin):
     """
