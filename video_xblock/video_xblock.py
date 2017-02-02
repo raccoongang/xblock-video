@@ -628,7 +628,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         # TODO consider: move auth fields validation and kwargs population to specific backends
         # Handles a case where no token was provided by a user
-        if self.token == self.fields['token'].default and str(self.player_name) != 'youtube-player':  # pylint: disable=unsubscriptable-object
+        is_default_token = self.token == self.fields['token'].default  # pylint: disable=unsubscriptable-object
+        is_youtube_player = str(self.player_name) != 'youtube-player'  # pylint: disable=unsubscriptable-object
+        if is_default_token and is_youtube_player:
             error_message = 'In order to authenticate to a video platform\'s API, please provide a Video API Token.'
             return {}, error_message
         if token:
