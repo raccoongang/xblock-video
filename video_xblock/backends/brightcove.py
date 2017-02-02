@@ -128,6 +128,13 @@ class BrightcoveApiClient(BaseApiClient):
 
 
 class BrightcoveHlsMixin(object):
+    """
+    BrightcoveHlsMixin encapsulates data and methods used for HLS specific features.
+    These features are:
+    1. Video playback autoquality. i.e. adjusting video bitrate depending on client's bandwidth.
+    2. Video content encryption using short-living keys.
+    """
+
     DI_PROFILES = {
         'autoquality': {
             'name': 'Open edX Video XBlock HLS ingest profile',
@@ -153,8 +160,6 @@ class BrightcoveHlsMixin(object):
         """
         Checks if custom HLS-enabled ingest profiles have been uploaded to the
         given Brightcove account_id. If not, uploads these profiles.
-
-        Returns:
         """
 
         existing_profiles = self.get_ingest_profiles(account_id)
@@ -165,11 +170,25 @@ class BrightcoveHlsMixin(object):
             self.upload_ingest_profile(account_id, self.DI_PROFILES['encryption'])
 
     def get_ingest_profiles(self, account_id):
+        """
+        Gets all Ingest Profiles available for a given account id.
+
+        Reference:
+        https://docs.brightcove.com/en/video-cloud/ingest-profiles-api/getting-started/api-overview.html
+        """
+
         url = 'https://ingestion.api.brightcove.com/v1/accounts/{}/profiles'.format(account_id)
         res = self.api_client.get(url)
         return res
 
     def upload_ingest_profile(self, account_id, ingest_profile):
+        """
+        Uploads Ingest Profile to Brightcove using Brightcove's Ingest Profiles API.
+
+        Reference:
+        https://docs.brightcove.com/en/video-cloud/ingest-profiles-api/getting-started/api-overview.html
+        """
+
         url = 'https://ingestion.api.brightcove.com/v1/accounts/{}/profiles'.format(account_id)
         profile = self.render_resource(
             ingest_profile['path'], name=ingest_profile['name'],
@@ -205,11 +224,15 @@ class BrightcoveHlsMixin(object):
             retranscode_params['profile'] = self.DI_PROFILES[profile_type]['name']
         res = self.api_client.post(url, json.dumps(retranscode_params))
         self.xblock.metadata['retranscode-status'] = (
-            'ReTranscode request submitted {} using profile "{}". Job id: {}'.format(
-                datetime.now(), retranscode_params.get('profile', 'default'), res['id']))
+            'ReTranscode request submitted {:%Y-%m-%d %H:%M} using profile "{}". Job id: {}'.format(
+                datetime.utcnow(), retranscode_params.get('profile', 'default'), res['id']))
         return res
 
     def get_video_renditions(self, account_id, video_id):
+        """
+        Returns information about video renditions provided by Brightcove API.
+        """
+
         url = 'https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets/renditions'.format(
             account_id=account_id, video_id=video_id
         )
@@ -218,12 +241,14 @@ class BrightcoveHlsMixin(object):
 
     def get_video_tech_info(self, account_id, video_id):
         """
-        Returns
+        Returns summary about given video:
             {
+              'renditions_count': <int>,
               'auto_quality': 'on/off/partial',
               'encryption': 'on/off/partial'
             }
         """
+
         renditions = self.get_video_renditions(account_id, video_id)
         info = {
             'auto_quality': 'off',
@@ -329,6 +354,13 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         return frag
 
     def dispatch(self, _request, suffix):
+        """
+        Brightcove dispatch method exposes different utility entry points.
+
+        Entry point can either return info about video or Brightcove account
+        or perform some action via Brightcove API.
+        """
+
         if not self.api_key and self.api_secret:
             raise BrightcoveApiClientError('No API credentials provided')
 
@@ -366,6 +398,9 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         return {'success': False, 'message': 'Unknown method'}
 
     def can_show_settings(self):
+        """
+        Reports to UI if it can show backend specific advanced settings.
+        """
         can_show = bool(
             self.xblock.metadata.get('client_id')
             and self.xblock.metadata.get('client_secret')
