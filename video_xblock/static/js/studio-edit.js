@@ -17,14 +17,27 @@ function StudioEditableXBlock(runtime, element) {
      *  profile: ingest profile to use for re-transcode job.
      *  Accepted values: default, autoquality, encryption.
      */
-    var submitBCReTranscode = function submitBCReTranscode(profile) {
-        var handlerUrl = runtime.handlerUrl(element, 'dispatch', 'submit_retranscode_' + profile);
-        $.ajax({
-            // type: 'GET',
-            type: 'POST',
-            url: handlerUrl,
+
+    var uiDispatch = function uiDispatch(method, suffix) {
+        return $.ajax({
+            type: method,
+            url: runtime.handlerUrl(element, 'ui_dispatch', suffix),
             data: '{}'
-        }).success(function(response) {
+        });
+    };
+
+    var dispatch = function dispatch(method, suffix) {
+        return $.ajax({
+            type: method,
+            url: runtime.handlerUrl(element, 'dispatch', suffix),
+            data: '{}'
+        });
+    };
+
+    var submitBCReTranscode = function submitBCReTranscode(profile) {
+        $.when(
+            dispatch('POST', 'submit_retranscode_' + profile)
+        ).then(function(response) {
             $('#brightcove-retranscode-status').html(
                 'Your retranscode request was successfully submitted to Brightcove VideoCloud. ' +
                 'It takes few minutes to process it. Job id ' + response.id);
@@ -32,14 +45,32 @@ function StudioEditableXBlock(runtime, element) {
     };
 
     var bcLoadVideoTechInfo = function bcLoadVideoTechInfo() {
-        $.ajax({
-            type: 'POST',
-            url: runtime.handlerUrl(element, 'dispatch', 'get_video_tech_info'),
-            data: '{}'
-        }).success(function(response) {
+        $.when(
+            dispatch('POST', 'get_video_tech_info')
+        ).then(function(response) {
             $('#bc-tech-info-renditions').html(response.renditions_count);
             $('#bc-tech-info-autoquality').html(response.auto_quality);
             $('#bc-tech-info-encryption').html(response.encryption);
+        });
+    };
+
+    var getReTranscodeStatus = function getReTranscodeStatus() {
+        $.when(
+            dispatch('POST', 'retranscode-status')
+        ).then(function(data) {
+            $('#brightcove-retranscode-status').html(data);
+        });
+    };
+
+    var showBackendSettings = function showBackendSettings() {
+        $.when(
+            uiDispatch('GET', 'can-show-backend-settings')
+        ).then(function(response) {
+            if (response.data.canShow) {
+                $('#brightcove-advanced-settings').toggleClass('is-hidden', false);
+                bcLoadVideoTechInfo();
+                getReTranscodeStatus();
+            }
         });
     };
 
@@ -50,7 +81,7 @@ function StudioEditableXBlock(runtime, element) {
     );
 
     $('#settings-tab').ready(function() {
-        bcLoadVideoTechInfo();
+        showBackendSettings();
     });
 
     $(element).find('.field-data-control').each(function() {
@@ -305,6 +336,7 @@ function StudioEditableXBlock(runtime, element) {
                         'success',
                         '.api-authenticate.status-success',
                         '.api-authenticate.status-error');
+                    showBackendSettings();
                 }
                 else if(error_message) {
                     showAuthenticateStatus(

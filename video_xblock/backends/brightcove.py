@@ -204,6 +204,9 @@ class BrightcoveHlsMixin(object):
         if profile_type != 'default':
             retranscode_params['profile'] = self.DI_PROFILES[profile_type]['name']
         res = self.api_client.post(url, json.dumps(retranscode_params))
+        self.xblock.metadata['retranscode-status'] = (
+            'ReTranscode request submitted {} using profile "{}". Job id: {}'.format(
+                datetime.now(), retranscode_params.get('profile', 'default'), res['id']))
         return res
 
     def get_video_renditions(self, account_id, video_id):
@@ -271,9 +274,6 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         self.api_key = xblock.metadata.get('client_id')
         self.api_secret = xblock.metadata.get('client_secret')
         self.api_client = BrightcoveApiClient(self.api_key, self.api_secret)
-
-    def connect_to_platform_api(self, token, account_id):
-        BrightcoveApiClient.create_credentials(token, account_id)
 
     def media_id(self, href):
         """
@@ -361,7 +361,16 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             return self.submit_retranscode_job(
                 self.xblock.account_id, self.media_id(self.xblock.href), 'encryption'
             )
+        elif suffix == 'retranscode-status':
+            return self.xblock.metadata.get('retranscode-status')
         return {'success': False, 'message': 'Unknown method'}
+
+    def can_show_settings(self):
+        can_show = bool(
+            self.xblock.metadata.get('client_id')
+            and self.xblock.metadata.get('client_secret')
+        )
+        return {'canShow': can_show}
 
     @staticmethod
     def customize_xblock_fields_display(editable_fields):

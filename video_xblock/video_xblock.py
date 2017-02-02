@@ -627,11 +627,19 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         certain part of UI.
         """
 
+        resp = {
+            'success': True,
+            'data': {}
+        }
         if suffix == 'get-metadata':
-            resp = {
-                'success': True,
-                'data': {'metadata': self.metadata}
-            }
+            resp['data'] = {'metadata': self.metadata}
+        elif suffix == 'can-show-backend-settings':
+            player = self.get_player()
+            if str(self.player_name) == 'brightcove-player':
+                resp['data'] = player.can_show_settings()
+            else:
+                resp['data'] = {'canShow': False}
+
         response = Response(json.dumps(resp), content_type='application/json')
         return response
 
