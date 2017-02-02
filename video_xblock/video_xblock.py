@@ -471,8 +471,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             video_player_id='video_player_{}'.format(self.location.block_id),  # pylint: disable=no-member
             save_state_url=save_state_url,
             player_state=self.player_state,
-            start_time=int(self.start_time.total_seconds()), # pylint: disable=no-member
-            end_time=int(self.end_time.total_seconds()), # pylint: disable=no-member
+            start_time=int(self.start_time.total_seconds()),  # pylint: disable=no-member
+            end_time=int(self.end_time.total_seconds()),  # pylint: disable=no-member
             brightcove_js_url=VideoXBlock.get_brightcove_js_url(self.account_id, self.player_id),
             transcripts=transcripts
         )
