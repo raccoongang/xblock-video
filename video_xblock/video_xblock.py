@@ -24,9 +24,9 @@ from webob import Response
 from .backends.base import BaseVideoPlayer, html_parser
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
+from .utils import ugettext as _
 
 
-_ = lambda text: text
 log = logging.getLogger(__name__)
 
 

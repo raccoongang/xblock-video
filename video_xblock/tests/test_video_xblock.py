@@ -13,10 +13,9 @@ from xblock.field_data import DictFieldData
 from xblock.test.tools import TestRuntime
 
 from video_xblock import VideoXBlock
+from video_xblock.utils import ugettext as _
 
 settings.configure()
-
-_ = lambda text: text
 
 
 class VideoXBlockTests(unittest.TestCase):
