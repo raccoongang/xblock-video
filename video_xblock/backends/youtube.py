@@ -210,3 +210,6 @@ class YoutubePlayer(BaseVideoPlayer):
         # TODO implement conversion of sub_dict to WebVVT format
 
         return u''
+
+    def dispatch(self, request, suffix):
+        pass

@@ -212,3 +212,6 @@ class WistiaPlayer(BaseVideoPlayer):
             unicode: Transcripts in WebVTT format.
         """
         return u''
+
+    def dispatch(self, request, suffix):
+        pass
