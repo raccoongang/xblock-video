@@ -54,6 +54,7 @@ class BaseApiClient(object):
             Response in python native data format.
         """
 
+
 class BaseVideoPlayer(Plugin):
     """
     Inherit your video player class from this class

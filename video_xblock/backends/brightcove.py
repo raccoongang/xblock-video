@@ -67,12 +67,13 @@ class BrightcoveApiClient(BaseApiClient):
         if response.status_code == 201 and response_data:
             client_secret = response_data.get('client_secret')
             client_id = response_data.get('client_id')
+            error_message = ''
         else:
             # For dev purposes, response_data.get('error_description') may also be considered.
             error_message = "Authentication to Brightcove API failed: no client credentials have been retrieved.\n" \
                             "Please ensure you have provided an appropriate BC token, using Video API Token field."
             raise BrightcoveApiClientError(error_message)
-        return client_secret, client_id
+        return client_secret, client_id, error_message
 
     def _refresh_access_token(self):
         url = "https://oauth.brightcove.com/v3/access_token"
@@ -93,7 +94,6 @@ class BrightcoveApiClient(BaseApiClient):
         headers_ = {'Authorization': 'Bearer ' + str(self.access_token)}
         if headers is not None:
             headers_.update(headers)
-
         resp = requests.get(url, headers=headers_)
         if resp.status_code == 200:
             return resp.json()
@@ -268,7 +268,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         self.api_secret = xblock.metadata.get('client_secret')
         self.api_client = BrightcoveApiClient(self.api_key, self.api_secret)
 
-    def connect_to_platrom_api(self, token, account_id):
+    def connect_to_platform_api(self, token, account_id):
         BrightcoveApiClient.create_credentials(token, account_id)
 
     def media_id(self, href):
@@ -384,6 +384,8 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         """
         token, account_id = kwargs.get('token'), kwargs.get('account_id')
         client_secret, client_id, error_message = BrightcoveApiClient.create_credentials(token, account_id)
+        self.api_client.api_key = client_id
+        self.api_client.api_secret = client_secret
         self.xblock.metadata['client_id'] = client_id
         self.xblock.metadata['client_secret'] = client_secret
         if error_message:
@@ -413,55 +415,52 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
                 ]
             message (str): message for a user on default transcripts fetching.
         """
-        default_transcripts = [{
-            'lang': 'lang_code',
-            'label': 'lang_label',
-            'url': 'transcript_url',
-        }]
-        return default_transcripts, 'This is stub method'
+        # default_transcripts = [{
+        #     'lang': 'lang_code',
+        #     'label': 'lang_label',
+        #     'url': 'transcript_url',
+        # }]
+        # return default_transcripts, 'This is stub method'
+        if not self.api_key and self.api_secret:
+            raise BrightcoveApiClientError('No API credentials provided')
 
-        # video_id = kwargs.get('video_id')
-        # account_id = kwargs.get('account_id')  # TODO add handling: default account_id
-        # url = self.captions_api['url'].format(account_id=account_id, media_id=video_id)
+        video_id = kwargs.get('video_id')
+        account_id = kwargs.get('account_id')
+        url = 'https://' + self.captions_api['url'].format(account_id=account_id, media_id=video_id)
+        default_transcripts = []
+        message = ''
+        # Fetch available transcripts' languages and urls if authentication succeeded.
+        try:
+            text = self.api_client.get(url)
+        except BrightcoveApiClientError:
+            message = 'No timed transcript may be fetched from a video platform.'
+            return default_transcripts, message
 
-        # default_transcripts = []
-        # message = ''
-
-        # # Fetch available transcripts' languages and urls if authentication succeeded.
-        # try:
-        #     text = self.api_client.get(url)
-        # except requests.exceptions.RequestException as exception:
-        #     # Probably, current API has changed
-        #     message = 'No timed transcript may be fetched from a video platform. ' \
-        #               'Error: {}'.format(str(exception))
-        #     return default_transcripts, message
-
-        # if text:
-        #     captions_data = text.get('text_tracks')
-        #     # Handle empty response (no subs uploaded on a platform)
-        #     if not captions_data:
-        #         message = 'For now, video platform doesn\'t have any timed transcript for this video.'
-        #         return default_transcripts, message
-        #     transcripts_data = [
-        #         [el.get('src'), el.get('srclang')]
-        #         for el in captions_data
-        #         ]
-        #     # Populate default_transcripts
-        #     for transcript_url, lang_code in transcripts_data:
-        #         lang_label = self.get_transcript_language_parameters(lang_code)[1]
-        #         default_transcript = {
-        #             'lang': lang_code,
-        #             'label': lang_label,
-        #             'url': transcript_url,
-        #         }
-        #         default_transcripts.append(default_transcript)
-        # else:
-        #     try:
-        #         message = str(text[0].get('message'))
-        #     except AttributeError:
-        #         message = 'No timed transcript may be fetched from a video platform. API response status: {}'.\
-        #             format(str(data.status_code))
-        # return default_transcripts, message
+        if text:
+            captions_data = text.get('text_tracks')
+            # Handle empty response (no subs uploaded on a platform)
+            if not captions_data:
+                message = 'For now, video platform doesn\'t have any timed transcript for this video.'
+                return default_transcripts, message
+            transcripts_data = [
+                [el.get('src'), el.get('srclang')]
+                for el in captions_data
+                ]
+            # Populate default_transcripts
+            for transcript_url, lang_code in transcripts_data:
+                lang_label = self.get_transcript_language_parameters(lang_code)[1]
+                default_transcript = {
+                    'lang': lang_code,
+                    'label': lang_label,
+                    'url': transcript_url,
+                }
+                default_transcripts.append(default_transcript)
+        else:
+            try:
+                message = str(text[0].get('message'))
+            except AttributeError:
+                message = 'No timed transcript may be fetched from a video platform. '
+        return default_transcripts, message
 
     def download_default_transcript(self, url):  # pylint: disable=unused-argument
         # TODO: implement

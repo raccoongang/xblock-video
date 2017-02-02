@@ -656,6 +656,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             kwargs = {'token': token}
         else:
             kwargs = {'token': self.token}
+
         # Handles a case where no account_id was provided by a user
         if str(self.player_name) == 'brightcove-player':
             if self.account_id == self.fields['account_id'].default:
