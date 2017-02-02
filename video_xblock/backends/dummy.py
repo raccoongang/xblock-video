@@ -38,4 +38,5 @@ class DummyPlayer(BaseVideoPlayer):
         return {}, ''
 
     def dispatch(self, request, suffix):
+        """Dummy dispatch method"""
         pass

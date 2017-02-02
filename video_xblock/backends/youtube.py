@@ -212,4 +212,7 @@ class YoutubePlayer(BaseVideoPlayer):
         return u''
 
     def dispatch(self, request, suffix):
+        """
+        Youtube dispatch method.
+        """
         pass

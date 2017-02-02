@@ -616,6 +616,12 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     @XBlock.json_handler
     def dispatch(self, request, suffix):
+        """
+        Dispatch request to XBlock's player.
+        Args:
+            request: incoming request data.
+            suffix: slug used for routing.
+        """
         return self.get_player().dispatch(request, suffix)
 
     @XBlock.handler

@@ -214,4 +214,7 @@ class WistiaPlayer(BaseVideoPlayer):
         return u''
 
     def dispatch(self, request, suffix):
+        """
+        Wistia dispatch method.
+        """
         pass
