@@ -2,8 +2,6 @@
 Test cases for video_xblock backends.
 """
 import unittest
-import pkg_resources
-from mock import Mock
 from ddt import ddt, data, unpack
 from django.test.utils import override_settings
 from video_xblock.backends.base import BaseVideoPlayer, VideoXBlockException
@@ -22,39 +20,35 @@ class TestAbstractBaseBackend(unittest.TestCase):
         BaseVideoPlayer.__abstractmethods__ = set()
 
         self.instance = BaseVideoPlayer()
-        pkg_resources.resource_string = Mock(
-            return_value='__file_1_content__&nbsp;__file_2_content__&emsp;{{player_state.transcripts}}')
         self.context = {
             'player_state': {'transcripts': []}
         }
+        self.path = '../static/html/base.html'
         super(TestAbstractBaseBackend, self).setUp()
 
     def test_render_resource(self):
         """
         Check template is rendered using provided context.
         """
-        expected = u'__file_1_content__\xa0__file_2_content__\u2003[]'
-
-        res = self.instance.render_resource('', **self.context)
-        self.assertEqual(res, expected)
+        regexp = r'^<html>([a-zA-Z0-9\s\\n<>\/]+)?<\/html>$'
+        res = self.instance.render_resource(self.path, **self.context)
+        self.assertRegexpMatches(res, regexp)
 
     def test_add_js_content(self):
         """
         Check that `add_js_content` method encapsulates provided javascript code in <script> tags.
         """
-        expected = u'<script>__file_1_content__\xa0__file_2_content__\u2003[]</script>'
+        regexp = r'^<script>([a-zA-Z0-9\s\\n<>\/]+)?<\/script>$'
 
-        res = self.instance.add_js_content('', **self.context)
-        self.assertEqual(res, expected)
+        res = self.instance.add_js_content(self.path, **self.context)
+        self.assertRegexpMatches(res, regexp)
 
     def test_get_player_html(self):
         """
-        Check that rendered html string is returned in Response body.
+        Check that player files content is returned in Response body.
         """
-        expected = '__file_1_content__\xc2\xa0__file_2_content__\xe2\x80\x83'
-
         res = self.instance.get_player_html(**self.context)
-        self.assertEqual(res.body, expected)
+        self.assertIn('window.videojs', res.body)
 
     def test_match_class_method(self):
         """
@@ -72,7 +66,7 @@ class TestAbstractBaseBackend(unittest.TestCase):
     @unpack
     def test_get_transcript_language_parameters(self, lng_abbr, lng_name):
         """
-        Check the parameters of a transcript's language.
+        Check parameters of the transcript's language.
         """
         try:
             res = BaseVideoPlayer.get_transcript_language_parameters(lng_abbr)
