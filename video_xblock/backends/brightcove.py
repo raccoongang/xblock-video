@@ -111,7 +111,7 @@ class BrightcoveApiClient(BaseApiClient):
         if headers is not None:
             headers_.update(headers)
 
-        resp = requests.post(url, data=payload.encode('utf-8'), headers=headers_)
+        resp = requests.post(url, data=payload, headers=headers_)
         if resp.status_code in (200, 201):
             return resp.json()
         elif resp.status_code == 401 and can_retry:
@@ -122,23 +122,25 @@ class BrightcoveApiClient(BaseApiClient):
 
 
 class BrightcoveHlsMixin(object):
-    HLS_DI_PROFILE = {
-        'name': 'Open edX Video XBlock HLS ingest profile',
-        'short_name': 'auto_quality',
-        'path': '../static/json/brightcove-ingest-profile-hlse.tmpl.json',
-        'description': (
-            'This profile is used by Open edX Video XBlock to enable auto-quality feature. '
-            'Uploaded {:%Y-%m-%d %H:%M}'.format(datetime.now())
-        )
-    }
-    HLSE_DI_PROFILE = {
-        'name': 'Open edX Video XBlock HLS with encryption ingest profile',
-        'short_name': 'encryption',
-        'path': '../static/json/brightcove-ingest-profile-hlse.tmpl.json',
-        'description': (
-            'This profile is used by Open edX Video XBlock to enable video content protection. '
-            'Uploaded {:%Y-%m-%d %H:%M}'.format(datetime.now())
-        )
+    DI_PROFILES = {
+        'autoquality': {
+            'name': 'Open edX Video XBlock HLS ingest profile',
+            'short_name': 'autoquality',
+            'path': '../static/json/brightcove-ingest-profile-hlse.tmpl.json',
+            'description': (
+                'This profile is used by Open edX Video XBlock to enable auto-quality feature. '
+                'Uploaded {:%Y-%m-%d %H:%M}'.format(datetime.now())
+            )
+        },
+        'encryption': {
+            'name': 'Open edX Video XBlock HLS with encryption ingest profile',
+            'short_name': 'encryption',
+            'path': '../static/json/brightcove-ingest-profile-hlse.tmpl.json',
+            'description': (
+                'This profile is used by Open edX Video XBlock to enable video content protection. '
+                'Uploaded {:%Y-%m-%d %H:%M}'.format(datetime.now())
+            )
+        }
     }
 
     def ensure_ingest_profiles(self, account_id):
@@ -151,11 +153,10 @@ class BrightcoveHlsMixin(object):
 
         existing_profiles = self.get_ingest_profiles(account_id)
         existing_profiles_names = [_['name'] for _ in existing_profiles]
-        if self.HLS_DI_PROFILE['name'] not in existing_profiles_names:
-            import ipdb; ipdb.set_trace()  # breakpoint eb902fc3 //
-            self.upload_ingest_profile(account_id, self.HLS_DI_PROFILE)
-        if self.HLSE_DI_PROFILE['name'] not in existing_profiles_names:
-            self.upload_ingest_profile(account_id, self.HLSE_DI_PROFILE)
+        if self.DI_PROFILES['autoquality']['name'] not in existing_profiles_names:
+            self.upload_ingest_profile(account_id, self.DI_PROFILES['autoquality'])
+        if self.DI_PROFILES['encryption']['name'] not in existing_profiles_names:
+            self.upload_ingest_profile(account_id, self.DI_PROFILES['encryption'])
 
     def get_ingest_profiles(self, account_id):
         url = 'https://ingestion.api.brightcove.com/v1/accounts/{}/profiles'.format(account_id)
@@ -178,25 +179,28 @@ class BrightcoveHlsMixin(object):
         Submit video for re-transcoding via Brightcove's Dynamic Ingestion API.
         profile_type:
             - default - re-transcode using default DI profile;
-            - auto_quality - re-transcode using HLS only profile;
+            - autoquality - re-transcode using HLS only profile;
             - encryption - re-transcode using HLS with encryption profile;
 
         """
 
         url = 'https://ingest.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/ingest-requests'.format(
-            account_id=account, video_id=video_id
+            account_id=account_id, video_id=video_id
         )
-        body = {
+        retranscode_params = {
             'master': {
                 # 'url': url,
                 'use_archived_master': True
             },
-            'profile': '58516bf7e4b0cfe795b834be',
-            'callbacks': ['https://726145ac.ngrok.io/', 'https://requestb.in/1dt4ryh1', ]
+            # 'profile': profile_id,
+            'callbacks': ['https://6da71d31.ngrok.io']
             # Notifications to be expected by callbacks
             # https://docs.brightcove.com/en/video-cloud/di-api/guides/notifications.html
         }
-        res = self.api_client.post(url, headers=headers, json=body)
+        if profile_type != 'default':
+            retranscode_params['profile'] = self.DI_PROFILES[profile_type]['name']
+        res = self.api_client.post(url, json.dumps(retranscode_params))
+        return res
 
     def get_video_renditions(self, account_id, video_id):
         url = 'https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets/renditions'.format(
@@ -220,16 +224,16 @@ class BrightcoveHlsMixin(object):
             'renditions_count': len(renditions),
         }
         hls_renditions_count = sum(_['hls'] is not None for _ in renditions)
-        drm_renditions_count = sum(_['drm'] is not None for _ in renditions)
+        encrypted_renditions_count = sum(_['hls']['encrypted'] for _ in renditions if _['hls'] is not None)
 
         if hls_renditions_count == len(renditions):
             info['auto_quality'] = 'on'
         elif hls_renditions_count > 0:
             info['auto_quality'] = 'partial'
 
-        if drm_renditions_count == len(renditions):
+        if encrypted_renditions_count == len(renditions):
             info['encryption'] = 'on'
-        elif drm_renditions_count > 0:
+        elif encrypted_renditions_count > 0:
             info['encryption'] = 'partial'
 
         return info
@@ -340,6 +344,19 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             return self.get_ingest_profiles(self.xblock.account_id)
         elif suffix == 'ensure_ingest_profiles':
             return self.ensure_ingest_profiles(self.xblock.account_id)
+
+        elif suffix == 'submit_retranscode_default':
+            return self.submit_retranscode_job(
+                self.xblock.account_id, self.media_id(self.xblock.href), 'default'
+            )
+        elif suffix == 'submit_retranscode_autoquality':
+            return self.submit_retranscode_job(
+                self.xblock.account_id, self.media_id(self.xblock.href), 'autoquality'
+            )
+        elif suffix == 'submit_retranscode_encryption':
+            return self.submit_retranscode_job(
+                self.xblock.account_id, self.media_id(self.xblock.href), 'encryption'
+            )
         return {'success': False, 'message': 'Unknown method'}
 
     @staticmethod

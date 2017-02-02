@@ -528,7 +528,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         Helper method to load video player by entry-point label
         """
         player = BaseVideoPlayer.load_class(self.player_name)
-        return player()
+        return player(self)
 
     def _make_field_info(self, field_name, field):
         """

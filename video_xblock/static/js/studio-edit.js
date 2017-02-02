@@ -12,7 +12,9 @@ function StudioEditableXBlock(runtime, element) {
     var loadBackendAdvancedSettings = function loadBackendAdvancedSettings() {
         // var handlerUrl = runtime.handlerUrl(element, 'dispatch', 'get_video_tech_info');
         // var handlerUrl = runtime.handlerUrl(element, 'ui_dispatch', 'get-metadata');
-        var handlerUrl = runtime.handlerUrl(element, 'dispatch', 'ensure_ingest_profiles');
+        // var handlerUrl = runtime.handlerUrl(element, 'dispatch', 'ensure_ingest_profiles');
+        // var handlerUrl = runtime.handlerUrl(element, 'dispatch', 'submit_retranscode_encryption');
+        var handlerUrl = runtime.handlerUrl(element, 'dispatch', 'submit_retranscode_default');
         debugger;
         $.ajax({
             // type: 'GET',
@@ -39,6 +41,10 @@ function StudioEditableXBlock(runtime, element) {
         });
 
     };
+    $('#submit-re-transcode').click(function() {
+        loadBackendAdvancedSettings();
+    }
+    );
 
     $("#settings-tab").ready(function() {
         bcLoadVideoTechInfo();
