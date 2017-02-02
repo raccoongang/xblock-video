@@ -338,7 +338,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             )
         elif suffix == 'create_credentials':
             return self.create_credentials(
-                self.xblock.metadata['token'], self.xblock.account_id
+                self.xblock.token, self.xblock.account_id
             )
         elif suffix == 'get_ingest_profiles':
             return self.get_ingest_profiles(self.xblock.account_id)
@@ -415,12 +415,6 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
                 ]
             message (str): message for a user on default transcripts fetching.
         """
-        # default_transcripts = [{
-        #     'lang': 'lang_code',
-        #     'label': 'lang_label',
-        #     'url': 'transcript_url',
-        # }]
-        # return default_transcripts, 'This is stub method'
         if not self.api_key and self.api_secret:
             raise BrightcoveApiClientError('No API credentials provided')
 

@@ -36,3 +36,6 @@ class DummyPlayer(BaseVideoPlayer):
 
     def authenticate_api(self, **kwargs):  # pylint: disable=unused-argument
         return {}, ''
+
+    def dispatch(self, request, suffix):
+        pass
