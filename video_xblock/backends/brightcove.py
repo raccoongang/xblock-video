@@ -197,9 +197,9 @@ class BrightcoveHlsMixin(object):
             'master': {
                 'use_archived_master': True
             },
-            'callbacks': ['https://6da71d31.ngrok.io']
             # Notifications to be expected by callbacks
             # https://docs.brightcove.com/en/video-cloud/di-api/guides/notifications.html
+            'callbacks': ['https://6da71d31.ngrok.io']
         }
         if profile_type != 'default':
             retranscode_params['profile'] = self.DI_PROFILES[profile_type]['name']
