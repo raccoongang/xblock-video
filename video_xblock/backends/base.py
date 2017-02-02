@@ -21,6 +21,13 @@ from django.template import Template, Context
 html_parser = HTMLParser()  # pylint: disable=invalid-name
 
 
+class VideoXBlockException(Exception):
+    """
+    Video XBlock general exception.
+    """
+    pass
+
+
 class BaseVideoPlayer(Plugin):
     """
     Inherit your video player class from this class
@@ -248,8 +255,10 @@ class BaseVideoPlayer(Plugin):
         lang_code = lang_code[0:2]
         # Check on consistency with the pre-configured ALL_LANGUAGES
         if lang_code not in [language[0] for language in settings.ALL_LANGUAGES]:
-            raise Exception('Not all the languages of transcripts fetched from video platform are '
-                            'consistent with the pre-configured ALL_LANGUAGES')
+            raise VideoXBlockException(
+                'Not all the languages of transcripts fetched from video platform are '
+                'consistent with the pre-configured ALL_LANGUAGES'
+            )
         lang_label = [language[1] for language in settings.ALL_LANGUAGES if language[0] == lang_code][0]
         return lang_code, lang_label
 
