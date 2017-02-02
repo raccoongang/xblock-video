@@ -23,7 +23,7 @@ function StudioEditableXBlock(runtime, element) {
             // type: 'GET',
             type: 'POST',
             url: handlerUrl,
-            data: JSON.stringify({})
+            data: '{}'
         }).success(function(response) {
             $('#brightcove-retranscode-status').html(
                 'Your retranscode request was successfully submitted to Brightcove VideoCloud. ' +
@@ -35,7 +35,7 @@ function StudioEditableXBlock(runtime, element) {
         $.ajax({
             type: 'POST',
             url: runtime.handlerUrl(element, 'dispatch', 'get_video_tech_info'),
-            data: ''
+            data: '{}'
         }).success(function(response) {
             $('#bc-tech-info-renditions').html(response.renditions_count);
             $('#bc-tech-info-autoquality').html(response.auto_quality);

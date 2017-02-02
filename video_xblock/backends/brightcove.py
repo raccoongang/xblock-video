@@ -195,10 +195,8 @@ class BrightcoveHlsMixin(object):
         )
         retranscode_params = {
             'master': {
-                # 'url': url,
                 'use_archived_master': True
             },
-            # 'profile': profile_id,
             'callbacks': ['https://6da71d31.ngrok.io']
             # Notifications to be expected by callbacks
             # https://docs.brightcove.com/en/video-cloud/di-api/guides/notifications.html
