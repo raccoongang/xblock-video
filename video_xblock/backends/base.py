@@ -9,7 +9,6 @@ import abc
 import re
 from HTMLParser import HTMLParser
 import pkg_resources
-import requests
 
 from webob import Response
 from xblock.fragment import Fragment
@@ -23,6 +22,9 @@ html_parser = HTMLParser()  # pylint: disable=invalid-name
 
 
 class ApiClientError(Exception):
+    """
+    Base API client exception
+    """
     pass
 
 

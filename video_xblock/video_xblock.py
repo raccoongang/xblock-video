@@ -619,7 +619,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         return self.get_player().dispatch(request, suffix)
 
     @XBlock.handler
-    def ui_dispatch(self, request, suffix):
+    def ui_dispatch(self, _request, suffix):
         """
         Dispatcher for a requests sent by dynamic Front-end components.
 

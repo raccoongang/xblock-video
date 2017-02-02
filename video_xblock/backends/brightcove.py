@@ -5,16 +5,18 @@ Brightcove Video player plugin
 import re
 import base64
 import json
-import requests
-
 from datetime import datetime
 
+import requests
 from xblock.fragment import Fragment
 
 from video_xblock.backends.base import ApiClientError, BaseVideoPlayer, BaseApiClient
 
 
 class BrightcoveApiClientError(ApiClientError):
+    """
+    Brightcove specific api client errors
+    """
     pass
 
 
@@ -76,6 +78,10 @@ class BrightcoveApiClient(BaseApiClient):
         return client_secret, client_id, error_message
 
     def _refresh_access_token(self):
+        """
+        Requests new access token to send with requests to
+        Brightcove's Access Token expires every 5 minutes.
+        """
         url = "https://oauth.brightcove.com/v3/access_token"
         params = {"grant_type": "client_credentials"}
         auth_string = base64.encodestring(
@@ -324,7 +330,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         )
         return frag
 
-    def dispatch(self, request, suffix):
+    def dispatch(self, _request, suffix):
         if not self.api_key and self.api_secret:
             raise BrightcoveApiClientError('No API credentials provided')
 
