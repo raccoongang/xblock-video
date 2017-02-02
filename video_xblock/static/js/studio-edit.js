@@ -8,6 +8,11 @@
 function StudioEditableXBlock(runtime, element) {
     'use strict';
 
+    var fields = [];
+    // Studio includes a copy of tinyMCE and its jQuery plugin
+    var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');  // TODO: Remove TinyMCE
+    var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
+
     /** This function is used for Brightcove HLS debugging
      *  profile: ingest profile to use for re-transcode job.
      *  Accepted values: default, autoquality, encryption.
@@ -18,43 +23,35 @@ function StudioEditableXBlock(runtime, element) {
             // type: 'GET',
             type: 'POST',
             url: handlerUrl,
-            data: JSON.stringify({}),
+            data: JSON.stringify({})
         }).success(function(response) {
             $('#brightcove-retranscode-status').html(
-                "Your retranscode request was successfully submitted to Brightcove VideoCloud. " +
-                "It takes few minutes to process it. Job id " + response.id);
+                'Your retranscode request was successfully submitted to Brightcove VideoCloud. ' +
+                'It takes few minutes to process it. Job id ' + response.id);
         });
-
     };
+
     var bcLoadVideoTechInfo = function bcLoadVideoTechInfo() {
         $.ajax({
-            // type: 'GET',
             type: 'POST',
             url: runtime.handlerUrl(element, 'dispatch', 'get_video_tech_info'),
-            data: JSON.stringify({}),
-            // dataType: 'json',
-            // global: false,  // Disable Studio's error handling that conflicts with studio's notify('save') and notify('cancel') :-/
+            data: ''
         }).success(function(response) {
             $('#bc-tech-info-renditions').html(response.renditions_count);
             $('#bc-tech-info-autoquality').html(response.auto_quality);
             $('#bc-tech-info-encryption').html(response.encryption);
         });
-
     };
+
     $('#submit-re-transcode').click(function() {
-        var profile = $("#xb-field-edit-retranscode-options").val();
+        var profile = $('#xb-field-edit-retranscode-options').val();
         submitBCReTranscode(profile);
     }
     );
 
-    $("#settings-tab").ready(function() {
+    $('#settings-tab').ready(function() {
         bcLoadVideoTechInfo();
     });
-
-    var fields = [];
-    // Studio includes a copy of tinyMCE and its jQuery plugin
-    var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');
-    var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
 
     $(element).find('.field-data-control').each(function() {
         var $field = $(this);
