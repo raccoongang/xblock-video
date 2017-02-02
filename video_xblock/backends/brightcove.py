@@ -402,8 +402,8 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         Reports to UI if it can show backend specific advanced settings.
         """
         can_show = bool(
-            self.xblock.metadata.get('client_id')
-            and self.xblock.metadata.get('client_secret')
+            self.xblock.metadata.get('client_id') and
+            self.xblock.metadata.get('client_secret')
         )
         return {'canShow': can_show}
 
