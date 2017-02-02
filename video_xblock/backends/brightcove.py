@@ -126,7 +126,7 @@ class BrightcoveHlsMixin(object):
         'autoquality': {
             'name': 'Open edX Video XBlock HLS ingest profile',
             'short_name': 'autoquality',
-            'path': '../static/json/brightcove-ingest-profile-hlse.tmpl.json',
+            'path': '../static/json/brightcove-ingest-profile-hls.tmpl.json',
             'description': (
                 'This profile is used by Open edX Video XBlock to enable auto-quality feature. '
                 'Uploaded {:%Y-%m-%d %H:%M}'.format(datetime.now())

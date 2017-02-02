@@ -8,23 +8,21 @@
 function StudioEditableXBlock(runtime, element) {
     'use strict';
 
-    /** This function is used for Brightcove HLS debugging */
-    var loadBackendAdvancedSettings = function loadBackendAdvancedSettings() {
-        // var handlerUrl = runtime.handlerUrl(element, 'dispatch', 'get_video_tech_info');
-        // var handlerUrl = runtime.handlerUrl(element, 'ui_dispatch', 'get-metadata');
-        // var handlerUrl = runtime.handlerUrl(element, 'dispatch', 'ensure_ingest_profiles');
-        // var handlerUrl = runtime.handlerUrl(element, 'dispatch', 'submit_retranscode_encryption');
-        var handlerUrl = runtime.handlerUrl(element, 'dispatch', 'submit_retranscode_default');
-        debugger;
+    /** This function is used for Brightcove HLS debugging
+     *  profile: ingest profile to use for re-transcode job.
+     *  Accepted values: default, autoquality, encryption.
+     */
+    var submitBCReTranscode = function submitBCReTranscode(profile) {
+        var handlerUrl = runtime.handlerUrl(element, 'dispatch', 'submit_retranscode_' + profile);
         $.ajax({
             // type: 'GET',
             type: 'POST',
             url: handlerUrl,
             data: JSON.stringify({}),
-            // dataType: 'json',
-            // global: false,  // Disable Studio's error handling that conflicts with studio's notify('save') and notify('cancel') :-/
         }).success(function(response) {
-            $('#backend-advanced-settings').html(JSON.stringify(response));
+            $('#brightcove-retranscode-status').html(
+                "Your retranscode request was successfully submitted to Brightcove VideoCloud. " +
+                "It takes few minutes to process it. Job id " + response.id);
         });
 
     };
@@ -37,12 +35,15 @@ function StudioEditableXBlock(runtime, element) {
             // dataType: 'json',
             // global: false,  // Disable Studio's error handling that conflicts with studio's notify('save') and notify('cancel') :-/
         }).success(function(response) {
-            $('#brightcove-video-tech-info').html(JSON.stringify(response));
+            $('#bc-tech-info-renditions').html(response.renditions_count);
+            $('#bc-tech-info-autoquality').html(response.auto_quality);
+            $('#bc-tech-info-encryption').html(response.encryption);
         });
 
     };
     $('#submit-re-transcode').click(function() {
-        loadBackendAdvancedSettings();
+        var profile = $("#xb-field-edit-retranscode-options").val();
+        submitBCReTranscode(profile);
     }
     );
 
