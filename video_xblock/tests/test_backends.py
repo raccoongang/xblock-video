@@ -4,9 +4,15 @@ Test cases for video_xblock backends.
 import unittest
 from ddt import ddt, data, unpack
 from django.test.utils import override_settings
+from xblock.core import XBlock
 from video_xblock.backends.base import BaseVideoPlayer, VideoXBlockException
 from video_xblock.settings import ALL_LANGUAGES
 from video_xblock.utils import ugettext as _
+from video_xblock.backends import (
+    brightcove,
+    wistia,
+    youtube
+)
 
 
 # pylint: disable=abstract-class-instantiated
@@ -87,3 +93,35 @@ class TestAbstractBaseBackend(unittest.TestCase):
         default_transcripts = [{'lang': 'en'}, {'lang': 'ru'}, {'lang': 'uk'}]
         res = BaseVideoPlayer.filter_default_transcripts(default_transcripts, transcripts)
         self.assertEqual(res, default)
+
+
+@ddt
+class TestCustomBackends(unittest.TestCase):
+    """
+    Unit tests for custom video xblock backends.
+    """
+    backends = ['youtube', 'brightcove', 'wistia']
+
+    def setUp(self):
+        super(TestCustomBackends, self).setUp()
+
+    @XBlock.register_temp_plugin(brightcove.BrightcovePlayer, 'brightcove')
+    @XBlock.register_temp_plugin(wistia.WistiaPlayer, 'wistia')
+    @XBlock.register_temp_plugin(youtube.YoutubePlayer, 'youtube')
+    @data(
+        *zip(
+            backends,
+            [
+                'https://www.youtube.com/watch?v=VXJhzACm63Q',
+                'https://studio.brightcove.com/products/videocloud/media/videos/45263567468485',
+                'https://wi.st/medias/HRrr784kH8932Z'
+            ],
+            ['VXJhzACm63Q', '45263567468485', 'HRrr784kH8932Z']
+        )
+    )
+    @unpack
+    def test_media_id(self, player_name, url, media_id):
+        player = XBlock.load_class(player_name)
+
+        res = player().media_id(url)
+        self.assertEqual(res, media_id)
