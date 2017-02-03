@@ -16,5 +16,9 @@ quality-py:
 quality-js:
 	eslint video_xblock/static/js/
 
+deps:
+	pip install -r requirements.txt
+	bower install
+
 package:
 	echo "Here be static dependencies packaging"
