@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/raccoongang/xblock-video.svg?branch=dev)](https://travis-ci.org/raccoongang/xblock-video)
+[![Coverage Status](https://coveralls.io/repos/github/raccoongang/xblock-video/badge.svg?branch=dev)](https://coveralls.io/github/raccoongang/xblock-video?branch=dev)
+
 # xblock-video
 XBlock to embed videos hosted on different video platform into your courses.
 
@@ -30,6 +33,24 @@ settings:
 ## Usage
 
 TODO
+
+## Development
+
+Install dependencies and development tools:
+```shell
+> pip install -r requirements.txt
+> pip install -r test_requirements.txt
+> npm install "eslint@^2.12.0" eslint-config-edx "eslint-plugin-dollar-sign@0.0.5" "eslint-plugin-import@^1.9.2"
+```
+
+Run quality checks:
+```shell
+> make quality
+```
+Run tests:
+```shell
+> make test
+```
 
 ## License
 
