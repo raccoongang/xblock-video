@@ -102,12 +102,20 @@ class TestCustomBackends(unittest.TestCase):
     """
     backends = ['youtube', 'brightcove', 'wistia']
 
-    def setUp(self):
-        super(TestCustomBackends, self).setUp()
-
     @XBlock.register_temp_plugin(brightcove.BrightcovePlayer, 'brightcove')
     @XBlock.register_temp_plugin(wistia.WistiaPlayer, 'wistia')
     @XBlock.register_temp_plugin(youtube.YoutubePlayer, 'youtube')
+    def setUp(self):
+        self.player = {}
+        for backend in self.backends:
+            player_class = XBlock.load_class(backend)
+            player_instance = XBlock.load_class(backend)()
+            self.player[backend] = {
+                'class': player_class,
+                'instance': player_instance
+            }
+        super(TestCustomBackends, self).setUp()
+
     @data(
         *zip(
             backends,
@@ -120,8 +128,6 @@ class TestCustomBackends(unittest.TestCase):
         )
     )
     @unpack
-    def test_media_id(self, player_name, url, media_id):
-        player = XBlock.load_class(player_name)
-
-        res = player().media_id(url)
+    def test_media_id(self, backend, url, media_id):
+        res = self.player[backend]['instance'].media_id(url)
         self.assertEqual(res, media_id)
