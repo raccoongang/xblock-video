@@ -224,7 +224,7 @@ class BrightcoveHlsMixin(object):
             retranscode_params['profile'] = self.DI_PROFILES[profile_type]['name']
         res = self.api_client.post(url, json.dumps(retranscode_params))
         self.xblock.metadata['retranscode-status'] = (
-            'ReTranscode request submitted {:%Y-%m-%d %H:%M} using profile "{}". Job id: {}'.format(
+            'ReTranscode request submitted {:%Y-%m-%d %H:%M} UTC using profile "{}". Job id: {}'.format(
                 datetime.utcnow(), retranscode_params.get('profile', 'default'), res['id']))
         return res
 
@@ -284,7 +284,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
     # Docs on captions: https://docs.brightcove.com/en/video-cloud/cms-api/guides/webvtt.html
     # Docs on auth: https://docs.brightcove.com/en/video-cloud/oauth-api/getting-started/oauth-api-overview.html
     captions_api = {
-        'url': 'cms.api.brightcove.com/v1/accounts/{account_id}/videos/{media_id}',
+        'url': 'https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{media_id}',
         'authorised_request_header': {
             'Authorization': 'Bearer {access_token}'
         },
@@ -468,7 +468,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
 
         video_id = kwargs.get('video_id')
         account_id = kwargs.get('account_id')
-        url = 'https://' + self.captions_api['url'].format(account_id=account_id, media_id=video_id)
+        url = self.captions_api['url'].format(account_id=account_id, media_id=video_id)
         default_transcripts = []
         message = ''
         # Fetch available transcripts' languages and urls if authentication succeeded.
