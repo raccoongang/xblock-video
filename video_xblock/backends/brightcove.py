@@ -262,6 +262,9 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         }
     }
 
+    # Stores default transcripts fetched from the captions API
+    default_transcripts = []
+
     def __init__(self, xblock):
         super(BrightcovePlayer, self).__init__(xblock)
         self.api_key = xblock.metadata.get('client_id')
@@ -449,6 +452,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
                     'url': transcript_url,
                 }
                 default_transcripts.append(default_transcript)
+                self.default_transcripts.append(default_transcript)
         else:
             try:
                 message = str(text[0].get('message'))
@@ -456,8 +460,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
                 message = 'No timed transcript may be fetched from a video platform. '
         return default_transcripts, message
 
-    def download_default_transcript(self, url):  # pylint: disable=unused-argument
-        # TODO: implement
+    def download_default_transcript(self, language_code=None, url=None):  # pylint: disable=unused-argument
         """
         Downloads default transcript from a video platform API in WebVVT format.
 
@@ -466,4 +469,5 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         Returns:
             unicode: Transcripts in WebVTT format.
         """
-        return u''
+        data = requests.get(url)
+        return unicode(data.content)

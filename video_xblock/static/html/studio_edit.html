@@ -174,13 +174,15 @@
                         <div class="default-transcripts-actions">
                           <a class="default-transcripts-action-link upload-default-transcript"
                              data-change-field-name="{{ field.name }}"
-                             data-lang-code="{{ default_transcript.code }}"
+                             data-lang-code="{{ default_transcript.lang }}"
                              data-lang-label="{{ default_transcript.label }}"
                              data-download-url="{{ default_transcript.url }}" >
                             {% trans "Upload" %}
                           </a>
                         </div>
                       </div>
+                      <div class="api-request upload-default-transcript {{ default_transcript.lang }} status-error"></div>
+                      <div class="api-request upload-default-transcript {{ default_transcript.lang }} status-success"></div>
                     {% endfor %}
                 {% else %}
                   <div class="default-transcripts-status status-error">
@@ -210,8 +212,8 @@
                       <span aria-hidden="true"></span>{% trans "Connect to video platform" %}<span class="sr"></span>
                     </button>
                   </div>
-                  <div class="api-authenticate status-error"></div>
-                  <div class="api-authenticate status-success"></div>
+                  <div class="api-request authenticate status-error"></div>
+                  <div class="api-request authenticate status-success"></div>
               </div>
               <div id="backend-advanced-settings"></div>
               <div id="brightcove-video-tech-info"></div>

@@ -10,6 +10,7 @@ import logging
 import os
 import pkg_resources
 import requests
+import mimetypes
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Boolean, Float, String, Dict
@@ -17,9 +18,13 @@ from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
+from xmodule.contentstore.django import contentstore
+from xmodule.contentstore.content import StaticContent
+
 from django.template import Template, Context
 from pycaption import detect_format, WebVTTWriter
 from webob import Response
+from functools import partial
 
 from .backends.base import BaseVideoPlayer, html_parser
 from .settings import ALL_LANGUAGES
@@ -46,7 +51,6 @@ class TranscriptsMixin(XBlock):
         Returns:
             unicode: Transcripts converted into WebVTT format.
         """
-
         reader = detect_format(caps)
         if reader:
             return WebVTTWriter().write(reader().read(caps))
@@ -400,16 +404,16 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         # since it is needed for the auth status message generation and the player's state update with auth status.
         auth_data, auth_error_message = self.authenticate_video_api()  # pylint: disable=unused-variable
 
-        # Fetch captions list (available/default transcripts list) from video platform API
+        # Prepare parameters necessary to make requests to API.
         video_id = player.media_id(self.href)
-        # Store parameters necessary to make requests to API.
         kwargs = {'video_id': video_id}
         for k in self.metadata:
             kwargs[k] = self.metadata[k]
         # For a Brightcove player only
         if self.account_id is not self.fields['account_id'].default:  # pylint: disable=unsubscriptable-object
             kwargs['account_id'] = self.account_id
-
+        # Fetch captions list (available/default transcripts list) from video platform API
+        # TODO use player.default_transcripts
         self.default_transcripts, transcripts_autoupload_message = player.get_default_transcripts(**kwargs)
         # Exclude enabled transcripts (fetched from video xblock) from the list of available ones.
         self.default_transcripts = player.filter_default_transcripts(self.default_transcripts, transcripts)
@@ -647,7 +651,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             auth_data (dict): tokens and credentials, necessary to perform authorised API requests.
         """
 
-        # TODO consider: move auth fields validation and kwargs population to specific backends
+        # TODO move auth fields validation and kwargs population to specific backends
         # Handles a case where no token was provided by a user
         if self.token == self.fields['token'].default and str(self.player_name) != 'youtube-player':  # pylint: disable=unsubscriptable-object
             error_message = 'In order to authenticate to a video platform\'s API, please provide a Video API Token.'
@@ -720,3 +724,49 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             self.metadata['access_token'] = ''   # Brightcove API
             self.metadata['client_id'] = ''      # Brightcove API
             self.metadata['client_secret'] = ''  # Brightcove API
+
+    @XBlock.json_handler
+    def upload_default_transcript_handler(self, data, suffix=''):  # pylint: disable=unused-argument
+        """
+        Function for uploading a transcript fetched a video platform's API to video xblock.
+
+        """
+        lang_code = str(data.get(u'lang'))
+        lang_label = str(data.get(u'label'))
+        sub_url = str(data.get(u'url'))
+        reference_name = lang_code.encode('utf8')
+
+        # Fetch default transcript
+        player = self.get_player()
+        # TODO get rid of &nbsp;  at the end of sub_unicode and sub  (Youtube...)
+        sub_unicode = player.download_default_transcript(url=sub_url, language_code=lang_code)
+
+        # Convert unicode sub to WTT unicode sub
+        sub = self.convert_caps_to_vtt(caps=sub_unicode)
+
+        # Define location of default transcript as a future asset and prepare content to store in assets
+        # TODO add name fetched from api url (different for each backend)
+        ext = '.vtt'
+        file_name = reference_name.replace(" ", "_") + ext
+        course_key = self.location.course_key  # pylint: disable=no-member
+        content_loc = StaticContent.compute_location(course_key, file_name)  # AssetLocator object
+        sc_partial = partial(StaticContent, content_loc, file_name, 'application/json')
+        content = sc_partial(sub)  # StaticContent object
+        external_url = '/' + str(content_loc)
+
+        # Commit the content
+        # TODO add additional checks before saving to contenstore as per the reference https://git.io/vDnBN
+        content._data = content.data.encode('UTF-8')
+        contentstore().save(content)
+
+        # Exceptions are handled on the frontend
+        success_message = 'Successfully uploaded "{file_name}". ' \
+                          'Please press Save button to enable a transcript in {language}'.\
+            format(file_name=file_name, language=lang_label)
+        response = {
+            'success_message': success_message,
+            'lang': lang_code,
+            'url': external_url,
+            'label': lang_label
+        }
+        return response

@@ -261,11 +261,13 @@ function StudioEditableXBlock(runtime, element) {
     var transcriptsValue = [];
     var disabledLanguages = [];
     var $fileUploader = $('.input-file-uploader', element);
+    var $defaultTranscriptUploader = $('.upload-default-transcript', element);
     var $langChoiceItem = $('.language-transcript-selector', element);
     var $videoApiAuthenticator = $('#video-api-authenticate', element);
     var gotTranscriptsValue = $('input[data-field-name="transcripts"]').val();
     var downloadTranscriptHandlerUrl = runtime.handlerUrl(element, 'download_transcript');
     var authenticateVideoApiHandlerUrl = runtime.handlerUrl(element, 'authenticate_video_api_handler');
+    var uploadDefaultTranscriptHandlerUrl = runtime.handlerUrl(element, 'upload_default_transcript_handler');
 
     if (gotTranscriptsValue){
         transcriptsValue = JSON.parse(gotTranscriptsValue);
@@ -275,7 +277,7 @@ function StudioEditableXBlock(runtime, element) {
         disabledLanguages.push(transcriptValue.lang)
     });
 
-    var showAuthenticateStatus = function(message, type, success_selector, error_selector){
+    var showStatus = function(message, type, success_selector, error_selector){
         if(type==='success'){
             $(error_selector).empty();
             $(success_selector).text(message).show();
@@ -302,29 +304,29 @@ function StudioEditableXBlock(runtime, element) {
                 var error_message = response['error_message'];
                 var success_message = response['success_message'];
                 if(success_message) {
-                    showAuthenticateStatus(
+                    showStatus(
                         success_message,
                         'success',
-                        '.api-authenticate.status-success',
-                        '.api-authenticate.status-error');
+                        '.api-request.authenticate.status-success',
+                        '.api-request.authenticate.status-error');
                 }
                 else if(error_message) {
-                    showAuthenticateStatus(
+                    showStatus(
                         error_message,
                         'error',
-                        '.api-authenticate.status-success',
-                        '.api-authenticate.status-error');
+                        '.api-request.authenticate.status-success',
+                        '.api-request.authenticate.status-error');
                 }
             }
         })
         .fail(function(jqXHR) {
             var message = gettext('This may be happening because of an error with our server or your ' +
                 'internet connection. Try refreshing the page or making sure you are online.');
-            showAuthenticateStatus(
+            showStatus(
                 message,
                 'error',
-                '.api-authenticate.status-success',
-                '.api-authenticate.status-error'
+                '.api-request.authenticate.status-success',
+                '.api-request.authenticate.status-error'
             );
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
                 try {
@@ -333,20 +335,20 @@ function StudioEditableXBlock(runtime, element) {
                         // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
                         message = $.map(message.messages, function(msg) { return msg.text; }).join(", ");
                         // TODO consider if it is worthwhile to show this message to a user
-                        showAuthenticateStatus(
+                        showStatus(
                             message,
                             'error',
-                            '.api-authenticate.status-success',
-                            '.api-authenticate.status-error'
+                            '.api-request.status-success',
+                            '.api-request.status-error'
                         );                   }
                 } catch (error) {
                     message = jqXHR.responseText.substr(0, 300);
                     // TODO consider if it is worthwhile to show this message to a user
-                    showAuthenticateStatus(
+                    showStatus(
                         message,
                         'error',
-                        '.api-authenticate.status-success',
-                        '.api-authenticate.status-error'
+                        '.api-request.status-success',
+                        '.api-request.status-error'
                     );
                 }
             }
@@ -419,6 +421,83 @@ function StudioEditableXBlock(runtime, element) {
 
         $fileUploader.click();
     };
+
+    function uploadDefaultTranscripts(data) {
+        $.ajax({
+            type: "POST",
+            url: uploadDefaultTranscriptHandlerUrl,
+            data: JSON.stringify(data),
+            dataType: 'json',
+            success: function(response) {
+                var new_lang = response['lang'];
+                var new_label = response['label'];
+                var new_url = response['url'];
+                pushTranscript(new_lang, new_label, new_url, '');
+                pushTranscriptsValue();
+                var error_message = response['error_message'];
+                var success_message = response['success_message'];
+                if(success_message) {
+                    showStatus(
+                        success_message,
+                        'success',
+                        '.api-request.upload-default-transcript.' + new_lang + '.status-success',
+                        '.api-request.upload-default-transcript.' + new_lang + '.status-error');
+                }
+                else if(error_message) {
+                    showStatus(
+                        error_message,
+                        'error',
+                        '.api-request.upload-default-transcript.' + new_lang + '.status-success',
+                        '.api-request.upload-default-transcript.' + new_lang + '.status-error');
+                }
+            }
+        })
+        .fail(function(jqXHR) {
+            var message = gettext('This may be happening because of an error with our server or your ' +
+                'internet connection. Try refreshing the page or making sure you are online.');
+            showStatus(
+                message,
+                'error',
+                '.api-request.status-success',
+                '.api-request.status-error'
+            );
+            if (jqXHR.responseText) { // Is there a more specific error message we can show?
+                try {
+                    message = JSON.parse(jqXHR.responseText).error;
+                    if (typeof message === 'object' && message.messages) {
+                        // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
+                        message = $.map(message.messages, function(msg) { return msg.text; }).join(", ");
+                        // TODO consider if it is worthwhile to show this message to a user
+                        showStatus(
+                            message,
+                            'error',
+                            '.api-request.status-success',
+                            '.api-request.status-error'
+                        );                   }
+                } catch (error) {
+                    message = jqXHR.responseText.substr(0, 300);
+                    // TODO consider if it is worthwhile to show this message to a user
+                    showStatus(
+                        message,
+                        'error',
+                        '.api-request.status-success',
+                        '.api-request.status-error'
+                    );
+                }
+            }
+            runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
+        });
+    }
+
+    $defaultTranscriptUploader.on('click', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var lang_code = $(event.currentTarget).attr('data-lang-code');
+        var label = $(event.currentTarget).attr('data-lang-label');
+        var url = $(event.currentTarget).attr('data-download-url');
+        var data = {'lang':lang_code, 'label':label, 'url':url}
+        uploadDefaultTranscripts(data);
+    });
 
     var languageChecker = function (event) {
         event.stopPropagation();
@@ -500,7 +579,9 @@ function StudioEditableXBlock(runtime, element) {
     };
 
     var successHandler = function(response, statusText, xhr, fieldName, lang, label, currentLiTag) {
+        console.log('============================ response ====================' + response);
         var url = '/' + response['asset']['id'];
+        console.log('============================ url ====================' + url);
         var regExp = /.*@(.+\..+)/;
         var filename = regExp.exec(url)[1];
         var downloadUrl = downloadTranscriptHandlerUrl + '?' + url;

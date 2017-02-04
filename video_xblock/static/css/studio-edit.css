@@ -198,11 +198,11 @@
     min-width: 240px;
 }
 
-.api-authenticate.status-success {
+.api-request.status-success {
     color: #51c67b;
 }
 
-.api-authenticate.status-error {
+.api-request.status-error {
     color: #b20610;
 }
 
