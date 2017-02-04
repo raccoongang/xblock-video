@@ -10,7 +10,6 @@ import logging
 import os
 import pkg_resources
 import requests
-import mimetypes
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Boolean, Float, String, Dict

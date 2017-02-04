@@ -268,6 +268,7 @@ function StudioEditableXBlock(runtime, element) {
     var downloadTranscriptHandlerUrl = runtime.handlerUrl(element, 'download_transcript');
     var authenticateVideoApiHandlerUrl = runtime.handlerUrl(element, 'authenticate_video_api_handler');
     var uploadDefaultTranscriptHandlerUrl = runtime.handlerUrl(element, 'upload_default_transcript_handler');
+    var language_code;
 
     if (gotTranscriptsValue){
         transcriptsValue = JSON.parse(gotTranscriptsValue);
@@ -334,7 +335,6 @@ function StudioEditableXBlock(runtime, element) {
                     if (typeof message === 'object' && message.messages) {
                         // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
                         message = $.map(message.messages, function(msg) { return msg.text; }).join(", ");
-                        // TODO consider if it is worthwhile to show this message to a user
                         showStatus(
                             message,
                             'error',
@@ -343,7 +343,6 @@ function StudioEditableXBlock(runtime, element) {
                         );                   }
                 } catch (error) {
                     message = jqXHR.responseText.substr(0, 300);
-                    // TODO consider if it is worthwhile to show this message to a user
                     showStatus(
                         message,
                         'error',
@@ -352,7 +351,7 @@ function StudioEditableXBlock(runtime, element) {
                     );
                 }
             }
-            runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
+            // runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
         });
     }
 
@@ -443,13 +442,6 @@ function StudioEditableXBlock(runtime, element) {
                         '.api-request.upload-default-transcript.' + new_lang + '.status-success',
                         '.api-request.upload-default-transcript.' + new_lang + '.status-error');
                 }
-                else if(error_message) {
-                    showStatus(
-                        error_message,
-                        'error',
-                        '.api-request.upload-default-transcript.' + new_lang + '.status-success',
-                        '.api-request.upload-default-transcript.' + new_lang + '.status-error');
-                }
             }
         })
         .fail(function(jqXHR) {
@@ -458,8 +450,8 @@ function StudioEditableXBlock(runtime, element) {
             showStatus(
                 message,
                 'error',
-                '.api-request.status-success',
-                '.api-request.status-error'
+                '.api-request.upload-default-transcript.' + language_code + '.status-success',
+                '.api-request.upload-default-transcript.' + language_code + '.status-error'
             );
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
                 try {
@@ -467,7 +459,6 @@ function StudioEditableXBlock(runtime, element) {
                     if (typeof message === 'object' && message.messages) {
                         // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
                         message = $.map(message.messages, function(msg) { return msg.text; }).join(", ");
-                        // TODO consider if it is worthwhile to show this message to a user
                         showStatus(
                             message,
                             'error',
@@ -476,16 +467,15 @@ function StudioEditableXBlock(runtime, element) {
                         );                   }
                 } catch (error) {
                     message = jqXHR.responseText.substr(0, 300);
-                    // TODO consider if it is worthwhile to show this message to a user
                     showStatus(
                         message,
                         'error',
-                        '.api-request.status-success',
-                        '.api-request.status-error'
+                        '.api-request.upload-default-transcript.' + language_code + '.status-success',
+                        '.api-request.upload-default-transcript.' + language_code + '.status-error'
                     );
                 }
             }
-            runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
+            // runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
         });
     }
 
@@ -495,6 +485,7 @@ function StudioEditableXBlock(runtime, element) {
         var lang_code = $(event.currentTarget).attr('data-lang-code');
         var label = $(event.currentTarget).attr('data-lang-label');
         var url = $(event.currentTarget).attr('data-download-url');
+        language_code = lang_code;
         var data = {'lang':lang_code, 'label':label, 'url':url}
         uploadDefaultTranscripts(data);
     });
@@ -579,9 +570,7 @@ function StudioEditableXBlock(runtime, element) {
     };
 
     var successHandler = function(response, statusText, xhr, fieldName, lang, label, currentLiTag) {
-        console.log('============================ response ====================' + response);
         var url = '/' + response['asset']['id'];
-        console.log('============================ url ====================' + url);
         var regExp = /.*@(.+\..+)/;
         var filename = regExp.exec(url)[1];
         var downloadUrl = downloadTranscriptHandlerUrl + '?' + url;
