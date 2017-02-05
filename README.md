@@ -7,7 +7,7 @@ XBlock to embed videos hosted on different video platform into your courses.
 
 ## Installation
 
-```bash
+```shell
 sudo -sHu edxapp
 source ~/edxapp_env
 # Clone and install xblock
