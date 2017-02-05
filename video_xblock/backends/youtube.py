@@ -114,12 +114,13 @@ class YoutubePlayer(BaseVideoPlayer):
         Arguments:
             video_id (str): media id fetched from href field of studio-edit modal.
         Returns:
-            list: List of pairs of codes and labels of captions' languages fetched from API,
+            available_languages (list): List of pairs of codes and labels of captions' languages fetched from API,
                 together with transcripts' names if any.
                 If the transcript name is not empty on youtube server we have to pass
                 name param in url in order to get transcript.
                 Example: http://video.google.com/timedtext?lang=en&v={video_id}&name={transcript_name}
                 Reference: https://git.io/vMoCA
+            message (str): Message with status on captions API call.
         """
         utf8_parser = etree.XMLParser(encoding='utf-8')
         # This is to update self.captions_api with a video id.

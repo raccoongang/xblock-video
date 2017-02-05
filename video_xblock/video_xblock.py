@@ -730,18 +730,16 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         Function for uploading a transcript fetched a video platform's API to video xblock.
 
         """
+        player = self.get_player()
+        video_id = player.media_id(self.href)
         lang_code = str(data.get(u'lang'))
         lang_label = str(data.get(u'label'))
         sub_url = str(data.get(u'url'))
-        # TODO add name fetched from api url (different for each backend); to be stored in player.default_transcripts
-        reference_name = lang_code.encode('utf8')
+        # File name format is <language label>_captions_video_<video_id>, e.g. "English_captions_video_456g68"
+        reference_name = "{}_captions_video_{}".format(lang_label, video_id).encode('utf8')
 
         # Fetch default transcript
-        player = self.get_player()
-        # TODO get rid of &nbsp;  at the end of sub_unicode and sub  (Youtube...)
         sub_unicode = player.download_default_transcript(url=sub_url, language_code=lang_code)
-
-        # Convert unicode sub to WTT unicode sub
         sub = self.convert_caps_to_vtt(caps=sub_unicode)
 
         # Define location of default transcript as a future asset and prepare content to store in assets
