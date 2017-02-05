@@ -733,6 +733,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         lang_code = str(data.get(u'lang'))
         lang_label = str(data.get(u'label'))
         sub_url = str(data.get(u'url'))
+        # TODO add name fetched from api url (different for each backend); to be stored in player.default_transcripts
         reference_name = lang_code.encode('utf8')
 
         # Fetch default transcript
@@ -744,7 +745,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         sub = self.convert_caps_to_vtt(caps=sub_unicode)
 
         # Define location of default transcript as a future asset and prepare content to store in assets
-        # TODO add name fetched from api url (different for each backend)
         ext = '.vtt'
         file_name = reference_name.replace(" ", "_") + ext
         course_key = self.location.course_key  # pylint: disable=no-member

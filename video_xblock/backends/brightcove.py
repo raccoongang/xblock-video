@@ -470,4 +470,5 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             unicode: Transcripts in WebVTT format.
         """
         data = requests.get(url)
-        return unicode(data.content)
+        sub = unicode(data.content)
+        return sub

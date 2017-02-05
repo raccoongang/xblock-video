@@ -205,10 +205,40 @@ class WistiaPlayer(BaseVideoPlayer):
             message = "Wistia video {video_id} doesn't exist.".format(video_id=str(video_id))
         return default_transcripts, message
 
+    @staticmethod
+    def format_transcript_text_line(line):
+        """
+        Replaces comma with dot in timings, e.g. 00:00:10,500 should be 00:00:10.500
+
+        """
+        pattern = re.compile(r"\d{2}:\d{2}:\d{2},\d{3}")
+        new_line = u""
+        for token in line.split():
+            if pattern.match(str(token)):
+                token = token.replace(",", ".")
+            new_line += token + u" "
+        return new_line
+
+    def format_transcript_text(self, text):
+        """
+        Prepares unicode transcripts to be converted to WebVTT format.
+
+        """
+        new_text = [
+            self.format_transcript_text_line(line)
+            for line in text[0].splitlines()
+            ]
+        new_text = '\n'.join(new_text)
+        if u"WEBVTT" not in text:
+            text = u"WEBVTT\n\n" + unicode(new_text)
+        else:
+            text = unicode(new_text)
+        return text
+
     def download_default_transcript(self, language_code, url=None):  # pylint: disable=unused-argument
         """
-        Gets default transcript fetched from a video platform API.
-        Though Wistia provides a method for transcript fetching, this is to avoid an API call.
+        Gets default transcript fetched from a video platform API and formats it to WebVTT-like unicode.
+        Though Wistia provides a method for a transcript fetching, this is to avoid an API call.
         References:
             https://wistia.com/doc/data-api#captions_index
             https://wistia.com/doc/data-api#captions_show
@@ -221,12 +251,7 @@ class WistiaPlayer(BaseVideoPlayer):
             for sub in self.default_transcripts
             if sub.get(u'lang') == unicode(language_code)
         ]
-        if text:
-            # TODO: fix timing format in other manner (00:00:10,500   ----->   00:00:10.500)
-            text = u"\nWEBVTT\n\n" + unicode(text[0].replace(',', '.'))
-        else:
-            text = u""
-
+        text = self.format_transcript_text(text) if text else u""
         return text
 
     def dispatch(self, request, suffix):

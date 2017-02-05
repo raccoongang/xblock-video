@@ -178,30 +178,46 @@ class YoutubePlayer(BaseVideoPlayer):
         return default_transcripts, message
 
     @staticmethod
-    def convert_sec_to_caption_format(sec):
+    def format_transcript_timing(sec):
         """
-        Converts seconds to the timestamp of the format `hh:mm:ss:mss`, e.g. 00:00:03.887
+        Converts seconds to timestamp of the format `hh:mm:ss:mss`, e.g. 00:00:03.887
 
         """
         mins, secs = divmod(sec, 60)  # pylint: disable=unused-variable
         hours, mins = divmod(mins, 60)
-
         hours_formatted = str(int(hours)).zfill(2)
         mins_formatted = str(int(mins)).zfill(2)
-        # TODO: handle a case of secs with 3 and more digits, e.g. `00:01:100.765 --> 00:01:104.322`
-        secs_formatted = str("{:.3f}".format(round(sec, 3))).zfill(6)
-
+        secs_formatted = str("{:06.3f}".format(round(secs, 3)))
         timing = "{}:{}:{}".format(
             hours_formatted,
             mins_formatted,
             secs_formatted
         )
-
         return timing
+
+    def format_transcript_element(self, element, i):
+        """
+        Parses XML elements of transcripts, fetched from the YouTube API, and
+        formats elements in order for them to be converted to WebVTT format.
+
+        """
+        sub_element = u"\n\n"
+        if element.tag == "text":
+            start = float(element.get("start"))
+            duration = float(element.get("dur", 0))  # dur is not mandatory
+            text = element.text
+            end = start + duration
+            if text:
+                start = self.format_transcript_timing(start)
+                end = self.format_transcript_timing(end)
+                timing = '{} --> {}'.format(start, end)
+                text = text.replace('\n', ' ')
+                sub_element = unicode(i) + u'\n' + unicode(timing) + u'\n' + unicode(text) + u'\n\n'
+        return sub_element
 
     def download_default_transcript(self, url, language_code=None):
         """
-        Downloads default transcript from Youtube API and convert to WebVTT-like unicode.
+        Downloads default transcript from Youtube API and formats it to WebVTT-like unicode.
 
         References:
             https://git.io/vMK6W
@@ -210,31 +226,13 @@ class YoutubePlayer(BaseVideoPlayer):
         """
         utf8_parser = etree.XMLParser(encoding='utf-8')
         data = requests.get(url)
-        sub = u"\nWEBVTT\n\n"
-        sub_starts, sub_ends, sub_texts = [], [], []
         xmltree = etree.fromstring(data.content, parser=utf8_parser)
-
-        for element in xmltree:
-            if element.tag == "text":
-                start = float(element.get("start"))
-                duration = float(element.get("dur", 0))  # dur is not mandatory
-                text = element.text
-                end = start + duration
-                if text:
-                    start = self.convert_sec_to_caption_format(start)
-                    sub_starts.append(start)
-                    end = self.convert_sec_to_caption_format(end)
-                    sub_ends.append(end)
-                    sub_texts.append(text.replace('\n', ' '))
-
-        sub_dict = {'start': sub_starts, 'end': sub_ends, 'text': sub_texts}
-        for i, el in enumerate(sub_dict['text'], 1):  # pylint: disable=unused-variable
-            start = sub_dict['start'][i-1]
-            end = sub_dict['end'][i-1]
-            timing = '{} --> {}'.format(start, end)
-            text = sub_dict['text'][i-1]
-            sub_element = unicode(i) + u'\n' + unicode(timing) + u'\n' + unicode(text) + u'\n\n'
-            sub += sub_element
+        sub = [
+            self.format_transcript_element(element, i)
+            for i, element in enumerate(xmltree, 1)
+        ]
+        sub = "".join(sub)
+        sub = u"WEBVTT\n\n" + unicode(sub) if "WEBVTT" not in sub else unicode(sub)
         return sub
 
     def dispatch(self, request, suffix):
