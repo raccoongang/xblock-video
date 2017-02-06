@@ -162,7 +162,6 @@
                           <a href="#" class="default-transcripts-action-link remove-default-transcript"
                              data-lang-code="{{ transcript.lang }}"
                              data-lang-label="{{ transcript.label }}"
-                             data-download-url=""
                           >
                             {% trans "Delete" %}
                           </a>
@@ -177,12 +176,11 @@
                   <a href="#" class="default-transcripts-action-link download-transcript download-setting">
                     {% trans "Download" %}
                   </a>
-                  <!-- href below will be updated with {{ transcript.url }} -->
+                  <!-- href below is to be updated with {{ transcript.url }} -->
                   <a href="{{ download_transcript_handler_url }}?"
                      class="default-transcripts-action-link remove-default-transcript"
                      data-lang-code=""
                      data-lang-label=""
-                     data-download-url=""
                   >
                     {% trans "Delete" %}
                   </a>
