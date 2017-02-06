@@ -412,8 +412,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         if self.account_id is not self.fields['account_id'].default:  # pylint: disable=unsubscriptable-object
             kwargs['account_id'] = self.account_id
         # Fetch captions list (available/default transcripts list) from video platform API
-        # TODO use player.default_transcripts
         self.default_transcripts, transcripts_autoupload_message = player.get_default_transcripts(**kwargs)
+        # Needed for frontend
+        initial_default_transcripts = self.default_transcripts
         # Exclude enabled transcripts (fetched from video xblock) from the list of available ones.
         self.default_transcripts = player.filter_default_transcripts(self.default_transcripts, transcripts)
         if self.default_transcripts:
@@ -426,6 +427,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             'transcripts': transcripts,
             'download_transcript_handler_url': download_transcript_handler_url,
             'default_transcripts': self.default_transcripts,
+            'initial_default_transcripts': initial_default_transcripts,
             'auth_error_message': auth_error_message,
             'transcripts_autoupload_message': transcripts_autoupload_message
         }
@@ -757,9 +759,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         contentstore().save(content)
 
         # Exceptions are handled on the frontend
-        success_message = 'Successfully uploaded "{file_name}". ' \
-                          'Please press Save button to enable a transcript in {language}'.\
-            format(file_name=file_name, language=lang_label)
+        success_message = 'Successfully uploaded "{}".'.format(file_name)
         response = {
             'success_message': success_message,
             'lang': lang_code,
