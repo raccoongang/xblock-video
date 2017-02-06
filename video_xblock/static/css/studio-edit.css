@@ -206,3 +206,15 @@
     text-align: right;
     font-size: 14px;
 }
+
+.default-transcripts-action-link.download-transcript.download-setting {
+    display: inline;
+    font-weight: 400;
+    margin-right: 0;
+}
+
+.default-transcripts-action-link.download-transcript.download-setting:hover {
+color: #be9730;
+background-color: #fff;
+font-weight: 400;
+}
