@@ -459,7 +459,7 @@ function StudioEditableXBlock(runtime, element) {
                 var $availableTranscriptBlock = $("div[value='" + newLang + "']").closest("div.available-default-transcripts-section:visible");
                 $availableTranscriptBlock.remove();
                 // TODO Adds a transcript to the list of enabled ones (xblock field Default Timed Transcript)
-                // var default_transcript= {'lang_code': newLang, 'lang_label': newLabel, 'download_url': newUrl};
+                // var default_transcript= {'langCode': newLang, 'langLabel': newLabel, 'downloadUrl': newUrl};
                 // createDefaultTranscriptBlock(event, default_transcript, 'enabled');
             }
         })
@@ -501,11 +501,11 @@ function StudioEditableXBlock(runtime, element) {
     $defaultTranscriptUploader.on('click', function(event) {
         event.preventDefault();
         event.stopPropagation();
-        var lang_code = $(event.currentTarget).attr('data-lang-code');
+        var langCode = $(event.currentTarget).attr('data-lang-code');
         var label = $(event.currentTarget).attr('data-lang-label');
         var url = $(event.currentTarget).attr('data-download-url');
-        languageCode = lang_code;
-        var data = {'lang':lang_code, 'label':label, 'url':url}
+        languageCode = langCode;
+        var data = {'lang': langCode, 'label' : label, 'url' : url}
         uploadDefaultTranscripts(data);
     });
 
@@ -583,8 +583,8 @@ function StudioEditableXBlock(runtime, element) {
     var createDefaultTranscriptBlock = function(event, default_transcript){
         event.preventDefault();
         event.stopPropagation();
-        var langCode = default_transcript['lang_code'];
-        var langLabel = default_transcript['lang_label'];
+        var langCode = default_transcript['langCode'];
+        var langLabel = default_transcript['langLabel'];
         var downloadUrl = '';
         // Get url for a transcript fetching from the API
         initialDefaultTranscripts.forEach(function(sub){
@@ -594,7 +594,7 @@ function StudioEditableXBlock(runtime, element) {
         });
         // Create a new transcript
         var $newTranscriptBlock = $('.default-transcripts-section:hidden').clone();
-        $newTranscriptBlock.removeClass('is-hidden').appendTo($('.' + transcriptType + 'default-transcripts-wrapper'));
+        $newTranscriptBlock.removeClass('is-hidden').appendTo($('.default-transcripts-wrapper'));
         $('.default-transcripts-label:visible').last().attr('value', langCode).text(langLabel);
         $('.default-transcripts-action-link.upload-default-transcript').last().attr(
             {'data-lang-code' : langCode, 'data-lang-label' : langLabel, 'data-download-url' : downloadUrl}
@@ -614,25 +614,25 @@ function StudioEditableXBlock(runtime, element) {
     var updateDefaultTranscriptBlock = function(event) {
         event.preventDefault();
         event.stopPropagation();
-        var lang_code = $(event.currentTarget).attr('data-lang-code');
-        var lang_label = $(event.currentTarget).attr('data-lang-label');
-        var download_url = $(event.currentTarget).attr('data-download-url');
-        var $transcriptBlock = $("a[data-lang-code='" + lang_code + "']").closest("li.list-settings-item");
-        var $enabledTranscriptBlock = $("div[value='" + lang_code + "']").closest("div.enabled-default-transcripts-section");
+        var langCode = $(event.currentTarget).attr('data-lang-code');
+        var langLabel = $(event.currentTarget).attr('data-lang-label');
+        var downloadUrl = $(event.currentTarget).attr('data-download-url');
+        var $transcriptBlock = $("a[data-lang-code='" + langCode + "']").closest("li.list-settings-item");
+        var $enabledTranscriptBlock = $("div[value='" + langCode + "']").closest("div.enabled-default-transcripts-section");
         // Remove transcript of a choice from the list of enabled transcripts (xblock field Default Timed Transcript)
-        removeTranscript(lang_code);
+        removeTranscript(langCode);
         if (!transcriptsValue.length) {
             $transcriptBlock.parents('li').removeClass('is-set').find('.setting-clear').removeClass('active').addClass('inactive');
         }
         $enabledTranscriptBlock.remove();
         // Remove transcript of a choice (xblock field Upload Transcript)
-        removeLanguage(lang_code);
+        removeLanguage(langCode);
         pushTranscriptsValue();
         $('.add-transcript', element).removeClass('is-disabled');
         $transcriptBlock.remove();
         disableOption();
         // Add transcript of a choice to the list of available transcripts (xblock field Default Timed Transcript)
-        var default_transcript= {'lang_code': lang_code, 'lang_label': lang_label, 'download_url': download_url};
+        var default_transcript= {'langCode': langCode, 'langLabel': langLabel, 'downloadUrl': downloadUrl};
         createDefaultTranscriptBlock(event, default_transcript);
         // TODO add messages
     };
