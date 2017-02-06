@@ -640,7 +640,6 @@ function StudioEditableXBlock(runtime, element) {
         var existsAvailableTranscript = $.inArray(langCode, allAvailableTranscripts) !== -1;
         var existsEnabledTranscript = $.inArray(langCode, allEnabledTranscripts) !== -1;
         var storedVideoPlatform = $.inArray(langCode, initialDefaultTranscriptsLangCodes) !== -1;
-        debugger;
         // Create a new available transcript if stored on a platform and doesn't already exist on video xblock
         if (defaultTranscriptType === "available" && !existsAvailableTranscript && storedVideoPlatform) {
             var $newAvailableTranscriptBlock = $('.available-default-transcripts-section:hidden').clone();
