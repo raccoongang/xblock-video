@@ -99,8 +99,7 @@ class BrightcovePlayer(BaseVideoPlayer):
                   'on the video platform, and a BC token is valid.'
         return message, editable_fields
 
-    @staticmethod
-    def get_client_credentials(token, account_id):
+    def get_client_credentials(self, token, account_id):
         """
         Gets client credentials, given a client token and an account_id.
         Reference: https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html

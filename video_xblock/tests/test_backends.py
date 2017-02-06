@@ -2,6 +2,9 @@
 Test cases for video_xblock backends.
 """
 import unittest
+import json
+import copy
+import requests
 from ddt import ddt, data, unpack
 from django.test.utils import override_settings
 from xblock.core import XBlock
@@ -13,6 +16,7 @@ from video_xblock.backends import (
     wistia,
     youtube
 )
+from video_xblock.tests.mocks import WistiaAuthMock, BrightcoveAuthMock
 
 
 # pylint: disable=abstract-class-instantiated
@@ -21,6 +25,7 @@ class TestAbstractBaseBackend(unittest.TestCase):
     """
     Unit tests for abstract base backend of video_xblock.
     """
+
     def setUp(self):
         # allow abstract class to be instantiated
         BaseVideoPlayer.__abstractmethods__ = set()
@@ -107,12 +112,24 @@ class TestCustomBackends(unittest.TestCase):
     @XBlock.register_temp_plugin(youtube.YoutubePlayer, 'youtube')
     def setUp(self):
         self.player = {}
+        self.mocked_objects = []
+        context = {
+            'data_setup': json.dumps({
+                "controlBar": {"volumeMenuButton": {"inline": False, "vertical": True}},
+                "playbackRates": [0.5, 1.0, 1.5, 2.0],
+                "plugins": {
+                    "xblockEventPlugin": {},
+                    "offset": {"start": '0:0:0', "end": '1:0:20', "current_time": '0:0:0'},
+                    "videoJSSpeedHandler": {},
+                }
+            }),
+            'player_state': {'transcripts': []}
+        }
         for backend in self.backends:
             player_class = XBlock.load_class(backend)
-            player_instance = XBlock.load_class(backend)()
             self.player[backend] = {
                 'class': player_class,
-                'instance': player_instance
+                'context': context
             }
         super(TestCustomBackends, self).setUp()
 
@@ -129,5 +146,122 @@ class TestCustomBackends(unittest.TestCase):
     )
     @unpack
     def test_media_id(self, backend, url, media_id):
-        res = self.player[backend]['instance'].media_id(url)
+        """
+        Check that media id is extracted from the video url.
+        """
+        player = self.player[backend]['class']()
+        res = player.media_id(url)
         self.assertEqual(res, media_id)
+
+    @data(*zip(
+        backends,
+        [  # expected results per backend
+            ('player_name',),
+            ['account_id', 'player_id', 'token', 'player_name'],
+            ('token', 'player_name')
+        ]
+    ))
+    @unpack
+    def test_customize_xblock_fields_display(self, backend, expected_result):
+        """
+        Check backend allows to edit only permitted fields.
+        """
+        editable_fields = ['account_id', 'player_id', 'token', 'player_name']
+        player = self.player[backend]['class']
+        res = player.customize_xblock_fields_display(editable_fields)
+        self.assertIsInstance(res, tuple)
+        self.assertEqual(res[-1], expected_result)
+
+    def apply_auth_mock(self, backend):
+        """
+        Save state of auth related entities before mocks are applied.
+        """
+        player = self.player[backend]['class']
+        if backend == 'wistia':
+            self.mocked_objects.append({
+                'obj': requests,
+                'attrs': ['get', ],
+                'value': [copy.copy(requests.get), ]
+            })
+            requests.get = WistiaAuthMock()
+        elif backend == 'brightcove':
+            self.mocked_objects.append({
+                'obj': player,
+                'attrs': ['get_client_credentials', 'get_access_token'],
+                'value': [player.get_client_credentials, player.get_access_token]
+            })
+            player.get_client_credentials = BrightcoveAuthMock().get_client_credentials()
+            player.get_access_token = BrightcoveAuthMock().get_access_token()
+        else:
+            # place here youtube auth mock assignment
+            pass
+
+    def restore_mocked(self):
+        """
+        Restore state of mocked entities.
+        """
+        if self.mocked_objects:
+            for original in self.mocked_objects:
+                for index, attr in enumerate(original['attrs']):
+                    setattr(original['obj'], attr, original['value'][index])
+            self.mocked_objects = []
+
+    @data(*zip(
+        backends,
+        ['', '', 'some_token'],
+        [({}, ''), (BrightcoveAuthMock.expected_value(), ''), (WistiaAuthMock.expected_value(token='some_token'), '')]
+    ))
+    @unpack
+    def test_authenticate_api(self, backend, token, expected_result):
+        """
+        Check that backend can successfully pass authentication.
+        """
+        player = self.player[backend]['class']
+        self.apply_auth_mock(backend)
+        auth_data, error = res = player().authenticate_api(**{'token': token, 'account_id': 45263567468485})
+        expected_auth_data = expected_result[0]
+        expected_error = expected_result[-1]
+        self.assertIsInstance(res, tuple)
+        self.assertEqual(auth_data, expected_auth_data)
+        self.assertIn(expected_error, error)
+        self.restore_mocked()
+
+    @data(*zip(
+        backends,
+        [({}, ''), ({}, 'Authentication to Brightcove API failed'), ({'token': None}, 'Authentication failed.')]
+    ))
+    @unpack
+    def test_authenticate_api_errors(self, backend, expected_result):
+        """
+        Make sure backend returns expected errors if wrong auth credentials provided.
+        """
+        player = self.player[backend]['class']
+        auth_data, error = res = player().authenticate_api(account_id=0)
+        expected_auth_data = expected_result[0]
+        expected_error = expected_result[-1]
+        self.assertIsInstance(res, tuple)
+        self.assertEqual(auth_data, expected_auth_data)
+        self.assertIn(expected_error, error)
+
+    @data(
+        *(
+            zip(
+                backends,
+                ['cFnqX6V21h4', '45263567468485', 'jzmku8z83i'],
+                [([], 'doesn\'t have any timed transcript'), ([], 'sdgd'), ([], 'fgs')]
+            ) + zip(
+                backends,
+                ['', '', ''],
+                [([], 'No timed transcript may be fetched'), ([], 'dfgd'), ([], 'Invalid credentials')]
+            )
+        )
+    )
+    @unpack
+    def test_get_default_transcripts(self, backend, video_id, expected_result):
+        player = self.player[backend]['class']
+        default_transcripts, message = res = player().get_default_transcripts(video_id=video_id, token='')
+        expected_default_transcripts = expected_result[0]
+        expected_message = expected_result[-1]
+        self.assertIsInstance(res, tuple)
+        self.assertEqual(default_transcripts, expected_default_transcripts)
+        self.assertIn(expected_message, message)

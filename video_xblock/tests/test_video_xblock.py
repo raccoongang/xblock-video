@@ -14,6 +14,7 @@ from xblock.test.tools import TestRuntime
 
 from video_xblock import VideoXBlock
 from video_xblock.utils import ugettext as _
+from video_xblock.tests.mocks import MockCourse
 
 settings.configure()
 
@@ -117,12 +118,3 @@ class VideoXBlockTests(unittest.TestCase):
             'captions_language': data['captionsLanguage'],
             'transcripts_object': '{}'
         })
-
-
-class MockCourse(object):
-    """
-    Mock Course object with required parameters.
-    """
-    def __init__(self, course_id):
-        self.course_id = course_id
-        self.language = 'en'
