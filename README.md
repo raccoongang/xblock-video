@@ -50,6 +50,7 @@ Run quality checks:
 ```
 
 Run tests:
+
 ```shell
 > make test
 ```
