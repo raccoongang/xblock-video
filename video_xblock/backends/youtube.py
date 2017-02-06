@@ -209,14 +209,14 @@ class YoutubePlayer(BaseVideoPlayer):
             text = element.text
             end = start + duration
             if text:
-                start = self.format_transcript_timing(start)
-                end = self.format_transcript_timing(end)
-                timing = '{} --> {}'.format(start, end)
+                formatted_start = self.format_transcript_timing(start)
+                formatted_end = self.format_transcript_timing(end)
+                timing = '{} --> {}'.format(formatted_start, formatted_end)
                 text = text.replace('\n', ' ')
                 sub_element = unicode(i) + u'\n' + unicode(timing) + u'\n' + unicode(text) + u'\n\n'
         return sub_element
 
-    def download_default_transcript(self, url, language_code=None):
+    def download_default_transcript(self, url, language_code=None):  # pylint: disable=unused-argument
         """
         Downloads default transcript from Youtube API and formats it to WebVTT-like unicode.
 

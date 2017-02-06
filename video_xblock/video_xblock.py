@@ -8,6 +8,7 @@ import datetime
 import json
 import logging
 import os
+import functools
 import pkg_resources
 import requests
 
@@ -17,13 +18,12 @@ from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
-from xmodule.contentstore.django import contentstore
-from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore  # pylint: disable=import-error
+from xmodule.contentstore.content import StaticContent  # pylint: disable=import-error
 
 from django.template import Template, Context
 from pycaption import detect_format, WebVTTWriter
 from webob import Response
-from functools import partial
 
 from .backends.base import BaseVideoPlayer, html_parser
 from .settings import ALL_LANGUAGES
@@ -409,7 +409,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         for k in self.metadata:
             kwargs[k] = self.metadata[k]
         # For a Brightcove player only
-        if self.account_id is not self.fields['account_id'].default:  # pylint: disable=unsubscriptable-object
+        is_not_default_account_id = self.account_id is not self.fields['account_id'].default
+        if is_not_default_account_id:  # pylint: disable=unsubscriptable-object
             kwargs['account_id'] = self.account_id
         # Fetch captions list (available/default transcripts list) from video platform API
         self.default_transcripts, transcripts_autoupload_message = player.get_default_transcripts(**kwargs)
@@ -434,7 +435,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         # Customize display of the particular xblock fields per each video platform.
         token_help_message, customised_editable_fields = \
-            player.customize_xblock_fields_display(self.editable_fields)
+            player.customize_xblock_fields_display(self.editable_fields)  # pylint: disable=unsubscriptable-object
         self.fields['token'].help = token_help_message  # pylint: disable=unsubscriptable-object
         self.editable_fields = customised_editable_fields
 
@@ -765,13 +766,12 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         file_name = reference_name.replace(" ", "_") + ext
         course_key = self.location.course_key  # pylint: disable=no-member
         content_loc = StaticContent.compute_location(course_key, file_name)  # AssetLocator object
-        sc_partial = partial(StaticContent, content_loc, file_name, 'application/json')
-        content = sc_partial(sub)  # StaticContent object
+        sc_partial = functools.partial(StaticContent, content_loc, file_name, 'application/json')
+        content = sc_partial(sub.encode('UTF-8'))  # StaticContent object
         external_url = '/' + str(content_loc)
 
         # Commit the content
         # TODO add additional checks before saving to contenstore as per the reference https://git.io/vDnBN
-        content._data = content.data.encode('UTF-8')
         contentstore().save(content)
 
         # Exceptions are handled on the frontend
