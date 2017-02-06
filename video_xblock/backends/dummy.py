@@ -27,7 +27,7 @@ class DummyPlayer(BaseVideoPlayer):
     def get_default_transcripts(self, **kwargs):  # pylint: disable=unused-argument
         return [], ''
 
-    def download_default_transcript(self, url):  # pylint: disable=unused-argument
+    def download_default_transcript(self, url, language_code):  # pylint: disable=unused-argument
         return u''
 
     @staticmethod

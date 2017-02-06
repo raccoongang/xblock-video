@@ -489,7 +489,7 @@ function StudioEditableXBlock(runtime, element) {
                 var $availableTranscriptBlock = $("div[value='" + newLang + "']")
                     .closest("div.available-default-transcripts-section:visible");
                 $availableTranscriptBlock.remove();
-                // TODO Adds a transcript to the list of enabled ones (xblock field Default Timed Transcript)
+                // Adds a transcript to the list of enabled ones (xblock field Default Timed Transcript)
                 var default_transcript= {'langCode': newLang, 'langLabel': newLabel, 'downloadUrl': newUrl};
                 createDefaultTranscriptBlock(event, default_transcript, 'enabled');
             }
