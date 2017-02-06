@@ -8,15 +8,14 @@ XBlock to embed videos hosted on different video platform into your courses.
 ## Installation
 
 ```shell
-> sudo -sHu edxapp
-> source ~/edxapp_env
-> # Clone and install xblock
-> git clone https://github.com/raccoongang/xblock-video.git
-> cd xblock-video
-> pip install -e .
-> # Install external JavaScript dependencies
-> cd video_xblock/static
-> bower install
+sudo -sHu edxapp
+source ~/edxapp_env
+# Clone and install xblock
+git clone https://github.com/raccoongang/xblock-video.git
+cd xblock-video
+pip install -e .
+# Install Python and JavaScript dependencies
+make deps
 ```
 
 ## Enabling in Studio
@@ -41,9 +40,7 @@ TODO
 Install dependencies and development tools:
 
 ```shell
-> pip install -r requirements.txt
-> pip install -r test_requirements.txt
-> npm install "eslint@^2.12.0" eslint-config-edx "eslint-plugin-dollar-sign@0.0.5" "eslint-plugin-import@^1.9.2"
+> make deps deps-test tools
 ```
 
 Run quality checks:
@@ -51,6 +48,7 @@ Run quality checks:
 ```shell
 > make quality
 ```
+
 Run tests:
 ```shell
 > make test
