@@ -298,7 +298,8 @@ function StudioEditableXBlock(runtime, element) {
     var authenticateVideoApiHandlerUrl = runtime.handlerUrl(element, 'authenticate_video_api_handler');
     var uploadDefaultTranscriptHandlerUrl = runtime.handlerUrl(element, 'upload_default_transcript_handler');
     var languageCode;
-    // Stores all the default transcripts fetched at document load
+
+    /** Store all the default transcripts fetched at document load */
     var initialDefaultTranscripts = (function() {
         var defaultSubs = $('.initial-default-transcript');
         var initialDefaultTranscripts = [];
@@ -337,6 +338,7 @@ function StudioEditableXBlock(runtime, element) {
         }
     };
 
+    /** Authenticate to video platform's API and show result message. */
     function authenticateVideoApi(data) {
         $.ajax({
             type: "POST",
@@ -464,6 +466,7 @@ function StudioEditableXBlock(runtime, element) {
         $fileUploader.click();
     };
 
+    /** Upload a transcript available on a video platform to video xblock and update displayed default transcripts. */
     function uploadDefaultTranscripts(data) {
         $.ajax({
             type: "POST",
@@ -611,6 +614,7 @@ function StudioEditableXBlock(runtime, element) {
 
     };
 
+    /** Display a transcript in a list of whether available or enabled transcripts. */
     var createDefaultTranscriptBlock = function(event, default_transcript, defaultTranscriptType){
         event.preventDefault();
         event.stopPropagation();
@@ -659,7 +663,7 @@ function StudioEditableXBlock(runtime, element) {
                 uploadDefaultTranscripts(data);
             })
         }
-        // Create a new enabled transcript if it doesn't already exist on video xblock
+        // Create a new enabled transcript if it doesn't already exist in a video xblock
         else if (defaultTranscriptType === "enabled" && !existsEnabledTranscript) {
             var $newEnabledTranscriptBlock = $('.enabled-default-transcripts-section:hidden').clone();
             var $lastEnabledTranscriptBlock = $('.enabled-default-transcripts-section:visible').last();
@@ -680,6 +684,7 @@ function StudioEditableXBlock(runtime, element) {
         }
     };
 
+    /** Update display of default transcripts on removal of an enabled transcript of choice. */
     var updateDefaultTranscriptBlock = function(event) {
         event.preventDefault();
         event.stopPropagation();

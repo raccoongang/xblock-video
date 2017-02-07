@@ -90,8 +90,10 @@ class YoutubePlayer(BaseVideoPlayer):
     @staticmethod
     def customize_xblock_fields_display(editable_fields):
         """
-        Customises display of studio editor fields per a video platform.
+        Customise display of studio editor fields per a video platform.
+
         Authentication to API is not required for Youtube.
+
         """
         message = 'This field is to be disabled.'
         editable_fields = list(editable_fields)
@@ -112,7 +114,7 @@ class YoutubePlayer(BaseVideoPlayer):
         Fetches available transcripts languages from a Youtube server.
 
         Reference to `youtube_video_transcript_name()`:
-            https://github.com/edx/edx-platform/blob/master/common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+            https://github.com/edx/edx-platform/blob/ecc3473d36b3c7a360e260f8962e21cb01eb1c39/common/lib/xmodule/xmodule/video_module/transcripts_utils.py#L97
 
         Arguments:
             video_id (str): media id fetched from href field of studio-edit modal.
@@ -156,9 +158,7 @@ class YoutubePlayer(BaseVideoPlayer):
         return available_languages, message
 
     def get_default_transcripts(self, **kwargs):
-        """
-        Fetches transcripts list from a video platform.
-        """
+        """Fetch transcripts list from a video platform."""
         # Fetch available transcripts' languages from API
         video_id = kwargs.get('video_id')
         available_languages, message = self.fetch_default_transcripts_languages(video_id)
@@ -225,7 +225,7 @@ class YoutubePlayer(BaseVideoPlayer):
         Downloads default transcript from Youtube API and formats it to WebVTT-like unicode.
 
         Reference to `get_transcripts_from_youtube()`:
-            https://github.com/edx/edx-platform/blob/master/common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+            https://github.com/edx/edx-platform/blob/ecc3473d36b3c7a360e260f8962e21cb01eb1c39/common/lib/xmodule/xmodule/video_module/transcripts_utils.py#L122
 
         """
         utf8_parser = etree.XMLParser(encoding='utf-8')
