@@ -1,0 +1,3 @@
+[pydocstyle]
+# Open edX style dictates to always use multiline docstrings.
+ignore = D200

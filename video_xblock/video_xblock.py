@@ -1,6 +1,6 @@
 """
-Video XBlock provides a convenient way to embed videos hosted on
-supported platforms into your course.
+Video XBlock provides a convenient way to embed videos hosted on supported platforms into your course.
+
 All you need to provide is video url, this XBlock does the rest for you.
 """
 
@@ -39,6 +39,7 @@ class TranscriptsMixin(XBlock):
     def convert_caps_to_vtt(caps):
         """
         Utility method converts any supported transcripts into WebVTT format.
+
         Supported input formats: DFXP/TTML - SAMI - SCC - SRT - WebVTT
 
         Arguments:
@@ -46,7 +47,6 @@ class TranscriptsMixin(XBlock):
         Returns:
             unicode: Transcripts converted into WebVTT format.
         """
-
         reader = detect_format(caps)
         if reader:
             return WebVTTWriter().write(reader().read(caps))
@@ -69,7 +69,7 @@ class TranscriptsMixin(XBlock):
     @XBlock.handler
     def srt_to_vtt(self, request, suffix=''):  # pylint: disable=unused-argument
         """
-        Fetches raw transcripts, converts them into WebVTT format and returns back.
+        Fetch raw transcripts, convert them into WebVTT format and return back.
 
         Path to raw transcripts is passed in as `request.query_string`.
 
@@ -88,6 +88,7 @@ class TranscriptsMixin(XBlock):
 class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
     """
     Main VideoXBlock class.
+
     Responsible for saving video settings and rendering it for students.
     """
 
@@ -344,7 +345,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     def render_resource(self, path, **context):
         """
-        Renders static resource using provided context
+        Render static resource using provided context.
 
         Returns: django.utils.safestring.SafeText
         """
@@ -355,10 +356,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     def student_view(self, context=None):  # pylint: disable=unused-argument
         """
-        The primary view of the VideoXBlock, shown to students
-        when viewing courses.
+        The primary view of the VideoXBlock, shown to students when viewing courses.
         """
-
         player_url = self.runtime.handler_url(self, 'render_player')
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
         transcript_download_link = self.get_transcript_download_link()

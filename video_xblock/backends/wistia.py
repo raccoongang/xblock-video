@@ -96,7 +96,7 @@ class WistiaPlayer(BaseVideoPlayer):
     @staticmethod
     def customize_xblock_fields_display(editable_fields):
         """
-        Customises display of studio editor fields per a video platform.
+        Customize display of studio editor fields per a video platform.
         """
         message = 'You can get a master token following the guide of ' \
                   '<a href="https://wistia.com/doc/data-api" target="_blank">Wistia</a>. ' \
@@ -109,7 +109,8 @@ class WistiaPlayer(BaseVideoPlayer):
 
     def authenticate_api(self, **kwargs):
         """
-        Calls a sample Wistia API url to check on authentication success.
+        Call a sample Wistia API url to check on authentication success.
+
         Reference: https://wistia.com/doc/data-api#authentication
 
         Arguments:

@@ -1,5 +1,9 @@
 """
-RelativeTive field back-ported from xmodule.fields to avoid import error and travis testing complication
+RelativeTive field back-ported from xmodule.fields.
+
+Backported to reduce coupling with XModule and make linting & testing possible.
+Reference:
+https://github.com/edx/edx-platform/blob/open-release/eucalyptus.master/common/lib/xmodule/xmodule/fields.py#L143
 """
 
 import datetime
@@ -27,6 +31,7 @@ class RelativeTime(JSONField):
     Python object of RelativeTime is datetime.timedelta.
     JSONed representation of RelativeTime is "HH:MM:SS"
     """
+
     # Timedeltas are immutable, see http://docs.python.org/2/library/datetime.html#available-types
     MUTABLE = False
 
@@ -103,7 +108,7 @@ class RelativeTime(JSONField):
 
     def timedelta_to_string(self, value):
         """
-        Makes first 'H' in str representation non-optional.
+        Make first 'H' in str representation non-optional.
 
         str(timedelta) has [H]H:MM:SS format, which is not suitable
         for front-end (and ISO time standard), so we force HH:MM:SS format.
