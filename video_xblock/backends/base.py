@@ -7,18 +7,14 @@ Base Video player plugin
 
 import abc
 import re
-from HTMLParser import HTMLParser
-import pkg_resources
 
 from webob import Response
 from xblock.fragment import Fragment
 from xblock.plugin import Plugin
 
 from django.conf import settings
-from django.template import Template, Context
 
-
-html_parser = HTMLParser()  # pylint: disable=invalid-name
+from video_xblock.utils import render_resource, resource_string
 
 
 class BaseVideoPlayer(Plugin):
@@ -152,8 +148,7 @@ class BaseVideoPlayer(Plugin):
 
     def resource_string(self, path):
         """Handy helper for getting resources from our kit."""
-        data = pkg_resources.resource_string(__name__, path)
-        return data.decode("utf8")
+        return resource_string(path)
 
     def render_resource(self, path, **context):
         """
@@ -161,10 +156,7 @@ class BaseVideoPlayer(Plugin):
 
         Returns: django.utils.safestring.SafeText
         """
-        html = Template(self.resource_string(path))
-        return html_parser.unescape(
-            html.render(Context(context))
-        )
+        return render_resource(path, **context)
 
     @classmethod
     def match(cls, href):
