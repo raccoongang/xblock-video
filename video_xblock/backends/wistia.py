@@ -214,7 +214,7 @@ class WistiaPlayer(BaseVideoPlayer):
         pattern = re.compile(r"\d{2}:\d{2}:\d{2},\d{3}")
         new_line = u""
         for token in line.split():
-            if pattern.match(str(token)):
+            if pattern.match(str(token)) or pattern.match(unicode(token), re.UNICODE):
                 token = token.replace(",", ".")
             new_line += token + u" "
         return new_line
@@ -238,10 +238,15 @@ class WistiaPlayer(BaseVideoPlayer):
     def download_default_transcript(self, language_code, url=None):  # pylint: disable=unused-argument
         """
         Gets default transcript fetched from a video platform API and formats it to WebVTT-like unicode.
+
         Though Wistia provides a method for a transcript fetching, this is to avoid an API call.
         References:
             https://wistia.com/doc/data-api#captions_index
             https://wistia.com/doc/data-api#captions_show
+
+        Arguments:
+            url (str): API url to fetch a default transcript from.
+            language_code (str): Language code of a default transcript to be downloaded.
 
         Returns:
             unicode: text of transcripts.

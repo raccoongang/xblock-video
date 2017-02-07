@@ -508,7 +508,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
                 message = 'No timed transcript may be fetched from a video platform. '
         return default_transcripts, message
 
-    def download_default_transcript(self, language_code=None, url=None):  # pylint: disable=unused-argument
+    def download_default_transcript(self, url, language_code=None):  # pylint: disable=unused-argument
         """
         Downloads default transcript from a video platform API in WebVVT format.
 

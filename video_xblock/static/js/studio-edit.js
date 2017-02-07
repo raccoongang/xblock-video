@@ -485,11 +485,11 @@ function StudioEditableXBlock(runtime, element) {
                         '.api-request.upload-default-transcript.' + newLang + '.status-success',
                         '.api-request.upload-default-transcript.' + newLang + '.status-error');
                 }
-                // Removes a transcript of choice from the list of available ones
+                // Remove a transcript of choice from the list of available ones
                 var $availableTranscriptBlock = $("div[value='" + newLang + "']")
                     .closest("div.available-default-transcripts-section:visible");
                 $availableTranscriptBlock.remove();
-                // Adds a transcript to the list of enabled ones (xblock field Default Timed Transcript)
+                // Add a transcript to the list of enabled ones
                 var default_transcript= {'langCode': newLang, 'langLabel': newLabel, 'downloadUrl': newUrl};
                 createDefaultTranscriptBlock(event, default_transcript, 'enabled');
             }
@@ -651,7 +651,7 @@ function StudioEditableXBlock(runtime, element) {
             // TODO Prepare elements for status messages display
             // var $errorMessage = $newAvailableTranscriptBlock.next().addClass(langCode);
             // var $successMessage = $errorMessage.next().addClass(langCode);
-            // Bind a listener for upload
+            // Bind a listener to upload
             $('.default-transcripts-action-link.upload-default-transcript').on('click', function (event) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -675,7 +675,7 @@ function StudioEditableXBlock(runtime, element) {
             $(".default-transcripts-action-link.remove-default-transcript:visible").last().attr(
                 {'data-lang-code': langCode, 'data-lang-label': langLabel, 'href': '#'}
             );
-            // TODO Bind listeners (after href fixes)
+            // TODO Bind listeners to download and delete (after href fixes)
             // TODO Prepare elements for status messages display
         }
     };
