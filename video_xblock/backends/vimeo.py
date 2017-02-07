@@ -79,7 +79,7 @@ class VimeoPlayer(BaseVideoPlayer):
         # Fetch available transcripts' languages from API
         return [], ''
 
-    def download_default_transcript(self, url):  # pylint: disable=unused-argument
+    def download_default_transcript(self, url, language_code):  # pylint: disable=unused-argument
         """
         Downloads default transcript in WebVVT format.
 
