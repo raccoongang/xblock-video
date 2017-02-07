@@ -1,5 +1,8 @@
 """
-RelativeTive field back-ported from xmodule.fields to avoid import error and travis testing complication
+RelativeTime field back-ported from xmodule.fields to avoid import error and travis testing complication.
+
+Reference: https://github.com/edx/edx-platform/blob/master/common/lib/xmodule/xmodule/fields.py#L143
+
 """
 
 import datetime

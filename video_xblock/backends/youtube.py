@@ -111,6 +111,9 @@ class YoutubePlayer(BaseVideoPlayer):
         """
         Fetches available transcripts languages from a Youtube server.
 
+        Reference to `youtube_video_transcript_name()`:
+            https://github.com/edx/edx-platform/blob/master/common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+
         Arguments:
             video_id (str): media id fetched from href field of studio-edit modal.
         Returns:
@@ -119,8 +122,9 @@ class YoutubePlayer(BaseVideoPlayer):
                 If the transcript name is not empty on youtube server we have to pass
                 name param in url in order to get transcript.
                 Example: http://video.google.com/timedtext?lang=en&v={video_id}&name={transcript_name}
-                Reference: https://git.io/vMoCA
+
             message (str): Message with status on captions API call.
+
         """
         utf8_parser = etree.XMLParser(encoding='utf-8')
         # This is to update self.captions_api with a video id.
@@ -220,9 +224,8 @@ class YoutubePlayer(BaseVideoPlayer):
         """
         Downloads default transcript from Youtube API and formats it to WebVTT-like unicode.
 
-        References:
-            https://git.io/vMK6W
-            https://git.io/vMoEc
+        Reference to `get_transcripts_from_youtube()`:
+            https://github.com/edx/edx-platform/blob/master/common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 
         """
         utf8_parser = etree.XMLParser(encoding='utf-8')

@@ -83,7 +83,8 @@ class VimeoPlayer(BaseVideoPlayer):
         """
         Downloads default transcript in WebVVT format.
 
-        Reference: https://git.io/vMK6W
+        Reference to `get_transcripts_from_youtube()`:
+            https://github.com/edx/edx-platform/blob/master/common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 
         """
         return u''
