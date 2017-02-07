@@ -625,9 +625,11 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
     def dispatch(self, request, suffix):
         """
         Dispatch request to XBlock's player.
-        Args:
+
+        Arguments:
             request: incoming request data.
             suffix: slug used for routing.
+
         """
         return self.get_player().dispatch(request, suffix)
 
@@ -772,7 +774,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         external_url = '/' + str(content_loc)
 
         # Commit the content
-        # TODO add additional checks before saving to contenstore as per the reference https://git.io/vDnBN
         contentstore().save(content)
 
         # Exceptions are handled on the frontend

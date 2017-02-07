@@ -30,10 +30,13 @@ class ApiClientError(Exception):
 
 class BaseApiClient(object):
     """
-    Low level video platform API client. Abstracts API interaction details like
+    Low level video platform API client.
+
+    Abstracts API interaction details like
     requests composition, API credentials handling.
 
     Subclass your platform specific API client from this base class.
+
     """
 
     @abc.abstractmethod
@@ -42,8 +45,14 @@ class BaseApiClient(object):
         Issues REST GET request to a given URL.
         Can throw ApiClientError or it's subclass.
 
+        Arguments:
+            url (str): API url to fetch a resource from.
+            headers (dict): Headers necessary as per API, e.g. authorization bearer to perform authorised requests.
+            can_retry (bool): True if this is to retry a call if authentication failed.
+
         Returns:
             Response in python native data format.
+
         """
 
     @abc.abstractmethod
@@ -52,14 +61,21 @@ class BaseApiClient(object):
         Issues REST POST request to a given URL.
         Can throw ApiClientError or it's subclass.
 
+        Arguments:
+            url (str): API url to fetch a resource from.
+            headers (dict): Headers necessary as per API, e.g. authorization bearer to perform authorised requests.
+            can_retry (bool): True if this is to retry a call if authentication failed.
+
         Returns:
             Response in python native data format.
+
         """
 
 
 class BaseVideoPlayer(Plugin):
     """
     Inherit your video player class from this class
+
     """
     __metaclass__ = abc.ABCMeta
 
@@ -263,13 +279,14 @@ class BaseVideoPlayer(Plugin):
     @abc.abstractmethod
     def download_default_transcript(self, url, language_code):  # pylint: disable=unused-argument
         """
-        Downloads default transcript from a video platform API and uploads it to the video xblock.
+        Downloads default transcript from a video platform API and formats it accordingly to the WebVTT standard.
 
         Arguments:
-            url (str): transcript download url,
-            language_code (str): language code of a transcript to be downloaded.
+            url (str): API url to fetch a default transcript from.
+            language_code (str): Language code of a transcript to be downloaded.
         Returns:
-            unicode: Transcripts in WebVTT or SRT format.
+            unicode: Transcripts formatted per WebVTT.
+
         """
         return u''
 
