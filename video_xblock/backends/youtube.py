@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-YouTube Video player plugin
+YouTube Video player plugin.
 """
 
 import json
@@ -9,11 +10,12 @@ import requests
 from lxml import etree
 
 from video_xblock import BaseVideoPlayer
+from video_xblock.constants import status
 
 
 class YoutubePlayer(BaseVideoPlayer):
     """
-    YoutubePlayer is used for videos hosted on the Youtube.com
+    YoutubePlayer is used for videos hosted on the Youtube.com.
     """
 
     # Regex is taken from http://regexr.com/3a2p0
@@ -133,7 +135,7 @@ class YoutubePlayer(BaseVideoPlayer):
                       'Error: {}'.format(str(exception))
             return available_languages, message
 
-        if data.status_code == 200 and data.text:
+        if data.status_code == status.HTTP_200_OK and data.text:
             youtube_data = etree.fromstring(data.content, parser=utf8_parser)
             empty_subs = False if [el.get('transcript_list') for el in youtube_data] else True
             available_languages = [
@@ -185,7 +187,7 @@ class YoutubePlayer(BaseVideoPlayer):
         data = requests.get(url)
 
         sub_dict, message = {}, ''  # pylint: disable=unused-variable
-        if data.status_code != 200 or not data.text:
+        if data.status_code != status.HTTP_200_OK or not data.text:
             message = "Can't receive transcripts from Youtube for {video_id}. Status code: {status_code}.".format(
                 video_id=self.captions_api['params']['v'],
                 status_code=data.status_code

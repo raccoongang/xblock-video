@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-Brightcove Video player plugin
+Brightcove Video player plugin.
 """
 
 import re
@@ -10,6 +11,7 @@ import requests
 from xblock.fragment import Fragment
 
 from video_xblock import BaseVideoPlayer
+from video_xblock.constants import status
 
 
 class BrightcovePlayer(BaseVideoPlayer):
@@ -37,7 +39,7 @@ class BrightcovePlayer(BaseVideoPlayer):
 
     def media_id(self, href):
         """
-        Brightcove specific implementation of BaseVideoPlayer.media_id()
+        Brightcove specific implementation of BaseVideoPlayer.media_id().
         """
         return self.url_re.match(href).group('media_id')
 
@@ -119,7 +121,7 @@ class BrightcovePlayer(BaseVideoPlayer):
         response = requests.post(url, data=payload, headers=headers)
         response_data = json.loads(response.text)
         # New resource must have been created.
-        if response.status_code == 201 and response_data:
+        if response.status_code == status.HTTP_201_CREATED and response_data:
             client_secret = response_data.get('client_secret')
             client_id = response_data.get('client_id')
             error_message = ''
@@ -150,7 +152,7 @@ class BrightcovePlayer(BaseVideoPlayer):
         response = requests.post(url, data=data, headers=headers)
         response_data = json.loads(response.text)
 
-        if response.status_code == 200 and response.text:
+        if response.status_code == status.HTTP_200_OK and response.text:
             access_token = response_data.get('access_token')
             error_message = ''
         else:
@@ -226,7 +228,7 @@ class BrightcovePlayer(BaseVideoPlayer):
                       'Error: {}'.format(str(exception))
             return default_transcripts, message
 
-        if data.status_code == 200 and text:
+        if data.status_code == status.HTTP_200_OK and text:
             captions_data = text.get('text_tracks')
             # Handle empty response (no subs uploaded on a platform)
             if not captions_data:
@@ -246,7 +248,7 @@ class BrightcovePlayer(BaseVideoPlayer):
                 }
                 default_transcripts.append(default_transcript)
         # Permission denied; authentication message should be already generated.
-        elif data.status_code == 401:
+        elif data.status_code == status.HTTP_401_UNAUTHORIZED:
             message = ''
         else:
             try:

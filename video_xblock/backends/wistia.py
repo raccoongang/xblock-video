@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 """
-Wistia Video player plugin
+Wistia Video player plugin.
 """
 
 import json
@@ -13,7 +14,7 @@ from video_xblock.constants import status
 
 class WistiaPlayer(BaseVideoPlayer):
     """
-    WistiaPlayer is used for videos hosted on the Wistia Video Cloud
+    WistiaPlayer is used for videos hosted on the Wistia Video Cloud.
     """
 
     # From official Wistia documentation. May change in the future
@@ -44,7 +45,7 @@ class WistiaPlayer(BaseVideoPlayer):
 
     def media_id(self, href):
         """
-        Wistia specific implementation of BaseVideoPlayer.media_id()
+        Wistia specific implementation of BaseVideoPlayer.media_id().
         """
         return self.url_re.search(href).group('media_id')
 
