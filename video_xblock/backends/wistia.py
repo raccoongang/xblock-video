@@ -227,7 +227,7 @@ class WistiaPlayer(BaseVideoPlayer):
         new_text = [
             self.format_transcript_text_line(line)
             for line in text[0].splitlines()
-            ]
+        ]
         new_text = '\n'.join(new_text)
         if u"WEBVTT" not in text:
             text = u"WEBVTT\n\n" + unicode(new_text)
@@ -237,7 +237,7 @@ class WistiaPlayer(BaseVideoPlayer):
 
     def download_default_transcript(self, language_code, url=None):  # pylint: disable=unused-argument
         """
-        Gets default transcript fetched from a video platform API and formats it to WebVTT-like unicode.
+        Get default transcript fetched from a video platform API and formats it to WebVTT-like unicode.
 
         Though Wistia provides a method for a transcript fetching, this is to avoid an API call.
         References:
@@ -250,6 +250,7 @@ class WistiaPlayer(BaseVideoPlayer):
 
         Returns:
             unicode: text of transcripts.
+
         """
         text = [
             sub.get(u'text')

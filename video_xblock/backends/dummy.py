@@ -29,7 +29,7 @@ class DummyPlayer(BaseVideoPlayer):
 
     def download_default_transcript(self, url, language_code):  # pylint: disable=unused-argument
         """
-        Downloads default transcript from a video platform API and formats it accordingly to the WebVTT standard.
+        Download default transcript from a video platform API and formats it accordingly to the WebVTT standard.
 
         Arguments:
             url (str): API url to fetch a default transcript from.
@@ -44,7 +44,3 @@ class DummyPlayer(BaseVideoPlayer):
 
     def authenticate_api(self, **kwargs):  # pylint: disable=unused-argument
         return {}, ''
-
-    def dispatch(self, request, suffix):
-        """Dummy dispatch method"""
-        pass

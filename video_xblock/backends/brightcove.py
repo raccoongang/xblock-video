@@ -195,7 +195,7 @@ class BrightcoveHlsMixin(object):
             account_id=account_id, description=ingest_profile['description']
         )
         resp = self.api_client.post(url, payload=json.dumps(json.loads(profile)))
-        self.xblock.metadata[ingest_profile['short_name']+'_profile_id'] = resp['id']
+        self.xblock.metadata[ingest_profile['short_name'] + '_profile_id'] = resp['id']
         return resp
 
     def submit_retranscode_job(self, account_id, video_id, profile_type):

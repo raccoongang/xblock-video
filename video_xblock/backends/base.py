@@ -42,7 +42,8 @@ class BaseApiClient(object):
     @abc.abstractmethod
     def get(self, url, headers=None, can_retry=True):
         """
-        Issues REST GET request to a given URL.
+        Issue REST GET request to a given URL.
+
         Can throw ApiClientError or it's subclass.
 
         Arguments:
@@ -58,7 +59,8 @@ class BaseApiClient(object):
     @abc.abstractmethod
     def post(self, url, payload, headers=None, can_retry=True):
         """
-        Issues REST POST request to a given URL.
+        Issue REST POST request to a given URL.
+
         Can throw ApiClientError or it's subclass.
 
         Arguments:
