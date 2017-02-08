@@ -1,5 +1,5 @@
 """
-Custom, VideoXblock specific Exceptions
+Custom, VideoXblock specific Exceptions.
 """
 from __future__ import unicode_literals
 
