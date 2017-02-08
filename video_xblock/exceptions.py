@@ -3,7 +3,7 @@ Custom, VideoXblock specific Exceptions.
 """
 from __future__ import unicode_literals
 
-from video_xblock.utils import ugettext as _
+from .utils import ugettext as _
 
 
 class VideoXBlockException(Exception):
@@ -15,6 +15,7 @@ class VideoXBlockException(Exception):
 
     def __init__(self, detail=None):
         self.detail = detail if detail is not None else self.default_detail
+        super(VideoXBlockException, self).__init__(detail)
 
     def __str__(self):
         return self.detail
