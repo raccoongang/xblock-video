@@ -5,6 +5,7 @@ All you need to provide is video url, this XBlock does the rest for you.
 """
 
 import datetime
+import functools
 import json
 import logging
 import os.path
@@ -15,6 +16,9 @@ from xblock.fields import Scope, Boolean, Float, String, Dict
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
+
+from xmodule.contentstore.django import contentstore
+from xmodule.contentstore.content import StaticContent
 
 from pycaption import detect_format, WebVTTWriter
 from webob import Response
