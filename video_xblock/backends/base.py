@@ -1,7 +1,6 @@
 """
 Backend classes are responsible for video platform specific logic such as
 validation, interaction with the platform via API and player rendering to end user.
-
 Base Video player plugin
 """
 
@@ -21,11 +20,46 @@ from django.template import Template, Context
 html_parser = HTMLParser()  # pylint: disable=invalid-name
 
 
-class VideoXBlockException(Exception):
+class ApiClientError(Exception):
     """
-    Video XBlock general exception.
+    Base API client exception
     """
     pass
+
+
+class BaseApiClient(object):
+    """
+    Low level video platform API client.
+    Abstracts API interaction details like
+    requests composition, API credentials handling.
+    Subclass your platform specific API client from this base class.
+    """
+
+    @abc.abstractmethod
+    def get(self, url, headers=None, can_retry=True):
+        """
+        Issue REST GET request to a given URL.
+        Can throw ApiClientError or it's subclass.
+        Arguments:
+            url (str): API url to fetch a resource from.
+            headers (dict): Headers necessary as per API, e.g. authorization bearer to perform authorised requests.
+            can_retry (bool): True if this is to retry a call if authentication failed.
+        Returns:
+            Response in python native data format.
+        """
+
+    @abc.abstractmethod
+    def post(self, url, payload, headers=None, can_retry=True):
+        """
+        Issue REST POST request to a given URL.
+        Can throw ApiClientError or it's subclass.
+        Arguments:
+            url (str): API url to fetch a resource from.
+            headers (dict): Headers necessary as per API, e.g. authorization bearer to perform authorised requests.
+            can_retry (bool): True if this is to retry a call if authentication failed.
+        Returns:
+            Response in python native data format.
+        """
 
 
 class BaseVideoPlayer(Plugin):
@@ -36,11 +70,13 @@ class BaseVideoPlayer(Plugin):
 
     entry_point = 'video_xblock.v1'
 
+    def __init__(self, xblock):
+        self.xblock = xblock
+
     @abc.abstractproperty
     def url_re(self):
         """
         Regex (list) to match video url
-
         Can be a regex object, a list of regex objects or a string.
         """
         return [] or re.compile('') or ''
@@ -56,10 +92,8 @@ class BaseVideoPlayer(Plugin):
     def metadata_fields(self):
         """
         List of keys (str) to be stored in the metadata xblock field.
-
         To keep xblock metadata field clean on it's each update,
         only backend-specific parameters should be stored in the field.
-
         Note: this is to add each new key (str) to be stored in metadata
         to the list being returned here.
         """
@@ -136,7 +170,6 @@ class BaseVideoPlayer(Plugin):
         """
         Customises display of studio editor fields per a video platform.
         E.g. 'account_id' should be displayed for Brightcove only.
-
         Returns:
             client_token_help_message (str)
             editable_fields (tuple)
@@ -147,7 +180,6 @@ class BaseVideoPlayer(Plugin):
         """
         Renders self.get_frag as a html string and returns it as a Response.
         This method is used by VideoXBlock.render_player()
-
         Rendering sequence is set to JS must be in the head tag and executed
         before initializing video components.
         """
@@ -165,7 +197,6 @@ class BaseVideoPlayer(Plugin):
     def render_resource(self, path, **context):
         """
         Renders static resource using provided context
-
         Returns: django.utils.safestring.SafeText
         """
         html = Template(self.resource_string(path))
@@ -177,7 +208,6 @@ class BaseVideoPlayer(Plugin):
     def match(cls, href):
         """
         Checks if provided video `href` can be rendered by a video backend.
-
         `cls.url_re` attribute defined in subclassess are used for the check.
         """
         if isinstance(cls.url_re, list):
@@ -197,7 +227,6 @@ class BaseVideoPlayer(Plugin):
     def get_default_transcripts(self, **kwargs):  # pylint: disable=unused-argument
         """
         Fetches transcripts list from a video platform.
-
         Arguments:
             kwargs (dict): key-value pairs of API-specific identifiers (account_id, video_id, etc.) and tokens,
                 necessary for API calls.
@@ -219,7 +248,6 @@ class BaseVideoPlayer(Plugin):
     def authenticate_api(self, **kwargs):
         """
         Authenticates to a video platform's API in order to perform authorized requests.
-
         Arguments:
             kwargs (dict): platform-specific predefined client parameters, required to get credentials / tokens.
         Returns:
@@ -229,14 +257,14 @@ class BaseVideoPlayer(Plugin):
         return {}, ''
 
     @abc.abstractmethod
-    def download_default_transcript(self, url):  # pylint: disable=unused-argument
+    def download_default_transcript(self, url, language_code):  # pylint: disable=unused-argument
         """
-        Downloads default transcript from a video platform API and uploads it to the video xblock.
-
+        Downloads default transcript from a video platform API and formats it accordingly to the WebVTT standard.
         Arguments:
-            url (str): transcript download url.
+            url (str): API url to fetch a default transcript from.
+            language_code (str): Language code of a transcript to be downloaded.
         Returns:
-            unicode: Transcripts in WebVTT or SRT format.
+            unicode: Transcripts formatted per WebVTT.
         """
         return u''
 
@@ -244,7 +272,6 @@ class BaseVideoPlayer(Plugin):
     def get_transcript_language_parameters(lang_code):
         """
         Gets the parameters of a transcript's language, having checked on consistency with settings.
-
         Arguments:
             lang_code (str): raw language code of a transcript, fetched from the external sources.
         Returns:
@@ -255,10 +282,8 @@ class BaseVideoPlayer(Plugin):
         lang_code = lang_code[0:2]
         # Check on consistency with the pre-configured ALL_LANGUAGES
         if lang_code not in [language[0] for language in settings.ALL_LANGUAGES]:
-            raise VideoXBlockException(
-                'Not all the languages of transcripts fetched from video platform are '
-                'consistent with the pre-configured ALL_LANGUAGES'
-            )
+            raise Exception('Not all the languages of transcripts fetched from video platform are '
+                            'consistent with the pre-configured ALL_LANGUAGES')
         lang_label = [language[1] for language in settings.ALL_LANGUAGES if language[0] == lang_code][0]
         return lang_code, lang_label
 
