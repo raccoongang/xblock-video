@@ -1,7 +1,13 @@
 language: python
+sudo: false
 python:
   - "2.7.10"
   - "2.7.13"
+
+addons:
+  apt:
+    packages:
+    - python-lxml
 
 cache:
   pip: true
@@ -13,8 +19,8 @@ before_install:
   # Install latest stable NodeJS version. Required for eslint.
   - nvm install stable
   # Install binary package for lxml to speed up build
-  - sudo apt-get -qq update
-  - sudo apt-get install -y python-lxml
+  # - sudo apt-get -qq update
+  # - sudo apt-get install -y
 
 before_script:
   - make deps-test
