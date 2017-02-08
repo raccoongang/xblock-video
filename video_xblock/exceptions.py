@@ -3,7 +3,6 @@ Custom, VideoXblock specific Exceptions
 """
 from __future__ import unicode_literals
 
-from video_xblock.constants import status
 from video_xblock.utils import ugettext as _
 
 
@@ -19,3 +18,10 @@ class VideoXBlockException(Exception):
 
     def __str__(self):
         return self.detail
+
+
+class ApiClientError(VideoXBlockException):
+    """
+    Base API client exception.
+    """
+    default_detail = _('API error occurred.')
