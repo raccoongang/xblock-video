@@ -11,10 +11,10 @@ class VideoXBlockException(Exception):
     Base class for video xblock exceptions.
     Subclasses should provide `.default_detail` property.
     """
-    default_detail = _('An exception occurred.')
+    default_msg = _('An exception occurred.')
 
     def __init__(self, detail=None):
-        self.detail = detail if detail is not None else self.default_detail
+        self.detail = detail if detail is not None else self.default_msg
         super(VideoXBlockException, self).__init__(detail)
 
     def __str__(self):
@@ -25,4 +25,4 @@ class ApiClientError(VideoXBlockException):
     """
     Base API client exception.
     """
-    default_detail = _('API error occurred.')
+    default_msg = _('API error occurred.')

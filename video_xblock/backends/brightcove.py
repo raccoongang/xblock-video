@@ -21,7 +21,7 @@ class BrightcoveApiClientError(ApiClientError):
     """
     Brightcove specific api client errors
     """
-    default_detail = _('Brightcove API error.')
+    default_msg = _('Brightcove API error.')
 
 
 class BrightcoveApiClient(BaseApiClient):
