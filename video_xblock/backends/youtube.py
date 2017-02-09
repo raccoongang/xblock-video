@@ -44,6 +44,7 @@ class YoutubePlayer(BaseVideoPlayer):
     default_transcripts = []
 
     def media_id(self, href):
+        print(href, self.url_re.search(href))
         return self.url_re.search(href).group('media_id')
 
     def get_frag(self, **context):

@@ -6,6 +6,8 @@ import json
 from copy import copy
 from mock import Mock
 
+from video_xblock.exceptions import VideoXBlockException
+
 
 class Response(object):
     """
@@ -26,12 +28,19 @@ class BaseMock(Mock):
     Base custom mock class.
     """
     event_types = []
+    event_results = []
 
     def expected_value(self, **kwargs):
         """
         Should return expected value after mock is applied.
         """
         raise NotImplementedError
+
+    def get_events(self):
+        """
+        Returns available events.
+        """
+        return self.event_types
 
 
 class MockCourse(object):
@@ -44,9 +53,22 @@ class MockCourse(object):
         self.language = 'en'
 
 
-class YoutubeAuthMock(Mock):
+class YoutubeAuthMock(BaseMock):
     """
     Youtube auth mock class.
+    """
+    return_value = {}
+
+    def expected_value(self, **kwargs):
+        """
+        Return expected value of `authenticate_api` after mock is applied.
+        """
+        return self.return_value
+
+
+class VimeoAuthMock(BaseMock):
+    """
+    Vimeo auth mock class.
     """
     return_value = {}
 
@@ -61,35 +83,42 @@ class BrightcoveAuthMock(BaseMock):
     """
     Brightcove auth mock class.
     """
+    event_types = ['credentials_created', 'auth_failed']
 
-    def get_client_credentials(self):
+    event_results = {
+        'credentials_created': {
+            'client_secret': 'brightcove_client_secret',
+            'client_id': 'brightcove_client_id',
+            'error_message': ''
+        },
+        'auth_failed': {
+            'client_secret': '',
+            'client_id': '',
+            'error_message': 'Authentication to Brightcove API failed: no client credentials have been retrieved.'
+        }
+    }
+
+    def create_credentials(self, event):
         """
         Mock `get_client_credentials` returned value.
         """
-        client_secret = 'brightcove_client_secret'
-        client_id = 'brightcove_client_id'
-        error_message = ""
-        self.return_value = (client_secret, client_id, error_message)
-        return self
-
-    def get_access_token(self):
-        """
-        Mock `get_access_token` returned value.
-        """
-        access_token = 'brightcove_access_token'
-        error_message = ''
-        self.return_value = (access_token, error_message)
+        if event == 'auth_failed':
+            self.side_effect = VideoXBlockException(self.event_results[event]['error_message'])
+        self.return_value = (
+            self.event_results[event]['client_secret'],
+            self.event_results[event]['client_id'],
+            self.event_results[event]['error_message']
+        )
         return self
 
     def expected_value(self, **kwargs):
         """
         Return expected value of `authenticate_api` after mock is applied.
         """
-        return {
-            'access_token': 'brightcove_access_token',
-            'client_id': 'brightcove_client_id',
-            'client_secret': 'brightcove_client_secret'
-        }
+        event = kwargs.get('event', '')
+        ret = copy(self.event_results[event])
+        error = ret.pop('error_message')
+        return ret, error
 
 
 class WistiaAuthMock(BaseMock):
@@ -98,11 +127,33 @@ class WistiaAuthMock(BaseMock):
     """
     return_value = Response(status_code=200, body='')
 
+    event_types = ['not_authorized', 'success']
+
+    event_results = {
+        'not_authorized': {
+            'auth_data': {'token': 'some_token'},
+            'error_message': 'Authentication failed.'
+        },
+        'success': {
+            'auth_data': {'token': 'some_token'},
+            'error_message': ''
+        }
+    }
+
+    def get(self, event):
+        """
+        Substitute requests.get method.
+        """
+        if event == 'not_authorized':
+            self.return_value = Response(status_code=401)
+        return lambda x: self.return_value
+
     def expected_value(self, **kwargs):
         """
         Return expected value of `authenticate_api` after mock is applied.
         """
-        return {'token': kwargs.get('token', '')}
+        event = kwargs.get('event', '')
+        return self.event_results[event]['auth_data'], self.event_results[event]['error_message']
 
 
 class YoutubeDefaultTranscriptsMock(BaseMock):
@@ -161,7 +212,7 @@ class YoutubeDefaultTranscriptsMock(BaseMock):
 class BrightcoveDefaultTranscriptsMock(BaseMock):
     event_types = [
         'fetch_transcripts_exception', 'text_tracks_not_in_response',
-        'response_not_authorized', 'status_not_200', 'success'
+        'not_authorized', 'status_not_200', 'success'
     ]
 
     default_transcripts = [
