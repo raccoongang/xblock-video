@@ -18,9 +18,6 @@ from video_xblock.exceptions import VideoXBlockException
 from video_xblock.utils import render_resource, resource_string, ugettext as _
 
 
-html_parser = HTMLParser()  # pylint: disable=invalid-name
-
-
 class BaseApiClient(object):
     """
     Low level video platform API client.
