@@ -45,3 +45,16 @@ function showStatus($el, type, message) {
         $el.addClass('is-hidden');
     }, msgShowTime);
 }
+
+
+/** Dispatch request to the video player backend via xblock handler.
+ */
+function dispatch(method, suffix, runtime, element) {
+    return $.ajax({
+        type: method,
+        url: runtime.handlerUrl(element, 'dispatch', suffix),
+        data: '{}'
+    });
+}
+
+export {dispatch, fillValues, showStatus};

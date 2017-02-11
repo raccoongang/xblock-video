@@ -41,5 +41,9 @@ coveralls:
 	coveralls-lcov -v -n video_xblock/static/coverage/PhantomJS\ 2.1.1\ \(Linux\ 0.0.0\)/lcov.info > coverage.json
 	coveralls --merge=coverage.json
 
-package:
-	echo "Here be static dependencies packaging"
+dist:
+	@echo "Assemble JS code"
+	webpack
+
+webpack:
+	webpack --watch

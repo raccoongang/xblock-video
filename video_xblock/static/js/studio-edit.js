@@ -3,9 +3,18 @@
     Reference:
         https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/templates/studio_edit.html
 */
-function StudioEditableXBlock(runtime, element) {
-    'use strict';
 
+import {dispatch, fillValues, showStatus} from './studio-edit-utils';
+
+
+/**
+ * StudioEditableXBlock function for setting up the Video xblock.
+ * This function was copied from xblock-utils by link
+ *     https://github.com/edx/xblock-utils/blob/master/xblockutils/templates/studio_edit.html
+ * and extended by Raccoon Gang company
+ * It is responsible for a validating and sending data to backend
+ */
+function StudioEditableXBlock(runtime, element) { // eslint-disable-line no-unused-vars
     var fields = [];
     // Studio includes a copy of tinyMCE and its jQuery plugin
     var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');  // TODO: Remove TinyMCE
@@ -90,7 +99,7 @@ function StudioEditableXBlock(runtime, element) {
      */
     function submitBCReTranscode(profile) {
         $.when(
-            dispatch('POST', 'submit_retranscode_' + profile)
+            dispatch('POST', 'submit_retranscode_' + profile, runtime, element)
         ).then(function(response) {
             $('#brightcove-retranscode-status').html(
                 'Your retranscode request was successfully submitted to Brightcove VideoCloud. ' +
@@ -102,7 +111,7 @@ function StudioEditableXBlock(runtime, element) {
      */
     function bcLoadVideoTechInfo() {
         $.when(
-            dispatch('POST', 'get_video_tech_info')
+            dispatch('POST', 'get_video_tech_info', runtime, element)
         ).then(function(response) {
             $('#bc-tech-info-renditions').html(response.renditions_count);
             $('#bc-tech-info-autoquality').html(response.auto_quality);
@@ -114,7 +123,7 @@ function StudioEditableXBlock(runtime, element) {
      */
     function getReTranscodeStatus() {
         $.when(
-            dispatch('POST', 'retranscode-status')
+            dispatch('POST', 'retranscode-status', runtime, element)
         ).then(function(data) {
             $('#brightcove-retranscode-status').html(data);
         });
