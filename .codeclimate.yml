@@ -29,4 +29,5 @@ ratings:
   - "**.js"
   - "**.md"
   - "**.py"
-exclude_paths: []
+exclude_paths:
+- "video_xblock/dist/studio-edit-bundle.js"
