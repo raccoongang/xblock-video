@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -71,8 +71,72 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return dispatch; });
-/** Dispatch request to the video player backend via xblock handler.
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__studio_edit_utils__ = __webpack_require__(1);
+/* harmony export (immutable) */ __webpack_exports__["c"] = submitBCReTranscode;
+/* harmony export (immutable) */ __webpack_exports__["a"] = bcLoadVideoTechInfo;
+/* harmony export (immutable) */ __webpack_exports__["b"] = getReTranscodeStatus;
+
+
+/**
+ * Submit video for a retranscode to Brightcove Video Cloud API.
+ */
+function submitBCReTranscode(profile, runtime, element) {
+    $.when(
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__studio_edit_utils__["a" /* dispatch */])('POST', 'submit_retranscode_' + profile, runtime, element)
+    ).then((response) => {
+        $('#brightcove-retranscode-status').html(
+            'Your retranscode request was successfully submitted to Brightcove VideoCloud. ' +
+            'It takes few minutes to process it. Job id ' + response.id);
+    });
+}
+
+/**
+ * Get tech info for a video and display it to teacher.
+ *
+ * @param  {Object} runtime
+ * @param  {Object} element
+ * @return {XMLHttpRequest}
+ */
+function bcLoadVideoTechInfo(runtime, element) {
+    $.when(
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__studio_edit_utils__["a" /* dispatch */])('POST', 'get_video_tech_info', runtime, element)
+    ).then((response) => {
+        $('#bc-tech-info-renditions').html(response.renditions_count);
+        $('#bc-tech-info-autoquality').html(response.auto_quality);
+        $('#bc-tech-info-encryption').html(response.encryption);
+    });
+}
+
+/**
+ * Get ReTranscode status for a video
+ *
+ * @param  {Object} runtime
+ * @param  {Object} element
+ * @return {XMLHttpRequest}
+ */
+function getReTranscodeStatus(runtime, element) {
+    $.when(
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__studio_edit_utils__["a" /* dispatch */])('POST', 'retranscode-status', runtime, element)
+    ).then((data) => {
+        $('#brightcove-retranscode-status').html(data);
+    });
+}
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = dispatch;
+/**
+ * Dispatch request to the video player backend via xblock handler.
+ *
+ * @param  {String} method - HTTP method: GET, POST, HEAD, &c.
+ * @param  {String} suffix -
+ * @param  {Object} runtime -
+ * @param  {Object} element -
+ * @return {XMLHttpRequest} -
  */
 function dispatch(method, suffix, runtime, element) {
     return $.ajax({
@@ -83,15 +147,13 @@ function dispatch(method, suffix, runtime, element) {
 }
 
 
-
-
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__studio_edit_utils__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__studio_edit_brightcove__ = __webpack_require__(0);
 
 
 /**
@@ -107,44 +169,16 @@ function StudioEditableXBlock(runtime, element) { // eslint-disable-line no-unus
     var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');  // TODO: Remove TinyMCE
     var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
 
-    /** This function is used for Brightcove HLS debugging
-     *  profile: ingest profile to use for re-transcode job.
-     *  Accepted values: default, autoquality, encryption.
+    /**
+     * This function is used for Brightcove HLS debugging
+     * profile: ingest profile to use for re-transcode job.
+     * Accepted values: default, autoquality, encryption.
      */
-
     var uiDispatch = function uiDispatch(method, suffix) {
         return $.ajax({
             type: method,
             url: runtime.handlerUrl(element, 'ui_dispatch', suffix),
             data: '{}'
-        });
-    };
-
-    var submitBCReTranscode = function submitBCReTranscode(profile) {
-        $.when(
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__studio_edit_utils__["a" /* dispatch */])('POST', 'submit_retranscode_' + profile, runtime, element)
-        ).then(function(response) {
-            $('#brightcove-retranscode-status').html(
-                'Your retranscode request was successfully submitted to Brightcove VideoCloud. ' +
-                'It takes few minutes to process it. Job id ' + response.id);
-        });
-    };
-
-    var bcLoadVideoTechInfo = function bcLoadVideoTechInfo() {
-        $.when(
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__studio_edit_utils__["a" /* dispatch */])('POST', 'get_video_tech_info', runtime, element)
-        ).then(function(response) {
-            $('#bc-tech-info-renditions').html(response.renditions_count);
-            $('#bc-tech-info-autoquality').html(response.auto_quality);
-            $('#bc-tech-info-encryption').html(response.encryption);
-        });
-    };
-
-    var getReTranscodeStatus = function getReTranscodeStatus() {
-        $.when(
-            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__studio_edit_utils__["a" /* dispatch */])('POST', 'retranscode-status', runtime, element)
-        ).then(function(data) {
-            $('#brightcove-retranscode-status').html(data);
         });
     };
 
@@ -154,15 +188,15 @@ function StudioEditableXBlock(runtime, element) { // eslint-disable-line no-unus
         ).then(function(response) {
             if (response.data.canShow) {
                 $('#brightcove-advanced-settings').toggleClass('is-hidden', false);
-                bcLoadVideoTechInfo();
-                getReTranscodeStatus();
+                __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__studio_edit_brightcove__["a" /* bcLoadVideoTechInfo */])();
+                __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__studio_edit_brightcove__["b" /* getReTranscodeStatus */])();
             }
         });
     };
 
     $('#submit-re-transcode').click(function() {
         var profile = $('#xb-field-edit-retranscode-options').val();
-        submitBCReTranscode(profile);
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__studio_edit_brightcove__["c" /* submitBCReTranscode */])(profile);
     }
     );
 

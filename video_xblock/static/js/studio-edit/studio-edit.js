@@ -4,8 +4,8 @@
         https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/templates/studio_edit.html
 */
 
+import {bcLoadVideoTechInfo, getReTranscodeStatus, submitBCReTranscode} from './studio-edit-brightcove';
 import {dispatch, fillValues, showStatus} from './studio-edit-utils';
-
 
 /**
  * StudioEditableXBlock function for setting up the Video xblock.
@@ -87,46 +87,6 @@ function StudioEditableXBlock(runtime, element) { // eslint-disable-line no-unus
      */
     function uiDispatch(method, suffix) {
         return ajaxCallDispatch(method, suffix, 'ui_dispatch');
-    }
-
-    /** Dispatch a specific method.
-     */
-    function dispatch(method, suffix) {
-        return ajaxCallDispatch(method, suffix, 'dispatch');
-    }
-
-    /** Submit Brightcove re-ntranscode for video content protection.
-     */
-    function submitBCReTranscode(profile) {
-        $.when(
-            dispatch('POST', 'submit_retranscode_' + profile, runtime, element)
-        ).then(function(response) {
-            $('#brightcove-retranscode-status').html(
-                'Your retranscode request was successfully submitted to Brightcove VideoCloud. ' +
-                'It takes few minutes to process it. Job id ' + response.id);
-        });
-    }
-
-    /** Load Brightcove video information.
-     */
-    function bcLoadVideoTechInfo() {
-        $.when(
-            dispatch('POST', 'get_video_tech_info', runtime, element)
-        ).then(function(response) {
-            $('#bc-tech-info-renditions').html(response.renditions_count);
-            $('#bc-tech-info-autoquality').html(response.auto_quality);
-            $('#bc-tech-info-encryption').html(response.encryption);
-        });
-    }
-
-    /** Fetch re-transcode status.
-     */
-    function getReTranscodeStatus() {
-        $.when(
-            dispatch('POST', 'retranscode-status', runtime, element)
-        ).then(function(data) {
-            $('#brightcove-retranscode-status').html(data);
-        });
     }
 
     /** Customize settings display.

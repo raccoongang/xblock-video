@@ -47,7 +47,14 @@ function showStatus($el, type, message) {
 }
 
 
-/** Dispatch request to the video player backend via xblock handler.
+/**
+ * Dispatch request to the video player backend via xblock handler.
+ *
+ * @param  {String} method - HTTP method: GET, POST, HEAD, &c.
+ * @param  {String} suffix -
+ * @param  {Object} runtime -
+ * @param  {Object} element -
+ * @return {XMLHttpRequest} -
  */
 function dispatch(method, suffix, runtime, element) {
     return $.ajax({

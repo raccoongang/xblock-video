@@ -24,7 +24,8 @@ quality-py:
 	pydocstyle -e
 
 quality-js:
-	eslint video_xblock/static/js/
+	eslint -c .eslintrc.studio-edit.json video_xblock/static/js/studio-edit/
+	eslint  --ignore-pattern "*studio-edit*" video_xblock/static/js/
 
 dev-install:
 	# Install package using pip to leverage pip's cache and shorten CI build time
@@ -42,7 +43,7 @@ coveralls:
 	coveralls --merge=coverage.json
 
 dist:
-	@echo "Assemble JS code"
+	@echo "Assemble JS code\n"
 	webpack
 
 webpack:

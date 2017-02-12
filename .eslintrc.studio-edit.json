@@ -1,0 +1,28 @@
+// Separate config for JS used for in Studio edit window
+// Eventually, configs should merge
+{
+    "extends": "eslint-config-edx",
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module"
+    },
+    "globals": {
+        "videojs": true,
+        "domReady": true
+    },
+    "rules": {
+        "no-underscore-dangle": [
+            "error", {"allow": [
+                // VideoJS components' attributes
+                "childNameIndex_", "el_", "kind_", "labelEl_", "options_", "player_", "tracks_"
+            ]}
+        ],
+        "require-jsdoc": ["error", {
+            "require": {
+                "FunctionDeclaration": true,
+                "MethodDefinition": true,
+                "ClassDeclaration": true
+            }
+        }]
+    }
+}

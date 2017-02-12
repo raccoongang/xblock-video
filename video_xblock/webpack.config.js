@@ -2,18 +2,18 @@
 const webpack = require('webpack')
 const path = require('path')
 
-// const extractCommons = new webpack.optimize.CommonsChunkPlugin({
-//   name: 'commons',
-//   filename: 'commons.js'
-// })
+const extractCommons = new webpack.optimize.CommonsChunkPlugin({
+  name: 'commons',
+  filename: 'commons.js'
+})
 
-// const ExtractTextPlugin = require('extract-text-webpack-plugin')
-// const extractCSS = new ExtractTextPlugin('[name].bundle.css')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const extractCSS = new ExtractTextPlugin('[name].bundle.css')
 const config = {
-  context: path.resolve(__dirname, 'video_xblock/static/js/studio-edit'),
-  entry: './studio-edit.js',
+  context: path.resolve(__dirname, 'src'),
+  entry: './static/js/studio-edit.js',
   output: {
-    path: path.resolve(__dirname, 'video_xblock/dist'),
+    path: path.resolve(__dirname, 'dist'),
     filename: 'studio-edit-bundle.js'
   },
   module: {
