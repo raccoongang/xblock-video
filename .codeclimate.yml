@@ -10,6 +10,7 @@ engines:
       - python
     exclude_fingerprints:
     - ffaa02171edd2e7b1184b6eacdbed97f
+    - 1df6c34e562e5d5a6218587f53f9bd0d
   eslint:
     # Disabled since CodeClimate doesn't yet support eslint-config-edx plugin
     enabled: false
