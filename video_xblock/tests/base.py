@@ -43,7 +43,7 @@ class VideoXBlockTestBase(unittest.TestCase):
         Restore state of mocked entities.
         """
         if self.mocked_objects:
-            for __, original in self.mocked_objects.items():  # pylint: disable=unused-variable
+            for original in self.mocked_objects.values():
                 for index, attr in enumerate(original['attrs']):
                     setattr(original['obj'], attr, original['value'][index])
             self.mocked_objects = {}
