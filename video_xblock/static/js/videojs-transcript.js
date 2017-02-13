@@ -1,3 +1,6 @@
+/**
+ * This part is responsible for creation of captions and transcripts buttons on player load.
+ */
 domReady(function() {
     'use strict';
 
@@ -8,7 +11,7 @@ domReady(function() {
         // attach the widget to the page
         var transcriptContainer = document.getElementById('transcript');
         var captionContainer = document.getElementsByClassName('vjs-text-track-display');
-        /** This function is wrapper for initial brightcove's captions. */
+        /** This function is wrapper for initial Brightcove's captions. */
         var initCaptions = function initCaptions() {
             var transcript;
             var tracks = player_.textTracks().tracks_;
@@ -29,7 +32,8 @@ domReady(function() {
             transcript = player_.transcript({
                 showTrackSelector: false,
                 showTitle: false,
-                followPlayerTrack: true
+                followPlayerTrack: true,
+                tabIndex: 10
             });
             transcript.el().addEventListener('click', function() {
                 player_.trigger('transcriptstatechanged');
@@ -87,7 +91,8 @@ domReady(function() {
             style: 'fa-cc',
             enabledEvent: 'captionenabled',
             disabledEvent: 'captiondisabled',
-            cssClasses: cssClasses
+            cssClasses: cssClasses,
+            tabIndex: 6
         });
         cssClasses = 'vjs-custom-transcript-button vjs-menu-button vjs-menu-button-popup vjs-control vjs-button';
         if (this.transcriptsEnabled) {
@@ -97,13 +102,15 @@ domReady(function() {
             style: 'fa-quote-left',
             enabledEvent: 'transcriptenabled',
             disabledEvent: 'transcriptdisabled',
-            cssClasses: cssClasses
+            cssClasses: cssClasses,
+            tabIndex: 7
         });
         this.toggleButton({
             style: 'fa-caret-left',
             enabledEvent: 'caretenabled',
             disabledEvent: 'caretdisabled',
-            cssClasses: 'vjs-custom-caret-button vjs-menu-button vjs-menu-button-popup vjs-control vjs-button'
+            cssClasses: 'vjs-custom-caret-button vjs-menu-button vjs-menu-button-popup vjs-control vjs-button',
+            tabIndex: 8
         });
     });
 });

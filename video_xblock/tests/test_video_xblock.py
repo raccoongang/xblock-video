@@ -1,10 +1,11 @@
 """
 Test cases for video_xblock
 """
-import mock
 import datetime
 import json
 import unittest
+
+import mock
 
 from django.test import RequestFactory
 from django.conf import settings
@@ -12,10 +13,9 @@ from xblock.field_data import DictFieldData
 from xblock.test.tools import TestRuntime
 
 from video_xblock import VideoXBlock
+from video_xblock.utils import ugettext as _
 
 settings.configure()
-
-_ = lambda text: text
 
 
 class VideoXBlockTests(unittest.TestCase):
@@ -27,7 +27,7 @@ class VideoXBlockTests(unittest.TestCase):
         Creates a XBlock VideoXBlock for testing purpose.
         """
         result = super(VideoXBlockTests, self).setUp()
-        runtime = TestRuntime() # pylint: disable=abstract-class-instantiated
+        runtime = TestRuntime()  # pylint: disable=abstract-class-instantiated
         self.block = VideoXBlock(runtime, DictFieldData({
             'account_id': 'account_id',
         }), mock.Mock())
@@ -105,9 +105,9 @@ class VideoXBlockTests(unittest.TestCase):
         factory = RequestFactory()
         request = factory.post('', json.dumps(data), content_type='application/json')
         response = self.block.save_player_state(request)
-        self.assertEqual('{"success": true}', response.body) # pylint: disable=no-member
+        self.assertEqual('{"success": true}', response.body)  # pylint: disable=no-member
         self.assertDictEqual(self.block.player_state, {
-            'current_time':data['currentTime'],
+            'current_time': data['currentTime'],
             'muted': data['muted'],
             'playback_rate': data['playbackRate'],
             'volume': data['volume'],
