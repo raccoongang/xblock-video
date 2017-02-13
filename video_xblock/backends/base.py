@@ -1,7 +1,8 @@
 """
 Backend classes are responsible for video platform specific logic such as
 validation, interaction with the platform via API and player rendering to end user.
-Base Video player plugin
+
+Base Video player plugin.
 """
 
 import abc
@@ -20,8 +21,9 @@ from video_xblock.utils import render_resource, resource_string, ugettext as _
 class BaseApiClient(object):
     """
     Low level video platform API client.
-    Abstracts API interaction details like
-    requests composition, API credentials handling.
+
+    Abstracts API interaction details like requests composition, API credentials handling.
+
     Subclass your platform specific API client from this base class.
     """
 
@@ -29,11 +31,14 @@ class BaseApiClient(object):
     def get(self, url, headers=None, can_retry=True):
         """
         Issue REST GET request to a given URL.
+
         Can throw ApiClientError or it's subclass.
+
         Arguments:
             url (str): API url to fetch a resource from.
             headers (dict): Headers necessary as per API, e.g. authorization bearer to perform authorised requests.
             can_retry (bool): True if this is to retry a call if authentication failed.
+
         Returns:
             Response in python native data format.
         """
@@ -42,11 +47,14 @@ class BaseApiClient(object):
     def post(self, url, payload, headers=None, can_retry=True):
         """
         Issue REST POST request to a given URL.
+
         Can throw ApiClientError or it's subclass.
+
         Arguments:
             url (str): API url to fetch a resource from.
             headers (dict): Headers necessary as per API, e.g. authorization bearer to perform authorised requests.
             can_retry (bool): True if this is to retry a call if authentication failed.
+
         Returns:
             Response in python native data format.
         """
@@ -54,7 +62,7 @@ class BaseApiClient(object):
 
 class BaseVideoPlayer(Plugin):
     """
-    Inherit your video player class from this class
+    Inherit your video player class from this class.
     """
     __metaclass__ = abc.ABCMeta
 
@@ -66,7 +74,8 @@ class BaseVideoPlayer(Plugin):
     @abc.abstractproperty
     def url_re(self):
         """
-        Regex (list) to match video url
+        Regex (list) to match video url.
+
         Can be a regex object, a list of regex objects or a string.
         """
         return [] or re.compile('') or ''
@@ -82,8 +91,10 @@ class BaseVideoPlayer(Plugin):
     def metadata_fields(self):
         """
         List of keys (str) to be stored in the metadata xblock field.
+
         To keep xblock metadata field clean on it's each update,
         only backend-specific parameters should be stored in the field.
+
         Note: this is to add each new key (str) to be stored in metadata
         to the list being returned here.
         """
@@ -160,6 +171,7 @@ class BaseVideoPlayer(Plugin):
         """
         Customises display of studio editor fields per a video platform.
         E.g. 'account_id' should be displayed for Brightcove only.
+
         Returns:
             client_token_help_message (str)
             editable_fields (tuple)
@@ -169,7 +181,8 @@ class BaseVideoPlayer(Plugin):
     def get_player_html(self, **context):
         """
         Renders self.get_frag as a html string and returns it as a Response.
-        This method is used by VideoXBlock.render_player()
+        This method is used by VideoXBlock.render_player().
+
         Rendering sequence is set to JS must be in the head tag and executed
         before initializing video components.
         """
