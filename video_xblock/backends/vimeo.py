@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Vimeo Video player plugin
+Vimeo Video player plugin.
 """
 
 import json

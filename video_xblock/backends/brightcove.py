@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Brightcove Video player plugin
+Brightcove Video player plugin.
 """
 
 import re
@@ -19,16 +19,15 @@ from video_xblock.utils import ugettext as _
 
 class BrightcoveApiClientError(ApiClientError):
     """
-    Brightcove specific api client errors
+    Brightcove specific api client errors.
     """
     default_msg = _('Brightcove API error.')
 
 
 class BrightcoveApiClient(BaseApiClient):
     """
-    Low level Brightcove API client. Does all heavy lifting of sending https
-    requests over the wire. Responsible for API credentials issuing and
-    access_token refreshing.
+    Low level Brightcove API client. Does all heavy lifting of sending https requests over the wire.
+    Responsible for API credentials issuing and access_token refreshing.
     """
 
     def __init__(self, api_key, api_secret, token=None, account_id=None):
@@ -176,6 +175,7 @@ class BrightcoveHlsMixin(object):
     def get_ingest_profiles(self, account_id):
         """
         Gets all Ingest Profiles available for a given account id.
+
         Reference:
         https://docs.brightcove.com/en/video-cloud/ingest-profiles-api/getting-started/api-overview.html
         """
@@ -187,6 +187,7 @@ class BrightcoveHlsMixin(object):
     def upload_ingest_profile(self, account_id, ingest_profile):
         """
         Uploads Ingest Profile to Brightcove using Brightcove's Ingest Profiles API.
+
         Reference:
         https://docs.brightcove.com/en/video-cloud/ingest-profiles-api/getting-started/api-overview.html
         """
@@ -313,6 +314,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
     def get_frag(self, **context):
         """
         Compose an XBlock fragment with video player to be rendered in student view.
+
         Brightcove backend is a special case and doesn't use vanila Video.js player.
         Because of this it doesn't use `super.get_frag()`
         """
@@ -361,6 +363,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
     def dispatch(self, _request, suffix):
         """
         Brightcove dispatch method exposes different utility entry points.
+
         Entry point can either return info about video or Brightcove account
         or perform some action via Brightcove API.
         """
@@ -426,9 +429,11 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         """
         Authenticates to a Brightcove API in order to perform authorized requests.
         Possible errors: https://docs.brightcove.com/en/perform/oauth-api/reference/error-messages.html
+
         Arguments:
             kwargs (dict): token and account_id key-value pairs
                 as a platform-specific predefined client parameters, required to get credentials and access token.
+
         Returns:
             auth_data (dict): tokens and credentials, necessary to perform authorised API requests, and
             error_status_message (str) for verbosity.
@@ -450,9 +455,11 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
     def get_default_transcripts(self, **kwargs):
         """
         Fetches transcripts list from a video platform.
+
         Arguments:
             kwargs (dict): key-value pairs with account_id and video_id (both fetched from href field of studio editor),
                            and access_token (fetched from Brightcove API).
+
         Returns:
             default_transcripts (list): list of dicts of transcripts. Example:
                 [
@@ -512,8 +519,10 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
     def download_default_transcript(self, url=None, language_code=None):  # pylint: disable=unused-argument
         """
         Downloads default transcript from a video platform API in WebVVT format.
+
         Arguments:
             url (str): transcript download url.
+
         Returns:
             unicode: Transcripts in WebVTT format.
         """

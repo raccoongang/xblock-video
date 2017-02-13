@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Wistia Video player plugin
+Wistia Video player plugin.
 """
 
 import json
@@ -16,7 +16,7 @@ from video_xblock.exceptions import VideoXBlockException
 
 class WistiaPlayer(BaseVideoPlayer):
     """
-    WistiaPlayer is used for videos hosted on the Wistia Video Cloud
+    WistiaPlayer is used for videos hosted on the Wistia Video Cloud.
     """
 
     # From official Wistia documentation. May change in the future
@@ -50,13 +50,14 @@ class WistiaPlayer(BaseVideoPlayer):
 
     def media_id(self, href):
         """
-        Wistia specific implementation of BaseVideoPlayer.media_id()
+        Wistia specific implementation of BaseVideoPlayer.media_id().
         """
         return self.url_re.search(href).group('media_id')
 
     def get_frag(self, **context):
         """
         Compose an XBlock fragment with video player to be rendered in student view.
+
         Extend general player fragment with Wistia specific context and JavaScript.
         """
         context['data_setup'] = json.dumps({
@@ -117,8 +118,10 @@ class WistiaPlayer(BaseVideoPlayer):
         """
         Calls a sample Wistia API url to check on authentication success.
         Reference: https://wistia.com/doc/data-api#authentication
+
         Arguments:
             kwargs (dict): Wistia master token key-value pair.
+
         Returns:
             auth_data (dict): master token, provided by a user, is to be stored in Wistia's player metadata,
                 since no access token should be generated
@@ -138,11 +141,14 @@ class WistiaPlayer(BaseVideoPlayer):
         """
         Fetches transcripts list from Wistia API.
         Reference: https://wistia.com/doc/data-api#captions_index
+
         Urls of transcipts are to be fetched later on with separate API calls.
         Reference: https://wistia.com/doc/data-api#captions_show
+
         Arguments:
             kwargs (dict): key-value pairs with video_id (fetched from href field of studio editor),
                            and token (fetched from Wistia API).
+
         Returns:
             list: List of dicts of transcripts.  Example:
             [
@@ -236,13 +242,16 @@ class WistiaPlayer(BaseVideoPlayer):
     def download_default_transcript(self, url=None, language_code=None):  # pylint: disable=unused-argument
         """
         Get default transcript fetched from a video platform API and formats it to WebVTT-like unicode.
+
         Though Wistia provides a method for a transcript fetching, this is to avoid an API call.
         References:
             https://wistia.com/doc/data-api#captions_index
             https://wistia.com/doc/data-api#captions_show
+
         Arguments:
             url (str): API url to fetch a default transcript from.
             language_code (str): Language code of a default transcript to be downloaded.
+
         Returns:
             unicode: text of transcripts.
         """

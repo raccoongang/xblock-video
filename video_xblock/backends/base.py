@@ -196,12 +196,15 @@ class BaseVideoPlayer(Plugin):
         )
 
     def resource_string(self, path):
-        """Handy helper for getting resources from our kit."""
+        """
+        Handy helper for getting resources from our kit.
+        """
         return resource_string(path)
 
     def render_resource(self, path, **context):
         """
-        Renders static resource using provided context
+        Renders static resource using provided context.
+
         Returns: django.utils.safestring.SafeText
         """
         return render_resource(path, **context)
@@ -210,6 +213,7 @@ class BaseVideoPlayer(Plugin):
     def match(cls, href):
         """
         Checks if provided video `href` can be rendered by a video backend.
+
         `cls.url_re` attribute defined in subclassess are used for the check.
         """
         if isinstance(cls.url_re, list):
@@ -229,9 +233,11 @@ class BaseVideoPlayer(Plugin):
     def get_default_transcripts(self, **kwargs):  # pylint: disable=unused-argument
         """
         Fetches transcripts list from a video platform.
+
         Arguments:
             kwargs (dict): key-value pairs of API-specific identifiers (account_id, video_id, etc.) and tokens,
                 necessary for API calls.
+
         Returns:
             list: List of dicts of transcripts. Example:
             [
@@ -250,8 +256,10 @@ class BaseVideoPlayer(Plugin):
     def authenticate_api(self, **kwargs):
         """
         Authenticates to a video platform's API in order to perform authorized requests.
+
         Arguments:
             kwargs (dict): platform-specific predefined client parameters, required to get credentials / tokens.
+
         Returns:
             auth_data (dict): tokens and credentials, necessary to perform authorised API requests, and
             error_status_message (str) for the sake of verbosity.
@@ -262,9 +270,11 @@ class BaseVideoPlayer(Plugin):
     def download_default_transcript(self, url, language_code):  # pylint: disable=unused-argument
         """
         Downloads default transcript from a video platform API and formats it accordingly to the WebVTT standard.
+
         Arguments:
             url (str): API url to fetch a default transcript from.
             language_code (str): Language code of a transcript to be downloaded.
+
         Returns:
             unicode: Transcripts formatted per WebVTT.
         """
@@ -274,8 +284,10 @@ class BaseVideoPlayer(Plugin):
     def get_transcript_language_parameters(lang_code):
         """
         Gets the parameters of a transcript's language, having checked on consistency with settings.
+
         Arguments:
             lang_code (str): raw language code of a transcript, fetched from the external sources.
+
         Returns:
             lang_code (str): pre-configured language code, e.g. 'br'
             lang_label (str): pre-configured language label, e.g. 'Breton'
@@ -294,7 +306,7 @@ class BaseVideoPlayer(Plugin):
     @staticmethod
     def filter_default_transcripts(default_transcripts, transcripts):
         """
-        Exclude enabled transcripts (fetched from API) from the list of available ones (fetched from video xblock)
+        Exclude enabled transcripts (fetched from API) from the list of available ones (fetched from video xblock).
         """
         enabled_languages_codes = [t[u'lang'] for t in transcripts]
         default_transcripts = [

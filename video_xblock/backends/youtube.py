@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-YouTube Video player plugin
+YouTube Video player plugin.
 """
 
 import json
@@ -95,6 +95,7 @@ class YoutubePlayer(BaseVideoPlayer):
     def customize_xblock_fields_display(editable_fields):
         """
         Customise display of studio editor fields per a video platform.
+
         Authentication to API is not required for Youtube.
         """
         message = 'This field is to be disabled.'
@@ -114,10 +115,13 @@ class YoutubePlayer(BaseVideoPlayer):
     def fetch_default_transcripts_languages(self, video_id):
         """
         Fetches available transcripts languages from a Youtube server.
+
         Reference to `youtube_video_transcript_name()`:
             https://github.com/edx/edx-platform/blob/ecc3473d36b3c7a360e260f8962e21cb01eb1c39/common/lib/xmodule/xmodule/video_module/transcripts_utils.py#L97
+
         Arguments:
             video_id (str): media id fetched from href field of studio-edit modal.
+
         Returns:
             available_languages (list): List of pairs of codes and labels of captions' languages fetched from API,
                 together with transcripts' names if any.
@@ -156,7 +160,9 @@ class YoutubePlayer(BaseVideoPlayer):
         return available_languages, message
 
     def get_default_transcripts(self, **kwargs):
-        """Fetch transcripts list from a video platform."""
+        """
+        Fetch transcripts list from a video platform.
+        """
         # Fetch available transcripts' languages from API
         video_id = kwargs.get('video_id')
         available_languages, message = self.fetch_default_transcripts_languages(video_id)
@@ -219,6 +225,7 @@ class YoutubePlayer(BaseVideoPlayer):
     def download_default_transcript(self, url=None, language_code=None):  # pylint: disable=unused-argument
         """
         Downloads default transcript from Youtube API and formats it to WebVTT-like unicode.
+
         Reference to `get_transcripts_from_youtube()`:
             https://github.com/edx/edx-platform/blob/ecc3473d36b3c7a360e260f8962e21cb01eb1c39/common/lib/xmodule/xmodule/video_module/transcripts_utils.py#L122
         """
