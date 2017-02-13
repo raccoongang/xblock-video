@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Brightcove Video player plugin
 """
@@ -10,14 +11,17 @@ from datetime import datetime
 import requests
 from xblock.fragment import Fragment
 
-from video_xblock.backends.base import ApiClientError, BaseVideoPlayer, BaseApiClient
+from video_xblock.backends.base import BaseVideoPlayer, BaseApiClient
+from video_xblock.constants import status
+from video_xblock.exceptions import ApiClientError
+from video_xblock.utils import ugettext as _
 
 
 class BrightcoveApiClientError(ApiClientError):
     """
     Brightcove specific api client errors
     """
-    pass
+    default_msg = _('Brightcove API error.')
 
 
 class BrightcoveApiClient(BaseApiClient):
@@ -66,7 +70,7 @@ class BrightcoveApiClient(BaseApiClient):
         response = requests.post(url, json=data, headers=headers)
         response_data = response.json()
         # New resource must have been created.
-        if response.status_code == 201 and response_data:
+        if response.status_code == status.HTTP_201_CREATED and response_data:
             client_secret = response_data.get('client_secret')
             client_id = response_data.get('client_id')
             error_message = ''
@@ -92,7 +96,7 @@ class BrightcoveApiClient(BaseApiClient):
             "Authorization": "Basic " + auth_string
         }
         resp = requests.post(url, headers=headers, data=params)
-        if resp.status_code == 200:
+        if resp.status_code == status.HTTP_200_OK:
             result = resp.json()
             return result['access_token']
 
@@ -101,9 +105,9 @@ class BrightcoveApiClient(BaseApiClient):
         if headers is not None:
             headers_.update(headers)
         resp = requests.get(url, headers=headers_)
-        if resp.status_code == 200:
+        if resp.status_code == status.HTTP_200_OK:
             return resp.json()
-        elif resp.status_code == 401 and can_retry:
+        elif resp.status_code == status.HTTP_401_UNAUTHORIZED and can_retry:
             self.access_token = self._refresh_access_token()
             return self.get(url, headers, can_retry=False)
         else:
@@ -118,9 +122,9 @@ class BrightcoveApiClient(BaseApiClient):
             headers_.update(headers)
 
         resp = requests.post(url, data=payload, headers=headers_)
-        if resp.status_code in (200, 201):
+        if resp.status_code in (status.HTTP_200_OK, status.HTTP_201_CREATED):
             return resp.json()
-        elif resp.status_code == 401 and can_retry:
+        elif resp.status_code == status.HTTP_401_UNAUTHORIZED and can_retry:
             self.access_token = self._refresh_access_token()
             return self.post(url, payload, headers, can_retry=False)
         else:
@@ -318,41 +322,41 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         """
 
         frag = Fragment(
-            self.render_resource('../static/html/brightcove.html', **context)
+            self.render_resource('static/html/brightcove.html', **context)
         )
         frag.add_css_url(
             'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'
         )
         frag.add_content(
-            self.add_js_content('../static/js/player_state.js', **context)
+            self.add_js_content('static/js/player_state.js', **context)
         )
         frag.add_content(
-            self.add_js_content('../static/js/toggle-button.js')
+            self.add_js_content('static/js/toggle-button.js')
         )
         if context['player_state']['transcripts']:
             frag.add_content(
-                self.add_js_content('../static/bower_components/videojs-transcript/dist/videojs-transcript.js')
+                self.add_js_content('static/bower_components/videojs-transcript/dist/videojs-transcript.js')
             )
             frag.add_content(
-                self.add_js_content('../static/js/videojs-transcript.js', **context)
+                self.add_js_content('static/js/videojs-transcript.js', **context)
             )
         frag.add_content(
-            self.add_js_content('../static/js/videojs-tabindex.js', **context)
+            self.add_js_content('static/js/videojs-tabindex.js', **context)
         )
         frag.add_content(
-            self.add_js_content('../static/js/videojs_event_plugin.js', **context)
+            self.add_js_content('static/js/videojs_event_plugin.js', **context)
         )
         frag.add_content(
-            self.add_js_content('../static/bower_components/videojs-offset/dist/videojs-offset.js')
+            self.add_js_content('static/bower_components/videojs-offset/dist/videojs-offset.js')
         )
         frag.add_content(
-            self.add_js_content('../static/js/videojs-speed-handler.js', **context)
+            self.add_js_content('static/js/videojs-speed-handler.js', **context)
         )
         frag.add_content(
-            self.add_js_content('../static/js/brightcove-videojs-init.js', **context)
+            self.add_js_content('static/js/brightcove-videojs-init.js', **context)
         )
         frag.add_css(
-            self.resource_string('../static/css/brightcove.css')
+            self.resource_string('static/css/brightcove.css')
         )
         return frag
 
@@ -365,7 +369,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         """
 
         if not self.api_key and self.api_secret:
-            raise BrightcoveApiClientError('No API credentials provided')
+            raise BrightcoveApiClientError(_('No API credentials provided'))
 
         if suffix == 'get_video_renditions':
             return self.get_video_renditions(
@@ -467,7 +471,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             message (str): message for a user on default transcripts fetching.
         """
         if not self.api_key and self.api_secret:
-            raise BrightcoveApiClientError('No API credentials provided')
+            raise BrightcoveApiClientError(_('No API credentials provided'))
 
         video_id = kwargs.get('video_id')
         account_id = kwargs.get('account_id')
