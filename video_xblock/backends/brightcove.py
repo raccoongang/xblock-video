@@ -13,7 +13,7 @@ from xblock.fragment import Fragment
 
 from video_xblock.backends.base import BaseVideoPlayer, BaseApiClient
 from video_xblock.constants import status
-from video_xblock.exceptions import ApiClientError
+from video_xblock.exceptions import ApiClientError, VideoXBlockException
 from video_xblock.utils import ugettext as _
 
 
@@ -463,7 +463,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
                 ]
             message (str): message for a user on default transcripts fetching.
         """
-        if not self.api_key and self.api_secret:
+        if not self.api_key and not self.api_secret:
             raise BrightcoveApiClientError(_('No API credentials provided'))
 
         video_id = kwargs.get('video_id')
@@ -500,12 +500,14 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
                 self.default_transcripts.append(default_transcript)
         else:
             try:
+                # no way this code could be executed
+                # TODO: refactor this code
                 message = str(text[0].get('message'))
             except AttributeError:
-                message = 'No timed transcript may be fetched from a video platform. '
+                message = 'No timed transcript may be fetched from a video platform.'
         return default_transcripts, message
 
-    def download_default_transcript(self, url, language_code=None):  # pylint: disable=unused-argument
+    def download_default_transcript(self, url=None, language_code=None):  # pylint: disable=unused-argument
         """
         Downloads default transcript from a video platform API in WebVVT format.
         Arguments:
@@ -513,6 +515,8 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         Returns:
             unicode: Transcripts in WebVTT format.
         """
+        if url is None:
+            raise VideoXBlockException(_('`url` parameter is required.'))
         data = requests.get(url)
         sub = unicode(data.content.decode('utf8'))
         return sub
