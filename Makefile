@@ -25,6 +25,7 @@ deps:
 
 deps-test:
 	pip install -r test_requirements.txt
+	bower install
 
 tools:
 	npm install "eslint@^2.12.0" eslint-config-edx "eslint-plugin-dollar-sign@0.0.5" "eslint-plugin-import@^1.9.2"
