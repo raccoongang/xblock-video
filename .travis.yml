@@ -20,9 +20,9 @@ before_install:
   - nvm install stable
 
 before_script:
-  - make deps-test
-  # Install eslint, eslint-config-edx and their dependencies
+  # Install bower, eslint, eslint-config-edx and their dependencies
   - make tools
+  - make deps-test
 
 script:
   - make quality-py
