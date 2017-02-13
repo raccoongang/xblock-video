@@ -58,6 +58,8 @@ class BaseMock(Mock):
         super(BaseMock, self).__init__()
         if 'mock_magic' in kwargs:
             self.mock = kwargs['mock_magic']
+        if 'event' in kwargs and kwargs['event'] in self.get_events():
+            self.event = kwargs['event']
 
     @property
     def ordered_results(self):
@@ -71,8 +73,9 @@ class BaseMock(Mock):
         Should return expected value after mock is applied.
         """
         ret = []
-        for item in self.to_return:
-            ret.append(self.ordered_results[event][item])
+        if event in self.get_events():
+            for item in self.to_return:
+                ret.append(self.ordered_results[event][item])
         return tuple(ret)
 
     def get_events(self):
@@ -133,16 +136,16 @@ class BrightcoveAuthMock(BaseMock):
         )
     )
 
-    def create_credentials(self, event):
+    def create_credentials(self):
         """
         Mock `get_client_credentials` returned value.
         """
-        if event == 'auth_failed':
-            self.side_effect = VideoXBlockException(self.ordered_results[event]['error_message'])
+        if self.event == 'auth_failed':
+            self.side_effect = VideoXBlockException(self.ordered_results[self.event]['error_message'])
         self.return_value = (
-            self.ordered_results[event]['client_secret'],
-            self.ordered_results[event]['client_id'],
-            self.ordered_results[event]['error_message']
+            self.ordered_results[self.event]['client_secret'],
+            self.ordered_results[self.event]['client_id'],
+            self.ordered_results[self.event]['error_message']
         )
         return self
 
@@ -174,11 +177,11 @@ class WistiaAuthMock(BaseMock):
 
     to_return = ['auth_data', 'error_message']
 
-    def get(self, event):
+    def get(self):
         """
         Substitute requests.get method.
         """
-        if event == 'not_authorized':
+        if self.event == 'not_authorized':
             self.return_value = ResponseStub(status_code=401)
         return lambda x: self.return_value
 
@@ -236,11 +239,13 @@ class YoutubeDefaultTranscriptsMock(BaseMock):
 
     to_return = ['default_transcripts', 'message']
 
-    def fetch_default_transcripts_languages(self, event):
+    def fetch_default_transcripts_languages(self):
         """
         Mock `fetch_default_transcripts_languages` returned value.
         """
-        self.return_value = (self.ordered_results[event]['available_languages'], self.ordered_results[event]['message'])
+        self.return_value = (
+            self.ordered_results[self.event]['available_languages'], self.ordered_results[self.event]['message']
+        )
         return self
 
 
@@ -321,13 +326,13 @@ class BrightcoveDefaultTranscriptsMock(BaseMock):
 
     to_return = ['default_transcripts', 'message']
 
-    def api_client_get(self, event):
+    def api_client_get(self):
         """
         Mock for `api_client` method.
         """
-        if event == 'fetch_transcripts_exception':
+        if self.event == 'fetch_transcripts_exception':
             self.side_effect = self.mock()
-        elif event == 'no_captions_data':
+        elif self.event == 'no_captions_data':
             self.return_value = ResponseStub(status_code=200, body=json.dumps(self._response))
         else:
             ret = copy(self._response)
@@ -335,11 +340,11 @@ class BrightcoveDefaultTranscriptsMock(BaseMock):
             self.return_value = ResponseStub(status_code=200, body=json.dumps(ret))
         return self
 
-    def no_credentials(self, event):
+    def no_credentials(self):
         """
         Returns xblock metadata.
         """
-        if event == 'no_credentials':
+        if self.event == 'no_credentials':
             return {'client_id': '', 'client_secret': ''}
         else:
             return self.mock
@@ -411,22 +416,22 @@ class WistiaDefaultTranscriptsMock(BaseMock):
 
     to_return = ['default_transcripts', 'message']
 
-    def get(self, event):
+    def get(self):
         """
         Substitute requests.get method.
         """
-        if event == 'request_data_exception':
+        if self.event == 'request_data_exception':
             self.side_effect = self.mock()
             return self
-        elif event == 'success_and_data_lang_code':
+        elif self.event == 'success_and_data_lang_code':
             self.return_value = ResponseStub(status_code=200, body=json.dumps(self._default_transcripts))
-        elif event == 'success_and_data_lang_code_exception':
+        elif self.event == 'success_and_data_lang_code_exception':
             default_transcripts = copy(self._default_transcripts)
             default_transcripts[0]['language'] = 'en'
             self.return_value = ResponseStub(status_code=200, body=json.dumps(default_transcripts))
-        elif event == 'success_no_data':
+        elif self.event == 'success_no_data':
             self.return_value = ResponseStub(status_code=200, body='[]')
-        elif event == 'returned_not_found':
+        elif self.event == 'returned_not_found':
             self.return_value = ResponseStub(status_code=404, body='{}')
         return lambda x: self.return_value
 
@@ -470,11 +475,11 @@ Forse me la canto e me la suono da sola un po&#39;,
 
     to_return = ['transcript', 'message']
 
-    def get(self, event):
+    def get(self):
         """
         Substitute requests.get method.
         """
-        if event == 'no_xml_data':
+        if self.event == 'no_xml_data':
             self.return_value = ResponseStub(status_code=200, body='{}')
         else:
             self.return_value = ResponseStub(status_code=200, body=self._xml)
@@ -509,7 +514,7 @@ accessed from mobile devices."""
 
     to_return = ['transcript', 'message']
 
-    def get(self, event):  # pylint: disable=unused-argument
+    def get(self):
         """
         Substitute requests.get method.
         """
@@ -562,7 +567,7 @@ class WistiaDownloadTranscriptMock(BaseMock):
 
     to_return = ['transcript', 'message']
 
-    def get(self, event):  # pylint: disable=unused-argument
+    def get(self):
         """
         Substitute player method.
         """

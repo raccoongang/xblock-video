@@ -148,19 +148,19 @@ class TestCustomBackends(VideoXBlockTestBase):
         Save state of auth related entities before mocks are applied.
         """
         if backend == 'wistia':
-            self.mocked_objects[backend] = {
+            self.mocked_objects.append({
                 'obj': requests,
                 'attrs': ['get', ],
                 'value': [copy.deepcopy(requests.get), ]
-            }
-            requests.get = WistiaAuthMock().get(event)
+            })
+            requests.get = WistiaAuthMock(event=event).get()
         elif backend == 'brightcove':
-            self.mocked_objects[backend] = {
+            self.mocked_objects.append({
                 'obj': brightcove.BrightcoveApiClient,
                 'attrs': ['create_credentials', ],
                 'value': [brightcove.BrightcoveApiClient.create_credentials, ]
-            }
-            brightcove.BrightcoveApiClient.create_credentials = BrightcoveAuthMock().create_credentials(event)
+            })
+            brightcove.BrightcoveApiClient.create_credentials = BrightcoveAuthMock(event=event).create_credentials()
         else:
             # place here youtube and vimeo auth mocks assignments
             pass
@@ -208,43 +208,40 @@ class TestCustomBackends(VideoXBlockTestBase):
         Save state of default transcripts related entities before mocks are applied.
         """
         player = self.player[backend]
-        if backend == 'brightcove':
-            self.mocked_objects[backend] = {
-                'obj': brightcove.BrightcoveApiClient,
-                'attrs': ['get', ],
-                'value': [copy.deepcopy(brightcove.BrightcoveApiClient.get), ]
-            }
-            self.mocked_objects[self.xblock.display_name] = {
-                'obj': self.xblock,
-                'attrs': ['metadata', ],
-                'value': [copy.deepcopy(self.xblock.metadata), ]
-            }
-            self.xblock.metadata = BrightcoveDefaultTranscriptsMock(
-                mock_magic=self.xblock.metadata
-            ).no_credentials(event)
-            brightcove.BrightcoveApiClient.get = BrightcoveDefaultTranscriptsMock(
-                mock_magic=brightcove.BrightcoveApiClientError
-            ).api_client_get(event)
-        elif backend == 'youtube':
-            self.mocked_objects[backend] = {
+        if backend == 'youtube':
+            self.mocked_objects.append({
                 'obj': player,
                 'attrs': ['fetch_default_transcripts_languages'],
                 'value': [player.fetch_default_transcripts_languages, ]
-            }
-            player.fetch_default_transcripts_languages = YoutubeDefaultTranscriptsMock()\
-                .fetch_default_transcripts_languages(event)
+            })
+            player.fetch_default_transcripts_languages = YoutubeDefaultTranscriptsMock(event=event)\
+                .fetch_default_transcripts_languages()
+        elif backend == 'brightcove':
+            self.mocked_objects.append({
+                'obj': brightcove.BrightcoveApiClient,
+                'attrs': ['get', ],
+                'value': [copy.deepcopy(brightcove.BrightcoveApiClient.get), ]
+            })
+            self.mocked_objects.append({
+                'obj': self.xblock,
+                'attrs': ['metadata', ],
+                'value': [copy.deepcopy(self.xblock.metadata), ]
+            })
+            self.xblock.metadata = BrightcoveDefaultTranscriptsMock(
+                mock_magic=self.xblock.metadata, event=event
+            ).no_credentials()
+            brightcove.BrightcoveApiClient.get = BrightcoveDefaultTranscriptsMock(
+                mock_magic=brightcove.BrightcoveApiClientError, event=event
+            ).api_client_get()
         elif backend == 'wistia':
-            self.mocked_objects[backend] = {
+            self.mocked_objects.append({
                 'obj': requests,
                 'attrs': ['get', ],
                 'value': [copy.deepcopy(requests.get), ]
-            }
-            self.mocked_objects['babelfish'] = {
-                'obj': babelfish,
-                'attrs': ['Language', ],
-                'value': [copy.deepcopy(babelfish.Language), ]
-            }
-            requests.get = WistiaDefaultTranscriptsMock(mock_magic=requests.exceptions.RequestException).get(event)
+            })
+            requests.get = WistiaDefaultTranscriptsMock(
+                mock_magic=requests.exceptions.RequestException, event=event
+            ).get()
         else:
             # vimeo
             pass
@@ -295,26 +292,26 @@ class TestCustomBackends(VideoXBlockTestBase):
         """
         player = self.player[backend]
         if backend == 'wistia':
-            self.mocked_objects[backend] = {
+            self.mocked_objects.append({
                 'obj': player,
                 'attrs': ['default_transcripts', ],
                 'value': [copy.deepcopy(player.default_transcripts), ]
-            }
-            player.default_transcripts = WistiaDownloadTranscriptMock().get(event)
+            })
+            player.default_transcripts = WistiaDownloadTranscriptMock(event=event).get()
         elif backend == 'brightcove':
-            self.mocked_objects[backend] = {
+            self.mocked_objects.append({
                 'obj': requests,
                 'attrs': ['get', ],
                 'value': [copy.deepcopy(requests.get), ]
-            }
-            requests.get = BrightcoveDownloadTranscriptMock().get(event)
+            })
+            requests.get = BrightcoveDownloadTranscriptMock(event=event).get()
         elif backend == 'youtube':
-            self.mocked_objects[backend] = {
+            self.mocked_objects.append({
                 'obj': requests,
                 'attrs': ['get', ],
                 'value': [copy.deepcopy(requests.get), ]
-            }
-            requests.get = YoutubeDownloadTranscriptMock().get(event)
+            })
+            requests.get = YoutubeDownloadTranscriptMock(event=event).get()
         else:
             # place here vimeo mocks assignments
             pass
