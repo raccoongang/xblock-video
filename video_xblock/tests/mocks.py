@@ -469,7 +469,7 @@ class BrightcoveDownloadTranscriptMock(BaseMock):
 
     to_return = ['transcript', 'message']
 
-    def get(self, event):
+    def get(self, event):  # pylint: disable=unused-argument
         """
         Substitute requests.get method.
         """
@@ -515,7 +515,7 @@ class WistiaDownloadTranscriptMock(BaseMock):
 
     to_return = ['transcript', 'message']
 
-    def get(self, event):
+    def get(self, event):  # pylint: disable=unused-argument
         """
         Substitute player method.
         """
