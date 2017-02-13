@@ -172,12 +172,12 @@ class YoutubeDefaultTranscriptsMock(BaseMock):
     """
     Youtube default transcripts mock class.
     """
-    available_languages = [
+    _available_languages = [
         (u'en', u'English', u''),
         (u'uk', u'Українська', u'')
     ]
 
-    default_transcripts = [
+    _default_transcripts = [
         {'label': u'English', 'lang': u'en',
          'url': 'http://video.google.com/timedtext?lang=en&name=&v=set_video_id_here'},
         {'label': u'Ukrainian', 'lang': u'uk',
@@ -193,8 +193,8 @@ class YoutubeDefaultTranscriptsMock(BaseMock):
             'message': 'No timed transcript may be fetched from a video platform.'
         },
         'empty_subs': {
-            'available_languages': available_languages,
-            'default_transcripts': default_transcripts,
+            'available_languages': _available_languages,
+            'default_transcripts': _default_transcripts,
             'message': 'For now, video platform doesn\'t have any timed transcript for this video.'
         },
         'cant_fetch_data': {
@@ -203,8 +203,8 @@ class YoutubeDefaultTranscriptsMock(BaseMock):
             'message': 'No timed transcript may be fetched from a video platform.'
         },
         'success': {
-            'available_languages': available_languages,
-            'default_transcripts': default_transcripts,
+            'available_languages': _available_languages,
+            'default_transcripts': _default_transcripts,
             'message': ''
         }
     }
@@ -223,14 +223,14 @@ class BrightcoveDefaultTranscriptsMock(BaseMock):
     """
     Brightcove default transcripts mock class.
     """
-    default_transcripts = [
+    _default_transcripts = [
         {'label': u'English', 'lang': u'en',
          'url': None},
         {'label': u'Ukrainian', 'lang': u'uk',
          'url': None}
     ]
 
-    response = {
+    _response = {
         "master": {
             "url": "http://host/master.mp4"
         },
@@ -281,7 +281,7 @@ class BrightcoveDefaultTranscriptsMock(BaseMock):
             'message': 'For now, video platform doesn\'t have any timed transcript for this video.'
         },
         'success': {
-            'default_transcripts': default_transcripts,
+            'default_transcripts': _default_transcripts,
             'message': ''
         }
     }
@@ -295,9 +295,9 @@ class BrightcoveDefaultTranscriptsMock(BaseMock):
         if event == 'fetch_transcripts_exception':
             self.side_effect = self.mock()
         elif event == 'no_captions_data':
-            self.return_value = Response(status_code=200, body=json.dumps(self.response))
+            self.return_value = Response(status_code=200, body=json.dumps(self._response))
         else:
-            ret = copy(self.response)
+            ret = copy(self._response)
             ret['text_tracks'] = self.transcripts
             self.return_value = Response(status_code=200, body=json.dumps(ret))
         return self
