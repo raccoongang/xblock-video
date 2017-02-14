@@ -215,13 +215,11 @@ class WistiaPlayer(BaseVideoPlayer):
         Replaces comma with dot in timings, e.g. 00:00:10,500 should be 00:00:10.500
 
         """
-        pattern = re.compile(r"\d{2}:\d{2}:\d{2},\d{3}")
         new_line = u""
         for token in line.split():
             decoded_token = token.encode('utf8', 'ignore')
-            if pattern.match(str(decoded_token)) or pattern.match(decoded_token, re.UNICODE):
-                decoded_token = unicode(decoded_token.replace(",", "."))
-            new_line += unicode(decoded_token.decode('utf8')) + u" "
+            formatted_token = re.sub(r'(\d{2}:\d{2}),(\d{3})', r'\1.\2', decoded_token)
+            new_line += unicode(formatted_token.decode('utf8')) + u" "
         return new_line
 
     def format_transcript_text(self, text):
