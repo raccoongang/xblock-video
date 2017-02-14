@@ -23,9 +23,7 @@ html_parser = HTMLParser()  # pylint: disable=invalid-name
 
 
 class ApiClientError(Exception):
-    """
-    Base API client exception.
-    """
+    """Base API client exception."""
     pass
 
 
@@ -71,9 +69,7 @@ class BaseApiClient(object):
 
 
 class BaseVideoPlayer(Plugin):
-    """
-    Inherit your video player class from this class.
-    """
+    """Inherit your video player class from this class."""
     __metaclass__ = abc.ABCMeta
 
     entry_point = 'video_xblock.v1'
@@ -92,9 +88,7 @@ class BaseVideoPlayer(Plugin):
 
     @abc.abstractproperty
     def captions_api(self):
-        """
-        Dictionary of url, request parameters, and response structure of video platform's captions API.
-        """
+        """Dictionary of url, request parameters, and response structure of video platform's captions API."""
         return {}
 
     @abc.abstractproperty
@@ -110,9 +104,7 @@ class BaseVideoPlayer(Plugin):
         return []
 
     def get_frag(self, **context):
-        """
-        Return a Fragment required to render video player on the client side.
-        """
+        """Return a Fragment required to render video player on the client side."""
         frag = Fragment()
         frag.add_css(self.resource_string(
             '../static/bower_components/video.js/dist/video-js.min.css'
@@ -205,9 +197,7 @@ class BaseVideoPlayer(Plugin):
         )
 
     def resource_string(self, path):
-        """
-        Handy helper for getting resources from our kit.
-        """
+        """Handy helper for getting resources from our kit."""
         data = pkg_resources.resource_string(__name__, path)
         return data.decode("utf8")
 
@@ -238,9 +228,7 @@ class BaseVideoPlayer(Plugin):
             return re.search(cls.url_re, href, re.I)
 
     def add_js_content(self, path, **context):
-        """
-        Helper for adding javascript code inside <body> section.
-        """
+        """Helper for adding javascript code inside <body> section."""
         return '<script>' + self.render_resource(path, **context) + '</script>'
 
     @abc.abstractmethod
@@ -313,9 +301,7 @@ class BaseVideoPlayer(Plugin):
 
     @staticmethod
     def filter_default_transcripts(default_transcripts, transcripts):
-        """
-        Exclude enabled transcripts (fetched from API) from the list of available ones (fetched from video xblock)
-        """
+        """Exclude enabled transcripts (fetched from API) from the list of available ones (from video xblock)."""
         enabled_languages_codes = [t[u'lang'] for t in transcripts]
         default_transcripts = [
             dt for dt in default_transcripts

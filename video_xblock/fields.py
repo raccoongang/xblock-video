@@ -83,7 +83,7 @@ class RelativeTime(JSONField):
         """
         Convert datetime.timedelta to "HH:MM:SS" format.
 
-        If not value, return "00:00:00"
+        If not value, return "00:00:00".
 
         Backward compatibility: check if value is float, and convert it. No exceptions here.
 
@@ -120,7 +120,7 @@ class RelativeTime(JSONField):
 
     def enforce_type(self, value):
         """
-        Ensure that when set explicitly the Field is set to a timedelta
+        Ensure that when set explicitly the Field is set to a timedelta.
         """
         if isinstance(value, datetime.timedelta) or value is None:
             return value

@@ -14,9 +14,7 @@ from video_xblock.backends.base import ApiClientError, BaseVideoPlayer, BaseApiC
 
 
 class BrightcoveApiClientError(ApiClientError):
-    """
-    Brightcove specific api client errors.
-    """
+    """Brightcove specific api client errors."""
     pass
 
 
@@ -80,11 +78,7 @@ class BrightcoveApiClient(BaseApiClient):
         return client_secret, client_id, error_message
 
     def _refresh_access_token(self):
-        """
-        Request new access token to send with requests to Brightcove.
-
-        Access Token expires every 5 minutes.
-        """
+        """Request new access token to send with requests to Brightcove. Access Token expires every 5 minutes."""
         url = "https://oauth.brightcove.com/v3/access_token"
         params = {"grant_type": "client_credentials"}
         auth_string = base64.encodestring(
@@ -100,6 +94,17 @@ class BrightcoveApiClient(BaseApiClient):
             return result['access_token']
 
     def get(self, url, headers=None, can_retry=True):
+        """
+        Issue REST GET request to a given URL. Can throw ApiClientError or it's subclass.
+
+        Arguments:
+            url (str): API url to fetch a resource from.
+            headers (dict): Headers necessary as per API, e.g. authorization bearer to perform authorised requests.
+            can_retry (bool): True if this is to retry a call if authentication failed.
+
+        Returns:
+            Response in python native data format.
+        """
         headers_ = {'Authorization': 'Bearer ' + str(self.access_token)}
         if headers is not None:
             headers_.update(headers)
@@ -113,6 +118,17 @@ class BrightcoveApiClient(BaseApiClient):
             raise BrightcoveApiClientError
 
     def post(self, url, payload, headers=None, can_retry=True):
+        """
+        Issue REST POST request to a given URL. Can throw ApiClientError or it's subclass.
+
+        Arguments:
+            url (str): API url to fetch a resource from.
+            headers (dict): Headers necessary as per API, e.g. authorization bearer to perform authorised requests.
+            can_retry (bool): True if this is to retry a call if authentication failed.
+
+        Returns:
+            Response in python native data format.
+        """
         headers_ = {
             'Authorization': 'Bearer ' + self.access_token,
             'Content-type': 'application/json'
@@ -229,9 +245,7 @@ class BrightcoveHlsMixin(object):
         return res
 
     def get_video_renditions(self, account_id, video_id):
-        """
-        Return information about video renditions provided by Brightcove API.
-        """
+        """Return information about video renditions provided by Brightcove API."""
         url = 'https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets/renditions'.format(
             account_id=account_id, video_id=video_id
         )
@@ -270,9 +284,7 @@ class BrightcoveHlsMixin(object):
 
 
 class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
-    """
-    BrightcovePlayer is used for videos hosted on the Brightcove Video Cloud.
-    """
+    """BrightcovePlayer is used for videos hosted on the Brightcove Video Cloud."""
     url_re = re.compile(r'https:\/\/studio.brightcove.com\/products\/videocloud\/media\/videos\/(?P<media_id>\d+)')
     metadata_fields = ['access_token', 'client_id', 'client_secret', ]
 
@@ -301,9 +313,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         self.api_client = BrightcoveApiClient(self.api_key, self.api_secret)
 
     def media_id(self, href):
-        """
-        Brightcove specific implementation of BaseVideoPlayer.media_id().
-        """
+        """Brightcove specific implementation of BaseVideoPlayer.media_id()."""
         return self.url_re.match(href).group('media_id')
 
     def get_frag(self, **context):
@@ -396,9 +406,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         return {'success': False, 'message': 'Unknown method'}
 
     def can_show_settings(self):
-        """
-        Report to UI if it can show backend specific advanced settings.
-        """
+        """Report to UI if it can show backend specific advanced settings."""
         can_show = bool(
             self.xblock.metadata.get('client_id') and
             self.xblock.metadata.get('client_secret')
@@ -407,9 +415,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
 
     @staticmethod
     def customize_xblock_fields_display(editable_fields):
-        """
-        Customise display of Brightcove's studio editor fields.
-        """
+        """Customise display of Brightcove's studio editor fields."""
         message = 'You can generate a BC token following the guide of ' \
                   '<a href="https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html" ' \
                   'target="_blank">Brightcove</a>. Please ensure appropriate operations scope has been set ' \
