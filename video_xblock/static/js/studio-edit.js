@@ -10,7 +10,7 @@ function StudioEditableXBlock(runtime, element) {
 
     var fields = [];
     // Studio includes a copy of tinyMCE and its jQuery plugin
-    var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');  // TODO: Remove TinyMCE
+    var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');  // To-Do: Remove TinyMCE
     var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
 
     /** This function is used for Brightcove HLS debugging
@@ -111,7 +111,7 @@ function StudioEditableXBlock(runtime, element) {
                     if (val === '') {
                         val = null;
                     } else {
-                        val = JSON.parse(val); // TODO: handle parse errors
+                        val = JSON.parse(val); // To-Do: handle parse errors
                     }
                     return val;
                 }
@@ -309,7 +309,7 @@ function StudioEditableXBlock(runtime, element) {
             var langCode = $(this).attr('data-lang-code');
             var langLabel = $(this).attr('data-lang-label');
             var downloadUrl = $(this).attr('data-download-url');
-            var newSub = {'langCode': langCode, 'langLabel' : langLabel, 'downloadUrl': downloadUrl};
+            var newSub = {'lang': langCode, 'label' : langLabel, 'url': downloadUrl};
             initialDefaultTranscripts.push(newSub);
             langCodes.push(langCode);
         });
@@ -493,7 +493,7 @@ function StudioEditableXBlock(runtime, element) {
                 }
                 // Add a transcript to the list of enabled ones
                 var downloadUrl = downloadTranscriptHandlerUrl + '?' + newUrl;
-                var defaultTranscript= {'langCode': newLang, 'langLabel': newLabel, 'downloadUrl': downloadUrl};
+                var defaultTranscript= {'lang': newLang, 'label': newLabel, 'url': downloadUrl};
                 createEnabledTranscriptBlock(defaultTranscript);
                 // Display status messages
                 // var error_message = response['error_message'];
@@ -611,19 +611,46 @@ function StudioEditableXBlock(runtime, element) {
         $currentBlock.remove();
         disableOption();
         // Remove a transcript from the list of enabled default transcripts
-        var enabledTranscript = {'langCode' : lang, 'langLabel' : label, 'downloadUrl': ''};
+        var enabledTranscript = {'lang' : lang, 'label' : label, 'url': ''};
         removeEnabledTranscriptBlock(enabledTranscript);
+    };
+
+   /** Get url of a specific transcript from a given transcripts array. */
+   var getTranscriptUrl = function(transcriptsArray, langCode){
+        var url = '';
+        transcriptsArray.forEach(function(sub){
+            if(sub['lang']==langCode){
+              url = sub['url'];
+            }
+        });
+        return url;
+   };
+
+    /** Create elements to display messages with status on actions with default transcripts. */
+    var createStatusMessageElement = function(langCode, actionSelector){
+        var errorMessageElementParentSelector = '';
+        var successMessageElementParentSelector = '';
+        if (actionSelector === 'upload-default-transcript') {
+            errorMessageElementParentSelector = 'available-default-transcripts-section';
+            successMessageElementParentSelector = 'enabled-default-transcripts-section';
+        }
+        else if (actionSelector === 'remove-default-transcript') {
+            errorMessageElementParentSelector = 'enabled-default-transcripts-section';
+            successMessageElementParentSelector = 'available-default-transcripts-section';
+        }
+        var isNotDisplayedErrorMessageElement = $(".api-request." + actionSelector + "." + langCode + ".status-error").length == 0;
+        var isNotDisplayedSuccessMessageElement = $(".api-request." + actionSelector + "." + langCode + ".status-success").length == 0;
+        if (isNotDisplayedErrorMessageElement && isNotDisplayedSuccessMessageElement)
+        {
+            var $errorMessageUpload = $("<div>", {"class": "api-request " + actionSelector + " " + langCode + " status-error"});
+            $errorMessageUpload.appendTo($('.' + errorMessageElementParentSelector + ':visible').last());
+            var $successMessageUpload = $("<div>", {"class": "api-request " + actionSelector + " " + langCode + " status-success"});
+            $successMessageUpload.appendTo($('.' + successMessageElementParentSelector + ':visible').last());
+        }
     };
 
     /** Create a new standard transcript block and fill it in automatically with transcript's data. */
     var createTranscriptBlock = function(langCode, langLabel) {
-        var externalResourceUrl = '';
-        var externalDownloadUrl;
-        transcriptsValue.forEach(function(sub){
-            if(sub['lang']==langCode){
-              externalResourceUrl = sub['url'];
-            }
-        });
         // Create a transcript block if not already displayed
         $('.add-transcript').trigger('click');
         // Select language option
@@ -637,26 +664,18 @@ function StudioEditableXBlock(runtime, element) {
         var $createdDownload = $createdLi.find('a.download-transcript.download-setting:hidden');
         $createdDownload.removeClass('is-hidden');
         // Assign external download link
-        transcriptsValue.forEach(function(sub){
-            if(sub['lang']==langCode){
-              externalResourceUrl = sub['url'];
-            }
-        });
-        externalDownloadUrl = downloadTranscriptHandlerUrl + '?' + externalResourceUrl;
+        var externalResourceUrl = getTranscriptUrl(transcriptsValue, langCode);
+        var externalDownloadUrl = downloadTranscriptHandlerUrl + '?' + externalResourceUrl;
         $createdDownload.attr('href', externalDownloadUrl);
         $('.add-transcript', element).removeClass('is-disabled');
     };
 
+    /** Display a transcript in a list of available transcripts. */
     var createAvailableTranscriptBlock = function(defaultTranscript){
-        var langCode = defaultTranscript['langCode'];
-        var langLabel = defaultTranscript['langLabel'];
-        var downloadUrlApi = '';  // External url for API call
+        var langCode = defaultTranscript['lang'];
+        var langLabel = defaultTranscript['label'];
         // Get url for a transcript fetching from the API
-        initialDefaultTranscripts.forEach(function(sub){
-            if(sub['langCode']==langCode){
-              downloadUrlApi = sub['downloadUrl'];
-            }
-        });
+        var downloadUrlApi = getTranscriptUrl(initialDefaultTranscripts, langCode); // External url for API call
         // Get all the currently available transcripts
         var allAvailableTranscripts = [];
         $('.available-default-transcripts-section .default-transcripts-label:visible').each(function(){
@@ -683,23 +702,15 @@ function StudioEditableXBlock(runtime, element) {
                     uploadDefaultTranscriptsToServer(data);
                 });
             // Create elements to display status messages on available transcript upload
-            var isNotDisplayedErrorMessageElement = $(".api-request.upload-default-transcript." + langCode + ".status-error").length == 0;
-            var isNotDisplayedSuccessMessageElement = $(".api-request.upload-default-transcript." + langCode + ".status-success").length == 0;
-            if (isNotDisplayedErrorMessageElement && isNotDisplayedSuccessMessageElement)
-            {
-                var $errorMessageUpload = $("<div>", {"class": "api-request upload-default-transcript " + langCode + " status-error"});
-                $errorMessageUpload.appendTo($('.available-default-transcripts-section:visible').last());
-                var $successMessageUpload = $("<div>", {"class": "api-request upload-default-transcript " + langCode + " status-success"});
-                $successMessageUpload.appendTo($('.enabled-default-transcripts-section:visible').last());
-            }
+            createStatusMessageElement(langCode, 'upload-default-transcript');
         }
     };
 
-    /** Display a transcript in a list of whether available or enabled transcripts. */
+    /** Display a transcript in a list of enabled transcripts. */
     var createEnabledTranscriptBlock = function(defaultTranscript){
-        var langCode = defaultTranscript['langCode'];
-        var langLabel = defaultTranscript['langLabel'];
-        var downloadUrlServer = defaultTranscript['downloadUrl']; // External url to download a resource from a server
+        var langCode = defaultTranscript['lang'];
+        var langLabel = defaultTranscript['label'];
+        var downloadUrlServer = defaultTranscript['url']; // External url to download a resource from a server
         // Get all the currently enabled transcripts
         var allEnabledTranscripts = [];
         $('.enabled-default-transcripts-section .default-transcripts-label:visible').each(function(){
@@ -740,17 +751,17 @@ function StudioEditableXBlock(runtime, element) {
             $removeElement
                 .attr({'data-lang-code': langCode, 'data-lang-label': langLabel})
                 .on('click', function() {
-                    var enabledTranscript = {'langCode' : langCode, 'langLabel' : langLabel, 'downloadUrl': downloadUrlServer};
+                    var enabledTranscript = {'lang' : langCode, 'label' : langLabel, 'url': downloadUrlServer};
                     removeEnabledTranscriptBlock(enabledTranscript);
                 });
         }
     };
 
-    /** Update display of default transcripts on removal of an enabled transcript of choice. */
+    /** Update default transcripts on removal of an enabled transcript of choice. */
     var removeEnabledTranscriptBlock = function(enabledTranscript) {
-        var langCode = enabledTranscript['langCode'];
-        var langLabel = enabledTranscript['langLabel'];
-        var downloadUrl = enabledTranscript['downloadUrl'];
+        var langCode = enabledTranscript['lang'];
+        var langLabel = enabledTranscript['label'];
+        var downloadUrl = enabledTranscript['url'];
         var $transcriptBlock = $("a[data-lang-code='" + langCode + "']").closest("li.list-settings-item");
         var $enabledTranscriptBlock = $("div[value='" + langCode + "']").closest("div.enabled-default-transcripts-section");
         // Remove transcript of a choice from the list of enabled transcripts (xblock field Default Timed Transcript)
@@ -770,17 +781,10 @@ function StudioEditableXBlock(runtime, element) {
         $transcriptBlock.remove();
         disableOption();
         // Add transcript of a choice to the list of available transcripts (xblock field Default Timed Transcript)
-        var defaultTranscript= {'langCode': langCode, 'langLabel': langLabel, 'downloadUrl': downloadUrl};
+        var defaultTranscript= {'lang': langCode, 'label': langLabel, 'url': downloadUrl};
         createAvailableTranscriptBlock(defaultTranscript);
         // Create elements to display status messages on enabled transcript removal
-        var isNotDisplayedRemovalErrorMessageElement = $(".api-request.remove-default-transcript." + langCode + ".status-error").length == 0;
-        var isNotDisplayedRemovalSuccessMessageElement = $(".api-request.remove-default-transcript." + langCode + ".status-success").length == 0;
-        if (isNotDisplayedRemovalErrorMessageElement && isNotDisplayedRemovalSuccessMessageElement) {
-            var $errorMessageRemove = $("<div>", {"class": "api-request remove-default-transcript " + langCode + " status-error"});
-            $errorMessageRemove.appendTo($('.enabled-default-transcripts-section:visible').last());
-            var $successMessageRemove = $("<div>", {"class": "api-request remove-default-transcript " + langCode + " status-success"});
-            $successMessageRemove.appendTo($('.available-default-transcripts-section:visible').last());
-        }
+        createStatusMessageElement(langCode, 'remove-default-transcript');
         // Get all the currently enabled transcripts
         var allEnabledTranscripts = [];
         $('.enabled-default-transcripts-section .default-transcripts-label:visible').each(function(){
@@ -846,7 +850,7 @@ function StudioEditableXBlock(runtime, element) {
             showUploadStatus($(currentLiTag), filename);
             // Update default transcripts with a new enabled transcript if all the data were provided.
             if (label) {
-                var defaultTranscript = {'langCode': lang, 'langLabel': label, 'downloadUrl': downloadUrl};
+                var defaultTranscript = {'lang': lang, 'label': label, 'url': downloadUrl};
                 createEnabledTranscriptBlock(defaultTranscript);
             }
         }
@@ -917,7 +921,7 @@ function StudioEditableXBlock(runtime, element) {
         var langCode = $(event.currentTarget).attr('data-lang-code');
         var langLabel = $(event.currentTarget).attr('data-lang-label');
         var downloadUrl = $(event.currentTarget).attr('data-download-url');
-        var enabledTranscript = {'langCode' : langCode, 'langLabel' : langLabel, 'downloadUrl': downloadUrl};
+        var enabledTranscript = {'lang' : langCode, 'label' : langLabel, 'url': downloadUrl};
         removeEnabledTranscriptBlock(enabledTranscript);
     });
 
