@@ -34,7 +34,7 @@ tools:
 
 send_coveralls:
 	coveralls-lcov -v -n video_xblock/static/coverage/PhantomJS\ 2.1.1\ \(Linux\ 0.0.0\)/lcov.info > coverage.json
-    coveralls --merge=coverage.json
+	coveralls --merge=coverage.json
 
 prepare-for-js:
 	export DISPLAY=:99.0
