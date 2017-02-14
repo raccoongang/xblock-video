@@ -3,7 +3,7 @@
 Common settings file, intended to set defaults.
 
 Source:
-  https://github.com/edx/edx-platform/blob/master/lms/envs/common.py#L2457
+  https://github.com/edx/edx-platform/blob/open-release/eucalyptus.master/lms/envs/common.py#L2390
 """
 
 ALL_LANGUAGES = (

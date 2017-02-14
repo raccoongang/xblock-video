@@ -54,7 +54,12 @@ class TranscriptsMixin(XBlock):
             return u''
 
     def route_transcripts(self, transcripts):
-        """Re-route non .vtt transcripts to `str_to_vtt` handler."""
+        """
+        Re-route non .vtt transcripts to `str_to_vtt` handler.
+
+        Arguments:
+            transcripts (unicode): Raw transcripts.
+        """
         transcripts = json.loads(transcripts) if transcripts else []
         for tran in transcripts:
             if not tran['url'].endswith('.vtt'):
@@ -275,7 +280,15 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     @staticmethod
     def get_brightcove_js_url(account_id, player_id):
-        """Return url to brightcove player js file considering `account_id` and `player_id`."""
+        """
+        Return url to brightcove player js file, considering `account_id` and `player_id`.
+
+        Arguments:
+            account_id (str): Account id fetched from video xblock.
+            player_id (str): Player id fetched from video xblock.
+        Returns:
+            Url to brightcove player js (str).
+        """
         return "https://players.brightcove.net/{account_id}/{player_id}_default/index.min.js".format(
             account_id=account_id,
             player_id=player_id
@@ -283,7 +296,12 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     @player_state.setter
     def player_state(self, state):
-        """Save video player state passed in as a dict into xblock's fields."""
+        """
+        Save video player state passed in as a dict into xblock's fields.
+
+        Arguments:
+            state (dict): Video player state key-value pairs.
+        """
         self.current_time = state.get('current_time', self.current_time)
         self.muted = state.get('muted', self.muted)
         self.playback_rate = state.get('playback_rate', self.playback_rate)
@@ -294,7 +312,16 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         self.captions_language = state.get('captions_language', self.captions_language)
 
     def validate_field_data(self, validation, data):
-        """Validate data submitted via xblock edit pop-up."""
+        """
+        Validate data submitted via xblock edit pop-up.
+
+        Reference:
+            https://github.com/edx/xblock-utils/blob/60af41a8b7a7e6c1cb713e470d2a653669a30539/xblockutils/studio_editable.py#L245
+
+        Attributes:
+            validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
+            data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
+        """
         if data.account_id and data.player_id:
             try:
                 response = requests.head(VideoXBlock.get_brightcove_js_url(data.account_id, data.player_id))
@@ -420,7 +447,15 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     @XBlock.handler
     def render_player(self, request, suffix=''):  # pylint: disable=unused-argument
-        """View `student_view` loads this handler as an iframe to display actual video player."""
+        """
+        View `student_view` loads this handler as an iframe to display actual video player.
+
+        Arguments:
+            request (webob.Request): Request to handle.
+            suffix (string): Slug used for routing.
+        Returns:
+            Rendered html string as a Response (webob.Response).
+        """
         player = self.get_player()
         save_state_url = self.runtime.handler_url(self, 'save_player_state')
         transcripts = render_resource(
@@ -441,7 +476,15 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     @XBlock.json_handler
     def save_player_state(self, request, suffix=''):  # pylint: disable=unused-argument
-        """Xblock handler to save playback player state. Called by JavaScript of `student_view`."""
+        """
+        Xblock handler to save playback player state. Called by JavaScript of `student_view`.
+
+        Arguments:
+            request (dict): Request data to handle.
+            suffix (str): Slug used for routing.
+        Returns:
+            Data on success (dict).
+        """
         player_state = {
             'current_time': request['currentTime'],
             'playback_rate': request['playbackRate'],
@@ -457,7 +500,15 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     @XBlock.json_handler
     def publish_event(self, data, suffix=''):  # pylint: disable=unused-argument
-        """Handler to publish XBlock event from frontend. Called by JavaScript of `student_view`."""
+        """
+        Handler to publish XBlock event from frontend. Called by JavaScript of `student_view`.
+
+        Arguments:
+            data (dict): Data from frontend on the event.
+            suffix (string): Slug used for routing.
+        Returns:
+            Data on result (dict).
+        """
         try:
             eventType = data.pop('eventType')  # pylint: disable=invalid-name
         except KeyError:
@@ -471,6 +522,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         Given POST data dictionary 'data', clean the data before validating it.
 
         Try to detect player by submitted video url. If fails, it defaults to 'dummy-player'.
+
+        Arguments:
+            data (dict): POST data.
         """
         data['player_name'] = self.fields['player_name'].default  # pylint: disable=unsubscriptable-object
         for player_name, player_class in BaseVideoPlayer.load_classes():
@@ -480,12 +534,28 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 data['player_name'] = player_name
 
     def get_player(self):
-        """Helper method to load video player by entry-point label."""
+        """
+        Helper method to load video player by entry-point label.
+
+        Returns:
+            Current player object (instance of a platform-specific player class).
+        """
         player = BaseVideoPlayer.load_class(self.player_name)
         return player(self)
 
     def _make_field_info(self, field_name, field):
-        """Override and extend data of built-in method."""
+        """
+        Override and extend data of built-in method.
+
+        Reference:
+            https://github.com/edx/xblock-utils/blob/79dbdcc8bbcb4d73ed9f9f578b2c9cd533e6550c/xblockutils/studio_editable.py#L96
+
+        Arguments:
+            field_name (str): Name of a video XBlock field whose info is to be made.
+            field (xblock.fields): Video XBlock field object.
+        Returns:
+            info (dict): Information on a field to be rendered in the studio editor modal.
+        """
         if field_name in ('start_time', 'end_time'):
             # RelativeTime field isn't supported by default.
             info = {
@@ -535,6 +605,11 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         Url, retrieved after storing of the file field in MongoDB, looks like this:
             'asset-v1-RaccoonGang+1+2018+type@asset+block@<filename>'
+
+        Arguments:
+            file_field (str): name a file is stored in MongoDB under.
+        Returns:
+            Full path of a downloaded asset.
         """
         if file_field:
             return os.path.join('/', file_field)
@@ -553,6 +628,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         """
         Download a transcript.
 
+        Arguments:
+            request (webob.Request): Request to handle.
+            suffix (string): Slug used for routing.
         Returns:
             File with the correct name.
         """
@@ -573,9 +651,11 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         Dispatch request to XBlock's player.
 
         Arguments:
-            request (HttpRequest): Incoming request data.
+            request (xblock.django.request.DjangoWebobRequest): Incoming request data.
             suffix (str): Slug used for routing.
-
+        Returns:
+             Depending on player's `dispatch()` entry point, either info on video / Brightcove account or None value
+             (when performing some action via Brightcove API) may be returned.
         """
         return self.get_player().dispatch(request, suffix)
 
@@ -585,6 +665,12 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         Dispatcher for a requests sent by dynamic Front-end components.
 
         Typical use case: Front-end wants to check with backend if it's ok to show certain part of UI.
+
+        Arguments:
+            _request (xblock.django.request.DjangoWebobRequest): Incoming request data (if any).
+            suffix (str): Slug used for routing.
+        Returns:
+             Response object, containing response data.
         """
         resp = {
             'success': True,
@@ -652,6 +738,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         """
         Xblock handler to authenticate to a video platform's API. Called by JavaScript of `studio_view`.
 
+        Arguments:
+            data (dict): Data from frontend, necessary for authentication (tokens, account id, etc).
+            suffix (str): Slug used for routing.
         Returns:
             response (dict): Status messages key-value pairs.
         """
@@ -669,7 +758,13 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         return response
 
     def update_metadata_authentication(self, auth_data, player):
-        """Update video xblock's metadata field with video platform's API authentication data."""
+        """
+        Update video xblock's metadata field with video platform's API authentication data.
+
+        Arguments:
+            auth_data (dict): Data containing credentials necessary for authentication.
+            player (object): Object of a platform-specific player class.
+        """
         # In case of successful authentication:
         for key in auth_data:
             if key not in player.metadata_fields:
@@ -686,7 +781,16 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     @XBlock.json_handler
     def upload_default_transcript_handler(self, data, suffix=''):  # pylint: disable=unused-argument
-        """Upload a transcript, fetched from a video platform's API, to video xblock."""
+        """
+        Upload a transcript, fetched from a video platform's API, to video xblock.
+
+        Arguments:
+            data (dict): Data from frontend on a default transcript to be fetched from a video platform.
+            suffix (str): Slug used for routing.
+        Returns:
+            response (dict): Data on a default transcript, fetched from a video platform.
+
+        """
         player = self.get_player()
         video_id = player.media_id(self.href)
         lang_code = str(data.get(u'lang'))

@@ -223,7 +223,7 @@ class BrightcoveHlsMixin(object):
 
     def submit_retranscode_job(self, account_id, video_id, profile_type):
         """
-        Draft version. Submit video for re-transcoding via Brightcove's Dynamic Ingestion API.
+        Submit video for re-transcoding via Brightcove's Dynamic Ingestion API.
 
         profile_type:
             - default - re-transcode using default DI profile;
