@@ -110,7 +110,7 @@ class RelativeTime(JSONField):
         """
         Make first 'H' in str representation non-optional.
 
-        str(timedelta) has [H]H:MM:SS format, which is not suitable
+        str (timedelta) has [H]H:MM:SS format, which is not suitable
         for front-end (and ISO time standard), so we force HH:MM:SS format.
         """
         stringified = str(value)

@@ -1,8 +1,9 @@
 """
-Backend classes are responsible for video platform specific logic such as
-validation, interaction with the platform via API and player rendering to end user.
+Backend classes are responsible for video platform specific logic.
 
-Base Video player plugin
+E.G. validation, interaction with the platform via API and player rendering to end user.
+
+Base Video player plugin.
 """
 
 import abc
@@ -23,7 +24,7 @@ html_parser = HTMLParser()  # pylint: disable=invalid-name
 
 class ApiClientError(Exception):
     """
-    Base API client exception
+    Base API client exception.
     """
     pass
 
@@ -32,13 +33,10 @@ class BaseApiClient(object):
     """
     Low level video platform API client.
 
-    Abstracts API interaction details like
-    requests composition, API credentials handling.
+    Abstracts API interaction details, e.g. requests composition and API credentials handling.
 
     Subclass your platform specific API client from this base class.
-
     """
-
     @abc.abstractmethod
     def get(self, url, headers=None, can_retry=True):
         """
@@ -53,7 +51,6 @@ class BaseApiClient(object):
 
         Returns:
             Response in python native data format.
-
         """
 
     @abc.abstractmethod
@@ -70,14 +67,12 @@ class BaseApiClient(object):
 
         Returns:
             Response in python native data format.
-
         """
 
 
 class BaseVideoPlayer(Plugin):
     """
-    Inherit your video player class from this class
-
+    Inherit your video player class from this class.
     """
     __metaclass__ = abc.ABCMeta
 
@@ -89,9 +84,9 @@ class BaseVideoPlayer(Plugin):
     @abc.abstractproperty
     def url_re(self):
         """
-        Regex (list) to match video url
+        Regex (list) to match video url.
 
-        Can be a regex object, a list of regex objects or a string.
+        Can be a regex object, a list of regex objects, or a string.
         """
         return [] or re.compile('') or ''
 
@@ -110,14 +105,13 @@ class BaseVideoPlayer(Plugin):
         To keep xblock metadata field clean on it's each update,
         only backend-specific parameters should be stored in the field.
 
-        Note: this is to add each new key (str) to be stored in metadata
-        to the list being returned here.
+        Note: this is to add each new key (str) to be stored in metadata to the list being returned here.
         """
         return []
 
     def get_frag(self, **context):
         """
-        Returns a Fragment required to render video player on the client side.
+        Return a Fragment required to render video player on the client side.
         """
         frag = Fragment()
         frag.add_css(self.resource_string(
@@ -175,7 +169,8 @@ class BaseVideoPlayer(Plugin):
     @abc.abstractmethod
     def media_id(self, href):  # pylint: disable=unused-argument
         """
-        Extracts Platform's media id from the video url.
+        Extract Platform's media id from the video url.
+
         E.g. https://example.wistia.com/medias/12345abcde -> 12345abcde
         """
         return ''
@@ -184,22 +179,24 @@ class BaseVideoPlayer(Plugin):
     @abc.abstractmethod
     def customize_xblock_fields_display(editable_fields):  # pylint: disable=unused-argument
         """
-        Customises display of studio editor fields per a video platform.
+        Customise display of studio editor fields per video platform.
+
         E.g. 'account_id' should be displayed for Brightcove only.
 
         Returns:
-            client_token_help_message (str)
-            editable_fields (tuple)
+            client_token_help_message (str): Help message with results of client token generation.
+            editable_fields (tuple): All the editable fields to be displayed in studio editor modal.
         """
         return '', ()
 
     def get_player_html(self, **context):
         """
-        Renders self.get_frag as a html string and returns it as a Response.
+        Render self.get_frag as a html string and returns it as a Response.
+
         This method is used by VideoXBlock.render_player()
 
-        Rendering sequence is set to JS must be in the head tag and executed
-        before initializing video components.
+        Rendering sequence is set to JS and must be placed in the head tag,
+        and executed before initializing video components.
         """
         frag = self.get_frag(**context)
         return Response(
@@ -208,15 +205,18 @@ class BaseVideoPlayer(Plugin):
         )
 
     def resource_string(self, path):
-        """Handy helper for getting resources from our kit."""
+        """
+        Handy helper for getting resources from our kit.
+        """
         data = pkg_resources.resource_string(__name__, path)
         return data.decode("utf8")
 
     def render_resource(self, path, **context):
         """
-        Renders static resource using provided context
+        Render static resource using provided context.
 
-        Returns: django.utils.safestring.SafeText
+        Returns:
+            django.utils.safestring.SafeText
         """
         html = Template(self.resource_string(path))
         return html_parser.unescape(
@@ -226,9 +226,9 @@ class BaseVideoPlayer(Plugin):
     @classmethod
     def match(cls, href):
         """
-        Checks if provided video `href` can be rendered by a video backend.
+        Check if provided video `href` can be rendered by a video backend.
 
-        `cls.url_re` attribute defined in subclassess are used for the check.
+        `cls.url_re` attribute, defined in subclassess, is used for the check.
         """
         if isinstance(cls.url_re, list):
             return any(regex.search(href) for regex in cls.url_re)
@@ -246,10 +246,10 @@ class BaseVideoPlayer(Plugin):
     @abc.abstractmethod
     def get_default_transcripts(self, **kwargs):  # pylint: disable=unused-argument
         """
-        Fetches transcripts list from a video platform.
+        Fetch transcripts list from a video platform.
 
         Arguments:
-            kwargs (dict): key-value pairs of API-specific identifiers (account_id, video_id, etc.) and tokens,
+            kwargs (dict): Key-value pairs of API-specific identifiers (account_id, video_id, etc.) and tokens,
                 necessary for API calls.
         Returns:
             list: List of dicts of transcripts. Example:
@@ -261,47 +261,46 @@ class BaseVideoPlayer(Plugin):
                 },
                 # ...
             ]
-            str: message for a user on default transcripts fetching.
+            str: Message for a user on default transcripts fetching.
         """
         return [], ''
 
     @abc.abstractmethod
     def authenticate_api(self, **kwargs):
         """
-        Authenticates to a video platform's API in order to perform authorized requests.
+        Authenticate to a video platform's API in order to perform authorized requests.
 
         Arguments:
-            kwargs (dict): platform-specific predefined client parameters, required to get credentials / tokens.
+            kwargs (dict): Platform-specific predefined client parameters, required to get credentials / tokens.
         Returns:
-            auth_data (dict): tokens and credentials, necessary to perform authorised API requests, and
-            error_status_message (str) for the sake of verbosity.
+            auth_data (dict): Tokens and credentials, necessary to perform authorised API requests.
+            error_status_message (str): Message with errors of authentication (if any) for the sake of verbosity.
         """
         return {}, ''
 
     @abc.abstractmethod
     def download_default_transcript(self, url, language_code):  # pylint: disable=unused-argument
         """
-        Downloads default transcript from a video platform API and formats it accordingly to the WebVTT standard.
+        Download default transcript from a video platform API and format it accordingly to the WebVTT standard.
 
         Arguments:
             url (str): API url to fetch a default transcript from.
             language_code (str): Language code of a transcript to be downloaded.
         Returns:
-            unicode: Transcripts formatted per WebVTT.
-
+            unicode: Transcripts formatted in WebVTT.
         """
         return u''
 
     @staticmethod
     def get_transcript_language_parameters(lang_code):
         """
-        Gets the parameters of a transcript's language, having checked on consistency with settings.
+        Get parameters of a transcript's language, having checked on consistency with settings.
 
         Arguments:
-            lang_code (str): raw language code of a transcript, fetched from the external sources.
+            lang_code (str): Raw language code of a transcript, fetched from the video platform.
         Returns:
-            lang_code (str): pre-configured language code, e.g. 'br'
-            lang_label (str): pre-configured language label, e.g. 'Breton'
+            lang_code (str): Pre-configured language code, e.g. 'br'
+            lang_label (str): Pre-configured language label, e.g. 'Breton'
         """
         # Delete region subtags; reference: https://github.com/edx/edx-platform/blob/master/lms/envs/common.py#L862
         lang_code = lang_code[0:2]
