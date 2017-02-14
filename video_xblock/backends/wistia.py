@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Wistia Video player plugin."""
+"""
+Wistia Video player plugin.
+"""
 
 import json
 import re
@@ -11,7 +13,9 @@ from video_xblock.constants import status
 
 
 class WistiaPlayer(BaseVideoPlayer):
-    """WistiaPlayer is used for videos hosted on the Wistia Video Cloud."""
+    """
+    WistiaPlayer is used for videos hosted on the Wistia Video Cloud.
+    """
 
     # From official Wistia documentation. May change in the future
     # https://wistia.com/doc/construct-an-embed-code#the_regex
@@ -98,7 +102,9 @@ class WistiaPlayer(BaseVideoPlayer):
 
     @staticmethod
     def customize_xblock_fields_display(editable_fields):
-        """Customize display of studio editor fields per a video platform."""
+        """
+        Customize display of studio editor fields per a video platform.
+        """
         message = 'You can get a master token following the guide of ' \
                   '<a href="https://wistia.com/doc/data-api" target="_blank">Wistia</a>. ' \
                   'Please ensure appropriate operations scope has been set on the video platform.'
@@ -206,7 +212,9 @@ class WistiaPlayer(BaseVideoPlayer):
 
     @staticmethod
     def format_transcript_text_line(line):
-        """Replace comma with dot in timings, e.g. 00:00:10,500 should be 00:00:10.500."""
+        """
+        Replace comma with dot in timings, e.g. 00:00:10,500 should be 00:00:10.500.
+        """
         pattern = re.compile(r"\d{2}:\d{2}:\d{2},\d{3}")
         new_line = u""
         for token in line.split():
@@ -216,7 +224,9 @@ class WistiaPlayer(BaseVideoPlayer):
         return new_line
 
     def format_transcript_text(self, text):
-        """Prepare unicode transcripts to be converted to WebVTT format."""
+        """
+        Prepare unicode transcripts to be converted to WebVTT format.
+        """
         new_text = [
             self.format_transcript_text_line(line)
             for line in text[0].splitlines()
@@ -252,5 +262,7 @@ class WistiaPlayer(BaseVideoPlayer):
         return text
 
     def dispatch(self, request, suffix):
-        """Wistia dispatch method."""
+        """
+        Wistia dispatch method.
+        """
         pass

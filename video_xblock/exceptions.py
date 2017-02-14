@@ -1,4 +1,6 @@
-"""Custom, VideoXblock specific Exceptions."""
+"""
+Custom, VideoXblock specific Exceptions.
+"""
 
 from __future__ import unicode_literals
 
@@ -23,6 +25,8 @@ class VideoXBlockException(Exception):
 
 
 class ApiClientError(VideoXBlockException):
-    """Base API client exception."""
+    """
+    Base API client exception.
+    """
 
     default_msg = _('API error occurred.')

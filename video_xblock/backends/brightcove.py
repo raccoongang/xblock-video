@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Brightcove Video player plugin."""
+"""
+Brightcove Video player plugin.
+"""
 
 import re
 import base64
@@ -16,7 +18,9 @@ from video_xblock.utils import ugettext as _
 
 
 class BrightcoveApiClientError(ApiClientError):
-    """Brightcove specific api client errors."""
+    """
+    Brightcove specific api client errors.
+    """
 
     default_msg = _('Brightcove API error.')
 
@@ -83,7 +87,9 @@ class BrightcoveApiClient(BaseApiClient):
         return client_secret, client_id, error_message
 
     def _refresh_access_token(self):
-        """Request new access token to send with requests to Brightcove. Access Token expires every 5 minutes."""
+        """
+        Request new access token to send with requests to Brightcove. Access Token expires every 5 minutes.
+        """
         url = "https://oauth.brightcove.com/v3/access_token"
         params = {"grant_type": "client_credentials"}
         auth_string = base64.encodestring(
@@ -251,7 +257,9 @@ class BrightcoveHlsMixin(object):
         return res
 
     def get_video_renditions(self, account_id, video_id):
-        """Return information about video renditions provided by Brightcove API."""
+        """
+        Return information about video renditions provided by Brightcove API.
+        """
         url = 'https://cms.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/assets/renditions'.format(
             account_id=account_id, video_id=video_id
         )
@@ -293,7 +301,9 @@ class BrightcoveHlsMixin(object):
 
 
 class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
-    """BrightcovePlayer is used for videos hosted on the Brightcove Video Cloud."""
+    """
+    BrightcovePlayer is used for videos hosted on the Brightcove Video Cloud.
+    """
 
     url_re = re.compile(r'https:\/\/studio.brightcove.com\/products\/videocloud\/media\/videos\/(?P<media_id>\d+)')
     metadata_fields = ['access_token', 'client_id', 'client_secret', ]
@@ -317,14 +327,18 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
     default_transcripts = []
 
     def __init__(self, xblock):
-        """Initialize Brightcove player class object."""
+        """
+        Initialize Brightcove player class object.
+        """
         super(BrightcovePlayer, self).__init__(xblock)
         self.api_key = xblock.metadata.get('client_id')
         self.api_secret = xblock.metadata.get('client_secret')
         self.api_client = BrightcoveApiClient(self.api_key, self.api_secret)
 
     def media_id(self, href):
-        """Extract Platform's media id from the video url."""
+        """
+        Extract Platform's media id from the video url.
+        """
         return self.url_re.match(href).group('media_id')
 
     def get_frag(self, **context):
@@ -419,7 +433,9 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         return {'success': False, 'message': 'Unknown method'}
 
     def can_show_settings(self):
-        """Report to UI if it can show backend specific advanced settings."""
+        """
+        Report to UI if it can show backend specific advanced settings.
+        """
         can_show = bool(
             self.xblock.metadata.get('client_id') and
             self.xblock.metadata.get('client_secret')
@@ -428,7 +444,9 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
 
     @staticmethod
     def customize_xblock_fields_display(editable_fields):
-        """Customise display of Brightcove's studio editor fields."""
+        """
+        Customise display of Brightcove's studio editor fields.
+        """
         message = 'You can generate a BC token following the guide of ' \
                   '<a href="https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html" ' \
                   'target="_blank">Brightcove</a>. Please ensure appropriate operations scope has been set ' \

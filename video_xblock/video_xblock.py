@@ -33,7 +33,9 @@ log = logging.getLogger(__name__)
 
 
 class TranscriptsMixin(XBlock):
-    """TranscriptsMixin class to encapsulate transcripts-related logic."""
+    """
+    TranscriptsMixin class to encapsulate transcripts-related logic.
+    """
 
     @staticmethod
     def convert_caps_to_vtt(caps):
@@ -87,7 +89,9 @@ class TranscriptsMixin(XBlock):
 
 
 class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
-    """Main VideoXBlock class, responsible for saving video settings and rendering it for students."""
+    """
+    Main VideoXBlock class, responsible for saving video settings and rendering it for students.
+    """
 
     icon_class = "video"
 
@@ -259,7 +263,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     @property
     def player_state(self):
-        """Return video player state as a dictionary."""
+        """
+        Return video player state as a dictionary.
+        """
         course = self.runtime.modulestore.get_course(self.course_id)
         transcripts = json.loads(self.transcripts) if self.transcripts else []
         transcripts_object = {
@@ -348,7 +354,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         ))
 
     def student_view(self, context=None):  # pylint: disable=unused-argument
-        """The primary view of the `VideoXBlock`, shown to students when viewing courses."""
+        """
+        The primary view of the `VideoXBlock`, shown to students when viewing courses.
+        """
         player_url = self.runtime.handler_url(self, 'render_player')
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
         transcript_download_link = self.get_transcript_download_link()
@@ -374,7 +382,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         return frag
 
     def studio_view(self, context):  # pylint: disable=unused-argument
-        """Render a form for XBlock editing."""
+        """
+        Render a form for XBlock editing.
+        """
         fragment = Fragment()
         player = self.get_player()
         languages = [{'label': label, 'code': lang} for lang, label in ALL_LANGUAGES]

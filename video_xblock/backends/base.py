@@ -62,14 +62,18 @@ class BaseApiClient(object):
 
 
 class BaseVideoPlayer(Plugin):
-    """Inherit your video player class from this class."""
+    """
+    Inherit your video player class from this class.
+    """
 
     __metaclass__ = abc.ABCMeta
 
     entry_point = 'video_xblock.v1'
 
     def __init__(self, xblock):
-        """Initialize base video player class object."""
+        """
+        Initialize base video player class object.
+        """
         self.xblock = xblock
 
     @abc.abstractproperty
@@ -83,7 +87,9 @@ class BaseVideoPlayer(Plugin):
 
     @abc.abstractproperty
     def captions_api(self):
-        """Dictionary of url, request parameters, and response structure of video platform's captions API."""
+        """
+        Dictionary of url, request parameters, and response structure of video platform's captions API.
+        """
         return {}
 
     @abc.abstractproperty
@@ -99,7 +105,9 @@ class BaseVideoPlayer(Plugin):
         return []
 
     def get_frag(self, **context):
-        """Return a Fragment required to render video player on the client side."""
+        """
+        Return a Fragment required to render video player on the client side.
+        """
         context['player_state'] = json.dumps(context['player_state'])
 
         frag = Fragment()
@@ -194,7 +202,9 @@ class BaseVideoPlayer(Plugin):
         )
 
     def resource_string(self, path):
-        """Handy helper for getting resources from our kit."""
+        """
+        Handy helper for getting resources from our kit.
+        """
         return resource_string(path)
 
     def render_resource(self, path, **context):
@@ -221,7 +231,9 @@ class BaseVideoPlayer(Plugin):
             return re.search(cls.url_re, href, re.I)
 
     def add_js_content(self, path, **context):
-        """Helper for adding javascript code inside <body> section."""
+        """
+        Helper for adding javascript code inside <body> section.
+        """
         return '<script>' + self.render_resource(path, **context) + '</script>'
 
     @abc.abstractmethod
@@ -296,7 +308,9 @@ class BaseVideoPlayer(Plugin):
 
     @staticmethod
     def filter_default_transcripts(default_transcripts, transcripts):
-        """Exclude enabled transcripts (fetched from API) from the list of available ones (from video xblock)."""
+        """
+        Exclude enabled transcripts (fetched from API) from the list of available ones (from video xblock).
+        """
         enabled_languages_codes = [t[u'lang'] for t in transcripts]
         default_transcripts = [
             dt for dt in default_transcripts

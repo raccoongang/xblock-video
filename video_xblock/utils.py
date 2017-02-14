@@ -1,4 +1,6 @@
-"""Video xblock helpers."""
+"""
+Video xblock helpers.
+"""
 
 from HTMLParser import HTMLParser
 import pkg_resources
@@ -10,7 +12,9 @@ html_parser = HTMLParser()  # pylint: disable=invalid-name
 
 
 def resource_string(path):
-    """Handy helper for getting resources from our kit."""
+    """
+    Handy helper for getting resources from our kit.
+    """
     data = pkg_resources.resource_string(__name__, path)
     return data.decode("utf8")
 
@@ -28,5 +32,7 @@ def render_resource(path, **context):
 
 
 def ugettext(text):
-    """Dummy ugettext method that doesn't do anything."""
+    """
+    Dummy ugettext method that doesn't do anything.
+    """
     return text

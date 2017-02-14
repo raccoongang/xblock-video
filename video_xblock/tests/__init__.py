@@ -1,1 +1,3 @@
-"""Testing of video_xblock modules."""
+"""
+Testing of video_xblock modules.
+"""

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-"""YouTube Video player plugin."""
+"""
+YouTube Video player plugin.
+"""
 
 import json
 import re
@@ -12,7 +14,9 @@ from video_xblock.constants import status
 
 
 class YoutubePlayer(BaseVideoPlayer):
-    """YoutubePlayer is used for videos hosted on the Youtube.com."""
+    """
+    YoutubePlayer is used for videos hosted on the Youtube.com.
+    """
 
     # Regex is taken from http://regexr.com/3a2p0
     url_re = re.compile(
@@ -40,11 +44,15 @@ class YoutubePlayer(BaseVideoPlayer):
     default_transcripts = []
 
     def media_id(self, href):
-        """Extract Platform's media id from the video url."""
+        """
+        Extract Platform's media id from the video url.
+        """
         return self.url_re.search(href).group('media_id')
 
     def get_frag(self, **context):
-        """Return a Fragment required to render video player on the client side."""
+        """
+        Return a Fragment required to render video player on the client side.
+        """
         context['data_setup'] = json.dumps({
             "controlBar": {
                 "volumeMenuButton": {
@@ -103,7 +111,9 @@ class YoutubePlayer(BaseVideoPlayer):
         return message, customised_editable_fields
 
     def authenticate_api(self, **kwargs):
-        """Current Youtube captions API doesn't require authentication, but this may change."""
+        """
+        Current Youtube captions API doesn't require authentication, but this may change.
+        """
         return {}, ''
 
     def fetch_default_transcripts_languages(self, video_id):
@@ -153,7 +163,9 @@ class YoutubePlayer(BaseVideoPlayer):
         return available_languages, message
 
     def get_default_transcripts(self, **kwargs):
-        """Fetch transcripts list from a video platform."""
+        """
+        Fetch transcripts list from a video platform.
+        """
         # Fetch available transcripts' languages from API
         video_id = kwargs.get('video_id')
         available_languages, message = self.fetch_default_transcripts_languages(video_id)
@@ -195,7 +207,9 @@ class YoutubePlayer(BaseVideoPlayer):
         return timing
 
     def format_transcript_element(self, element, i):
-        """Format transcript's element in order for it to be converted to WebVTT format."""
+        """
+        Format transcript's element in order for it to be converted to WebVTT format.
+        """
         sub_element = u"\n\n"
         if element.tag == "text":
             start = float(element.get("start"))
@@ -229,5 +243,7 @@ class YoutubePlayer(BaseVideoPlayer):
         return sub
 
     def dispatch(self, request, suffix):
-        """Youtube dispatch method."""
+        """
+        Youtube dispatch method.
+        """
         pass
