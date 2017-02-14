@@ -187,11 +187,15 @@ class YoutubePlayer(BaseVideoPlayer):
         return default_transcripts, message
 
     @staticmethod
-    def format_transcript_timing(sec):
+    def format_transcript_timing(sec, period_type=None):
         """
         Converts seconds to timestamp of the format `hh:mm:ss:mss`, e.g. 00:00:03.887
 
         """
+        # Get rid of overlapping periods.
+        if period_type == 'end' and float(sec) >= 0.001:
+            float_sec = float(sec) - 0.001
+            sec = float_sec
         mins, secs = divmod(sec, 60)  # pylint: disable=unused-variable
         hours, mins = divmod(mins, 60)
         hours_formatted = str(int(hours)).zfill(2)
@@ -219,7 +223,7 @@ class YoutubePlayer(BaseVideoPlayer):
             end = start + duration
             if text:
                 formatted_start = self.format_transcript_timing(start)
-                formatted_end = self.format_transcript_timing(end)
+                formatted_end = self.format_transcript_timing(end, 'end')
                 timing = '{} --> {}'.format(formatted_start, formatted_end)
                 text_encoded = text.encode('utf8', 'ignore')
                 text = text_encoded.replace('\n', ' ')
