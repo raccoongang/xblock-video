@@ -106,13 +106,12 @@ class BrightcoveApiClient(BaseApiClient):
 
     def get(self, url, headers=None, can_retry=True):
         """
-        Issue REST GET request to a given URL. Can throw ApiClientError or it's subclass.
+        Issue REST GET request to a given URL. Can throw ApiClientError or its subclass.
 
         Arguments:
             url (str): API url to fetch a resource from.
             headers (dict): Headers necessary as per API, e.g. authorization bearer to perform authorised requests.
-            can_retry (bool): True if this is to retry a call if authentication failed.
-
+            can_retry (bool): True if in a case of authentication error it can refresh access token and retry a call.
         Returns:
             Response in python native data format.
         """
@@ -130,13 +129,13 @@ class BrightcoveApiClient(BaseApiClient):
 
     def post(self, url, payload, headers=None, can_retry=True):
         """
-        Issue REST POST request to a given URL. Can throw ApiClientError or it's subclass.
+        Issue REST POST request to a given URL. Can throw ApiClientError or its subclass.
 
         Arguments:
             url (str): API url to fetch a resource from.
             payload (dict): POST data.
             headers (dict): Headers necessary as per API, e.g. authorization bearer to perform authorised requests.
-            can_retry (bool): True if this is to retry a call if authentication failed.
+            can_retry (bool): True if in a case of authentication error it can refresh access token and retry a call.
         Returns:
             Response in Python native data format.
         """

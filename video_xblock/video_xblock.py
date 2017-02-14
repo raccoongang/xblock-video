@@ -677,7 +677,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         Typical use case: Front-end wants to check with backend if it's ok to show certain part of UI.
 
         Arguments:
-            _request (xblock.django.request.DjangoWebobRequest): Incoming request data (if any).
+            _request (xblock.django.request.DjangoWebobRequest): Incoming request data. Not used.
             suffix (str): Slug used for routing.
         Returns:
              Response object, containing response data.
