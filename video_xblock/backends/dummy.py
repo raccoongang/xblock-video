@@ -1,6 +1,4 @@
-"""
-Dummy Video player plugin
-"""
+"""Dummy Video player plugin."""
 
 import re
 
@@ -10,6 +8,7 @@ from video_xblock import BaseVideoPlayer
 
 class DummyPlayer(BaseVideoPlayer):
     """DummyPlayer is a placeholder for cases when appropriate player can't be displayed."""
+
     url_re = re.compile(r'')
     metadata_fields = []
 

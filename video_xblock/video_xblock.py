@@ -36,6 +36,7 @@ log = logging.getLogger(__name__)
 
 class TranscriptsMixin(XBlock):
     """TranscriptsMixin class to encapsulate transcripts-related logic."""
+
     @staticmethod
     def convert_caps_to_vtt(caps):
         """
@@ -85,6 +86,7 @@ class TranscriptsMixin(XBlock):
 
 class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
     """Main VideoXBlock class, responsible for saving video settings and rendering it for students."""
+
     icon_class = "video"
 
     display_name = String(
@@ -459,7 +461,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     @XBlock.json_handler
     def save_player_state(self, request, suffix=''):  # pylint: disable=unused-argument
-        """XBlock handler to save playback player state. Called by student_view's JavaScript."""
+        """Xblock handler to save playback player state. Called by student_view's JavaScript."""
         player_state = {
             'current_time': request['currentTime'],
             'playback_rate': request['playbackRate'],
@@ -626,12 +628,10 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
         Arguments:
             token (str): token provided by a user before the save button was clicked (for handlers).
-
         Returns:
             error_message (dict): Status message for template rendering.
             auth_data (dict): Tokens and credentials, necessary to perform authorised API requests.
         """
-
         # TODO move auth fields validation and kwargs population to specific backends
         # Handles a case where no token was provided by a user
         is_default_token = self.token == self.fields['token'].default  # pylint: disable=unsubscriptable-object
@@ -670,7 +670,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
     @XBlock.json_handler
     def authenticate_video_api_handler(self, data, suffix=''):  # pylint: disable=unused-argument
         """
-        XBlock handler to authenticate to a video platform's API.
+        Xblock handler to authenticate to a video platform's API.
 
         Called by studio_view's JavaScript.
 

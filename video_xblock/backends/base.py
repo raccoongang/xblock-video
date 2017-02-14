@@ -24,6 +24,7 @@ html_parser = HTMLParser()  # pylint: disable=invalid-name
 
 class ApiClientError(Exception):
     """Base API client exception."""
+
     pass
 
 
@@ -35,6 +36,7 @@ class BaseApiClient(object):
 
     Subclass your platform specific API client from this base class.
     """
+
     @abc.abstractmethod
     def get(self, url, headers=None, can_retry=True):
         """
@@ -70,11 +72,13 @@ class BaseApiClient(object):
 
 class BaseVideoPlayer(Plugin):
     """Inherit your video player class from this class."""
+
     __metaclass__ = abc.ABCMeta
 
     entry_point = 'video_xblock.v1'
 
     def __init__(self, xblock):
+        """Initialize base video player class."""
         self.xblock = xblock
 
     @abc.abstractproperty

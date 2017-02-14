@@ -1,6 +1,4 @@
-"""
-Vimeo Video player plugin
-"""
+"""Vimeo Video player plugin."""
 
 import json
 import re
@@ -10,6 +8,7 @@ from video_xblock import BaseVideoPlayer
 
 class VimeoPlayer(BaseVideoPlayer):
     """VimeoPlayer is used for videos hosted on the Vimeo.com."""
+
     # Regex is taken from http://regexr.com/3a2p0
     # https://vimeo.com/153979733
     url_re = re.compile(r'https?:\/\/(.+)?(vimeo.com)\/(?P<media_id>.*)')
@@ -20,6 +19,11 @@ class VimeoPlayer(BaseVideoPlayer):
     captions_api = {}
 
     def media_id(self, href):
+        """
+        Extract Platform's media id from the video url.
+
+        E.g. https://example.wistia.com/medias/12345abcde -> 12345abcde
+        """
         return self.url_re.search(href).group('media_id')
 
     def get_frag(self, **context):

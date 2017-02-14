@@ -1,6 +1,4 @@
-"""
-Brightcove Video player plugin
-"""
+"""Brightcove Video player plugin."""
 
 import re
 import base64
@@ -15,6 +13,7 @@ from video_xblock.backends.base import ApiClientError, BaseVideoPlayer, BaseApiC
 
 class BrightcoveApiClientError(ApiClientError):
     """Brightcove specific api client errors."""
+
     pass
 
 
@@ -25,7 +24,9 @@ class BrightcoveApiClient(BaseApiClient):
     Does all heavy lifting of sending https requests over the wire.
     Responsible for API credentials issuing and access_token refreshing.
     """
+
     def __init__(self, api_key, api_secret, token=None, account_id=None):
+        """Initialize Brightcove API client."""
         if token and account_id:
             self.create_credentials(token, account_id)
         else:
@@ -154,6 +155,7 @@ class BrightcoveHlsMixin(object):
     1. Video playback autoquality. i.e. adjusting video bitrate depending on client's bandwidth.
     2. Video content encryption using short-living keys.
     """
+
     DI_PROFILES = {
         'autoquality': {
             'name': 'Open edX Video XBlock HLS ingest profile',
@@ -254,12 +256,15 @@ class BrightcoveHlsMixin(object):
 
     def get_video_tech_info(self, account_id, video_id):
         """
-        Return summary about given video:
-            {
-              'renditions_count': <int>,
-              'auto_quality': 'on/off/partial',
-              'encryption': 'on/off/partial'
-            }
+        Return summary about given video.
+
+        Returns:
+            info (dict): Summary about given video. E.g.
+                {
+                  'renditions_count': <int>,
+                  'auto_quality': 'on/off/partial',
+                  'encryption': 'on/off/partial'
+                }
         """
         renditions = self.get_video_renditions(account_id, video_id)
         info = {
@@ -285,6 +290,7 @@ class BrightcoveHlsMixin(object):
 
 class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
     """BrightcovePlayer is used for videos hosted on the Brightcove Video Cloud."""
+
     url_re = re.compile(r'https:\/\/studio.brightcove.com\/products\/videocloud\/media\/videos\/(?P<media_id>\d+)')
     metadata_fields = ['access_token', 'client_id', 'client_secret', ]
 
@@ -307,13 +313,14 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
     default_transcripts = []
 
     def __init__(self, xblock):
+        """Initialize Brightcove player class."""
         super(BrightcovePlayer, self).__init__(xblock)
         self.api_key = xblock.metadata.get('client_id')
         self.api_secret = xblock.metadata.get('client_secret')
         self.api_client = BrightcoveApiClient(self.api_key, self.api_secret)
 
     def media_id(self, href):
-        """Brightcove specific implementation of BaseVideoPlayer.media_id()."""
+        """Extract Platform's media id from the video url."""
         return self.url_re.match(href).group('media_id')
 
     def get_frag(self, **context):
@@ -415,7 +422,9 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
 
     @staticmethod
     def customize_xblock_fields_display(editable_fields):
-        """Customise display of Brightcove's studio editor fields."""
+        """
+        Customise display of Brightcove's studio editor fields.
+        """
         message = 'You can generate a BC token following the guide of ' \
                   '<a href="https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html" ' \
                   'target="_blank">Brightcove</a>. Please ensure appropriate operations scope has been set ' \

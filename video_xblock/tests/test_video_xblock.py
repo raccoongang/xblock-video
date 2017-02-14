@@ -1,6 +1,4 @@
-"""
-Test cases for video_xblock.
-"""
+"""Test cases for video_xblock."""
 
 import datetime
 import json
@@ -20,13 +18,9 @@ settings.configure()
 
 
 class VideoXBlockTests(unittest.TestCase):
-    """
-    Test cases for video_xblock.
-    """
+    """Test cases for video_xblock."""
     def setUp(self):
-        """
-        Create a XBlock VideoXBlock for testing purpose.
-        """
+        """Create a XBlock VideoXBlock for testing purpose."""
         result = super(VideoXBlockTests, self).setUp()
         runtime = TestRuntime()  # pylint: disable=abstract-class-instantiated
         self.block = VideoXBlock(runtime, DictFieldData({
@@ -35,6 +29,7 @@ class VideoXBlockTests(unittest.TestCase):
         return result
 
     def test_fields_xblock(self):
+        """Test xblock fields consistency with their default values."""
         self.assertEqual(self.block.display_name, _('Video'))
         self.assertEqual(self.block.href, '')
         self.assertEqual(self.block.account_id, 'account_id')
@@ -54,9 +49,7 @@ class VideoXBlockTests(unittest.TestCase):
         self.assertEqual(self.block.download_transcript_allowed, False)
 
     def test_player_state(self):
-        """
-        Test player state property.
-        """
+        """Test player state property."""
         self.block.course_id = 'test:course:id'
         self.block.runtime.modulestore = mock.Mock(get_course=MockCourse)
         self.assertDictEqual(
@@ -75,9 +68,7 @@ class VideoXBlockTests(unittest.TestCase):
         )
 
     def test_get_brightcove_js_url(self):
-        """
-        Test brightcove.js url generation.
-        """
+        """Test brightcove.js url generation."""
         self.assertEqual(
             VideoXBlock.get_brightcove_js_url(self.block.account_id, self.block.player_id),
             "https://players.brightcove.net/{account_id}/{player_id}_default/index.min.js".format(
@@ -87,9 +78,7 @@ class VideoXBlockTests(unittest.TestCase):
         )
 
     def test_save_player_state(self):
-        """
-        Test player state saving.
-        """
+        """Test player state saving."""
         self.block.course_id = 'test:course:id'
         self.block.runtime.modulestore = mock.Mock(get_course=MockCourse)
         data = {
@@ -121,9 +110,7 @@ class VideoXBlockTests(unittest.TestCase):
 
 
 class MockCourse(object):
-    """
-    Mock Course object with required parameters.
-    """
+    """Mock Course object with required parameters."""
     def __init__(self, course_id):
         self.course_id = course_id
         self.language = 'en'

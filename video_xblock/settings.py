@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This is the common settings file, intended to set defaults.
+Common settings file, intended to set defaults.
 
 Source:
   https://github.com/edx/edx-platform/blob/master/lms/envs/common.py#L2457

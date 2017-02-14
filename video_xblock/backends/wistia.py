@@ -1,6 +1,4 @@
-"""
-Wistia Video player plugin
-"""
+"""Wistia Video player plugin."""
 
 import json
 import re
@@ -12,6 +10,7 @@ from video_xblock import BaseVideoPlayer
 
 class WistiaPlayer(BaseVideoPlayer):
     """WistiaPlayer is used for videos hosted on the Wistia Video Cloud."""
+
     # From official Wistia documentation. May change in the future
     # https://wistia.com/doc/construct-an-embed-code#the_regex
     url_re = re.compile(
@@ -42,7 +41,11 @@ class WistiaPlayer(BaseVideoPlayer):
     default_transcripts = []
 
     def media_id(self, href):
-        """Wistia specific implementation of BaseVideoPlayer.media_id()."""
+        """
+        Extract Platform's media id from the video url.
+
+        E.g. https://example.wistia.com/medias/12345abcde -> 12345abcde
+        """
         return self.url_re.search(href).group('media_id')
 
     def get_frag(self, **context):
@@ -131,7 +134,6 @@ class WistiaPlayer(BaseVideoPlayer):
         Fetch transcripts list from Wistia API.
 
         Urls of transcipts are to be fetched later on with separate API calls.
-
         References:
             https://wistia.com/doc/data-api#captions_index
             https://wistia.com/doc/data-api#captions_show
@@ -229,7 +231,6 @@ class WistiaPlayer(BaseVideoPlayer):
         Get default transcript fetched from a video platform API and formats it to WebVTT-like unicode.
 
         Though Wistia provides a method for a transcript fetching, this is to avoid API call.
-
         References:
             https://wistia.com/doc/data-api#captions_index
             https://wistia.com/doc/data-api#captions_show

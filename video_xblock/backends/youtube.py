@@ -1,6 +1,4 @@
-"""
-YouTube Video player plugin
-"""
+"""YouTube Video player plugin."""
 
 import json
 import re
@@ -13,6 +11,7 @@ from video_xblock import BaseVideoPlayer
 
 class YoutubePlayer(BaseVideoPlayer):
     """YoutubePlayer is used for videos hosted on the Youtube.com."""
+
     # Regex is taken from http://regexr.com/3a2p0
     url_re = re.compile(
         r'(?:youtube\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\?(?:\S*?&?v\=))|youtu\.be\/)(?P<media_id>[a-zA-Z0-9_-]{6,11})'

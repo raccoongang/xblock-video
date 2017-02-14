@@ -1,6 +1,4 @@
-"""
-This module contains video xblock helpers.
-"""
+"""Video xblock helpers."""
 
 
 def ugettext(text):
