@@ -35,4 +35,4 @@ script:
   - make test-js
 
 after_success:
-  - make coveralls
+  - make send_coveralls
