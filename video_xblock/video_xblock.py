@@ -276,7 +276,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     @staticmethod
     def get_brightcove_js_url(account_id, player_id):
-        """Return url to brightcove player js file considering account_id and player_id."""
+        """Return url to brightcove player js file considering `account_id` and `player_id`."""
         return "https://players.brightcove.net/{account_id}/{player_id}_default/index.min.js".format(
             account_id=account_id,
             player_id=player_id
@@ -320,7 +320,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             ValidationMessage.ERROR,
             _(u"Incorrect or unsupported video URL, please recheck.")
         ))
-
 
     def student_view(self, context=None):  # pylint: disable=unused-argument
         """The primary view of the VideoXBlock, shown to students when viewing courses."""

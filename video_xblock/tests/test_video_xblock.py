@@ -111,6 +111,8 @@ class VideoXBlockTests(unittest.TestCase):
 
 class MockCourse(object):
     """Mock Course object with required parameters."""
+
     def __init__(self, course_id):
+        """Initialize mock course object."""
         self.course_id = course_id
         self.language = 'en'

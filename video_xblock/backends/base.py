@@ -70,7 +70,7 @@ class BaseVideoPlayer(Plugin):
     entry_point = 'video_xblock.v1'
 
     def __init__(self, xblock):
-        """Initialize base video player class."""
+        """Initialize base video player class object."""
         self.xblock = xblock
 
     @abc.abstractproperty

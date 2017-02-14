@@ -17,7 +17,7 @@ from video_xblock.utils import ugettext as _
 
 class BrightcoveApiClientError(ApiClientError):
     """Brightcove specific api client errors."""
-    
+
     default_msg = _('Brightcove API error.')
 
 
@@ -317,7 +317,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
     default_transcripts = []
 
     def __init__(self, xblock):
-        """Initialize Brightcove player class."""
+        """Initialize Brightcove player class object."""
         super(BrightcovePlayer, self).__init__(xblock)
         self.api_key = xblock.metadata.get('client_id')
         self.api_secret = xblock.metadata.get('client_secret')
