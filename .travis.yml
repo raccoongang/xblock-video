@@ -8,6 +8,7 @@ addons:
   apt:
     packages:
     # Install binary package for lxml to speed up build
+    - ruby1.9.3
     - python-lxml
 
 cache:
@@ -18,11 +19,14 @@ cache:
 before_install:
   # Install latest stable NodeJS version. Required for eslint.
   - nvm install stable
+  - gem install coveralls-lcov
 
 before_script:
   - make deps-test
   # Install eslint, eslint-config-edx and their dependencies
   - make tools
+  # Prepare for js tests
+  - make prepare-for-js
 
 script:
   - make quality-py
@@ -31,6 +35,4 @@ script:
   - make test-js
 
 after_success:
-  - coverage xml
-  - python merge-xml-coverage.py -o coverage_report.xml coverage.xml video_xblock/static/coverage/PhantomJS\ 2.1.1\ \(Linux\ 0.0.0\)/cobertura-coverage.xml
-  - coveralls --data_file coverage_report.xml
+  - make coveralls
