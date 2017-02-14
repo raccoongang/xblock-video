@@ -22,9 +22,9 @@ before_install:
   - gem install coveralls-lcov
 
 before_script:
-  - make deps-test
-  # Install eslint, eslint-config-edx and their dependencies
+  # Install bower, eslint, eslint-config-edx and their dependencies
   - make tools
+  - make deps-test
   # Prepare for js tests
   - make prepare-for-js
 
