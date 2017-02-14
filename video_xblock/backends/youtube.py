@@ -114,7 +114,7 @@ class YoutubePlayer(BaseVideoPlayer):
             https://github.com/edx/edx-platform/blob/ecc3473d36b3c7a360e260f8962e21cb01eb1c39/common/lib/xmodule/xmodule/video_module/transcripts_utils.py#L97
 
         Arguments:
-            video_id (str): Media id fetched from href field of studio-edit modal.
+            video_id (str): Media id fetched from `href` field of studio-edit modal.
         Returns:
             available_languages (list): List of pairs of codes and labels of captions' languages fetched from API,
                 together with transcripts' names if any.

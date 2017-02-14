@@ -34,13 +34,12 @@ class BaseApiClient(object):
         """
         Issue REST GET request to a given URL.
 
-        Can throw ApiClientError or it's subclass.
+        Can throw `ApiClientError` or it's subclass.
 
         Arguments:
             url (str): API url to fetch a resource from.
             headers (dict): Headers necessary as per API, e.g. authorization bearer to perform authorised requests.
             can_retry (bool): True if this is to retry a call if authentication failed.
-
         Returns:
             Response in python native data format.
         """
@@ -54,9 +53,9 @@ class BaseApiClient(object):
 
         Arguments:
             url (str): API url to fetch a resource from.
+            payload (dict): POST data.
             headers (dict): Headers necessary as per API, e.g. authorization bearer to perform authorised requests.
             can_retry (bool): True if this is to retry a call if authentication failed.
-
         Returns:
             Response in python native data format.
         """
@@ -181,9 +180,9 @@ class BaseVideoPlayer(Plugin):
 
     def get_player_html(self, **context):
         """
-        Render self.get_frag as a html string and returns it as a Response.
+        Render `self.get_frag` as a html string and returns it as a Response.
 
-        This method is used by VideoXBlock.render_player()
+        This method is used by `VideoXBlock.render_player()`.
 
         Rendering sequence is set to JS and must be placed in the head tag,
         and executed before initializing video components.

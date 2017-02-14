@@ -135,7 +135,7 @@ class WistiaPlayer(BaseVideoPlayer):
         """
         Fetch transcripts list from Wistia API.
 
-        Urls of transcipts are to be fetched later on with separate API calls.
+        Urls of transcripts are to be fetched later on with separate API calls.
         References:
             https://wistia.com/doc/data-api#captions_index
             https://wistia.com/doc/data-api#captions_show

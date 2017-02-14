@@ -10,9 +10,7 @@ html_parser = HTMLParser()  # pylint: disable=invalid-name
 
 
 def resource_string(path):
-    """
-    Handy helper for getting resources from our kit.
-    """
+    """Handy helper for getting resources from our kit."""
     data = pkg_resources.resource_string(__name__, path)
     return data.decode("utf8")
 

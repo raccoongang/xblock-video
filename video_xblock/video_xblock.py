@@ -72,8 +72,7 @@ class TranscriptsMixin(XBlock):
 
         Arguments:
             request (webob.Request): The request to handle
-            suffix (string): The remainder of the url, after the handler url prefix, if available
-
+            suffix (string): The remainder of the url, after the handler url prefix, if available.
         Returns:
             webob.Response: WebVTT transcripts wrapped in Response object.
         """
@@ -322,7 +321,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         ))
 
     def student_view(self, context=None):  # pylint: disable=unused-argument
-        """The primary view of the VideoXBlock, shown to students when viewing courses."""
+        """The primary view of the `VideoXBlock`, shown to students when viewing courses."""
         player_url = self.runtime.handler_url(self, 'render_player')
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
         transcript_download_link = self.get_transcript_download_link()
@@ -421,7 +420,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     @XBlock.handler
     def render_player(self, request, suffix=''):  # pylint: disable=unused-argument
-        """Student_view() loads this handler as an iframe to display actual video player."""
+        """View `student_view` loads this handler as an iframe to display actual video player."""
         player = self.get_player()
         save_state_url = self.runtime.handler_url(self, 'save_player_state')
         transcripts = render_resource(
@@ -442,7 +441,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     @XBlock.json_handler
     def save_player_state(self, request, suffix=''):  # pylint: disable=unused-argument
-        """Xblock handler to save playback player state. Called by student_view's JavaScript."""
+        """Xblock handler to save playback player state. Called by JavaScript of `student_view`."""
         player_state = {
             'current_time': request['currentTime'],
             'playback_rate': request['playbackRate'],
@@ -458,7 +457,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     @XBlock.json_handler
     def publish_event(self, data, suffix=''):  # pylint: disable=unused-argument
-        """Handler to publish XBlock event from frontend. Called by student_view's JavaScript."""
+        """Handler to publish XBlock event from frontend. Called by JavaScript of `student_view`."""
         try:
             eventType = data.pop('eventType')  # pylint: disable=invalid-name
         except KeyError:
@@ -518,7 +517,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
 
     def get_file_name_from_path(self, field):
         """
-        Helper for getting filename from string with path to mongoDB storage.
+        Helper for getting filename from string with path to MongoDB storage.
 
         Example of string:
             asset-v1-RaccoonGang+1+2018+type@asset+block@<filename>
@@ -534,7 +533,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         """
         Return downloaded asset url with slash in start of it.
 
-        Url, retrieved after storing of the file field in mongoDB, looks like this:
+        Url, retrieved after storing of the file field in MongoDB, looks like this:
             'asset-v1-RaccoonGang+1+2018+type@asset+block@<filename>'
         """
         if file_field:
@@ -651,9 +650,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
     @XBlock.json_handler
     def authenticate_video_api_handler(self, data, suffix=''):  # pylint: disable=unused-argument
         """
-        Xblock handler to authenticate to a video platform's API.
-
-        Called by studio_view's JavaScript.
+        Xblock handler to authenticate to a video platform's API. Called by JavaScript of `studio_view`.
 
         Returns:
             response (dict): Status messages key-value pairs.

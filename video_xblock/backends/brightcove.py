@@ -128,11 +128,11 @@ class BrightcoveApiClient(BaseApiClient):
 
         Arguments:
             url (str): API url to fetch a resource from.
+            payload (dict): POST data.
             headers (dict): Headers necessary as per API, e.g. authorization bearer to perform authorised requests.
             can_retry (bool): True if this is to retry a call if authentication failed.
-
         Returns:
-            Response in python native data format.
+            Response in Python native data format.
         """
         headers_ = {
             'Authorization': 'Bearer ' + self.access_token,
@@ -183,7 +183,7 @@ class BrightcoveHlsMixin(object):
 
     def ensure_ingest_profiles(self, account_id):
         """
-        Check if custom HLS-enabled ingest profiles have been uploaded to the given Brightcove account_id.
+        Check if custom HLS-enabled ingest profiles have been uploaded to the given Brightcove `account_id`.
 
         If not, upload these profiles.
         """
@@ -196,7 +196,7 @@ class BrightcoveHlsMixin(object):
 
     def get_ingest_profiles(self, account_id):
         """
-        Get all Ingest Profiles available for a given account id.
+        Get all Ingest Profiles available for a given `account_id`.
 
         Reference:
             https://docs.brightcove.com/en/video-cloud/ingest-profiles-api/getting-started/api-overview.html
@@ -428,9 +428,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
 
     @staticmethod
     def customize_xblock_fields_display(editable_fields):
-        """
-        Customise display of Brightcove's studio editor fields.
-        """
+        """Customise display of Brightcove's studio editor fields."""
         message = 'You can generate a BC token following the guide of ' \
                   '<a href="https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html" ' \
                   'target="_blank">Brightcove</a>. Please ensure appropriate operations scope has been set ' \
