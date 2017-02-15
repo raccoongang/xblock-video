@@ -551,7 +551,6 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         Returns:
             sub (unicode): Transcripts formatted per WebVTT format https://w3c.github.io/webvtt/
         """
-
         data = requests.get(url)
         text = data.content.decode('utf8')
         # To clean subs text from special symbols here, we need `unescape()` from xml.sax.saxutils
