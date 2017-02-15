@@ -12,7 +12,7 @@ var domReady = function(callback) {
 };
 
 /** Get url of a specific transcript from a given transcripts array. */
-var getTranscriptUrl = function(transcriptsArray, langCode){
+function getTranscriptUrl(transcriptsArray, langCode){
     var url = '';
     transcriptsArray.forEach(function(sub){
         if(sub['lang']==langCode){
@@ -23,7 +23,7 @@ var getTranscriptUrl = function(transcriptsArray, langCode){
 };
 
 /** Create elements to display messages with status on actions with default transcripts. */
-var createStatusMessageElement = function(langCode, actionSelector){
+function createStatusMessageElement(langCode, actionSelector){
     var errorMessageElementParentSelector = '';
     var successMessageElementParentSelector = '';
     if (actionSelector === 'upload-default-transcript') {
@@ -46,7 +46,7 @@ var createStatusMessageElement = function(langCode, actionSelector){
 };
 
 /** Display message with results on a performed action. */
-var showStatus = function(message, type, successSelector, errorSelector){
+function showStatus(message, type, successSelector, errorSelector){
     // Only one success message is to be displayed at once
     $('.api-request').empty();
     if(type==='success'){
@@ -91,7 +91,7 @@ domReady(function() {
     var initialDefaultTranscriptsLangCodes = initialDefaultTranscriptsData[1];
 
     /** Display a transcript in a list of enabled transcripts. Listeners on removal are bound in studio editor js.*/
-    var createEnabledTranscriptBlock = function(defaultTranscript){
+    function createEnabledTranscriptBlock(defaultTranscript){
         var langCode = defaultTranscript['lang'];
         var langLabel = defaultTranscript['label'];
         var downloadUrlServer = defaultTranscript['url']; // External url to download a resource from a server
@@ -131,10 +131,10 @@ domReady(function() {
                     removeEnabledTranscriptBlock(enabledTranscript);
                 });
         }
-    };
+    }
 
     /** Create available transcript. */
-    var createAvailableTranscriptBlock = function(defaultTranscript){
+    function createAvailableTranscriptBlock(defaultTranscript){
         var langCode = defaultTranscript['lang'];
         var langLabel = defaultTranscript['label'];
         // Get all the currently available transcripts
@@ -164,10 +164,10 @@ domReady(function() {
             // Create elements to display status messages on available transcript upload
             createStatusMessageElement(langCode, 'upload-default-transcript');
         }
-    };
+    }
 
     /** Remove enabled transcript of choice. */
-    var removeEnabledTranscriptBlock = function(enabledTranscript) {
+    function removeEnabledTranscriptBlock(enabledTranscript) {
         var langCode = enabledTranscript['lang'];
         var langLabel = enabledTranscript['label'];
         var downloadUrl = enabledTranscript['url'];
@@ -216,7 +216,7 @@ domReady(function() {
                 '.api-request.remove-default-transcript.' + langCode + '.status-success',
                 '.api-request.remove-default-transcript.' + langCode + '.status-error');
         }
-    };
+    }
 
     $defaultTranscriptUploader.click(function(event) {
         event.preventDefault();

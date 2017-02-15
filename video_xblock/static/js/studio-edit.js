@@ -323,7 +323,7 @@ function StudioEditableXBlock(runtime, element) {
         disabledLanguages.push(transcriptValue.lang)
     });
 
-    var showStatus = function(message, type, successSelector, errorSelector){
+    function showStatus(message, type, successSelector, errorSelector){
         // Only one success message is to be displayed at once
         $('.api-request').empty();
         if(type==='success'){
@@ -404,7 +404,7 @@ function StudioEditableXBlock(runtime, element) {
         });
     }
 
-    var disableOption = function(){
+    function disableOption(){
 
         $langChoiceItem.find('option').each(function(ind){
             if (disabledLanguages.indexOf($(this).val()) > -1){
@@ -413,7 +413,7 @@ function StudioEditableXBlock(runtime, element) {
                 $(this).attr('disabled', false)
             }
         })
-    };
+    }
     /**
      * Replaces an existing transcript to transcriptsValue or adds new
      * Returns true if new one was added or false otherwise
@@ -422,7 +422,7 @@ function StudioEditableXBlock(runtime, element) {
      * @param {String} url
      * @param {String} oldLang
      */
-    var pushTranscript = function pushTranscript(lang, label, url, oldLang){
+    function pushTranscript(lang, label, url, oldLang){
         var indexLanguage;
         for (var i=0; i < transcriptsValue.length; i++) {
             if (oldLang == transcriptsValue[i].lang || lang == transcriptsValue[i].lang) {
@@ -447,7 +447,7 @@ function StudioEditableXBlock(runtime, element) {
         }
     };
 
-    var clickUploader = function(event) {
+    function clickUploader(event) {
         event.preventDefault();
         event.stopPropagation();
         var $buttonBlock = $(event.currentTarget);
@@ -531,7 +531,7 @@ function StudioEditableXBlock(runtime, element) {
         });
     }
 
-    var languageChecker = function (event) {
+    function languageChecker(event) {
         event.stopPropagation();
         var $selectedOption = $(event.currentTarget).find('option:selected');
         var selectedLanguage = $selectedOption.val();
@@ -560,32 +560,32 @@ function StudioEditableXBlock(runtime, element) {
         });
         disableOption();
         pushTranscriptsValue();
-    };
+    }
 
-    var removeLanguage = function(language) {
+    function removeLanguage(language) {
         var index = disabledLanguages.indexOf(language);
         disabledLanguages.splice(index, 1);
-    };
+    }
 
-    var removeTranscript = function(lang) {
+    function removeTranscript(lang) {
         for (var i=0; i < transcriptsValue.length; i++) {
             if (lang == transcriptsValue[i].lang) {
                 transcriptsValue.splice(i,1);
                 break;
             }
         }
-    };
+    }
 
-    var pushTranscriptsValue = function() {
+    function pushTranscriptsValue() {
         transcriptsValue.forEach(function (transcriptValue, index, array) {
             if (transcriptValue.lang == '' || transcriptValue.label == '' || transcriptValue.url == '') {
                 transcriptsValue.splice(index, 1);
             }
         });
         $('input[data-field-name="transcripts"]').val(JSON.stringify(transcriptsValue)).change();
-    };
+    }
 
-    var removeTranscriptBlock = function(event) {
+    function removeTranscriptBlock(event) {
         event.preventDefault();
         event.stopPropagation();
         var $currentBlock = $(event.currentTarget).closest('li');
@@ -602,10 +602,10 @@ function StudioEditableXBlock(runtime, element) {
         // Affect default transcripts
         var enabledTranscript = {'lang' : lang, 'label' : label, 'url': ''};
         updateEnabledTranscriptBlockRemoval(enabledTranscript);
-    };
+    }
 
    /** Get url of a specific transcript from a given transcripts array. */
-   var getTranscriptUrl = function(transcriptsArray, langCode){
+   function getTranscriptUrl(transcriptsArray, langCode){
         var url = '';
         transcriptsArray.forEach(function(sub){
             if(sub['lang']==langCode){
@@ -613,10 +613,10 @@ function StudioEditableXBlock(runtime, element) {
             }
         });
         return url;
-   };
+   }
 
     /** Create a new standard transcript block and fill it in automatically with transcript's data. */
-    var createTranscriptBlock = function(langCode, langLabel) {
+    function createTranscriptBlock(langCode, langLabel) {
         // Create a transcript block if not already displayed
         $('.add-transcript').trigger('click');
         // Select language option
@@ -634,10 +634,10 @@ function StudioEditableXBlock(runtime, element) {
         var externalDownloadUrl = downloadTranscriptHandlerUrl + '?' + externalResourceUrl;
         $createdDownload.attr('href', externalDownloadUrl);
         $('.add-transcript', element).removeClass('is-disabled');
-    };
+    }
 
     /** Affect standard transcripts on enabled sub creation and update a newly created enabled transcript. */
-    var updateEnabledTranscriptBlockCreation = function(defaultTranscript){
+    function updateEnabledTranscriptBlockCreation(defaultTranscript){
         var langCode = defaultTranscript['lang'];
         var langLabel = defaultTranscript['label'];
         var downloadUrlServer = defaultTranscript['url']; // External url to download a resource from a server
@@ -664,10 +664,10 @@ function StudioEditableXBlock(runtime, element) {
                 var enabledTranscript = {'lang' : langCode, 'label' : langLabel, 'url': downloadUrlServer};
                 updateEnabledTranscriptBlockRemoval(enabledTranscript);
             });
-    };
+    }
 
     /** Update default transcripts on removal of an enabled transcript of choice. */
-    var updateEnabledTranscriptBlockRemoval = function(enabledTranscript) {
+    function updateEnabledTranscriptBlockRemoval(enabledTranscript) {
         var langCode = enabledTranscript['lang'];
         var langLabel = enabledTranscript['label'];
         // Remove a standard transcript (xblock field Upload Transcript)
@@ -689,17 +689,17 @@ function StudioEditableXBlock(runtime, element) {
                 var data = {'lang': langCode, 'label': langLabel, 'url': downloadUrlApi};
                 uploadDefaultTranscriptsToServer(data);
             });
-    };
+    }
 
-    var showUploadStatus = function($element, filename) {
+    function showUploadStatus($element, filename) {
         $('.status-error', $element).empty();
         $('.status-upload', $element).text('File ' + '"' + filename + '"' + ' uploaded successfully').show();
         setTimeout(function() {
             $('.status-upload', $element).hide();
         }, 5000);
-    };
+    }
 
-    var successHandler = function(response, statusText, xhr, fieldName, lang, label, currentLiTag) {
+    function successHandler(response, statusText, xhr, fieldName, lang, label, currentLiTag) {
         var url = '/' + response['asset']['id'];
         var regExp = /.*@(.+\..+)/;
         var filename = regExp.exec(url)[1];
@@ -808,7 +808,7 @@ function StudioEditableXBlock(runtime, element) {
         disableOption();
     });
 
-    var parseRelativeTime = function (value) {
+    function parseRelativeTime(value) {
         // This function ensure you have two-digits
         // By default max value of RelativeTime field on Backend is 23:59:59,
         // that is 86399 seconds.
