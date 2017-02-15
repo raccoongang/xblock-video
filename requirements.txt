@@ -1,3 +1,2 @@
 # At the moment of writing PyPI hosts outdated version of xblock-utils, hence git
--e git+https://github.com/edx/xblock-utils.git@v1.0.2#egg=xblock-utils-1.0.2
 -e .
