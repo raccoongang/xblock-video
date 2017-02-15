@@ -10,7 +10,7 @@ function StudioEditableXBlock(runtime, element) {
 
     var fields = [];
     // Studio includes a copy of tinyMCE and its jQuery plugin
-    var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');  // To-Do: Remove TinyMCE
+    var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');  // TODO: Remove TinyMCE
     var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
 
     /** This function is used for Brightcove HLS debugging
@@ -111,7 +111,7 @@ function StudioEditableXBlock(runtime, element) {
                     if (val === '') {
                         val = null;
                     } else {
-                        val = JSON.parse(val); // To-Do: handle parse errors
+                        val = JSON.parse(val); // TODO: handle parse errors
                     }
                     return val;
                 }

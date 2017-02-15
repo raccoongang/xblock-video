@@ -220,7 +220,7 @@ class WistiaPlayer(BaseVideoPlayer):
         new_line = u""
         for token in line.split():
             decoded_token = token.encode('utf8', 'ignore')
-            formatted_token = re.sub(r'(\d{2}:\d{2}),(\d{3})', r'\1.\2', decoded_token)
+            formatted_token = re.sub(r'(\d{2}:\d{2}:\d{2}),(\d{3})', r'\1.\2', decoded_token)
             new_line += unicode(formatted_token.decode('utf8')) + u" "
         return new_line
 

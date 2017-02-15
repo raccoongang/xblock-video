@@ -195,6 +195,10 @@ class YoutubePlayer(BaseVideoPlayer):
     def format_transcript_timing(sec, period_type=None):
         """
         Convert seconds to timestamp of the format `hh:mm:ss:mss`, e.g. 00:00:03.887.
+
+        Arguments:
+            sec (str): Transcript timing in seconds with milliseconds resolution.
+            period_type (str): Timing period type (whether `end` or `start`).
         """
         # Get rid of overlapping periods.
         if period_type == 'end' and float(sec) >= 0.001:
@@ -212,7 +216,7 @@ class YoutubePlayer(BaseVideoPlayer):
         )
         return timing
 
-    def format_transcript_element(self, element, i):
+    def format_transcript_element(self, element, element_number):
         """
         Format transcript's element in order for it to be converted to WebVTT format.
         """
@@ -230,7 +234,7 @@ class YoutubePlayer(BaseVideoPlayer):
                 text_encoded = text.encode('utf8', 'ignore')
                 text = text_encoded.replace('\n', ' ')
                 unescaped_text = html_parser.unescape(text.decode('utf8'))
-                sub_element = unicode(i) + u'\n' + unicode(timing) + u'\n' + unicode(unescaped_text) + u'\n\n'
+                sub_element = unicode(element_number) + u'\n' + unicode(timing) + u'\n' + unicode(unescaped_text) + u'\n\n'
         return sub_element
 
     def download_default_transcript(self, url, language_code=None):  # pylint: disable=unused-argument
