@@ -22,14 +22,14 @@ def package_data(pkg, roots):
 
 setup(
     name='video-xblock',
-    version='0.1',
+    version='0.4.0',
     description='Video XBlock to embed videos hosted on different video platform into your courseware',
     license='GPL v3',
     packages=[
         'video_xblock',
     ],
     dependency_links=[
-        'git+https://github.com/edx/xblock-utils.git@v1.0.2#egg=xblock-utils==1.0.2',
+        'git+https://github.com/edx/xblock-utils.git@v1.0.2#egg=xblock-utils-1.0.2',
     ],
     install_requires=[
         'XBlock==0.4.14',

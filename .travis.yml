@@ -20,7 +20,7 @@ before_install:
   - nvm install stable
 
 install:
-  - pip install .
+  - pip install --process-dependency-links .
 
 before_script:
   - make deps-test
