@@ -1,2 +1,1 @@
-# At the moment of writing PyPI hosts outdated version of xblock-utils, hence git
 -e .
