@@ -87,12 +87,12 @@ class YoutubePlayer(BaseVideoPlayer):
             self.render_resource('static/html/youtube.html', **context)
         )
 
-        JS_FILES = [
+        js_files = [
             'static/bower_components/videojs-youtube/dist/Youtube.min.js',
             'static/bower_components/videojs-offset/dist/videojs-offset.min.js'
         ]
 
-        for js_file in JS_FILES:
+        for js_file in js_files:
             frag.add_javascript(self.resource_string(js_file))
 
         return frag

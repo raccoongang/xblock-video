@@ -114,19 +114,19 @@ class BaseVideoPlayer(Plugin):
         frag.add_css_url(
             'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'
         )
-        CSS_FILES = [
+        css_files = [
             'static/bower_components/video.js/dist/video-js.min.css',
             'static/css/videojs.css',
             'static/css/videojs-contextmenu-ui.css',
         ]
-        for css_file in CSS_FILES:
+        for css_file in css_files:
             frag.add_css(self.resource_string(css_file))
 
         frag.add_javascript(
             self.render_resource('static/js/context.js', **context)
         )
 
-        JS_FILES = [
+        js_files = [
             'static/bower_components/video.js/dist/video.min.js',
             'static/bower_components/videojs-contextmenu/dist/videojs-contextmenu.min.js',
             'static/bower_components/videojs-contextmenu-ui/dist/videojs-contextmenu-ui.min.js',
@@ -137,19 +137,19 @@ class BaseVideoPlayer(Plugin):
         ]
 
         if json.loads(context['player_state'])['transcripts']:
-            JS_FILES += [
+            js_files += [
                 'static/bower_components/videojs-transcript/dist/videojs-transcript.js',
                 'static/js/transcript-download.js',
                 'static/js/videojs-transcript.js'
             ]
 
-        JS_FILES += [
+        js_files += [
             'static/js/videojs-tabindex.js',
             'static/js/toggle-button.js',
             'static/js/videojs_event_plugin.js'
         ]
 
-        for js_file in JS_FILES:
+        for js_file in js_files:
             frag.add_javascript(self.resource_string(js_file))
 
         return frag

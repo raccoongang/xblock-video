@@ -62,12 +62,12 @@ class VimeoPlayer(BaseVideoPlayer):
         frag.add_content(
             self.render_resource('static/html/vimeo.html', **context)
         )
-        JS_FILES = [
+        js_files = [
             'static/bower_components/videojs-vimeo/src/Vimeo.js',
             'static/bower_components/videojs-offset/dist/videojs-offset.min.js'
         ]
 
-        for js_file in JS_FILES:
+        for js_file in js_files:
             frag.add_javascript(self.resource_string(js_file))
 
         return frag

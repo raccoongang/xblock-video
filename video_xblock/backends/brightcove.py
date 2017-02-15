@@ -359,15 +359,15 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         frag.add_javascript(
             self.render_resource('static/js/context.js', **context)
         )
-        JS_FILES = [
+        js_files = [
             'static/js/toggle-button.js'
         ]
         if json.loads(context['player_state'])['transcripts']:
-            JS_FILES += [
+            js_files += [
                 'static/bower_components/videojs-transcript/dist/videojs-transcript.js',
                 'static/js/videojs-transcript.js'
             ]
-        JS_FILES += [
+        js_files += [
             'static/js/videojs-tabindex.js',
             'static/js/videojs_event_plugin.js',
             'static/bower_components/videojs-offset/dist/videojs-offset.js',
@@ -375,7 +375,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             'static/js/brightcove-videojs-init.js'
         ]
 
-        for js_file in JS_FILES:
+        for js_file in js_files:
             frag.add_javascript(self.resource_string(js_file))
 
         frag.add_css(
