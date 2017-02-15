@@ -19,9 +19,6 @@ before_install:
   # Install latest stable NodeJS version. Required for eslint.
   - nvm install stable
 
-install:
-  - pip install --process-dependency-links .
-
 before_script:
   - make deps-test
   # Install eslint, eslint-config-edx and their dependencies
