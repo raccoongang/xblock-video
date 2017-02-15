@@ -228,7 +228,7 @@ domReady(function() {
         createEnabledTranscriptBlock(defaultTranscript);
     });
 
-    $defaultTranscriptRemover.click(function(){
+    $defaultTranscriptRemover.click(function(event){
         var langCode = $(event.currentTarget).attr('data-lang-code');
         var langLabel = $(event.currentTarget).attr('data-lang-label');
         var downloadUrl = $(event.currentTarget).attr('data-download-url');
@@ -236,7 +236,7 @@ domReady(function() {
         removeEnabledTranscriptBlock(defaultTranscript);
     });
 
-   $standardTranscriptRemover.click(function(){
+   $standardTranscriptRemover.click(function(event){
         var $currentBlock = $(event.currentTarget).closest('li');
         var lang = $currentBlock.find('option:selected').val();
         var label = $currentBlock.find('option:selected').attr('data-lang-label');
