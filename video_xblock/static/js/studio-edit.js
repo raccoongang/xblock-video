@@ -302,22 +302,18 @@ function StudioEditableXBlock(runtime, element) {
     var currentLanguageLabel;
 
     /** Store all the default transcripts, fetched at document load, and their languages' codes. */
-    var initialDefaultTranscriptsData = (function() {
+    var initialDefaultTranscripts = (function() {
         var defaultSubs = $('.initial-default-transcript');
         var initialDefaultTranscripts = [];
-        var langCodes = [];
         defaultSubs.each(function(){
             var langCode = $(this).attr('data-lang-code');
             var langLabel = $(this).attr('data-lang-label');
             var downloadUrl = $(this).attr('data-download-url');
             var newSub = {'lang': langCode, 'label' : langLabel, 'url': downloadUrl};
             initialDefaultTranscripts.push(newSub);
-            langCodes.push(langCode);
         });
-        return [initialDefaultTranscripts, langCodes];
+        return initialDefaultTranscripts;
     })();
-    var initialDefaultTranscripts = initialDefaultTranscriptsData[0];
-    var initialDefaultTranscriptsLangCodes = initialDefaultTranscriptsData[1];
 
     if (gotTranscriptsValue){
         transcriptsValue = JSON.parse(gotTranscriptsValue);
@@ -603,7 +599,7 @@ function StudioEditableXBlock(runtime, element) {
         pushTranscriptsValue();
         $currentBlock.remove();
         disableOption();
-        // Remove a transcript from the list of enabled default transcripts
+        // Affect default transcripts
         var enabledTranscript = {'lang' : lang, 'label' : label, 'url': ''};
         updateEnabledTranscriptBlockRemoval(enabledTranscript);
     };

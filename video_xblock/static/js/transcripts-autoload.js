@@ -70,6 +70,7 @@ domReady(function() {
 
     var $defaultTranscriptUploader = $('.upload-default-transcript');
     var $defaultTranscriptRemover = $('.remove-default-transcript');
+    var $standardTranscriptRemover = $('.remove-action');
 
     /** Store all the default transcripts, fetched at document load, and their languages' codes. */
     var initialDefaultTranscriptsData = (function() {
@@ -94,6 +95,14 @@ domReady(function() {
         var langCode = defaultTranscript['lang'];
         var langLabel = defaultTranscript['label'];
         var downloadUrlServer = defaultTranscript['url']; // External url to download a resource from a server
+        var $availableTranscriptBlock = $("div[value='" + langCode + "']")
+            .closest("div.available-default-transcripts-section:visible");
+        // Remove a transcript of choice from the list of available ones
+        $availableTranscriptBlock.remove();
+        // Hide label of available transcripts if no such items left
+        if (!$("div.available-default-transcripts-section:visible").length) {
+            $("div.custom-field-section-label:contains('Available transcripts')").addClass('is-hidden');
+        }
         // Get all the currently enabled transcripts
         var allEnabledTranscripts = [];
         $('.enabled-default-transcripts-section .default-transcripts-label:visible').each(function(){
@@ -215,25 +224,25 @@ domReady(function() {
         var langCode = $(event.currentTarget).attr('data-lang-code');
         var label = $(event.currentTarget).attr('data-lang-label');
         var url = $(event.currentTarget).attr('data-download-url');
-        // Remove a transcript of choice from the list of available ones
-        var $availableTranscriptBlock = $("div[value='" + langCode + "']")
-            .closest("div.available-default-transcripts-section:visible");
-        $availableTranscriptBlock.remove();
-        // Hide label of available transcripts if no such items left
-        if (!$("div.available-default-transcripts-section:visible").length) {
-            $("div.custom-field-section-label:contains('Available transcripts')").addClass('is-hidden');
-        }
-        // Create enabled transcript
-        var default_transcript = {'lang': langCode, 'label' : label, 'url' : url};
-        createEnabledTranscriptBlock(default_transcript);
+        var defaultTranscript = {'lang': langCode, 'label' : label, 'url' : url};
+        createEnabledTranscriptBlock(defaultTranscript);
     });
 
     $defaultTranscriptRemover.click(function(){
         var langCode = $(event.currentTarget).attr('data-lang-code');
         var langLabel = $(event.currentTarget).attr('data-lang-label');
         var downloadUrl = $(event.currentTarget).attr('data-download-url');
-        var enabledTranscript = {'lang' : langCode, 'label' : langLabel, 'url': downloadUrl};
-        removeEnabledTranscriptBlock(enabledTranscript);
+        var defaultTranscript = {'lang' : langCode, 'label' : langLabel, 'url': downloadUrl};
+        removeEnabledTranscriptBlock(defaultTranscript);
+    });
+
+   $standardTranscriptRemover.click(function(){
+        var $currentBlock = $(event.currentTarget).closest('li');
+        var lang = $currentBlock.find('option:selected').val();
+        var label = $currentBlock.find('option:selected').attr('data-lang-label');
+        // Remove a transcript from the list of enabled default transcripts
+        var defaultTranscript = {'lang' : lang, 'label' : label, 'url': ''};
+        removeEnabledTranscriptBlock(defaultTranscript);
     });
 
 });
