@@ -556,12 +556,12 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         # To clean subs text from special symbols here, we need `unescape()` from xml.sax.saxutils
         # Reference: https://wiki.python.org/moin/EscapingHtml
         html_unescape_table = {
-            "&amp;": "&", "&amp; ": "&", " &amp;": "&",
-            "&quot;": '"', "&quot; ": '"', " &quot": '"',
-            "&amp;#39;": "'", "&amp;#39; ": "'", " &amp;#39;": "'",
-            "&apos;": "'", "&apos; ": "'", " &apos;": "'",
-            "&gt;": ">", "&gt; ": ">", " &gt;": ">",
-            "&lt;": "<", "&lt; ": "<", " &lt;": "<",
+            "&amp;": "&",
+            "&quot;": '"',
+            "&amp;#39;": "'",
+            "&apos;": "'",
+            "&gt;": ">",
+            "&lt;": "<"
         }
         unescaped_text = unescape(text, html_unescape_table)
         sub = unicode(unescaped_text)
