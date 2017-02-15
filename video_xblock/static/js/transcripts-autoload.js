@@ -3,13 +3,13 @@
  */
 
 /** Run a callback when DOM is fully loaded */
-var domReady = function(callback) {
+function domReady(callback) {
     if (document.readyState === "interactive" || document.readyState === "complete") {
         callback();
     } else {
         document.addEventListener("DOMContentLoaded", callback);
     }
-};
+}
 
 /** Get url of a specific transcript from a given transcripts array. */
 function getTranscriptUrl(transcriptsArray, langCode){
@@ -20,7 +20,7 @@ function getTranscriptUrl(transcriptsArray, langCode){
         }
     });
     return url;
-};
+}
 
 /** Create elements to display messages with status on actions with default transcripts. */
 function createStatusMessageElement(langCode, actionSelector){
@@ -43,7 +43,7 @@ function createStatusMessageElement(langCode, actionSelector){
         var $successMessageUpload = $("<div>", {"class": "api-request " + actionSelector + " " + langCode + " status-success"});
         $successMessageUpload.appendTo($('.' + successMessageElementParentSelector + ':visible').last());
     }
-};
+}
 
 /** Display message with results on a performed action. */
 function showStatus(message, type, successSelector, errorSelector){
@@ -63,7 +63,7 @@ function showStatus(message, type, successSelector, errorSelector){
             $(errorSelector).hide()
         }, 5000);
     }
-};
+}
 
 domReady(function() {
     'use strict';
@@ -97,12 +97,6 @@ domReady(function() {
         var downloadUrlServer = defaultTranscript['url']; // External url to download a resource from a server
         var $availableTranscriptBlock = $("div[value='" + langCode + "']")
             .closest("div.available-default-transcripts-section:visible");
-        // Remove a transcript of choice from the list of available ones
-        $availableTranscriptBlock.remove();
-        // Hide label of available transcripts if no such items left
-        if (!$("div.available-default-transcripts-section:visible").length) {
-            $("div.custom-field-section-label:contains('Available transcripts')").addClass('is-hidden');
-        }
         // Get all the currently enabled transcripts
         var allEnabledTranscripts = [];
         $('.enabled-default-transcripts-section .default-transcripts-label:visible').each(function(){
@@ -131,6 +125,12 @@ domReady(function() {
                     removeEnabledTranscriptBlock(enabledTranscript);
                 });
         }
+        // Remove a transcript of choice from the list of available ones
+        $availableTranscriptBlock.remove();
+        // Hide label of available transcripts if no such items left
+        if (!$("div.available-default-transcripts-section:visible").length) {
+            $("div.custom-field-section-label:contains('Available transcripts')").addClass('is-hidden');
+        }
     }
 
     /** Create available transcript. */
@@ -155,7 +155,6 @@ domReady(function() {
             var $newAvailableTranscriptBlock = $('.available-default-transcripts-section:hidden').clone();
             $newAvailableTranscriptBlock.removeClass('is-hidden').appendTo($('.default-transcripts-wrapper'));
             $('.default-transcripts-label:visible').last().attr('value', langCode).text(langLabel);
-
             // Get url for a transcript fetching from the API
             var downloadUrlApi = getTranscriptUrl(initialDefaultTranscripts, langCode); // External url for API call
             // Update attributes

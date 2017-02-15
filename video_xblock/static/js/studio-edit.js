@@ -18,23 +18,23 @@ function StudioEditableXBlock(runtime, element) {
      *  Accepted values: default, autoquality, encryption.
      */
 
-    var uiDispatch = function uiDispatch(method, suffix) {
+    function uiDispatch(method, suffix) {
         return $.ajax({
             type: method,
             url: runtime.handlerUrl(element, 'ui_dispatch', suffix),
             data: '{}'
         });
-    };
+    }
 
-    var dispatch = function dispatch(method, suffix) {
+    function dispatch(method, suffix) {
         return $.ajax({
             type: method,
             url: runtime.handlerUrl(element, 'dispatch', suffix),
             data: '{}'
         });
-    };
+    }
 
-    var submitBCReTranscode = function submitBCReTranscode(profile) {
+    function submitBCReTranscode(profile) {
         $.when(
             dispatch('POST', 'submit_retranscode_' + profile)
         ).then(function(response) {
@@ -42,9 +42,9 @@ function StudioEditableXBlock(runtime, element) {
                 'Your retranscode request was successfully submitted to Brightcove VideoCloud. ' +
                 'It takes few minutes to process it. Job id ' + response.id);
         });
-    };
+    }
 
-    var bcLoadVideoTechInfo = function bcLoadVideoTechInfo() {
+    function bcLoadVideoTechInfo() {
         $.when(
             dispatch('POST', 'get_video_tech_info')
         ).then(function(response) {
@@ -52,17 +52,17 @@ function StudioEditableXBlock(runtime, element) {
             $('#bc-tech-info-autoquality').html(response.auto_quality);
             $('#bc-tech-info-encryption').html(response.encryption);
         });
-    };
+    }
 
-    var getReTranscodeStatus = function getReTranscodeStatus() {
+    function getReTranscodeStatus() {
         $.when(
             dispatch('POST', 'retranscode-status')
         ).then(function(data) {
             $('#brightcove-retranscode-status').html(data);
         });
-    };
+    }
 
-    var showBackendSettings = function showBackendSettings() {
+    function showBackendSettings() {
         $.when(
             uiDispatch('GET', 'can-show-backend-settings')
         ).then(function(response) {
@@ -72,7 +72,7 @@ function StudioEditableXBlock(runtime, element) {
                 getReTranscodeStatus();
             }
         });
-    };
+    }
 
     $('#submit-re-transcode').click(function() {
         var profile = $('#xb-field-edit-retranscode-options').val();
@@ -204,7 +204,7 @@ function StudioEditableXBlock(runtime, element) {
         });
     });
 
-    var studio_submit = function(data) {
+    function studio_submit(data) {
         var handlerUrl = runtime.handlerUrl(element, 'submit_studio_edits');
         runtime.notify('save', {state: 'start', message: gettext('Saving')});
         $.ajax({
@@ -227,11 +227,10 @@ function StudioEditableXBlock(runtime, element) {
             }
             runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
         });
-    };
+    }
 
     // Raccoongang changes
-
-    var fillValues = function (e) {
+    function fillValues(e) {
         var values = {};
         var notSet = []; // List of field names that should be set to default values
         for (var i in fields) {
@@ -248,9 +247,9 @@ function StudioEditableXBlock(runtime, element) {
             }
         }
         studio_submit({values: values, defaults: notSet});
-    };
+    }
 
-    var validateTranscripts = function(e) {
+    function validateTranscripts(e) {
         e.preventDefault();
         var isValid = [];
         var $visibleLangChoiceItems = $langChoiceItem.find('li:visible');
@@ -266,7 +265,7 @@ function StudioEditableXBlock(runtime, element) {
         if (isValid.length == $visibleLangChoiceItems.length) {
             fillValues(e);
         }
-    };
+    }
 
     $('.save-button', element).bind('click', validateTranscripts);
 
@@ -282,11 +281,9 @@ function StudioEditableXBlock(runtime, element) {
         e.preventDefault();
         runtime.notify('cancel', {});
     });
-
     // End of Raccoongang changes
 
     // Raccoongang addons
-
     var transcriptsValue = [];
     var disabledLanguages = [];
     var $fileUploader = $('.input-file-uploader', element);
@@ -322,25 +319,6 @@ function StudioEditableXBlock(runtime, element) {
     transcriptsValue.forEach(function(transcriptValue) {
         disabledLanguages.push(transcriptValue.lang)
     });
-
-    function showStatus(message, type, successSelector, errorSelector){
-        // Only one success message is to be displayed at once
-        $('.api-request').empty();
-        if(type==='success'){
-            $(errorSelector).empty();
-            $(successSelector).text(message).show();
-            setTimeout(function(){
-                $(successSelector).hide()
-            }, 5000);
-        }
-        else if(type==='error'){
-            $(successSelector).empty();
-            $(errorSelector).text(message).show();
-            setTimeout(function(){
-                $(errorSelector).hide()
-            }, 5000);
-        }
-    };
 
     /** Authenticate to video platform's API and show result message. */
     function authenticateVideoApi(data) {
@@ -405,7 +383,6 @@ function StudioEditableXBlock(runtime, element) {
     }
 
     function disableOption(){
-
         $langChoiceItem.find('option').each(function(ind){
             if (disabledLanguages.indexOf($(this).val()) > -1){
                 $(this).attr('disabled', true)
@@ -445,7 +422,7 @@ function StudioEditableXBlock(runtime, element) {
             });
             return true;
         }
-    };
+    }
 
     function clickUploader(event) {
         event.preventDefault();
@@ -465,7 +442,7 @@ function StudioEditableXBlock(runtime, element) {
             'data-li-index': dataLiIndex
         });
         $fileUploader.click();
-    };
+    }
 
     /** Upload a transcript available on a video platform to video xblock and update displayed default transcripts. */
     function uploadDefaultTranscriptsToServer(data) {
@@ -543,7 +520,7 @@ function StudioEditableXBlock(runtime, element) {
             var newTranscriptAdded = pushTranscript(selectedLanguage, languageLabel, undefined, oldLang);
             if (newTranscriptAdded){
                 $uploadButton.removeClass('is-hidden');
-            };
+            }
             $('.add-transcript').removeClass('is-disabled');
             disabledLanguages.push(selectedLanguage);
             if (oldLang != '') {
@@ -603,17 +580,6 @@ function StudioEditableXBlock(runtime, element) {
         var enabledTranscript = {'lang' : lang, 'label' : label, 'url': ''};
         updateEnabledTranscriptBlockRemoval(enabledTranscript);
     }
-
-   /** Get url of a specific transcript from a given transcripts array. */
-   function getTranscriptUrl(transcriptsArray, langCode){
-        var url = '';
-        transcriptsArray.forEach(function(sub){
-            if(sub['lang']==langCode){
-              url = sub['url'];
-            }
-        });
-        return url;
-   }
 
     /** Create a new standard transcript block and fill it in automatically with transcript's data. */
     function createTranscriptBlock(langCode, langLabel) {
@@ -730,7 +696,7 @@ function StudioEditableXBlock(runtime, element) {
             'data-lang-code': '',
             'data-lang-label': ''
         });
-    };
+    }
 
     $videoApiAuthenticator.on('click', function(event) {
         event.preventDefault();
@@ -837,6 +803,6 @@ function StudioEditableXBlock(runtime, element) {
             pad(date.getUTCMinutes()),
             pad(date.getUTCSeconds())
         ].join(':');
-    };
+    }
     // End of Raccoongang addons
 }
