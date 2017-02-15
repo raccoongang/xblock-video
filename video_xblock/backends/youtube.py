@@ -234,9 +234,10 @@ class YoutubePlayer(BaseVideoPlayer):
                 text_encoded = text.encode('utf8', 'ignore')
                 text = text_encoded.replace('\n', ' ')
                 unescaped_text = html_parser.unescape(text.decode('utf8'))
-                sub_element = unicode(element_number) + u'\n' + \
-                              unicode(timing) + u'\n' + \
-                              unicode(unescaped_text) + u'\n\n'
+                sub_element = \
+                    unicode(element_number) + u'\n' + \
+                    unicode(timing) + u'\n' + \
+                    unicode(unescaped_text) + u'\n\n'
         return sub_element
 
     def download_default_transcript(self, url, language_code=None):  # pylint: disable=unused-argument
