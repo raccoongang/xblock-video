@@ -19,7 +19,7 @@ var domReady = function(callback) {
     }
 };
 
-var player_state_obj = JSON.parse('{{ player_state }}');
+var player_state_obj = window.player_state_obj;
 var player_state = {
     volume: player_state_obj.volume,
     currentTime: player_state_obj.current_time,
@@ -54,8 +54,8 @@ var setInitialState = function(player, state) {
     var playbackProgress = localStorage.getItem('playbackProgress');
     if (playbackProgress){
         playbackProgress=JSON.parse(playbackProgress);
-        if (playbackProgress['{{ video_player_id }}']) {
-            stateCurrentTime = playbackProgress['{{ video_player_id }}'];
+        if (playbackProgress[window.video_player_id]) {
+            stateCurrentTime = playbackProgress[window.video_player_id];
         }
     }
     if (stateCurrentTime > 0) {
@@ -114,12 +114,12 @@ var saveProgressToLocalStore = function saveProgressToLocalStore() {
         playbackProgress = '{}';
     }
     playbackProgress = JSON.parse(playbackProgress);
-    playbackProgress['{{ video_player_id }}'] = player.ended() ? 0 : player.currentTime();
+    playbackProgress[window.video_player_id] = player.ended() ? 0 : player.currentTime();
     localStorage.setItem('playbackProgress',JSON.stringify(playbackProgress));
 };
 
 domReady(function() {
-    videojs('{{ video_player_id }}').ready(function() {
+    videojs(window.video_player_id).ready(function() {
     var player = this;
     // Restore default or previously saved player state
     setInitialState(player, player_state);

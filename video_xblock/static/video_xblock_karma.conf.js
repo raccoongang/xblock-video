@@ -16,8 +16,9 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       'bower_components/video-js/dist/video.js',
+      'js/spec/test_context.js',
       'js/player_state.js',
-      'js/spec/*.js'
+      'js/spec/*_spec.js'
     ],
     plugins : [
         'karma-chrome-launcher',

@@ -9,7 +9,7 @@
 
 domReady(function() {
     'use strict';
-    videojs('{{ video_player_id }}').ready(function() {
+    videojs(window.video_player_id).ready(function() {
         /** Order tabIndex in player control */
         var orderTabIndex = function orderTabIndex(_player) {
             var controlBar;
