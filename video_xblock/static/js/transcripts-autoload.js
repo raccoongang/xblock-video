@@ -65,15 +65,8 @@ function showStatus(message, type, successSelector, errorSelector){
     }
 }
 
-domReady(function() {
-    'use strict';
-
-    var $defaultTranscriptUploader = $('.upload-default-transcript');
-    var $defaultTranscriptRemover = $('.remove-default-transcript');
-    var $standardTranscriptRemover = $('.remove-action');
-
-    /** Store all the default transcripts, fetched at document load, and their languages' codes. */
-    var initialDefaultTranscriptsData = (function() {
+/** Store all the default transcripts, fetched at document load, and their languages' codes. */
+function getInitialDefaultTranscriptsData() {
         var defaultSubs = $('.initial-default-transcript');
         var initialDefaultTranscripts = [];
         var langCodes = [];
@@ -86,7 +79,15 @@ domReady(function() {
             langCodes.push(langCode);
         });
         return [initialDefaultTranscripts, langCodes];
-    })();
+}
+
+domReady(function() {
+    'use strict';
+
+    var $defaultTranscriptUploader = $('.upload-default-transcript');
+    var $defaultTranscriptRemover = $('.remove-default-transcript');
+    var $standardTranscriptRemover = $('.remove-action');
+    var initialDefaultTranscriptsData = getInitialDefaultTranscriptsData();
     var initialDefaultTranscripts = initialDefaultTranscriptsData[0];
     var initialDefaultTranscriptsLangCodes = initialDefaultTranscriptsData[1];
 

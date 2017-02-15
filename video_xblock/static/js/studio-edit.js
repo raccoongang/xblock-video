@@ -297,20 +297,7 @@ function StudioEditableXBlock(runtime, element) {
     var uploadDefaultTranscriptHandlerUrl = runtime.handlerUrl(element, 'upload_default_transcript_handler');
     var currentLanguageCode;
     var currentLanguageLabel;
-
-    /** Store all the default transcripts, fetched at document load, and their languages' codes. */
-    var initialDefaultTranscripts = (function() {
-        var defaultSubs = $('.initial-default-transcript');
-        var initialDefaultTranscripts = [];
-        defaultSubs.each(function(){
-            var langCode = $(this).attr('data-lang-code');
-            var langLabel = $(this).attr('data-lang-label');
-            var downloadUrl = $(this).attr('data-download-url');
-            var newSub = {'lang': langCode, 'label' : langLabel, 'url': downloadUrl};
-            initialDefaultTranscripts.push(newSub);
-        });
-        return initialDefaultTranscripts;
-    })();
+    var initialDefaultTranscripts = getInitialDefaultTranscriptsData()[0];
 
     if (gotTranscriptsValue){
         transcriptsValue = JSON.parse(gotTranscriptsValue);
