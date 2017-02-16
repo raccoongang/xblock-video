@@ -4,7 +4,7 @@ describe('Player state', function() {
     var player = {
         captionsLanguage: 'en'
     };
-    window.video_player_id = playerId;
+    window.videoPlayerId = playerId;
     beforeEach(function() {
         var video = document.createElement('video');
         video.id = playerId;
@@ -12,6 +12,6 @@ describe('Player state', function() {
         document.body.appendChild(video);
     });
     it('return download transcript url', function() {
-        expect(getDownloadTranscriptUrl(player)).toBe(transcripts['en'].url); // eslint-disable-line
+        expect(getDownloadTranscriptUrl(player)).toBe(transcripts.en.url);
     });
 });

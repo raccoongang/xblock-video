@@ -133,7 +133,6 @@ class BaseVideoPlayer(Plugin):
             'static/js/video-speed.js',
             'static/js/player_state.js',
             'static/js/videojs-speed-handler.js'
-
         ]
 
         if json.loads(context['player_state'])['transcripts']:

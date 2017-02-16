@@ -11,7 +11,10 @@ test-py:
 	nosetests video_xblock --with-coverage --cover-package=video_xblock
 
 test-js:
+	export DISPLAY=:99.0
+	sh -e /etc/init.d/xvfb start
 	karma start video_xblock/static/video_xblock_karma.conf.js
+	sh -e /etc/init.d/xvfb stop
 
 quality: quality-py quality-js
 
@@ -33,13 +36,11 @@ deps-test:
 tools:
 	npm install bower "eslint@^2.12.0" eslint-config-edx "eslint-plugin-dollar-sign@0.0.5" "eslint-plugin-import@^1.9.2"
 
-send_coveralls:
+coveralls:
 	coveralls-lcov -v -n video_xblock/static/coverage/PhantomJS\ 2.1.1\ \(Linux\ 0.0.0\)/lcov.info > coverage.json
 	coveralls --merge=coverage.json
 
 prepare-for-js:
-	export DISPLAY=:99.0
-	sh -e /etc/init.d/xvfb start
 	npm install jasmine-core karma karma-jasmine karma-phantomjs-launcher karma-coverage karma-coveralls karma-chrome-launcher
 
 package:

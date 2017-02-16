@@ -31,8 +31,7 @@ before_script:
 script:
   - make quality-py
   - make quality-js
-  - make test-py
-  - make test-js
+  - make test
 
 after_success:
-  - make send_coveralls
+  - make coveralls

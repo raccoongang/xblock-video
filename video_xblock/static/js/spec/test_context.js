@@ -1,8 +1,8 @@
 /**
  * Set js global variables for testing
  */
-window.video_player_id = 'test_id';
-window.player_state_obj = {
+window.videoPlayerId = 'test_id';
+window.playerStateObj = {
     volume: 1,
     current_time: 0,
     playback_rate: 1,
