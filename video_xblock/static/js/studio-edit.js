@@ -271,7 +271,7 @@ function StudioEditableXBlock(runtime, element) {
     var initialDefaultTranscriptsData = getInitialDefaultTranscriptsData();
     var initialDefaultTranscripts = initialDefaultTranscriptsData[0];
 
-    if (gotTranscriptsValue){
+    if (gotTranscriptsValue) {
         transcriptsValue = JSON.parse(gotTranscriptsValue);
     }
 
@@ -481,7 +481,7 @@ function StudioEditableXBlock(runtime, element) {
         });
     }
 
-    function standardTranscriptRemovalWrapper(event){
+    function standardTranscriptRemovalWrapper(event) {
         // Affect standard transcripts
         removeTranscriptBlock(event, transcriptsValue, disabledLanguages);
         disableOption($langChoiceItem, disabledLanguages);
@@ -523,13 +523,13 @@ function StudioEditableXBlock(runtime, element) {
         authenticateVideoApi($data);
     });
 
-    $('.lang-select').on('change', function(event){
+    $('.lang-select').on('change', function(event) {
         languageChecker(event, transcriptsValue, disabledLanguages);
         disableOption($langChoiceItem, disabledLanguages);
         pushTranscriptsValue(transcriptsValue);
     });
 
-    $('.upload-transcript, .upload-action').on('click', function(event){
+    $('.upload-transcript, .upload-action').on('click', function(event) {
         clickUploader(event, $fileUploader);
     });
 
@@ -546,26 +546,26 @@ function StudioEditableXBlock(runtime, element) {
         // disableOption($langChoiceItem, disabledLanguages);
     });
 
-    $standardTranscriptUploader.click(function(event){
+    $standardTranscriptUploader.click(function(event) {
         var $templateItem = $('.list-settings-item:hidden').clone();
         event.preventDefault();
         $(event.currentTarget).addClass('is-disabled');
         $templateItem.removeClass('is-hidden').appendTo($langChoiceItem);
-        $('.upload-transcript', $templateItem).on('click', function(event){
+        $('.upload-transcript', $templateItem).on('click', function(event) {
             clickUploader(event, $fileUploader);
         });
-        $('.lang-select', $templateItem).on('change', function(event){
+        $('.lang-select', $templateItem).on('change', function(event) {
             languageChecker(event, transcriptsValue, disabledLanguages);
             disableOption($langChoiceItem, disabledLanguages);
             pushTranscriptsValue(transcriptsValue);
         });
         // Bind a listener
-        $('.remove-action').on('click', function(event){
+        $('.remove-action').on('click', function(event) {
             standardTranscriptRemovalWrapper(event);
         });
    });
 
-   $standardTranscriptRemover.click(function(event){
+   $standardTranscriptRemover.click(function(event) {
         standardTranscriptRemovalWrapper(event);
     });
 
@@ -584,7 +584,7 @@ function StudioEditableXBlock(runtime, element) {
         createTranscriptBlock(langCode, label, transcriptsValue, downloadTranscriptHandlerUrl)
     });
 
-    $defaultTranscriptRemover.click(function(event){
+    $defaultTranscriptRemover.click(function(event) {
         var langCode = $(event.currentTarget).attr('data-lang-code');
         var langLabel = $(event.currentTarget).attr('data-lang-label');
         var downloadUrl = $(event.currentTarget).attr('data-download-url');

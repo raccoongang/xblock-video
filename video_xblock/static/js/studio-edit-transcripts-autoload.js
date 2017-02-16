@@ -5,11 +5,12 @@
 /**
  * Get url of a specific transcript from a given transcripts array.
  */
-function getTranscriptUrl(transcriptsArray, langCode){
+function getTranscriptUrl(transcriptsArray, langCode) {
+    'use strict';
     var url = '';
-    transcriptsArray.forEach(function(sub){
-        if(sub['lang']==langCode){
-          url = sub['url'];
+    transcriptsArray.forEach(function(sub) {
+        if(sub.lang ==langCode) {
+          url = sub.url;
         }
     });
     return url;
@@ -18,7 +19,8 @@ function getTranscriptUrl(transcriptsArray, langCode){
 /**
  * Create elements to display messages with status on actions with default transcripts.
  */
-function createStatusMessageElement(langCode, actionSelector){
+function createStatusMessageElement(langCode, actionSelector) {
+    'use strict';
     var errorMessageElementParentSelector = '';
     var successMessageElementParentSelector = '';
     if (actionSelector === 'upload-default-transcript') {
@@ -43,22 +45,23 @@ function createStatusMessageElement(langCode, actionSelector){
 /**
  * Display message with results on a performed action.
  */
-function showStatus(message, type, successSelector, errorSelector){
+function showStatus(message, type, successSelector, errorSelector) {
+    'use strict';
     // Only one success message is to be displayed at once
     $('.api-request').empty();
     var selectorToEmpty = '';
     var selectorToShow = '';
-    if(type==='success'){
+    if(type==='success') {
         selectorToEmpty = errorSelector;
         selectorToShow = successSelector;
     }
-    else if(type==='error'){
+    else if(type==='error') {
         selectorToEmpty = successSelector;
         selectorToShow = errorSelector;
     }
     $(selectorToEmpty).empty();
     $(selectorToShow).text(message).show();
-    setTimeout(function(){
+    setTimeout(function() {
         $(errorSelector).hide()
     }, 5000);
 }
@@ -67,23 +70,25 @@ function showStatus(message, type, successSelector, errorSelector){
  *  Store all the default transcripts, fetched at document load, and their languages' codes.
  */
 function getInitialDefaultTranscriptsData() {
-        var defaultSubs = $('.initial-default-transcript');
-        var initialDefaultTranscripts = [];
-        var langCodes = [];
-        defaultSubs.each(function(){
-            var langCode = $(this).attr('data-lang-code');
-            var langLabel = $(this).attr('data-lang-label');
-            var downloadUrl = $(this).attr('data-download-url');
-            var newSub = {'lang': langCode, 'label' : langLabel, 'url': downloadUrl};
-            initialDefaultTranscripts.push(newSub);
-            langCodes.push(langCode);
-        });
-        return [initialDefaultTranscripts, langCodes];
+    'use strict';
+    var defaultSubs = $('.initial-default-transcript');
+    var initialDefaultTranscripts = [];
+    var langCodes = [];
+    defaultSubs.each(function() {
+        var langCode = $(this).attr('data-lang-code');
+        var langLabel = $(this).attr('data-lang-label');
+        var downloadUrl = $(this).attr('data-download-url');
+        var newSub = {'lang': langCode, 'label' : langLabel, 'url': downloadUrl};
+        initialDefaultTranscripts.push(newSub);
+        langCodes.push(langCode);
+    });
+    return [initialDefaultTranscripts, langCodes];
 }
 
-function getDefaultTranscriptsArray(defaultTranscriptType){
+function getDefaultTranscriptsArray(defaultTranscriptType) {
+    'use strict';
     var defaultTranscriptsArray = [];
-    $('.' + defaultTranscriptType + '-default-transcripts-section .default-transcripts-label:visible').each(function(){
+    $('.' + defaultTranscriptType + '-default-transcripts-section .default-transcripts-label:visible').each(function() {
         var code = $(this).attr('value');
         defaultTranscriptsArray.push(code);
     });
@@ -91,9 +96,10 @@ function getDefaultTranscriptsArray(defaultTranscriptType){
 }
 
 /** Create available transcript. */
-function createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData){
-    var langCode = defaultTranscript['lang'];
-    var langLabel = defaultTranscript['label'];
+function createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData) {
+    'use strict';
+    var langCode = defaultTranscript.lang;
+    var langLabel = defaultTranscript.label;
     var initialDefaultTranscripts = initialDefaultTranscriptsData[0];
     var initialDefaultTranscriptsLangCodes = initialDefaultTranscriptsData[1];
     // Get all the currently available transcripts
@@ -114,17 +120,24 @@ function createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscr
         var downloadUrlApi = getTranscriptUrl(initialDefaultTranscripts, langCode); // External url for API call
         // Update attributes
         $('.default-transcripts-action-link.upload-default-transcript').last()
-            .attr({'data-lang-code': langCode, 'data-lang-label': langLabel, 'data-download-url': downloadUrlApi})
+            .attr({'data-lang-code': langCode, 'data-lang-label': langLabel, 'data-download-url': downloadUrlApi});
         // Create elements to display status messages on available transcript upload
         createStatusMessageElement(langCode, 'upload-default-transcript');
     }
 }
 
-/** Display a transcript in a list of enabled transcripts. Listeners on removal are bound in studio editor js.*/
-function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer){
-    var langCode = defaultTranscript['lang'];
-    var langLabel = defaultTranscript['label'];
-    // var downloadUrlServer = defaultTranscript['url']; // TODO add to docstring::: External url to download a resource from a server
+/**
+ * Display a transcript in a list of enabled transcripts. Listeners on removal are bound in studio editor js.
+ *
+ * Arguments:
+ * defaultTranscript (Array): Array containing transcript data.
+ * downloadUrlServer (String): External url to download a resource from a server.
+ *
+ */
+function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
+    'use strict';
+    var langCode = defaultTranscript.lang;
+    var langLabel = defaultTranscript.label;
     var $availableTranscriptBlock = $("div[value='" + langCode + "']")
         .closest("div.available-default-transcripts-section:visible");
     // Remove a transcript of choice from the list of available ones
@@ -163,8 +176,9 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer){
 
 /** Remove enabled transcript of choice. */
 function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscriptsData) {
-    var langCode = enabledTranscript['lang'];
-    var langLabel = enabledTranscript['label'];
+    'use strict';
+    var langCode = enabledTranscript.lang;
+    var langLabel = enabledTranscript.label;
     var initialDefaultTranscriptsLangCodes = initialDefaultTranscriptsData[1];
     // Remove enabled transcript of choice
     var $enabledTranscriptBlock = $("div[value='" + langCode + "']").closest("div.enabled-default-transcripts-section");
@@ -190,7 +204,7 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
             '.api-request.remove-default-transcript.' + langCode + '.status-success',
             '.api-request.remove-default-transcript.' + langCode + '.status-error');
     }
-    else if(isSuccessfulRemoval && !isStoredVideoPlatform){
+    else if(isSuccessfulRemoval && !isStoredVideoPlatform) {
         showStatus(
             errorMessage,
             'error',

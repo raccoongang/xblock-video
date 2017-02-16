@@ -52,9 +52,9 @@ function validateTranscripts(e, $langChoiceItem) {
     e.preventDefault();
     var isValid = [];
     var $visibleLangChoiceItems = $langChoiceItem.find('li:visible');
-    $visibleLangChoiceItems.each(function(idx, el){
+    $visibleLangChoiceItems.each(function(idx, el) {
         var urls = $('.download-setting', $(el)).filter('.is-hidden');
-        if (urls.length){
+        if (urls.length) {
             $('.status-error', $(el))
                 .text('Please upload the transcript file for this language or remove the language.')
         } else {
@@ -73,7 +73,7 @@ function validateTranscripts(e, $langChoiceItem) {
  * @param {String} oldLang
  * @param {Array} transcriptsValue
  */
-function pushTranscript(lang, label, url, oldLang, transcriptsValue){
+function pushTranscript(lang, label, url, oldLang, transcriptsValue) {
     var indexLanguage;
     for (var i=0; i < transcriptsValue.length; i++) {
         if (oldLang == transcriptsValue[i].lang || lang == transcriptsValue[i].lang) {
@@ -115,9 +115,9 @@ function removeTranscript(lang, transcriptsValue) {
 /**
  * Disable language option already selected when uploading a transcript.
  */
-function disableOption($langChoiceItem, disabledLanguages){
-    $langChoiceItem.find('option').each(function(ind){
-        if (disabledLanguages.indexOf($(this).val()) > -1){
+function disableOption($langChoiceItem, disabledLanguages) {
+    $langChoiceItem.find('option').each(function(ind) {
+        if (disabledLanguages.indexOf($(this).val()) > -1) {
             $(this).attr('disabled', true)
         } else {
             $(this).attr('disabled', false)
@@ -191,9 +191,9 @@ function languageChecker(event, transcriptsValue, disabledLanguages) {
     var $langSelectParent = $(event.currentTarget).parent('li');
     var $uploadButton = $('.upload-transcript', $langSelectParent);
     var oldLang = $uploadButton.data('lang-code');
-    if (selectedLanguage != oldLang && selectedLanguage != ''){
+    if (selectedLanguage != oldLang && selectedLanguage != '') {
         var newTranscriptAdded = pushTranscript(selectedLanguage, languageLabel, '', oldLang, transcriptsValue);
-        if (newTranscriptAdded){
+        if (newTranscriptAdded) {
             $uploadButton.removeClass('is-hidden');
         }
         $('.add-transcript').removeClass('is-disabled');
@@ -212,7 +212,7 @@ function languageChecker(event, transcriptsValue, disabledLanguages) {
     });
 }
 
-function disableTranscriptBlock(transcriptsValue, $currentBlock){
+function disableTranscriptBlock(transcriptsValue, $currentBlock) {
     if (!transcriptsValue.length) {
         $currentBlock.parents('li').removeClass('is-set').find('.setting-clear').removeClass('active').addClass('inactive');
     }
