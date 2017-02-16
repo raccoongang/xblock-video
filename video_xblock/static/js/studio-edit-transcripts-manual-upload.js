@@ -102,11 +102,10 @@ function pushTranscript(lang, label, url, oldLang, transcriptsValue) {
         }
     }
     if (indexLanguage !== undefined) {
-        /*eslint no-param-reassign: [2, { "props": true }]*/
-        transcriptsValue[indexLanguage].lang = lang;
-        transcriptsValue[indexLanguage].label = label;
+        transcriptsValue[indexLanguage].lang = lang;  // eslint-disable-line no-param-reassign
+        transcriptsValue[indexLanguage].label = label;  // eslint-disable-line no-param-reassign
         if (url) {
-            transcriptsValue[indexLanguage].url = url;
+            transcriptsValue[indexLanguage].url = url;  // eslint-disable-line no-param-reassign
         }
         return false;
     } else {
