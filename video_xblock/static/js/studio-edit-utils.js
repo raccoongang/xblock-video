@@ -10,8 +10,9 @@ function fillValues(fields) {
     var values = {};
     var notSet = []; // List of field names that should be set to default values
     var i;
+    var field;
     for (i = 0; i < fields.length; i++) {
-        var field = fields[i];
+        field = fields[i];
         if (field.isSet()) {
             values[field.name] = field.val();
         } else {
