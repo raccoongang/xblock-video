@@ -94,7 +94,8 @@ function validateTranscripts(e, $langChoiceItem) {
 function pushTranscript(lang, label, url, oldLang, transcriptsValue) {
     'use strict';
     var indexLanguage;
-    for (var i = 0; i < transcriptsValue.length; i++) {
+    var i;
+    for (i = 0; i < transcriptsValue.length; i++) {
         if (oldLang === transcriptsValue[i].lang || lang === transcriptsValue[i].lang) {
             indexLanguage = i;
             break;
@@ -109,9 +110,9 @@ function pushTranscript(lang, label, url, oldLang, transcriptsValue) {
         return false;
     } else {
         transcriptsValue.push({
-            lang: lang,
-            url: url,
-            label: label
+            'lang': lang,
+            'url': url,
+            'label': label
         });
         return true;
     }
@@ -131,7 +132,8 @@ function removeLanguage(language, disabledLanguages) {
  */
 function removeTranscript(lang, transcriptsValue) {
     'use strict';
-    for (var i = 0; i < transcriptsValue.length; i++) {
+    var i;
+    for (i = 0; i < transcriptsValue.length; i++) {
         if (lang === transcriptsValue[i].lang) {
             transcriptsValue.splice(i, 1);
             break;
