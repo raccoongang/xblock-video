@@ -35,7 +35,7 @@ setup(
     install_requires=[
         'XBlock>=0.4.14,<0.5.0',
         'xblock-utils==1.0.2',
-        'pycaption<1.0',  # The latest Python 2.7 compatible version
+        'pycaption>=0.7.1,<1.0',  # The latest Python 2.7 compatible version
         'requests>=2.9.1,<3.0.0',
         'babelfish>=0.5.5,<0.6.0',
     ],
