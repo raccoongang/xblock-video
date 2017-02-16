@@ -30,16 +30,15 @@ function createStatusMessageElement(langCode, actionSelector) {
     if (actionSelector === 'upload-default-transcript') {
         errorMessageElementParentSelector = 'available-default-transcripts-section';
         successMessageElementParentSelector = 'enabled-default-transcripts-section';
-    }
-    else if (actionSelector === 'remove-default-transcript') {
+    } else if (actionSelector === 'remove-default-transcript') {
         errorMessageElementParentSelector = 'enabled-default-transcripts-section';
         successMessageElementParentSelector = 'available-default-transcripts-section';
-    } isNotDisplayedErrorMessageElement = $('.api-request.' + actionSelector + '.' + langCode + '.status-error')
+    }
+    isNotDisplayedErrorMessageElement = $('.api-request.' + actionSelector + '.' + langCode + '.status-error')
             .length === 0;
     isNotDisplayedSuccessMessageElement = $('.api-request.' + actionSelector + '.' + langCode + '.status-success')
             .length === 0;
-    if (isNotDisplayedErrorMessageElement && isNotDisplayedSuccessMessageElement)
-    {
+    if (isNotDisplayedErrorMessageElement && isNotDisplayedSuccessMessageElement) {
         $errorMessageUpload = $('<div>',
             {class: 'api-request ' + actionSelector + ' ' + langCode + ' status-error'});
         $errorMessageUpload.appendTo($('.' + errorMessageElementParentSelector + ':visible').last());
@@ -54,15 +53,14 @@ function createStatusMessageElement(langCode, actionSelector) {
  */
 function showStatus(message, type, successSelector, errorSelector) {
     'use strict';
-    // Only one success message is to be displayed at once
-    $('.api-request').empty();
     var selectorToEmpty = '';
     var selectorToShow = '';
+    // Only one success message is to be displayed at once
+    $('.api-request').empty();
     if (type === 'success') {
         selectorToEmpty = errorSelector;
         selectorToShow = successSelector;
-    }
-    else if (type === 'error') {
+    } else if (type === 'error') {
         selectorToEmpty = successSelector;
         selectorToShow = errorSelector;
     }
@@ -132,7 +130,9 @@ function createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscr
         // Create a default (available) transcript block
         $newAvailableTranscriptBlock = $('.available-default-transcripts-section:hidden').clone();
         $newAvailableTranscriptBlock.removeClass('is-hidden').appendTo($('.default-transcripts-wrapper'));
-        $('.default-transcripts-label:visible').last().attr('value', langCode).text(langLabel);
+        $('.default-transcripts-label:visible').last()
+            .attr('value', langCode)
+            .text(langLabel);
         // Get url for a transcript fetching from the API
         downloadUrlApi = getTranscriptUrl(initialDefaultTranscripts, langCode); // External url for API call
         // Update attributes
@@ -233,8 +233,7 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
             'success',
             '.api-request.remove-default-transcript.' + langCode + '.status-success',
             '.api-request.remove-default-transcript.' + langCode + '.status-error');
-    }
-    else if (isSuccessfulRemoval && !isStoredVideoPlatform) {
+    } else if (isSuccessfulRemoval && !isStoredVideoPlatform) {
         showStatus(
             errorMessage,
             'error',

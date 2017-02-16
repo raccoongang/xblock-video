@@ -54,10 +54,10 @@ function parseRelativeTime(value) {
  */
 function validateTranscripts(e, $langChoiceItem) {
     'use strict';
-    e.preventDefault();
     var isValid = [];
     var $visibleLangChoiceItems = $langChoiceItem.find('li:visible');
     var urls;
+    e.preventDefault();
     $visibleLangChoiceItems.each(function(idx, el) {
         urls = $('.download-setting', $(el)).filter('.is-hidden');
         if (urls.length) {
@@ -136,11 +136,11 @@ function disableOption($langChoiceItem, disabledLanguages) {
     'use strict';
     $langChoiceItem.find('option').each(function() {
         if (disabledLanguages.indexOf($(this).val()) > -1) {
-            $(this).attr('disabled', true)
+            $(this).attr('disabled', true);
         } else {
-            $(this).attr('disabled', false)
+            $(this).attr('disabled', false);
         }
-    })
+    });
 }
 
 /**
@@ -194,8 +194,6 @@ function createTranscriptBlock(langCode, langLabel, transcriptsValue, downloadTr
  */
 function clickUploader(event, $fileUploader) {
     'use strict';
-    event.preventDefault();
-    event.stopPropagation();
     var $buttonBlock = $(event.currentTarget);
     var indexOfParentLi = $('.language-transcript-selector').children().index($buttonBlock.closest('li'));
     var langCode = $buttonBlock.attr('data-lang-code');
@@ -203,6 +201,8 @@ function clickUploader(event, $fileUploader) {
     var fieldNameDetails = $buttonBlock.attr('data-change-field-name') === 'transcripts' ? '.srt, .vtt' : '';
     var fieldName = $buttonBlock.attr('data-change-field-name');
     var dataLiIndex = $buttonBlock.attr('data-change-field-name') === 'transcripts' ? indexOfParentLi : '';
+    event.preventDefault();
+    event.stopPropagation();
     $fileUploader.attr({
         'data-lang-code': langCode,
         'data-lang-label': langLabel,
@@ -218,7 +218,6 @@ function clickUploader(event, $fileUploader) {
  */
 function languageChecker(event, transcriptsValue, disabledLanguages) {
     'use strict';
-    event.stopPropagation();
     var $selectedOption = $(event.currentTarget).find('option:selected');
     var selectedLanguage = $selectedOption.val();
     var languageLabel = $selectedOption.attr('data-lang-label');
@@ -226,14 +225,15 @@ function languageChecker(event, transcriptsValue, disabledLanguages) {
     var $uploadButton = $('.upload-transcript', $langSelectParent);
     var oldLang = $uploadButton.data('lang-code');
     var newTranscriptAdded;
-    if (selectedLanguage != oldLang && selectedLanguage != '') {
+    event.stopPropagation();
+    if (selectedLanguage !== oldLang && selectedLanguage !== '') {
         newTranscriptAdded = pushTranscript(selectedLanguage, languageLabel, '', oldLang, transcriptsValue);
         if (newTranscriptAdded) {
             $uploadButton.removeClass('is-hidden');
         }
         $('.add-transcript').removeClass('is-disabled');
         disabledLanguages.push(selectedLanguage);
-        if (oldLang != '') {
+        if (oldLang !== '') {
             removeLanguage(oldLang, disabledLanguages);
         }
         $uploadButton.data('lang-code', selectedLanguage);
@@ -264,10 +264,10 @@ function disableTranscriptBlock(transcriptsValue, $currentBlock) {
  */
 function removeTranscriptBlock(event, transcriptsValue, disabledLanguages) {
     'use strict';
-    event.preventDefault();
-    event.stopPropagation();
     var $currentBlock = $(event.currentTarget).closest('li');
     var lang = $currentBlock.find('option:selected').val();
+    event.preventDefault();
+    event.stopPropagation();
     removeTranscript(lang, transcriptsValue);
     disableTranscriptBlock(transcriptsValue, $currentBlock);
     removeLanguage(lang, disabledLanguages);
