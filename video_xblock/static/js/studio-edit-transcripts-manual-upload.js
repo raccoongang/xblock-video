@@ -62,7 +62,7 @@ function getTranscriptUrl(transcriptsArray, langCode) {
 }
 
 /**
- * Validate transcript data before to save it to video xblock.
+ * Validate transcript data before save it to video xblock.
  */
 function validateTranscripts(e, $langChoiceItem) {
     'use strict';
@@ -94,8 +94,7 @@ function validateTranscripts(e, $langChoiceItem) {
 function pushTranscript(lang, label, url, oldLang, transcriptsValue) {
     'use strict';
     var indexLanguage;
-    var i;
-    for (i = 0; i < transcriptsValue.length; i++) {
+    for (var i = 0; i < transcriptsValue.length; i++) {
         if (oldLang === transcriptsValue[i].lang || lang === transcriptsValue[i].lang) {
             indexLanguage = i;
             break;
@@ -132,8 +131,7 @@ function removeLanguage(language, disabledLanguages) {
  */
 function removeTranscript(lang, transcriptsValue) {
     'use strict';
-    var i;
-    for (i = 0; i < transcriptsValue.length; i++) {
+    for (var i = 0; i < transcriptsValue.length; i++) {
         if (lang === transcriptsValue[i].lang) {
             transcriptsValue.splice(i, 1);
             break;

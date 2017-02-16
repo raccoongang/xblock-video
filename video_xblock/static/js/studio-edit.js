@@ -558,10 +558,6 @@ function StudioEditableXBlock(runtime, element) {
         $currentBlock.find('ol').find('li:visible').remove();
     });
 
-    $().ready(function() {
-        // disableOption($langChoiceItem, disabledLanguages);
-    });
-
     $standardTranscriptUploader.click(function(event) {
         var $templateItem = $('.list-settings-item:hidden').clone();
         event.preventDefault();
@@ -581,11 +577,11 @@ function StudioEditableXBlock(runtime, element) {
         });
    });
 
-   $standardTranscriptRemover.click(function(event) {
+    $standardTranscriptRemover.click(function(event) {
         standardTranscriptRemovalWrapper(event);
     });
 
-   $defaultTranscriptUploader.click(function(event) {
+    $defaultTranscriptUploader.click(function(event) {
         event.preventDefault();
         event.stopPropagation();
         var langCode = $(event.currentTarget).attr('data-lang-code');
