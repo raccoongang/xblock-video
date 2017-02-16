@@ -17,6 +17,7 @@
                 "MethodDefinition": true,
                 "ClassDeclaration": true
             }
-        }]
+        }],
+        "quote-props": ["error", "always"]
     }
 }
