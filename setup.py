@@ -33,7 +33,7 @@ setup(
         'git+https://github.com/edx/xblock-utils.git@v1.0.2#egg=xblock-utils-1.0.2',
     ],
     install_requires=[
-        'XBlock>=0.4.14,<0.5.0',
+        'XBlock>=0.4.10,<0.5.0',
         'xblock-utils==1.0.2',
         'pycaption>=0.7.1,<1.0',  # The latest Python 2.7 compatible version
         'requests>=2.9.1,<3.0.0',
