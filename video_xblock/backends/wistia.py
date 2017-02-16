@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Wistia Video player plugin
+Wistia Video player plugin.
 """
 
+import HTMLParser
 import json
 import re
+
 import requests
 import babelfish
 
@@ -14,7 +16,7 @@ from video_xblock.constants import status
 
 class WistiaPlayer(BaseVideoPlayer):
     """
-    WistiaPlayer is used for videos hosted on the Wistia Video Cloud
+    WistiaPlayer is used for videos hosted on the Wistia Video Cloud.
     """
 
     # From official Wistia documentation. May change in the future
@@ -48,7 +50,9 @@ class WistiaPlayer(BaseVideoPlayer):
 
     def media_id(self, href):
         """
-        Wistia specific implementation of BaseVideoPlayer.media_id()
+        Extract Platform's media id from the video url.
+
+        E.g. https://example.wistia.com/medias/12345abcde -> 12345abcde
         """
         return self.url_re.search(href).group('media_id')
 
@@ -101,7 +105,7 @@ class WistiaPlayer(BaseVideoPlayer):
     @staticmethod
     def customize_xblock_fields_display(editable_fields):
         """
-        Customises display of studio editor fields per a video platform.
+        Customize display of studio editor fields per a video platform.
         """
         message = 'You can get a master token following the guide of ' \
                   '<a href="https://wistia.com/doc/data-api" target="_blank">Wistia</a>. ' \
@@ -114,15 +118,16 @@ class WistiaPlayer(BaseVideoPlayer):
 
     def authenticate_api(self, **kwargs):
         """
-        Calls a sample Wistia API url to check on authentication success.
-        Reference: https://wistia.com/doc/data-api#authentication
+        Call a sample Wistia API url to check on authentication success.
+
+        Reference:
+            https://wistia.com/doc/data-api#authentication
 
         Arguments:
             kwargs (dict): Wistia master token key-value pair.
         Returns:
-            auth_data (dict): master token, provided by a user, is to be stored in Wistia's player metadata,
-                since no access token should be generated
-            error_status_message (str) for the sake of verbosity.
+            auth_data (dict): Master token, provided by a user, which is to be stored in Wistia's player metadata.
+            error_status_message (str): Message with authentication outcomes for the sake of verbosity.
         """
         token, media_id = kwargs.get('token'), kwargs.get('video_id')  # pylint: disable=unused-variable
         auth_data, error_message = {}, ''
@@ -136,17 +141,17 @@ class WistiaPlayer(BaseVideoPlayer):
 
     def get_default_transcripts(self, **kwargs):
         """
-        Fetches transcripts list from Wistia API.
-        Reference: https://wistia.com/doc/data-api#captions_index
+        Fetch transcripts list from Wistia API.
 
-        Urls of transcipts are to be fetched later on with separate API calls.
-        Reference: https://wistia.com/doc/data-api#captions_show
+        Urls of transcripts are to be fetched later on with separate API calls.
+        References:
+            https://wistia.com/doc/data-api#captions_index
+            https://wistia.com/doc/data-api#captions_show
 
         Arguments:
-            kwargs (dict): key-value pairs with video_id (fetched from href field of studio editor),
-                           and token (fetched from Wistia API).
+            kwargs (dict): Key-value pairs with video_id, fetched from video xblock, and token, fetched from Wistia API.
         Returns:
-            list: List of dicts of transcripts.  Example:
+            list: List of dicts of transcripts. Example:
             [
                 {
                     'lang': 'en',
@@ -210,38 +215,37 @@ class WistiaPlayer(BaseVideoPlayer):
     @staticmethod
     def format_transcript_text_line(line):
         """
-        Replaces comma with dot in timings, e.g. 00:00:10,500 should be 00:00:10.500
-
+        Replace comma with dot in timings, e.g. 00:00:10,500 should be 00:00:10.500.
         """
-        pattern = re.compile(r"\d{2}:\d{2}:\d{2},\d{3}")
         new_line = u""
         for token in line.split():
-            if pattern.match(str(token)) or pattern.match(unicode(token), re.UNICODE):
-                token = token.replace(",", ".")
-            new_line += token + u" "
+            decoded_token = token.encode('utf8', 'ignore')
+            formatted_token = re.sub(r'(\d{2}:\d{2}:\d{2}),(\d{3})', r'\1.\2', decoded_token)
+            new_line += unicode(formatted_token.decode('utf8')) + u" "
         return new_line
 
     def format_transcript_text(self, text):
         """
-        Prepares unicode transcripts to be converted to WebVTT format.
-
+        Prepare unicode transcripts to be converted to WebVTT format.
         """
         new_text = [
             self.format_transcript_text_line(line)
             for line in text[0].splitlines()
         ]
         new_text = '\n'.join(new_text)
+        html_parser = HTMLParser.HTMLParser()
+        unescaped_text = html_parser.unescape(new_text)
         if u"WEBVTT" not in text:
-            text = u"WEBVTT\n\n" + unicode(new_text)
+            text = u"WEBVTT\n\n" + unicode(unescaped_text)
         else:
-            text = unicode(new_text)
+            text = unicode(unescaped_text)
         return text
 
     def download_default_transcript(self, language_code, url=None):  # pylint: disable=unused-argument
         """
         Get default transcript fetched from a video platform API and formats it to WebVTT-like unicode.
 
-        Though Wistia provides a method for a transcript fetching, this is to avoid an API call.
+        Though Wistia provides a method for a transcript fetching, this is to avoid API call.
         References:
             https://wistia.com/doc/data-api#captions_index
             https://wistia.com/doc/data-api#captions_show
@@ -249,10 +253,8 @@ class WistiaPlayer(BaseVideoPlayer):
         Arguments:
             url (str): API url to fetch a default transcript from.
             language_code (str): Language code of a default transcript to be downloaded.
-
         Returns:
-            unicode: text of transcripts.
-
+            text (unicode): Text of transcripts.
         """
         text = [
             sub.get(u'text')
