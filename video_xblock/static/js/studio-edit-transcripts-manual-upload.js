@@ -7,7 +7,6 @@
  */
 function showUploadStatus($element, filename) {
     'use strict';
-
     $('.status-error', $element).empty();
     $('.status-upload', $element).text('File ' + filename + ' uploaded successfully').show();
     setTimeout(function() {
@@ -21,7 +20,6 @@ function showUploadStatus($element, filename) {
  */
 function parseRelativeTime(value) {
     'use strict';
-
     var maxTimeInSeconds = 86399;
     var pad = function(number) {
         return (number < 10) ? '0' + number : number;
@@ -47,6 +45,20 @@ function parseRelativeTime(value) {
         pad(date.getUTCMinutes()),
         pad(date.getUTCSeconds())
     ].join(':');
+}
+
+/**
+ * Get url of a specific transcript from a given transcripts array.
+ */
+function getTranscriptUrl(transcriptsArray, langCode) {
+    'use strict';
+    var url = '';
+    transcriptsArray.forEach(function(sub) {
+        if (sub.lang === langCode) {
+            url = sub.url;
+        }
+    });
+    return url;
 }
 
 /**
@@ -90,6 +102,7 @@ function pushTranscript(lang, label, url, oldLang, transcriptsValue) {
         }
     }
     if (indexLanguage !== undefined) {
+        /*eslint no-param-reassign: [2, { "props": true }]*/
         transcriptsValue[indexLanguage].lang = lang;
         transcriptsValue[indexLanguage].label = label;
         if (url) {
@@ -182,7 +195,7 @@ function createTranscriptBlock(langCode, langLabel, transcriptsValue, downloadTr
         .attr({'data-lang-code': langCode, 'data-lang-label': langLabel});
     $createdDownload = $createdLi.find('a.download-transcript.download-setting:hidden');
     $createdDownload.removeClass('is-hidden');
-    // Assign external download link
+    // Assign external download link to href attribute
     externalResourceUrl = getTranscriptUrl(transcriptsValue, langCode);
     externalDownloadUrl = downloadTranscriptHandlerUrl + '?' + externalResourceUrl;
     $createdDownload.attr('href', externalDownloadUrl);
@@ -207,8 +220,8 @@ function clickUploader(event, $fileUploader) {
         'data-lang-code': langCode,
         'data-lang-label': langLabel,
         'data-change-field-name': fieldName,
-        'accept': fieldNameDetails,
-        'data-li-index': dataLiIndex
+        'data-li-index': dataLiIndex,
+        accept: fieldNameDetails
     });
     $fileUploader.click();
 }

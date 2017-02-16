@@ -3,20 +3,6 @@
  */
 
 /**
- * Get url of a specific transcript from a given transcripts array.
- */
-function getTranscriptUrl(transcriptsArray, langCode) {
-    'use strict';
-    var url = '';
-    transcriptsArray.forEach(function(sub) {
-        if (sub.lang === langCode) {
-            url = sub.url;
-        }
-    });
-    return url;
-}
-
-/**
  * Create elements to display messages with status on actions with default transcripts.
  */
 function createStatusMessageElement(langCode, actionSelector) {
@@ -194,7 +180,7 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
         $insertedEnabledTranscriptBlock.attr('value', langCode).text(langLabel);
         $downloadElement = $('.default-transcripts-action-link.download-transcript.download-setting:visible').last();
         $downloadElement.attr(
-            {'data-lang-code': langCode, 'data-lang-label': langLabel, 'href': downloadUrlServer}
+            {'data-lang-code': langCode, 'data-lang-label': langLabel, href: downloadUrlServer}
         );
         $removeElement = $('.default-transcripts-action-link.remove-default-transcript:visible').last();
         $removeElement.attr({'data-lang-code': langCode, 'data-lang-label': langLabel});
