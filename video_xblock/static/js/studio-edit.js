@@ -18,20 +18,20 @@ function StudioEditableXBlock(runtime, element) {
      *  Accepted values: default, autoquality, encryption.
      */
 
-    function uiDispatch(method, suffix) {
+    function ajaxCallDispatch(method, suffix, handlerMethod) {
         return $.ajax({
             type: method,
-            url: runtime.handlerUrl(element, 'ui_dispatch', suffix),
+            url: runtime.handlerUrl(element, handlerMethod, suffix),
             data: '{}'
         });
     }
 
+    function uiDispatch(method, suffix) {
+        return ajaxCallDispatch(method, suffix, 'ui_dispatch');
+    }
+
     function dispatch(method, suffix) {
-        return $.ajax({
-            type: method,
-            url: runtime.handlerUrl(element, 'dispatch', suffix),
-            data: '{}'
-        });
+        return ajaxCallDispatch(method, suffix, 'dispatch');
     }
 
     function submitBCReTranscode(profile) {
@@ -362,7 +362,7 @@ function StudioEditableXBlock(runtime, element) {
                 // Add a default transcript to the list of enabled ones
                 var downloadUrl = downloadTranscriptHandlerUrl + '?' + newUrl;
                 var defaultTranscript= {'lang': newLang, 'label': newLabel, 'url': downloadUrl};
-                createEnabledTranscriptBlock(defaultTranscript, downloadUrl); // TODO check on `downloadUrl`
+                createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
                 bindRemovalListenerEnabledTranscript(newLang, newLabel, newUrl);
                 // Display status messages
                 // var error_message = response['error_message'];
@@ -481,6 +481,20 @@ function StudioEditableXBlock(runtime, element) {
         });
     }
 
+    function standardTranscriptRemovalWrapper(event){
+        // Affect standard transcripts
+        removeTranscriptBlock(event, transcriptsValue, disabledLanguages);
+        disableOption($langChoiceItem, disabledLanguages);
+        // Affect default transcripts
+        var $currentBlock = $(event.currentTarget).closest('li');
+        var lang = $currentBlock.find('option:selected').val();
+        var label = $currentBlock.find('option:selected').attr('data-lang-label');
+        var defaultTranscript = {'lang' : lang, 'label' : label, 'url': ''};
+        removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
+        createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
+        bindUploadListenerAvailableTranscript(lang, label);
+    }
+
     $fileUploader.on('change', function(event) {
         if (!$fileUploader.val()) {
             return;
@@ -547,32 +561,12 @@ function StudioEditableXBlock(runtime, element) {
         });
         // Bind a listener
         $('.remove-action').on('click', function(event){
-            // Affect standard transcripts
-            removeTranscriptBlock(event, transcriptsValue, disabledLanguages);
-            disableOption($langChoiceItem, disabledLanguages);
-            // Affect default transcripts
-            var $currentBlock = $(event.currentTarget).closest('li');
-            var lang = $currentBlock.find('option:selected').val();
-            var label = $currentBlock.find('option:selected').attr('data-lang-label');
-            var defaultTranscript = {'lang' : lang, 'label' : label, 'url': ''};
-            removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
-            createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
-            bindUploadListenerAvailableTranscript(lang, label);
+            standardTranscriptRemovalWrapper(event);
         });
    });
 
    $standardTranscriptRemover.click(function(event){
-        // Affect standard transcripts
-        removeTranscriptBlock(event, transcriptsValue, disabledLanguages);
-        disableOption($langChoiceItem, disabledLanguages);
-        // Affect default transcripts
-        var $currentBlock = $(event.currentTarget).closest('li');
-        var lang = $currentBlock.find('option:selected').val();
-        var label = $currentBlock.find('option:selected').attr('data-lang-label');
-        var defaultTranscript = {'lang' : lang, 'label' : label, 'url': ''};
-        removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
-        createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
-        bindUploadListenerAvailableTranscript(lang, label);
+        standardTranscriptRemovalWrapper(event);
     });
 
    $defaultTranscriptUploader.click(function(event) {

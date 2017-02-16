@@ -3,17 +3,6 @@
  */
 
 /**
- * Run a callback when DOM is fully loaded
- */
-function domReady(callback) {
-    if (document.readyState === "interactive" || document.readyState === "complete") {
-        callback();
-    } else {
-        document.addEventListener("DOMContentLoaded", callback);
-    }
-}
-
-/**
  * Prepare data to be saved to video xblock.
  */
 function fillValues(fields) {

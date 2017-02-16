@@ -212,6 +212,12 @@ function languageChecker(event, transcriptsValue, disabledLanguages) {
     });
 }
 
+function disableTranscriptBlock(transcriptsValue, $currentBlock){
+    if (!transcriptsValue.length) {
+        $currentBlock.parents('li').removeClass('is-set').find('.setting-clear').removeClass('active').addClass('inactive');
+    }
+}
+
 /**
  * Manually remove a transcript of choice. Used for standard transcripts functionality only.
  */
@@ -222,9 +228,7 @@ function removeTranscriptBlock(event, transcriptsValue, disabledLanguages) {
     var lang = $currentBlock.find('option:selected').val();
     var label = $currentBlock.find('option:selected').attr('data-lang-label');
     removeTranscript(lang, transcriptsValue);
-    if (!transcriptsValue.length) {
-        $currentBlock.parents('li').removeClass('is-set').find('.setting-clear').removeClass('active').addClass('inactive');
-    }
+    disableTranscriptBlock(transcriptsValue, $currentBlock);
     removeLanguage(lang, disabledLanguages);
     pushTranscriptsValue(transcriptsValue);
     $currentBlock.remove();
@@ -235,11 +239,8 @@ function removeTranscriptBlock(event, transcriptsValue, disabledLanguages) {
  */
 function removeStandardTranscriptBlock(langCode, transcriptsValue, disabledLanguages) {
     var $transcriptBlock = $("a[data-lang-code='" + langCode + "']").closest("li.list-settings-item");
-    // debugger;
     removeTranscript(langCode, transcriptsValue);
-    if (!transcriptsValue.length) {
-        $transcriptBlock.parents('li').removeClass('is-set').find('.setting-clear').removeClass('active').addClass('inactive');
-    }
+    disableTranscriptBlock(transcriptsValue, $transcriptBlock);
     removeLanguage(langCode, disabledLanguages);
     pushTranscriptsValue(transcriptsValue);
     $('.add-transcript').removeClass('is-disabled');
