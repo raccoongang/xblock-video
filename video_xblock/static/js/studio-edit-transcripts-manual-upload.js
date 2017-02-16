@@ -147,7 +147,10 @@ function createTranscriptBlock(langCode, langLabel, transcriptsValue, downloadTr
     // Update language label
     $createdLi.val(langLabel);
     var $createdUploadReplace = $createdLi.find('a.upload-setting.upload-transcript:hidden');
-    $createdUploadReplace.removeClass('is-hidden').html('Replace');
+    $createdUploadReplace
+        .removeClass('is-hidden')
+        .html('Replace')
+        .attr({'data-lang-code': langCode, 'data-lang-label': langLabel});
     var $createdDownload = $createdLi.find('a.download-transcript.download-setting:hidden');
     $createdDownload.removeClass('is-hidden');
     // Assign external download link
@@ -232,6 +235,7 @@ function removeTranscriptBlock(event, transcriptsValue, disabledLanguages) {
  */
 function removeStandardTranscriptBlock(langCode, transcriptsValue, disabledLanguages) {
     var $transcriptBlock = $("a[data-lang-code='" + langCode + "']").closest("li.list-settings-item");
+    // debugger;
     removeTranscript(langCode, transcriptsValue);
     if (!transcriptsValue.length) {
         $transcriptBlock.parents('li').removeClass('is-set').find('.setting-clear').removeClass('active').addClass('inactive');

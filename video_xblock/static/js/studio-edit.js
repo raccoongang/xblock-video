@@ -256,10 +256,10 @@ function StudioEditableXBlock(runtime, element) {
     var transcriptsValue = [];
     var disabledLanguages = [];
     var $fileUploader = $('.input-file-uploader', element);
-    var $defaultTranscriptUploader = $('.upload-default-transcript', element);
-    var $defaultTranscriptRemover = $('.remove-default-transcript', element);
-    var $standartTranscriptUploader = $('.add-transcript', element);
-    var $standardTranscriptRemover = $('.remove-action', element);
+    var $defaultTranscriptUploader = $('.upload-default-transcript');
+    var $defaultTranscriptRemover = $('.remove-default-transcript');
+    var $standardTranscriptUploader = $('.add-transcript');
+    var $standardTranscriptRemover = $('.remove-action');
     var $langChoiceItem = $('.language-transcript-selector', element);
     var $videoApiAuthenticator = $('#video-api-authenticate', element);
     var gotTranscriptsValue = $('input[data-field-name="transcripts"]').val();
@@ -460,8 +460,12 @@ function StudioEditableXBlock(runtime, element) {
         $uploadElement.click(function () {
             // Get url for a transcript fetching from the API
             var downloadUrlApi = getTranscriptUrl(initialDefaultTranscripts, langCode);
-            var data = {'lang': langCode, 'label': langLabel, 'url': downloadUrlApi};
-            uploadDefaultTranscriptsToServer(data);
+            var defaultTranscript = {'lang': langCode, 'label': langLabel, 'url': downloadUrlApi};
+            uploadDefaultTranscriptsToServer(defaultTranscript);
+            createEnabledTranscriptBlock(defaultTranscript);
+            bindRemovalListenerEnabledTranscript(langCode, langLabel, downloadUrlApi);
+            // Affect standard transcripts
+            createTranscriptBlock(langCode, langLabel, transcriptsValue, downloadTranscriptHandlerUrl)
         });
     }
 
@@ -475,6 +479,7 @@ function StudioEditableXBlock(runtime, element) {
             // Affect default transcripts
             removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
             createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
+            bindUploadListenerAvailableTranscript(langCode, langLabel);
             // Affect standard transcripts
             removeStandardTranscriptBlock(langCode, transcriptsValue, disabledLanguages);
             disableOption($langChoiceItem, disabledLanguages);
@@ -532,7 +537,7 @@ function StudioEditableXBlock(runtime, element) {
         // disableOption($langChoiceItem, disabledLanguages);
     });
 
-    $standartTranscriptUploader.click(function(event){
+    $standardTranscriptUploader.click(function(event){
         var $templateItem = $('.list-settings-item:hidden').clone();
         event.preventDefault();
         $(event.currentTarget).addClass('is-disabled');
@@ -554,7 +559,7 @@ function StudioEditableXBlock(runtime, element) {
             var lang = $currentBlock.find('option:selected').val();
             var label = $currentBlock.find('option:selected').attr('data-lang-label');
             var defaultTranscript = {'lang' : lang, 'label' : label, 'url': ''};
-            removeEnabledTranscriptBlock(defaultTranscript);
+            removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
             createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
             bindUploadListenerAvailableTranscript(lang, label);
         });
@@ -569,7 +574,7 @@ function StudioEditableXBlock(runtime, element) {
         var lang = $currentBlock.find('option:selected').val();
         var label = $currentBlock.find('option:selected').attr('data-lang-label');
         var defaultTranscript = {'lang' : lang, 'label' : label, 'url': ''};
-        removeEnabledTranscriptBlock(defaultTranscript);
+        removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
         createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
         bindUploadListenerAvailableTranscript(lang, label);
     });
