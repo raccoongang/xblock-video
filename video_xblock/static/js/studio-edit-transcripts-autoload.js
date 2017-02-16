@@ -9,8 +9,8 @@ function getTranscriptUrl(transcriptsArray, langCode) {
     'use strict';
     var url = '';
     transcriptsArray.forEach(function(sub) {
-        if(sub.lang ==langCode) {
-          url = sub.url;
+        if (sub.lang === langCode) {
+            url = sub.url;
         }
     });
     return url;
@@ -30,14 +30,17 @@ function createStatusMessageElement(langCode, actionSelector) {
     else if (actionSelector === 'remove-default-transcript') {
         errorMessageElementParentSelector = 'enabled-default-transcripts-section';
         successMessageElementParentSelector = 'available-default-transcripts-section';
-    }
-    var isNotDisplayedErrorMessageElement = $(".api-request." + actionSelector + "." + langCode + ".status-error").length == 0;
-    var isNotDisplayedSuccessMessageElement = $(".api-request." + actionSelector + "." + langCode + ".status-success").length == 0;
+    } var isNotDisplayedErrorMessageElement = $('.api-request.' + actionSelector + '.' + langCode + '.status-error')
+            .length == 0;
+    var isNotDisplayedSuccessMessageElement = $('.api-request.' + actionSelector + '.' + langCode + '.status-success')
+            .length == 0;
     if (isNotDisplayedErrorMessageElement && isNotDisplayedSuccessMessageElement)
     {
-        var $errorMessageUpload = $("<div>", {"class": "api-request " + actionSelector + " " + langCode + " status-error"});
+        var $errorMessageUpload = $('<div>',
+            {class: 'api-request ' + actionSelector + ' ' + langCode + ' status-error'});
         $errorMessageUpload.appendTo($('.' + errorMessageElementParentSelector + ':visible').last());
-        var $successMessageUpload = $("<div>", {"class": "api-request " + actionSelector + " " + langCode + " status-success"});
+        var $successMessageUpload = $('<div>',
+            {class: 'api-request ' + actionSelector + ' ' + langCode + ' status-success'});
         $successMessageUpload.appendTo($('.' + successMessageElementParentSelector + ':visible').last());
     }
 }
@@ -51,11 +54,11 @@ function showStatus(message, type, successSelector, errorSelector) {
     $('.api-request').empty();
     var selectorToEmpty = '';
     var selectorToShow = '';
-    if(type==='success') {
+    if (type==='success') {
         selectorToEmpty = errorSelector;
         selectorToShow = successSelector;
     }
-    else if(type==='error') {
+    else if (type==='error') {
         selectorToEmpty = successSelector;
         selectorToShow = errorSelector;
     }
@@ -109,8 +112,8 @@ function createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscr
     var isStoredVideoPlatform = $.inArray(langCode, initialDefaultTranscriptsLangCodes) !== -1;
     if (isNotDisplayedAvailableTranscript && isStoredVideoPlatform) {
         // Show label of available transcripts if no such label is displayed
-        var $availableLabel = $("div.custom-field-section-label:contains('Available transcripts')");
-        var isHiddenAvailableLabel = !$("div.custom-field-section-label:contains('Available transcripts'):visible").length;
+        var $availableLabel = $('div.custom-field-section-label:contains("Available transcripts")');
+        var isHiddenAvailableLabel = !$('div.custom-field-section-label:contains("Available transcripts"):visible').length;
         if (isHiddenAvailableLabel) { $availableLabel.removeClass('is-hidden'); }
         // Create a default (available) transcript block
         var $newAvailableTranscriptBlock = $('.available-default-transcripts-section:hidden').clone();
@@ -138,13 +141,13 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
     'use strict';
     var langCode = defaultTranscript.lang;
     var langLabel = defaultTranscript.label;
-    var $availableTranscriptBlock = $("div[value='" + langCode + "']")
-        .closest("div.available-default-transcripts-section:visible");
+    var $availableTranscriptBlock = $('div[value=' + langCode + ']')
+        .closest('div.available-default-transcripts-section:visible');
     // Remove a transcript of choice from the list of available ones
     $availableTranscriptBlock.remove();
     // Hide label of available transcripts if no such items left
-    if (!$("div.available-default-transcripts-section:visible").length) {
-        $("div.custom-field-section-label:contains('Available transcripts')").addClass('is-hidden');
+    if (!$('div.available-default-transcripts-section:visible').length) {
+        $('div.custom-field-section-label:contains("Available transcripts")').addClass('is-hidden');
     }
     // Get all the currently enabled transcripts
     var allEnabledTranscripts = getDefaultTranscriptsArray('enabled');
@@ -152,8 +155,8 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
     var isNotDisplayedEnabledTranscript = $.inArray(langCode, allEnabledTranscripts) == -1;
     if (isNotDisplayedEnabledTranscript) {
         // Display label of enabled transcripts if hidden
-        var $enabledLabel = $("div.custom-field-section-label:contains('Enabled transcripts')");
-        var isHiddenEnabledLabel = !$("div.custom-field-section-label:contains('Enabled transcripts'):visible").length;
+        var $enabledLabel = $('div.custom-field-section-label:contains("Enabled transcripts")');
+        var isHiddenEnabledLabel = !$('div.custom-field-section-label:contains("Enabled transcripts"):visible').length;
         if (isHiddenEnabledLabel) { $enabledLabel.removeClass('is-hidden'); }
         // Create a default (enabled) transcript block
         var $newEnabledTranscriptBlock = $('.enabled-default-transcripts-section:hidden').clone();
@@ -164,12 +167,11 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
         // Update attributes
         var $insertedEnabledTranscriptBlock = $('.enabled-default-transcripts-section .default-transcripts-label:visible').last();
         $insertedEnabledTranscriptBlock.attr('value', langCode).text(langLabel);
-        var $downloadElement = $(".default-transcripts-action-link.download-transcript.download-setting:visible").last();
+        var $downloadElement = $('.default-transcripts-action-link.download-transcript.download-setting:visible').last();
         $downloadElement.attr(
             {'data-lang-code': langCode, 'data-lang-label': langLabel, 'href': downloadUrlServer}
         );
-        var $removeElement = $(".default-transcripts-action-link.remove-default-transcript:visible").last();
-        // $(".default-transcripts-action-link.remove-default-transcript:visible[data-lang-code=" + langCode + "]");
+        var $removeElement = $('.default-transcripts-action-link.remove-default-transcript:visible').last();
         $removeElement.attr({'data-lang-code': langCode, 'data-lang-label': langLabel});
     }
 }
@@ -181,11 +183,11 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     var langLabel = enabledTranscript.label;
     var initialDefaultTranscriptsLangCodes = initialDefaultTranscriptsData[1];
     // Remove enabled transcript of choice
-    var $enabledTranscriptBlock = $("div[value='" + langCode + "']").closest("div.enabled-default-transcripts-section");
+    var $enabledTranscriptBlock = $('div[value=' + langCode + ']').closest('div.enabled-default-transcripts-section');
     $enabledTranscriptBlock.remove();
     // Hide label of enabled transcripts if no such items left
-    if (!$("div.enabled-default-transcripts-section:visible").length) {
-        $("div.custom-field-section-label:contains('Enabled transcripts')").addClass('is-hidden');
+    if (!$('div.enabled-default-transcripts-section:visible').length) {
+        $('div.custom-field-section-label:contains("Enabled transcripts")').addClass('is-hidden');
     }
     // Create elements to display status messages on enabled transcript removal
     createStatusMessageElement(langCode, 'remove-default-transcript');
@@ -194,17 +196,17 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     var allEnabledTranscripts = getDefaultTranscriptsArray('enabled');
     var isSuccessfulRemoval = $.inArray(langCode, allEnabledTranscripts) == -1; // Is not in array
     var isStoredVideoPlatform = $.inArray(langCode, initialDefaultTranscriptsLangCodes) !== -1;  // Is in array
-    var successMessageRemoval = langLabel + " transcripts are successfully removed from the list of enabled ones.";
-    var errorMessage = langLabel + " transcripts are removed, but can not be uploaded from the video platform.";
-    var failureMessage = langLabel + " transcripts are not neither removed nor added to the list of available ones.";
-    if(isSuccessfulRemoval && isStoredVideoPlatform) {
+    var successMessageRemoval = langLabel + ' transcripts are successfully removed from the list of enabled ones.';
+    var errorMessage = langLabel + ' transcripts are removed, but can not be uploaded from the video platform.';
+    var failureMessage = langLabel + ' transcripts are not neither removed nor added to the list of available ones.';
+    if (isSuccessfulRemoval && isStoredVideoPlatform) {
         showStatus(
             successMessageRemoval,
             'success',
             '.api-request.remove-default-transcript.' + langCode + '.status-success',
             '.api-request.remove-default-transcript.' + langCode + '.status-error');
     }
-    else if(isSuccessfulRemoval && !isStoredVideoPlatform) {
+    else if (isSuccessfulRemoval && !isStoredVideoPlatform) {
         showStatus(
             errorMessage,
             'error',

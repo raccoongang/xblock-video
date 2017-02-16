@@ -146,7 +146,7 @@ function StudioEditableXBlock(runtime, element) {
                 skin: 'studio-tmce4',
                 height: '200px',
                 formats: { code: { inline: 'code' } },
-                codemirror: { path: "" + baseUrl + '/js/vendor' },
+                codemirror: { path: '' + baseUrl + '/js/vendor' },
                 convert_urls: false,
                 plugins: 'link codemirror',
                 menubar: false,
@@ -221,7 +221,7 @@ function StudioEditableXBlock(runtime, element) {
                     message = JSON.parse(jqXHR.responseText).error;
                     if (typeof message === 'object' && message.messages) {
                         // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
-                        message = $.map(message.messages, function(msg) { return msg.text; }).join(", ");
+                        message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
                     }
                 } catch (error) { message = jqXHR.responseText.substr(0, 300); }
             }
@@ -284,14 +284,14 @@ function StudioEditableXBlock(runtime, element) {
      */
     function authenticateVideoApi(data) {
         $.ajax({
-            type: "POST",
+            type: 'POST',
             url: authenticateVideoApiHandlerUrl,
             data: JSON.stringify(data),
             dataType: 'json',
             success: function(response) {
                 var error_message = response['error_message'];
                 var success_message = response['success_message'];
-                if(success_message) {
+                if (success_message) {
                     showStatus(
                         success_message,
                         'success',
@@ -299,7 +299,7 @@ function StudioEditableXBlock(runtime, element) {
                         '.api-request.authenticate.status-error');
                     showBackendSettings();
                 }
-                else if(error_message) {
+                else if (error_message) {
                     showStatus(
                         error_message,
                         'error',
@@ -322,7 +322,7 @@ function StudioEditableXBlock(runtime, element) {
                     message = JSON.parse(jqXHR.responseText).error;
                     if (typeof message === 'object' && message.messages) {
                         // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
-                        message = $.map(message.messages, function(msg) { return msg.text; }).join(", ");
+                        message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
                         showStatus(
                             message,
                             'error',
@@ -348,7 +348,7 @@ function StudioEditableXBlock(runtime, element) {
      */
     function uploadDefaultTranscriptsToServer(data) {
         $.ajax({
-            type: "POST",
+            type: 'POST',
             url: uploadDefaultTranscriptHandlerUrl,
             data: JSON.stringify(data),
             dataType: 'json',
@@ -367,7 +367,7 @@ function StudioEditableXBlock(runtime, element) {
                 // Display status messages
                 // var error_message = response['error_message'];
                 var success_message = response['success_message'];
-                if(success_message) {
+                if (success_message) {
                     showStatus(
                         success_message,
                         'success',
@@ -390,7 +390,7 @@ function StudioEditableXBlock(runtime, element) {
                     message = JSON.parse(jqXHR.responseText).error;
                     if (typeof message === 'object' && message.messages) {
                         // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
-                        message = $.map(message.messages, function(msg) { return msg.text; }).join(", ");
+                        message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
                         showStatus(
                             message,
                             'error',
@@ -436,7 +436,7 @@ function StudioEditableXBlock(runtime, element) {
             showUploadStatus($(currentLiTag), filename);
             // Affect default transcripts
             // Update respective enabled transcript with an external url from a newly created standard transcript
-            var downloadUrlServer = $(".list-settings-buttons .upload-setting.upload-transcript[data-lang-code=" + lang + "]")
+            var downloadUrlServer = $('.list-settings-buttons .upload-setting.upload-transcript[data-lang-code=' + lang + ']')
                 .siblings('a.download-transcript.download-setting').attr('href');
             var defaultTranscript= {'lang': lang, 'label': label, 'url': downloadUrlServer};
             createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
@@ -453,7 +453,7 @@ function StudioEditableXBlock(runtime, element) {
      * Bind upload listener to a newly created available transcript.
      */
     function bindUploadListenerAvailableTranscript(langCode, langLabel) {
-        var $uploadElement = $(".default-transcripts-action-link.upload-default-transcript:visible[data-lang-code=" + langCode + "]");
+        var $uploadElement = $('.default-transcripts-action-link.upload-default-transcript:visible[data-lang-code=' + langCode + ']');
         $uploadElement.click(function () {
             // Get url for a transcript fetching from the API
             var downloadUrlApi = getTranscriptUrl(initialDefaultTranscripts, langCode);
@@ -468,7 +468,7 @@ function StudioEditableXBlock(runtime, element) {
      * Bind removal listener to a newly created enabled transcript.
      */
     function bindRemovalListenerEnabledTranscript(langCode, langLabel, downloadUrlServer) {
-        var $removeElement = $(".default-transcripts-action-link.remove-default-transcript:visible[data-lang-code=" + langCode + "]");
+        var $removeElement = $('.default-transcripts-action-link.remove-default-transcript:visible[data-lang-code=' + langCode + ']');
         $removeElement.click(function() {
             var defaultTranscript = {'lang' : langCode, 'label' : langLabel, 'url': downloadUrlServer};
             // Affect default transcripts

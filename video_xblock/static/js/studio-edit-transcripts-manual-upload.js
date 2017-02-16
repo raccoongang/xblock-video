@@ -6,6 +6,8 @@
  * Display message with results on a transcript manual upload.
  */
 function showUploadStatus($element, filename) {
+    'use strict';
+
     $('.status-error', $element).empty();
     $('.status-upload', $element).text('File ' + '"' + filename + '"' + ' uploaded successfully').show();
     setTimeout(function() {
@@ -18,6 +20,8 @@ function showUploadStatus($element, filename) {
  * By default max value of RelativeTime field on Backend is 23:59:59, that is 86399 seconds.
  */
 function parseRelativeTime(value) {
+    'use strict';
+
     var maxTimeInSeconds = 86399;
     var pad = function (number) {
             return (number < 10) ? '0' + number : number;
@@ -49,6 +53,8 @@ function parseRelativeTime(value) {
  * Validate transcript data before to save it to video xblock.
  */
 function validateTranscripts(e, $langChoiceItem) {
+    'use strict';
+
     e.preventDefault();
     var isValid = [];
     var $visibleLangChoiceItems = $langChoiceItem.find('li:visible');
@@ -74,6 +80,8 @@ function validateTranscripts(e, $langChoiceItem) {
  * @param {Array} transcriptsValue
  */
 function pushTranscript(lang, label, url, oldLang, transcriptsValue) {
+    'use strict';
+
     var indexLanguage;
     for (var i=0; i < transcriptsValue.length; i++) {
         if (oldLang == transcriptsValue[i].lang || lang == transcriptsValue[i].lang) {
@@ -99,11 +107,15 @@ function pushTranscript(lang, label, url, oldLang, transcriptsValue) {
 }
 
 function removeLanguage(language, disabledLanguages) {
+    'use strict';
+
     var index = disabledLanguages.indexOf(language);
     disabledLanguages.splice(index, 1);
 }
 
 function removeTranscript(lang, transcriptsValue) {
+    'use strict';
+
     for (var i=0; i < transcriptsValue.length; i++) {
         if (lang == transcriptsValue[i].lang) {
             transcriptsValue.splice(i,1);
@@ -116,6 +128,8 @@ function removeTranscript(lang, transcriptsValue) {
  * Disable language option already selected when uploading a transcript.
  */
 function disableOption($langChoiceItem, disabledLanguages) {
+    'use strict';
+
     $langChoiceItem.find('option').each(function(ind) {
         if (disabledLanguages.indexOf($(this).val()) > -1) {
             $(this).attr('disabled', true)
@@ -126,6 +140,8 @@ function disableOption($langChoiceItem, disabledLanguages) {
 }
 
 function pushTranscriptsValue(transcriptsValue) {
+    'use strict';
+
     transcriptsValue.forEach(function (transcriptValue, index, array) {
         if (transcriptValue.lang == '' || transcriptValue.label == '' || transcriptValue.url == '') {
             transcriptsValue.splice(index, 1);
@@ -138,6 +154,7 @@ function pushTranscriptsValue(transcriptsValue) {
  * Create a new standard transcript block and fill it in automatically with transcript's data.
  */
 function createTranscriptBlock(langCode, langLabel, transcriptsValue, downloadTranscriptHandlerUrl) {
+    'use strict';
     // Create a transcript block if not already displayed
     $('.add-transcript').trigger('click');
     // Select language option
@@ -161,6 +178,7 @@ function createTranscriptBlock(langCode, langLabel, transcriptsValue, downloadTr
 }
 
 function clickUploader(event, $fileUploader) {
+    'use strict';
     event.preventDefault();
     event.stopPropagation();
     var $buttonBlock = $(event.currentTarget);
@@ -184,6 +202,7 @@ function clickUploader(event, $fileUploader) {
  * Check for language of a transcript being manually uploaded.
  */
 function languageChecker(event, transcriptsValue, disabledLanguages) {
+    'use strict';
     event.stopPropagation();
     var $selectedOption = $(event.currentTarget).find('option:selected');
     var selectedLanguage = $selectedOption.val();
@@ -213,6 +232,7 @@ function languageChecker(event, transcriptsValue, disabledLanguages) {
 }
 
 function disableTranscriptBlock(transcriptsValue, $currentBlock) {
+    'use strict';
     if (!transcriptsValue.length) {
         $currentBlock.parents('li').removeClass('is-set').find('.setting-clear').removeClass('active').addClass('inactive');
     }
@@ -222,6 +242,7 @@ function disableTranscriptBlock(transcriptsValue, $currentBlock) {
  * Manually remove a transcript of choice. Used for standard transcripts functionality only.
  */
 function removeTranscriptBlock(event, transcriptsValue, disabledLanguages) {
+    'use strict';
     event.preventDefault();
     event.stopPropagation();
     var $currentBlock = $(event.currentTarget).closest('li');
@@ -238,7 +259,8 @@ function removeTranscriptBlock(event, transcriptsValue, disabledLanguages) {
  * Automatically remove standard transcript. Used with default transcripts functionality.
  */
 function removeStandardTranscriptBlock(langCode, transcriptsValue, disabledLanguages) {
-    var $transcriptBlock = $("a[data-lang-code='" + langCode + "']").closest("li.list-settings-item");
+    'use strict';
+    var $transcriptBlock = $('a[data-lang-code=' + langCode + ']').closest('li.list-settings-item');
     removeTranscript(langCode, transcriptsValue);
     disableTranscriptBlock(transcriptsValue, $transcriptBlock);
     removeLanguage(langCode, disabledLanguages);
