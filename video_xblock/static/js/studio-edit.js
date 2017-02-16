@@ -13,11 +13,8 @@ function StudioEditableXBlock(runtime, element) {
     var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');  // TODO: Remove TinyMCE
     var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
 
-    /** This function is used for Brightcove HLS debugging
-     *  profile: ingest profile to use for re-transcode job.
-     *  Accepted values: default, autoquality, encryption.
+    /** Wrapper function for dispatched ajax calls.
      */
-
     function ajaxCallDispatch(method, suffix, handlerMethod) {
         return $.ajax({
             type: method,
@@ -26,14 +23,22 @@ function StudioEditableXBlock(runtime, element) {
         });
     }
 
+    /** This function is used for Brightcove HLS debugging
+     *  profile: ingest profile to use for re-transcode job.
+     *  Accepted values: default, autoquality, encryption.
+     */
     function uiDispatch(method, suffix) {
         return ajaxCallDispatch(method, suffix, 'ui_dispatch');
     }
 
+    /** Dispatch a specific method.
+     */
     function dispatch(method, suffix) {
         return ajaxCallDispatch(method, suffix, 'dispatch');
     }
 
+    /** Submit Brightcove re-ntranscode for video content protection.
+     */
     function submitBCReTranscode(profile) {
         $.when(
             dispatch('POST', 'submit_retranscode_' + profile)
@@ -44,6 +49,8 @@ function StudioEditableXBlock(runtime, element) {
         });
     }
 
+    /** Load Brightcove video information.
+     */
     function bcLoadVideoTechInfo() {
         $.when(
             dispatch('POST', 'get_video_tech_info')
@@ -54,6 +61,8 @@ function StudioEditableXBlock(runtime, element) {
         });
     }
 
+    /** Fetch re-transcode status.
+     */
     function getReTranscodeStatus() {
         $.when(
             dispatch('POST', 'retranscode-status')
@@ -62,6 +71,8 @@ function StudioEditableXBlock(runtime, element) {
         });
     }
 
+    /** Customize settings display.
+     */
     function showBackendSettings() {
         $.when(
             uiDispatch('GET', 'can-show-backend-settings')
@@ -204,6 +215,8 @@ function StudioEditableXBlock(runtime, element) {
         });
     });
 
+    /** Submit studio editor settings.
+     */
     function studio_submit(data) {
         var handlerUrl = runtime.handlerUrl(element, 'submit_studio_edits');
         runtime.notify('save', {state: 'start', message: gettext('Saving')});
@@ -481,6 +494,9 @@ function StudioEditableXBlock(runtime, element) {
         });
     }
 
+    /**
+     * Wrap standard transcript removal sequence for it to be re-used.
+     */
     function standardTranscriptRemovalWrapper(event) {
         // Affect standard transcripts
         removeTranscriptBlock(event, transcriptsValue, disabledLanguages);

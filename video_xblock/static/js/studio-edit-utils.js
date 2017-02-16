@@ -6,9 +6,11 @@
  * Prepare data to be saved to video xblock.
  */
 function fillValues(fields) {
+    'use strict';
     var values = {};
     var notSet = []; // List of field names that should be set to default values
-    for (var i in fields) {
+    var i;
+    for (i = 0; i < fields.length; i++) {
         var field = fields[i];
         if (field.isSet()) {
             values[field.name] = field.val();
