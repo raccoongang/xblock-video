@@ -12,6 +12,6 @@ describe('Player state', function() {
         document.body.appendChild(video);
     });
     it('return download transcript url', function() {
-        expect(getDownloadTranscriptUrl(player)).toBe(transcripts.en.url);
+        expect(getDownloadTranscriptUrl(player)).toBe(transcripts.en.url); // eslint-disable-line
     });
 });
