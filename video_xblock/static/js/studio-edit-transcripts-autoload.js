@@ -208,17 +208,4 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     }
 }
 
-/**
- * Update attributes of enabled transcript.
- */
-function updateEnabledTranscriptBlock(langCode, langLabel, downloadUrlServer){
-    var $enabledTranscriptDownloadElement =
-        $(".default-transcripts-action-link.remove-default-transcript:visible[data-lang-code=" + langCode + "]").prev();
-    $enabledTranscriptDownloadElement.attr(
-        {'data-lang-code': langCode, 'data-lang-label': langLabel, 'href': downloadUrlServer}
-    );
-    // TODO check on
-    // var $enabledTranscriptBlock = $('.enabled-default-transcripts-section .default-transcripts-label:visible').last();
-    // $enabledTranscriptBlock.attr('value', langCode).text(langLabel);
-}
 

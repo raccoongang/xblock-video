@@ -363,12 +363,7 @@ function StudioEditableXBlock(runtime, element) {
                 var downloadUrl = downloadTranscriptHandlerUrl + '?' + newUrl;
                 var defaultTranscript= {'lang': newLang, 'label': newLabel, 'url': downloadUrl};
                 createEnabledTranscriptBlock(defaultTranscript, downloadUrl); // TODO check on `downloadUrl`
-                // Bind removal listener to a newly created enabled transcript
-                var $removeElement = $(".default-transcripts-action-link.remove-default-transcript:visible").last();
-                $removeElement.click(function() {
-                    removeStandardTranscriptBlock(newLang, transcriptsValue, disabledLanguages);
-                    disableOption($langChoiceItem, disabledLanguages);
-                });
+                bindRemovalListenerEnabledTranscript(newLang, newLabel, newUrl);
                 // Display status messages
                 // var error_message = response['error_message'];
                 var success_message = response['success_message'];
@@ -443,7 +438,9 @@ function StudioEditableXBlock(runtime, element) {
             // Update respective enabled transcript with an external url from a newly created standard transcript
             var downloadUrlServer = $(".list-settings-buttons .upload-setting.upload-transcript[data-lang-code=" + lang + "]")
                 .siblings('a.download-transcript.download-setting').attr('href');
-            updateEnabledTranscriptBlock(lang, label, downloadUrlServer);
+            var defaultTranscript= {'lang': lang, 'label': label, 'url': downloadUrlServer};
+            createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
+            bindRemovalListenerEnabledTranscript(lang, label, downloadUrl);
         }
         $(event.currentTarget).attr({
             'data-change-field-name': '',
@@ -462,10 +459,8 @@ function StudioEditableXBlock(runtime, element) {
             var downloadUrlApi = getTranscriptUrl(initialDefaultTranscripts, langCode);
             var defaultTranscript = {'lang': langCode, 'label': langLabel, 'url': downloadUrlApi};
             uploadDefaultTranscriptsToServer(defaultTranscript);
-            createEnabledTranscriptBlock(defaultTranscript);
-            bindRemovalListenerEnabledTranscript(langCode, langLabel, downloadUrlApi);
             // Affect standard transcripts
-            createTranscriptBlock(langCode, langLabel, transcriptsValue, downloadTranscriptHandlerUrl)
+            createTranscriptBlock(langCode, langLabel, transcriptsValue, downloadTranscriptHandlerUrl);
         });
     }
 
@@ -550,6 +545,7 @@ function StudioEditableXBlock(runtime, element) {
             disableOption($langChoiceItem, disabledLanguages);
             pushTranscriptsValue(transcriptsValue);
         });
+        // Bind a listener
         $('.remove-action').on('click', function(event){
             // Affect standard transcripts
             removeTranscriptBlock(event, transcriptsValue, disabledLanguages);
@@ -590,8 +586,6 @@ function StudioEditableXBlock(runtime, element) {
         var defaultTranscript = {'lang': langCode, 'label' : label, 'url' : url};
         // Affect default transcripts
         uploadDefaultTranscriptsToServer(defaultTranscript);
-        createEnabledTranscriptBlock(defaultTranscript);
-        bindRemovalListenerEnabledTranscript(langCode, label, url);
         // Affect standard transcripts
         createTranscriptBlock(langCode, label, transcriptsValue, downloadTranscriptHandlerUrl)
     });
