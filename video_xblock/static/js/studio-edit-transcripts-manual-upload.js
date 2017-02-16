@@ -110,9 +110,9 @@ function pushTranscript(lang, label, url, oldLang, transcriptsValue) {
         return false;
     } else {
         transcriptsValue.push({
-            'lang': lang,
-            'url': url,
-            'label': label
+            lang: lang,
+            url: url,
+            label: label
         });
         return true;
     }
