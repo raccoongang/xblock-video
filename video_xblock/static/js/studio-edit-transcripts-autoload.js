@@ -149,6 +149,7 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
     var isHiddenEnabledLabel;
     var $newEnabledTranscriptBlock;
     var $lastEnabledTranscriptBlock;
+    var $hiddenEnabledTranscriptBlock;
     var $parentElement;
     var $insertedEnabledTranscriptBlock;
     var $downloadElement;
@@ -173,7 +174,12 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
         // Insert a new default transcript block
         $lastEnabledTranscriptBlock = $('.enabled-default-transcripts-section:visible').last();
         $parentElement = (isHiddenEnabledLabel) ? $enabledLabel : $lastEnabledTranscriptBlock;
-        $newEnabledTranscriptBlock.removeClass('is-hidden').insertAfter($parentElement);
+        if ($parentElement) {
+            $newEnabledTranscriptBlock.removeClass('is-hidden').insertAfter($parentElement);
+        } else {
+            $hiddenEnabledTranscriptBlock = $('.enabled-default-transcripts-section:hidden');
+            $newEnabledTranscriptBlock.removeClass('is-hidden').insertBefore($hiddenEnabledTranscriptBlock);
+        }
         // Update attributes
         $insertedEnabledTranscriptBlock =
             $('.enabled-default-transcripts-section .default-transcripts-label:visible').last();
@@ -233,3 +239,12 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
             '.api-request.remove-default-transcript.' + langCode + '.status-error');
     }
 }
+
+domReady(function() {
+    var $enabledLabel = $('div.custom-field-section-label:contains("Enabled transcripts")');
+    var notPresentEnabledTranscript = !$('.enabled-default-transcripts-section:visible').length;
+    var isVisibleEnabledLabel = $('div.custom-field-section-label:contains("Enabled transcripts"):visible').length > 0;
+    if (isVisibleEnabledLabel && notPresentEnabledTranscript) { $enabledLabel.addClass('is-hidden'); }
+});
+
+

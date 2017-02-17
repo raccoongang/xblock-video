@@ -167,11 +167,11 @@
     transform: translateX(23px);
 }
 
-.default-transcripts-wrapper {
-    display: none;
-}
-.default-transcripts-switch-input:checked ~ .default-transcripts-wrapper {
+.default-transcripts-wrapper:checked {
     display: block;
+}
+.default-transcripts-switch-input:not(:checked) ~ .default-transcripts-wrapper {
+    display: none;
 }
 
 .default-transcripts-status.status-error {
