@@ -7,7 +7,9 @@ Base Video player plugin.
 """
 
 import abc
+import itertools
 import json
+import operator
 import re
 
 from webob import Response
@@ -302,26 +304,19 @@ class BaseVideoPlayer(Plugin):
         Remove duplicates from default transcripts fetched from a video platform.
 
         Default transcripts should contain transcripts of distinct languages only.
+        Reference:
+            http://stackoverflow.com/a/1280464
 
         Arguments:
             default_transcripts (list): Nested list of dictionaries with data on default transcripts.
         Returns:
             distinct_transcripts (list): Distinct default transcripts to be shown in studio editor.
         """
-        available_languages_codes = [dt.get('lang') for dt in default_transcripts]
-        language_duplicates = list(set(
-            l for l in available_languages_codes
-            if available_languages_codes.count(l) > 1))
-        unique_transcripts = []
-        # First occurrence is taken
-        for lang in language_duplicates:
-            unique_transcripts.append(
-                [dt for dt in default_transcripts
-                 if dt['lang'] == lang][0])
-        distinct_transcripts = \
-            [def_trans for def_trans in default_transcripts
-             if (def_trans['lang'] not in language_duplicates)] + \
-            unique_transcripts
+        get_values = operator.itemgetter('lang')
+        default_transcripts.sort(key=get_values)
+        distinct_transcripts = []
+        for k, g in itertools.groupby(default_transcripts, get_values):
+            distinct_transcripts.append(g.next())
         return distinct_transcripts
 
     def filter_default_transcripts(self, default_transcripts, transcripts):
