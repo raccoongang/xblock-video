@@ -154,7 +154,17 @@ function StudioEditableXBlock(runtime, element) {
             $field.val($wrapper.attr('data-default')); // Use attr instead of data to force treating the default value as a string
             $wrapper.removeClass('is-set');
             $resetButton.removeClass('active').addClass('inactive');
-            // TODO remove all enabled default transcripts
+            // Remove all enabled default transcripts
+            var currentEnabledTranscripts = $('.default-transcripts-action-link.remove-default-transcript:visible');
+            currentEnabledTranscripts.each(function(index, elem) {
+                var code = elem.dataset.langCode;
+                var label = elem.dataset.langLabel;
+                var url = '';
+                var defaultTranscript = {'lang' : code, 'label' : label, 'url': url};
+                removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
+                createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
+                bindUploadListenerAvailableTranscript(code, label);
+            });
         });
         if (type == 'html' && tinyMceAvailable) {
             tinyMCE.baseURL = baseUrl + '/js/vendor/tinymce/js/tinymce';
@@ -218,6 +228,17 @@ function StudioEditableXBlock(runtime, element) {
             });
             $wrapper.removeClass('is-set');
             $resetButton.removeClass('active').addClass('inactive');
+            // Remove all enabled default transcripts
+            var currentEnabledTranscripts = $('.default-transcripts-action-link.remove-default-transcript:visible');
+            currentEnabledTranscripts.each(function(index, elem) {
+                var code = elem.dataset.langCode;
+                var label = elem.dataset.langLabel;
+                var url = '';
+                var defaultTranscript = {'lang' : code, 'label' : label, 'url': url};
+                removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
+                createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
+                bindUploadListenerAvailableTranscript(code, label);
+            });
         });
     });
 

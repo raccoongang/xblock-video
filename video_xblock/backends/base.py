@@ -287,7 +287,8 @@ class BaseVideoPlayer(Plugin):
             lang_code (str): Pre-configured language code, e.g. 'br'
             lang_label (str): Pre-configured language label, e.g. 'Breton'
         """
-        # Delete region subtags; reference: https://github.com/edx/edx-platform/blob/master/lms/envs/common.py#L862
+        # Delete region subtags
+        # Reference: https://github.com/edx/edx-platform/blob/release-2017-02-16-12.24/lms/envs/common.py#L861
         lang_code = lang_code[0:2]
         # Check on consistency with the pre-configured ALL_LANGUAGES
         if lang_code not in [language[0] for language in settings.ALL_LANGUAGES]:
@@ -315,8 +316,8 @@ class BaseVideoPlayer(Plugin):
         get_values = operator.itemgetter('lang')
         default_transcripts.sort(key=get_values)
         distinct_transcripts = []
-        for k, g in itertools.groupby(default_transcripts, get_values):
-            distinct_transcripts.append(g.next())
+        for key, group in itertools.groupby(default_transcripts, get_values):  # pylint: disable=unused-variable
+            distinct_transcripts.append(group.next())
         return distinct_transcripts
 
     def filter_default_transcripts(self, default_transcripts, transcripts):
@@ -328,6 +329,4 @@ class BaseVideoPlayer(Plugin):
             dt for dt in default_transcripts
             if (unicode(dt.get('lang')) not in enabled_languages_codes) and default_transcripts
         ]
-        # Default transcripts should contain transcripts of distinct languages only
-        distinct_transcripts = self.clean_default_transcripts(default_transcripts)
-        return distinct_transcripts
+        return default_transcripts
