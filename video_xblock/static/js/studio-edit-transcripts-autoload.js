@@ -239,5 +239,3 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
             '.api-request.remove-default-transcript.' + langCode + '.status-error');
     }
 }
-
-

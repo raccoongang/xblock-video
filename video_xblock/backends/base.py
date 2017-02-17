@@ -297,7 +297,32 @@ class BaseVideoPlayer(Plugin):
         return lang_code, lang_label
 
     @staticmethod
-    def filter_default_transcripts(default_transcripts, transcripts):
+    def clean_default_transcripts(default_transcripts):
+        """
+        Remove duplicates from default transcripts fetched from a video platform.
+
+        Default transcripts should contain transcripts of distinct languages only.
+
+        Arguments:
+            default_transcripts (list): Nested list of dictionaries with data on default transcripts.
+        Returns:
+            distinct_transcripts (list): Distinct default transcripts to be shown in studio editor.
+        """
+        available_languages_codes = [dt.get('lang') for dt in default_transcripts]
+        language_duplicates = list(set(
+            l for l in available_languages_codes
+            if available_languages_codes.count(l) > 1))
+        not_included_language = True
+        distinct_transcripts = []
+        for def_trans in default_transcripts:
+            if (def_trans['lang'] in language_duplicates) and not_included_language:
+                distinct_transcripts.append(def_trans)
+                not_included_language = False
+            elif def_trans['lang'] not in language_duplicates:
+                distinct_transcripts.append(def_trans)
+        return distinct_transcripts
+
+    def filter_default_transcripts(self, default_transcripts, transcripts):
         """
         Exclude enabled transcripts (fetched from API) from the list of available ones (fetched from video xblock).
         """
@@ -307,16 +332,5 @@ class BaseVideoPlayer(Plugin):
             if (unicode(dt.get('lang')) not in enabled_languages_codes) and default_transcripts
         ]
         # Default transcripts should contain transcripts of distinct languages only
-        available_languages_codes = [dt.get('lang') for dt in default_transcripts]
-        language_duplicates = list(set(
-            l for l in available_languages_codes
-            if available_languages_codes.count(l) > 1))
-        not_included_language = True
-        filtered_transcripts = []
-        for def_trans in default_transcripts:
-            if (def_trans['lang'] in language_duplicates) and not_included_language:
-                filtered_transcripts.append(def_trans)
-                not_included_language = False
-            elif def_trans['lang'] not in language_duplicates:
-                filtered_transcripts.append(def_trans)
-        return filtered_transcripts
+        distinct_transcripts = self.clean_default_transcripts(default_transcripts)
+        return distinct_transcripts
