@@ -8,6 +8,8 @@ import mock
 
 from django.test import RequestFactory
 from django.conf import settings
+from xblock.test.tools import TestRuntime
+from xblock.field_data import DictFieldData
 
 from video_xblock import VideoXBlock
 from video_xblock.utils import ugettext as _
@@ -120,16 +122,3 @@ class VideoXBlockTests(VideoXBlockTestBase):
             'captions_language': data['captionsLanguage'],
             'transcripts_object': {}
         })
-
-
-class MockCourse(object):
-    """
-    Mock Course object with required parameters.
-    """
-
-    def __init__(self, course_id):
-        """
-        Initialize mock course object.
-        """
-        self.course_id = course_id
-        self.language = 'en'

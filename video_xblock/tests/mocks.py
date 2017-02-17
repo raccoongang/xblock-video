@@ -15,6 +15,9 @@ class ResponseStub(object):
     """
 
     def __init__(self, **kwargs):
+        """
+        Delegate kwargs to class properties.
+        """
         for key, val in kwargs.items():
             setattr(self, key, val)
 
@@ -48,6 +51,7 @@ class BaseMock(Mock):
     """
     Base custom mock class.
     """
+
     # `outcomes` should be in the format of dict().items() to keep the order of items.
     # First argument: result name, second argument - dictionary containing result data.
     # Example: (("key1", {}), ("key2", {}), ...)
@@ -55,6 +59,9 @@ class BaseMock(Mock):
     to_return = []
 
     def __init__(self, **kwargs):
+        """
+        Set specific properties from the kwargs.
+        """
         super(BaseMock, self).__init__()
         if 'mock_magic' in kwargs:
             self.mock = kwargs['mock_magic']
@@ -64,7 +71,7 @@ class BaseMock(Mock):
     @property
     def ordered_results(self):
         """
-        Transforms `outcomes` to dict.
+        Transform `outcomes` to dict.
         """
         return dict(self.outcomes)
 
@@ -80,7 +87,7 @@ class BaseMock(Mock):
 
     def get_events(self):
         """
-        Returns available events.
+        Return available events.
         """
         ret = []
         for key, val in self.outcomes:
@@ -95,6 +102,10 @@ class MockCourse(object):
     """
 
     def __init__(self, course_id):
+        """
+        Delegate course_id to class property and set course's language.
+
+        """
         self.course_id = course_id
         self.language = 'en'
 
@@ -103,6 +114,7 @@ class YoutubeAuthMock(BaseMock):
     """
     Youtube auth mock class.
     """
+
     pass
 
 
@@ -110,6 +122,7 @@ class VimeoAuthMock(BaseMock):
     """
     Vimeo auth mock class.
     """
+
     pass
 
 
@@ -117,6 +130,7 @@ class BrightcoveAuthMock(BaseMock):
     """
     Brightcove auth mock class.
     """
+
     outcomes = (
         (
             'credentials_created',
@@ -162,6 +176,7 @@ class WistiaAuthMock(BaseMock):
     """
     Wistia auth mock class.
     """
+
     return_value = ResponseStub(status_code=200, body='')
 
     outcomes = (
@@ -190,6 +205,7 @@ class YoutubeDefaultTranscriptsMock(BaseMock):
     """
     Youtube default transcripts mock class.
     """
+
     _available_languages = [
         (u'en', u'English', u''),
         (u'uk', u'Українська', u'')
@@ -253,6 +269,7 @@ class BrightcoveDefaultTranscriptsMock(BaseMock):
     """
     Brightcove default transcripts mock class.
     """
+
     _default_transcripts = [
         {'label': u'English', 'lang': u'en', 'url': None},
         {'label': u'Ukrainian', 'lang': u'uk', 'url': None}
@@ -342,7 +359,7 @@ class BrightcoveDefaultTranscriptsMock(BaseMock):
 
     def no_credentials(self):
         """
-        Returns xblock metadata.
+        Return xblock metadata.
         """
         if self.event == 'no_credentials':
             return {'client_id': '', 'client_secret': ''}
@@ -354,6 +371,7 @@ class WistiaDefaultTranscriptsMock(BaseMock):
     """
     Wistia default transcripts mock class.
     """
+
     _expected = [
         {
             'lang': u'en',
@@ -440,23 +458,24 @@ class YoutubeDownloadTranscriptMock(BaseMock):
     """
     Youtube download default transcript mock class.
     """
-    _vtt = """WEBVTT
+
+    _vtt = u"""WEBVTT
 
 1
-00:00:00.000 --> 00:00:01.680
+00:00:00.000 --> 00:00:01.679
 [INTRODUZIONE]
 
 2
-00:00:03.093 --> 00:00:06.393
+00:00:03.093 --> 00:00:06.392
 Oggi voglio parlare di sottotitoli, di nuovo.
 
 3
-00:00:06.400 --> 00:00:10.812
+00:00:06.400 --> 00:00:10.811
 Come sapete, io sono una grande sostenitrice dei sottotitoli su YouTube.
 
 4
-00:00:10.812 --> 00:00:13.291
-Forse me la canto e me la suono da sola un po&#39;,
+00:00:10.812 --> 00:00:13.290
+Forse me la canto e me la suono da sola un po',
 
 """
 
@@ -490,6 +509,7 @@ class BrightcoveDownloadTranscriptMock(BaseMock):
     """
     Brightcove download default transcript mock class.
     """
+
     _vtt = """WEBVTT
 
 00:06.047 --> 00:06.068
@@ -526,6 +546,7 @@ class WistiaDownloadTranscriptMock(BaseMock):
     """
     Brightcove download default transcript mock class.
     """
+
     _default_transcripts = [
         {
             'lang': u'en',
@@ -575,4 +596,7 @@ class WistiaDownloadTranscriptMock(BaseMock):
         return self
 
     def __iter__(self):
+        """
+        Iter through default transcripts.
+        """
         return iter(self._default_transcripts)

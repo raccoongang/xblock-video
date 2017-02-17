@@ -57,7 +57,14 @@ class TestCustomBackends(VideoXBlockTestBase):
         Check that player files content is returned in Response body.
         """
         context = {
-            'player_state': {'transcripts': [], 'current_time': ''},
+            'player_state': {
+                'transcripts': [{
+                    'lang': 'en',
+                    'label': 'English',
+                    'url': 'http://test.url'
+                }],
+                'current_time': ''
+            },
             'url': '',
             'start_time': '',
             'end_time': ''
@@ -66,6 +73,30 @@ class TestCustomBackends(VideoXBlockTestBase):
             player = self.player[backend]
             res = player(self.xblock).get_player_html(**context)
             self.assertIn('window.videojs', res.body)
+
+    @data(
+        *zip(
+            backends,
+            [  # media urls
+                'https://www.youtube.com/watch?v=44zaxzFsthY',
+                'https://studio.brightcove.com/products/videocloud/media/videos/45263567468485',
+                'https://wi.st/medias/HRrr784kH8932Z',
+                'https://vimeo.com/202889234'
+            ],
+        )
+    )
+    @unpack
+    def test_match(self, backend, url):
+        """
+        Check if provided video `href` validates in right way.
+        """
+        player = self.player[backend]
+        res = player.match(url)
+        self.assertTrue(bool(res))
+
+        #test wrong data
+        res = player.match('http://wrong.url')
+        self.assertFalse(bool(res))
 
     @data(
         ([{'lang': 'ru'}], [{'lang': 'en'}, {'lang': 'uk'}]),

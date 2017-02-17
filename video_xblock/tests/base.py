@@ -14,9 +14,10 @@ class VideoXBlockTestBase(unittest.TestCase):
     """
     Base video_xblock test class.
     """
+
     def setUp(self):
         """
-        Creates a XBlock VideoXBlock for testing purpose.
+        Create a XBlock VideoXBlock for testing purpose.
         """
         super(VideoXBlockTestBase, self).setUp()
         runtime = TestRuntime()  # pylint: disable=abstract-class-instantiated
@@ -48,5 +49,8 @@ class VideoXBlockTestBase(unittest.TestCase):
             self.mocked_objects = []
 
     def tearDown(self):
+        """
+        Restore mocket objects to default stay.
+        """
         self.restore_mocked()
         super(VideoXBlockTestBase, self).tearDown()
