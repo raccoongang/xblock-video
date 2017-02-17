@@ -12,6 +12,7 @@ describe('Player state', function() {
         document.body.appendChild(video);
     });
     it('return download transcript url', function() {
+        // TODO avoid the eslint shutdown for the implicity got variables
         expect(getDownloadTranscriptUrl(player)).toBe(transcripts.en.url); // eslint-disable-line
     });
 });
