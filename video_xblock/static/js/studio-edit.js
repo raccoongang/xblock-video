@@ -155,16 +155,7 @@ function StudioEditableXBlock(runtime, element) {
             $wrapper.removeClass('is-set');
             $resetButton.removeClass('active').addClass('inactive');
             // Remove all enabled default transcripts
-            var currentEnabledTranscripts = $('.default-transcripts-action-link.remove-default-transcript:visible');
-            currentEnabledTranscripts.each(function(index, elem) {
-                var code = elem.dataset.langCode;
-                var label = elem.dataset.langLabel;
-                var url = '';
-                var defaultTranscript = {'lang' : code, 'label' : label, 'url': url};
-                removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
-                createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
-                bindUploadListenerAvailableTranscript(code, label);
-            });
+            removeAllEnabledTranscripts(initialDefaultTranscriptsData, bindUploadListenerAvailableTranscript);
         });
         if (type == 'html' && tinyMceAvailable) {
             tinyMCE.baseURL = baseUrl + '/js/vendor/tinymce/js/tinymce';
@@ -229,16 +220,7 @@ function StudioEditableXBlock(runtime, element) {
             $wrapper.removeClass('is-set');
             $resetButton.removeClass('active').addClass('inactive');
             // Remove all enabled default transcripts
-            var currentEnabledTranscripts = $('.default-transcripts-action-link.remove-default-transcript:visible');
-            currentEnabledTranscripts.each(function(index, elem) {
-                var code = elem.dataset.langCode;
-                var label = elem.dataset.langLabel;
-                var url = '';
-                var defaultTranscript = {'lang' : code, 'label' : label, 'url': url};
-                removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
-                createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
-                bindUploadListenerAvailableTranscript(code, label);
-            });
+            removeAllEnabledTranscripts(initialDefaultTranscriptsData, bindUploadListenerAvailableTranscript);
         });
     });
 

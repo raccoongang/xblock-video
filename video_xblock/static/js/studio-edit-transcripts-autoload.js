@@ -239,3 +239,16 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
             '.api-request.remove-default-transcript.' + langCode + '.status-error');
     }
 }
+
+function removeAllEnabledTranscripts(initialDefaultTranscriptsData, bindFunction) {
+    var currentEnabledTranscripts = $('.default-transcripts-action-link.remove-default-transcript:visible');
+    currentEnabledTranscripts.each(function(index, elem) {
+        var code = elem.dataset.langCode;
+        var label = elem.dataset.langLabel;
+        var url = '';
+        var defaultTranscript = {'lang' : code, 'label' : label, 'url': url};
+        removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
+        createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
+        bindFunction(code, label);
+    });
+}
