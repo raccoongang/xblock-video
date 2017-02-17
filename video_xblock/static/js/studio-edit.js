@@ -149,6 +149,7 @@ function StudioEditableXBlock(runtime, element) {
             $field.val($wrapper.attr('data-default')); // Use attr instead of data to force treating the default value as a string
             $wrapper.removeClass('is-set');
             $resetButton.removeClass('active').addClass('inactive');
+            // TODO remove all enabled default transcripts
         });
         if (type == 'html' && tinyMceAvailable) {
             tinyMCE.baseURL = baseUrl + '/js/vendor/tinymce/js/tinymce';

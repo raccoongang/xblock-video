@@ -309,11 +309,25 @@ class BaseVideoPlayer(Plugin):
     @staticmethod
     def filter_default_transcripts(default_transcripts, transcripts):
         """
-        Exclude enabled transcripts (fetched from API) from the list of available ones (from video xblock).
+        Exclude enabled transcripts (fetched from API) from the list of available ones (fetched from video xblock).
         """
         enabled_languages_codes = [t[u'lang'] for t in transcripts]
         default_transcripts = [
             dt for dt in default_transcripts
             if (unicode(dt.get('lang')) not in enabled_languages_codes) and default_transcripts
         ]
-        return default_transcripts
+        # Default transcripts should contain transcripts of distinct languages only
+        available_languages_codes = [dt.get('lang') for dt in default_transcripts]
+        language_duplicates = list(set(
+            l for l in available_languages_codes
+            if available_languages_codes.count(l) > 1)
+        )
+        not_included_language = True
+        filtered_transcripts = []
+        for dt in default_transcripts:
+            if (dt['lang'] in language_duplicates) and not_included_language:
+                filtered_transcripts.append(dt)
+                not_included_language = False
+            elif dt['lang'] not in language_duplicates:
+                filtered_transcripts.append(dt)
+        return filtered_transcripts

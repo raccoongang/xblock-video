@@ -410,12 +410,12 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             kwargs['account_id'] = self.account_id
         # Fetch captions list (available/default transcripts list) from video platform API
         self.default_transcripts, transcripts_autoupload_message = player.get_default_transcripts(**kwargs)
-        # Needed for frontend
-        initial_default_transcripts = self.default_transcripts
-        # Exclude enabled transcripts (fetched from video xblock) from the list of available ones.
+        # Exclude enabled transcripts from the list of available ones, and remove duplicates
         self.default_transcripts = player.filter_default_transcripts(self.default_transcripts, transcripts)
         if self.default_transcripts:
             self.default_transcripts.sort(key=lambda l: l['label'])
+        # Needed for frontend
+        initial_default_transcripts = self.default_transcripts
 
         context = {
             'fields': [],
