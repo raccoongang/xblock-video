@@ -50,6 +50,7 @@ function showStatus(message, type, successSelector, errorSelector) {
         selectorToEmpty = successSelector;
         selectorToShow = errorSelector;
     }
+    debugger;
     $(selectorToEmpty).empty();
     $(selectorToShow).text(message).show();
     setTimeout(function() {
