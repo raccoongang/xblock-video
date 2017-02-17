@@ -240,13 +240,17 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     }
 }
 
+/**
+ * Remove all enabled transcripts.
+ */
 function removeAllEnabledTranscripts(initialDefaultTranscriptsData, bindFunction) {
-    var currentEnabledTranscripts = $('.default-transcripts-action-link.remove-default-transcript:visible');
-    currentEnabledTranscripts.each(function(index, elem) {
+    'use strict';
+    var $currentEnabledTranscripts = $('.default-transcripts-action-link.remove-default-transcript:visible');
+    $currentEnabledTranscripts.each(function(index, elem) {
         var code = elem.dataset.langCode;
         var label = elem.dataset.langLabel;
         var url = '';
-        var defaultTranscript = {'lang' : code, 'label' : label, 'url': url};
+        var defaultTranscript = {lang: code, label: label, url: url};
         removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
         createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
         bindFunction(code, label);
