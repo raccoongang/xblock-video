@@ -94,7 +94,7 @@ class TestCustomBackends(VideoXBlockTestBase):
         res = player.match(url)
         self.assertTrue(bool(res))
 
-        #test wrong data
+        # test wrong data
         res = player.match('http://wrong.url')
         self.assertFalse(bool(res))
 
