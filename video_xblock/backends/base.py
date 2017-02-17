@@ -312,14 +312,16 @@ class BaseVideoPlayer(Plugin):
         language_duplicates = list(set(
             l for l in available_languages_codes
             if available_languages_codes.count(l) > 1))
-        not_included_language = True
-        distinct_transcripts = []
-        for def_trans in default_transcripts:
-            if (def_trans['lang'] in language_duplicates) and not_included_language:
-                distinct_transcripts.append(def_trans)
-                not_included_language = False
-            elif def_trans['lang'] not in language_duplicates:
-                distinct_transcripts.append(def_trans)
+        unique_transcripts = []
+        # First occurrence is taken
+        for lang in language_duplicates:
+            unique_transcripts.append(
+                [dt for dt in default_transcripts
+                 if dt['lang'] == lang][0])
+        distinct_transcripts = \
+            [def_trans for def_trans in default_transcripts
+             if (def_trans['lang'] not in language_duplicates)] + \
+            unique_transcripts
         return distinct_transcripts
 
     def filter_default_transcripts(self, default_transcripts, transcripts):
