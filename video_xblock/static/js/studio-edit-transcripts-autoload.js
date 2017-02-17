@@ -240,11 +240,4 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     }
 }
 
-domReady(function() {
-    var $enabledLabel = $('div.custom-field-section-label:contains("Enabled transcripts")');
-    var notPresentEnabledTranscript = !$('.enabled-default-transcripts-section:visible').length;
-    var isVisibleEnabledLabel = $('div.custom-field-section-label:contains("Enabled transcripts"):visible').length > 0;
-    if (isVisibleEnabledLabel && notPresentEnabledTranscript) { $enabledLabel.addClass('is-hidden'); }
-});
-
 

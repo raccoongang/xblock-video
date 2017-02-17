@@ -12,6 +12,11 @@ function StudioEditableXBlock(runtime, element) {
     // Studio includes a copy of tinyMCE and its jQuery plugin
     var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');  // TODO: Remove TinyMCE
     var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
+    var $enabledLabel = $('div.custom-field-section-label:contains("Enabled transcripts")');
+    var noEnabledTranscript = !$('.enabled-default-transcripts-section:visible').length;
+
+    // Hide label of enabled default transcripts block if no transcript is enabled
+    if (noEnabledTranscript) { $enabledLabel.addClass('is-hidden'); }
 
     /** Wrapper function for dispatched ajax calls.
      */
