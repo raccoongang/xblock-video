@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Vimeo Video player plugin.
-"""
+"""Vimeo Video player plugin."""
 
 import json
 import re
@@ -15,7 +13,7 @@ class VimeoPlayer(BaseVideoPlayer):
     """
 
     # Regex is taken from http://regexr.com/3a2p0
-    # https://vimeo.com/153979733
+    # Reference: https://vimeo.com/153979733
     url_re = re.compile(r'https?:\/\/(.+)?(vimeo.com)\/(?P<media_id>.*)')
 
     metadata_fields = []
@@ -24,9 +22,17 @@ class VimeoPlayer(BaseVideoPlayer):
     captions_api = {}
 
     def media_id(self, href):
+        """
+        Extract Platform's media id from the video url.
+
+        E.g. https://example.wistia.com/medias/12345abcde -> 12345abcde
+        """
         return self.url_re.search(href).group('media_id')
 
     def get_frag(self, **context):
+        """
+        Return a Fragment required to render video player on the client side.
+        """
         context['data_setup'] = json.dumps({
             "controlBar": {
                 "volumeMenuButton": {
@@ -56,14 +62,13 @@ class VimeoPlayer(BaseVideoPlayer):
         frag.add_content(
             self.render_resource('static/html/vimeo.html', **context)
         )
-
-        frag.add_javascript(self.resource_string(
-            'static/bower_components/videojs-vimeo/src/Vimeo.js'
-        ))
-
-        frag.add_javascript(self.resource_string(
+        js_files = [
+            'static/bower_components/videojs-vimeo/src/Vimeo.js',
             'static/bower_components/videojs-offset/dist/videojs-offset.min.js'
-        ))
+        ]
+
+        for js_file in js_files:
+            frag.add_javascript(self.resource_string(js_file))
 
         return frag
 
@@ -75,14 +80,13 @@ class VimeoPlayer(BaseVideoPlayer):
 
     def get_default_transcripts(self, **kwargs):  # pylint: disable=unused-argument
         """
-        Fetches transcripts list from a video platform.
+        Fetch transcripts list from a video platform.
         """
-        # Fetch available transcripts' languages from API
         return [], ''
 
     def download_default_transcript(self, url, language_code):  # pylint: disable=unused-argument
         """
-        Downloads default transcript in WebVVT format.
+        Download default transcript in WebVVT format.
         """
         return u''
 

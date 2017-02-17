@@ -1,6 +1,7 @@
 """
 Test cases for video_xblock.
 """
+
 import datetime
 import json
 import mock
@@ -20,7 +21,22 @@ class VideoXBlockTests(VideoXBlockTestBase):
     """
     Test cases for video_xblock.
     """
+
+    def setUp(self):
+        """
+        Create a XBlock VideoXBlock for testing purpose.
+        """
+        result = super(VideoXBlockTests, self).setUp()
+        runtime = TestRuntime()  # pylint: disable=abstract-class-instantiated
+        self.xblock = VideoXBlock(runtime, DictFieldData({
+            'account_id': 'account_id',
+        }), mock.Mock())
+        return result
+
     def test_fields_xblock(self):
+        """
+        Test xblock fields consistency with their default values.
+        """
         self.assertEqual(self.xblock.display_name, _('Video'))
         self.assertEqual(self.xblock.href, '')
         self.assertEqual(self.xblock.account_id, 'account_id')
@@ -104,3 +120,16 @@ class VideoXBlockTests(VideoXBlockTestBase):
             'captions_language': data['captionsLanguage'],
             'transcripts_object': {}
         })
+
+
+class MockCourse(object):
+    """
+    Mock Course object with required parameters.
+    """
+
+    def __init__(self, course_id):
+        """
+        Initialize mock course object.
+        """
+        self.course_id = course_id
+        self.language = 'en'

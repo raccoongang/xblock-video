@@ -3,9 +3,11 @@
 YouTube Video player plugin.
 """
 
+import HTMLParser
 import json
 import re
 import urllib
+
 import requests
 from lxml import etree
 
@@ -46,9 +48,15 @@ class YoutubePlayer(BaseVideoPlayer):
     default_transcripts = []
 
     def media_id(self, href):
+        """
+        Extract Platform's media id from the video url.
+        """
         return self.url_re.search(href).group('media_id')
 
     def get_frag(self, **context):
+        """
+        Return a Fragment required to render video player on the client side.
+        """
         context['data_setup'] = json.dumps({
             "controlBar": {
                 "volumeMenuButton": {
@@ -81,13 +89,13 @@ class YoutubePlayer(BaseVideoPlayer):
             self.render_resource('static/html/youtube.html', **context)
         )
 
-        frag.add_javascript(self.resource_string(
-            'static/bower_components/videojs-youtube/dist/Youtube.min.js'
-        ))
-
-        frag.add_javascript(self.resource_string(
+        js_files = [
+            'static/bower_components/videojs-youtube/dist/Youtube.min.js',
             'static/bower_components/videojs-offset/dist/videojs-offset.min.js'
-        ))
+        ]
+
+        for js_file in js_files:
+            frag.add_javascript(self.resource_string(js_file))
 
         return frag
 
@@ -96,7 +104,7 @@ class YoutubePlayer(BaseVideoPlayer):
         """
         Customise display of studio editor fields per a video platform.
 
-        Authentication to API is not required for Youtube.
+        Authentication to API is not required by Youtube API.
         """
         message = 'This field is to be disabled.'
         editable_fields = list(editable_fields)
@@ -114,14 +122,13 @@ class YoutubePlayer(BaseVideoPlayer):
 
     def fetch_default_transcripts_languages(self, video_id):
         """
-        Fetches available transcripts languages from a Youtube server.
+        Fetch available transcripts languages from a Youtube server.
 
         Reference to `youtube_video_transcript_name()`:
             https://github.com/edx/edx-platform/blob/ecc3473d36b3c7a360e260f8962e21cb01eb1c39/common/lib/xmodule/xmodule/video_module/transcripts_utils.py#L97
 
         Arguments:
-            video_id (str): media id fetched from href field of studio-edit modal.
-
+            video_id (str): Media id fetched from `href` field of studio-edit modal.
         Returns:
             available_languages (list): List of pairs of codes and labels of captions' languages fetched from API,
                 together with transcripts' names if any.
@@ -187,10 +194,18 @@ class YoutubePlayer(BaseVideoPlayer):
         return default_transcripts, message
 
     @staticmethod
-    def format_transcript_timing(sec):
+    def format_transcript_timing(sec, period_type=None):
         """
-        Converts seconds to timestamp of the format `hh:mm:ss:mss`, e.g. 00:00:03.887
+        Convert seconds to timestamp of the format `hh:mm:ss:mss`, e.g. 00:00:03.887.
+
+        Arguments:
+            sec (str): Transcript timing in seconds with milliseconds resolution.
+            period_type (str): Timing period type (whether `end` or `start`).
         """
+        # Get rid of overlapping periods.
+        if period_type == 'end' and float(sec) >= 0.001:
+            float_sec = float(sec) - 0.001
+            sec = float_sec
         mins, secs = divmod(sec, 60)  # pylint: disable=unused-variable
         hours, mins = divmod(mins, 60)
         hours_formatted = str(int(hours)).zfill(2)
@@ -203,12 +218,12 @@ class YoutubePlayer(BaseVideoPlayer):
         )
         return timing
 
-    def format_transcript_element(self, element, i):
+    def format_transcript_element(self, element, element_number):
         """
-        Parses XML elements of transcripts, fetched from the YouTube API, and
-        formats elements in order for them to be converted to WebVTT format.
+        Format transcript's element in order for it to be converted to WebVTT format.
         """
         sub_element = u"\n\n"
+        html_parser = HTMLParser.HTMLParser()
         if element.tag == "text":
             start = float(element.get("start"))
             duration = float(element.get("dur", 0))  # dur is not mandatory
@@ -216,15 +231,20 @@ class YoutubePlayer(BaseVideoPlayer):
             end = start + duration
             if text:
                 formatted_start = self.format_transcript_timing(start)
-                formatted_end = self.format_transcript_timing(end)
+                formatted_end = self.format_transcript_timing(end, 'end')
                 timing = '{} --> {}'.format(formatted_start, formatted_end)
-                text = text.replace('\n', ' ')
-                sub_element = unicode(i) + u'\n' + unicode(timing) + u'\n' + unicode(text) + u'\n\n'
+                text_encoded = text.encode('utf8', 'ignore')
+                text = text_encoded.replace('\n', ' ')
+                unescaped_text = html_parser.unescape(text.decode('utf8'))
+                sub_element = \
+                    unicode(element_number) + u'\n' + \
+                    unicode(timing) + u'\n' + \
+                    unicode(unescaped_text) + u'\n\n'
         return sub_element
 
     def download_default_transcript(self, url=None, language_code=None):  # pylint: disable=unused-argument
         """
-        Downloads default transcript from Youtube API and formats it to WebVTT-like unicode.
+        Download default transcript from Youtube API and format it to WebVTT-like unicode.
 
         Reference to `get_transcripts_from_youtube()`:
             https://github.com/edx/edx-platform/blob/ecc3473d36b3c7a360e260f8962e21cb01eb1c39/common/lib/xmodule/xmodule/video_module/transcripts_utils.py#L122
