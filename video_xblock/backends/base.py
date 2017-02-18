@@ -7,6 +7,7 @@ Base Video player plugin.
 """
 
 import abc
+from itertools import chain
 import json
 import re
 
@@ -104,6 +105,16 @@ class BaseVideoPlayer(Plugin):
         """
         return []
 
+    @property
+    def fields_help(self):
+        """
+        Declare backend specific fields' help text.
+
+        Example:
+            {'token': 'Get your token at https://example.com/get-token'}
+        """
+        return {}
+
     def get_frag(self, **context):
         """
         Return a Fragment required to render video player on the client side.
@@ -181,10 +192,9 @@ class BaseVideoPlayer(Plugin):
         E.g. 'account_id' should be displayed for Brightcove only.
 
         Returns:
-            client_token_help_message (str): Help message with results of client token generation.
             editable_fields (tuple): All the editable fields to be displayed in studio editor modal.
         """
-        return '', ()
+        return ()
 
     def get_player_html(self, **context):
         """

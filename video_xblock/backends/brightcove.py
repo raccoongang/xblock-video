@@ -328,6 +328,13 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
     # Stores default transcripts fetched from the captions API
     default_transcripts = []
 
+    fields_help = {
+        'token': 'You can generate a BC token following the guide of '
+                 '<a href="https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html" '
+                 'target="_blank">Brightcove</a>. Please ensure appropriate operations scope has been set '
+                 'on the video platform, and a BC token is valid.'
+    }
+
     def __init__(self, xblock):
         """
         Initialize Brightcove player class object.
@@ -449,11 +456,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         """
         Customise display of Brightcove's studio editor fields.
         """
-        message = 'You can generate a BC token following the guide of ' \
-                  '<a href="https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html" ' \
-                  'target="_blank">Brightcove</a>. Please ensure appropriate operations scope has been set ' \
-                  'on the video platform, and a BC token is valid.'
-        return message, editable_fields
+        return editable_fields
 
     def authenticate_api(self, **kwargs):
         """

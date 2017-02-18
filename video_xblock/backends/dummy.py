@@ -55,7 +55,7 @@ class DummyPlayer(BaseVideoPlayer):
         """
         Customise display of studio editor fields per video platform.
         """
-        return '', editable_fields
+        return editable_fields
 
     def authenticate_api(self, **kwargs):  # pylint: disable=unused-argument
         """

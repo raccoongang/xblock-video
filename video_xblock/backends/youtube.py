@@ -42,6 +42,10 @@ class YoutubePlayer(BaseVideoPlayer):
         }
     }
 
+    fields_help = {
+        'token': 'This field is to be disabled.'
+    }
+
     # Stores default transcripts fetched from the Youtube captions API
     default_transcripts = []
 
@@ -104,13 +108,12 @@ class YoutubePlayer(BaseVideoPlayer):
 
         Authentication to API is not required by Youtube API.
         """
-        message = 'This field is to be disabled.'
         editable_fields = list(editable_fields)
         editable_fields.remove('account_id')
         editable_fields.remove('player_id')
         editable_fields.remove('token')
         customised_editable_fields = tuple(editable_fields)
-        return message, customised_editable_fields
+        return customised_editable_fields
 
     def authenticate_api(self, **kwargs):
         """

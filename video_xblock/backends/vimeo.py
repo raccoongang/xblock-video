@@ -18,6 +18,10 @@ class VimeoPlayer(BaseVideoPlayer):
 
     metadata_fields = []
 
+    fields_help = {
+        'token': 'This field is to be disabled.'
+    }
+
     # Vimeo API for requesting transcripts.
     captions_api = {}
 
@@ -96,10 +100,9 @@ class VimeoPlayer(BaseVideoPlayer):
         """
         Customise display of studio editor fields per a video platform.
         """
-        message = 'This field is to be disabled.'
         editable_fields = list(editable_fields)
         editable_fields.remove('account_id')
         editable_fields.remove('player_id')
         editable_fields.remove('token')
         customised_editable_fields = tuple(editable_fields)
-        return message, customised_editable_fields
+        return customised_editable_fields

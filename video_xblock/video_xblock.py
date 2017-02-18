@@ -430,10 +430,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         }
 
         # Customize display of the particular xblock fields per each video platform.
-        token_help_message, customised_editable_fields = \
+        self.editable_fields = \
             player.customize_xblock_fields_display(self.editable_fields)  # pylint: disable=unsubscriptable-object
-        self.fields['token'].help = token_help_message  # pylint: disable=unsubscriptable-object
-        self.editable_fields = customised_editable_fields
 
         # Build a list of all the fields that can be edited:
         for field_name in self.editable_fields:
@@ -556,6 +554,14 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         player = BaseVideoPlayer.load_class(self.player_name)
         return player(self)
 
+    def _get_field_help(self, field_name, field):
+        backend_fields_help = self.get_player().fields_help
+        if field_name in backend_fields_help:
+            return backend_fields_help[field_name]
+        elif field.help:
+            return field.help
+        return ''
+
     def _make_field_info(self, field_name, field):
         """
         Override and extend data of built-in method.
@@ -578,7 +584,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 'default': field.default,
                 'value': field.read_from(self),
                 'has_values': False,
-                'help': field.help if field.help else "",
                 'allow_reset': field.runtime_options.get('resettable_editor', True),
                 'list_values': None,
                 'has_list_values': False,
@@ -586,6 +591,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             }
         else:
             info = super(VideoXBlock, self)._make_field_info(field_name, field)
+            info['help'] = self._get_field_help(field_name, field)
             if field_name == 'handout':
                 info['type'] = 'file_uploader'
                 info['file_name'] = self.get_file_name_from_path(self.handout)

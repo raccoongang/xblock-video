@@ -48,6 +48,12 @@ class WistiaPlayer(BaseVideoPlayer):
     # Stores default transcripts fetched from the captions API
     default_transcripts = []
 
+    fields_help = {
+        'token': 'You can get a master token following the guide of '
+                 '<a href="https://wistia.com/doc/data-api" target="_blank">Wistia</a>. '
+                 'Please ensure appropriate operations scope has been set on the video platform.'
+    }
+
     def media_id(self, href):
         """
         Extract Platform's media id from the video url.
@@ -107,14 +113,11 @@ class WistiaPlayer(BaseVideoPlayer):
         """
         Customize display of studio editor fields per a video platform.
         """
-        message = 'You can get a master token following the guide of ' \
-                  '<a href="https://wistia.com/doc/data-api" target="_blank">Wistia</a>. ' \
-                  'Please ensure appropriate operations scope has been set on the video platform.'
         editable_fields = list(editable_fields)
         editable_fields.remove('account_id')
         editable_fields.remove('player_id')
         customised_editable_fields = tuple(editable_fields)
-        return message, customised_editable_fields
+        return customised_editable_fields
 
     def authenticate_api(self, **kwargs):
         """
