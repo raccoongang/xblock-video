@@ -24,6 +24,12 @@ class WistiaPlayer(BaseVideoPlayer):
     url_re = re.compile(
         r'https?:\/\/(.+)?(wistia.com|wi.st)\/(medias|embed)\/(?P<media_id>.*)'
     )
+
+    advanced_fields = (
+        'start_time', 'end_time', 'handout', 'transcripts',
+        'download_transcript_allowed', 'token', 'default_transcripts'
+    )
+
     # Token field is stored in metadata only if authentication was successful
     metadata_fields = ['token', ]
 
@@ -107,17 +113,6 @@ class WistiaPlayer(BaseVideoPlayer):
         frag.add_javascript(self.render_resource('static/js/player-context-menu.js', **context))
 
         return frag
-
-    @staticmethod
-    def customize_xblock_fields_display(editable_fields):
-        """
-        Customize display of studio editor fields per a video platform.
-        """
-        editable_fields = list(editable_fields)
-        editable_fields.remove('account_id')
-        editable_fields.remove('player_id')
-        customised_editable_fields = tuple(editable_fields)
-        return customised_editable_fields
 
     def authenticate_api(self, **kwargs):
         """

@@ -328,6 +328,15 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
     # Stores default transcripts fetched from the captions API
     default_transcripts = []
 
+    @property
+    def basic_fields(self):
+        return super(BrightcovePlayer, self).basic_fields + ('account_id',)
+
+    advanced_fields = (
+        'player_id', 'start_time', 'end_time', 'handout', 'transcripts',
+        'download_transcript_allowed', 'token', 'default_transcripts'
+    )
+
     fields_help = {
         'token': 'You can generate a BC token following the guide of '
                  '<a href="https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html" '
@@ -450,13 +459,6 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             self.xblock.metadata.get('client_secret')
         )
         return {'canShow': can_show}
-
-    @staticmethod
-    def customize_xblock_fields_display(editable_fields):
-        """
-        Customise display of Brightcove's studio editor fields.
-        """
-        return editable_fields
 
     def authenticate_api(self, **kwargs):
         """

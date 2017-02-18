@@ -251,11 +251,15 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         help="Captions are enabled or not"
     )
 
-    editable_fields = (
-        'display_name', 'href', 'start_time', 'end_time', 'account_id',
-        'player_id', 'handout', 'transcripts', 'download_transcript_allowed',
-        'default_transcripts', 'token'
+    basic_fields = (
+        'display_name', 'href'
     )
+
+    advanced_fields = (
+        'start_time', 'end_time', 'handout', 'transcripts',
+        'download_transcript_allowed', 'default_transcripts'
+    )
+
     player_state_fields = (
         'current_time', 'muted', 'playback_rate', 'volume',
         'transcripts_enabled', 'captions_enabled', 'captions_language'
@@ -429,12 +433,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             'transcripts_autoupload_message': transcripts_autoupload_message
         }
 
-        # Customize display of the particular xblock fields per each video platform.
-        self.editable_fields = \
-            player.customize_xblock_fields_display(self.editable_fields)  # pylint: disable=unsubscriptable-object
-
         # Build a list of all the fields that can be edited:
-        for field_name in self.editable_fields:
+        for field_name in self.get_player().editable_fields:
             field = self.fields[field_name]  # pylint: disable=unsubscriptable-object
             assert field.scope in (Scope.content, Scope.settings), (
                 "Only Scope.content or Scope.settings fields can be used with "
@@ -555,6 +555,12 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         return player(self)
 
     def _get_field_help(self, field_name, field):
+        """
+        Get help text for field.
+
+        First try to load override from video backend, then check field definition
+        and lastly fall back to empty string.
+        """
         backend_fields_help = self.get_player().fields_help
         if field_name in backend_fields_help:
             return backend_fields_help[field_name]

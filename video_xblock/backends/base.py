@@ -106,6 +106,33 @@ class BaseVideoPlayer(Plugin):
         return []
 
     @property
+    def editable_fields(self):
+        """
+        Tuple of all editable VideoXBlock fields to display in studio edit window.
+
+        Defaults to contatenation of `basic_fields` and `advanced_fields`.
+        """
+        return tuple(chain(self.basic_fields, self.advanced_fields))
+
+    @property
+    def basic_fields(self):
+        """
+        Tuple of VideoXBlock fields to display in Basic tab of edit modal window.
+
+        Subclasses can extend or redefine list if needed. Defaults to a tuple defined by VideoXBlock.
+        """
+        return self.xblock.basic_fields
+
+    @property
+    def advanced_fields(self):
+        """
+        Tuple of VideoXBlock fields to display in Advanced tab of edit modal window.
+
+        Subclasses can extend or redefine list if needed. Defaults to a tuple defined by VideoXBlock.
+        """
+        return self.xblock.advanced_fields
+
+    @property
     def fields_help(self):
         """
         Declare backend specific fields' help text.
@@ -182,19 +209,6 @@ class BaseVideoPlayer(Plugin):
         E.g. https://example.wistia.com/medias/12345abcde -> 12345abcde
         """
         return ''
-
-    @staticmethod
-    @abc.abstractmethod
-    def customize_xblock_fields_display(editable_fields):  # pylint: disable=unused-argument
-        """
-        Customise display of studio editor fields per video platform.
-
-        E.g. 'account_id' should be displayed for Brightcove only.
-
-        Returns:
-            editable_fields (tuple): All the editable fields to be displayed in studio editor modal.
-        """
-        return ()
 
     def get_player_html(self, **context):
         """
