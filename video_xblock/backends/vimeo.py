@@ -18,10 +18,6 @@ class VimeoPlayer(BaseVideoPlayer):
 
     metadata_fields = []
 
-    fields_help = {
-        'token': 'This field is to be disabled.'
-    }
-
     # Vimeo API for requesting transcripts.
     captions_api = {}
 
