@@ -328,9 +328,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
     # Stores default transcripts fetched from the captions API
     default_transcripts = []
 
-    @property
-    def basic_fields(self):
-        return super(BrightcovePlayer, self).basic_fields + ('account_id',)
+    basic_fields = BaseVideoPlayer.basic_fields + ('account_id',)
 
     advanced_fields = (
         'player_id', 'start_time', 'end_time', 'handout', 'transcripts',
