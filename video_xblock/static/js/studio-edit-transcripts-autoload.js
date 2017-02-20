@@ -170,7 +170,7 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
     if (isNotDisplayedEnabledTranscript) {
         // Display label of enabled transcripts if hidden
         $enabledLabel = $('div.custom-field-section-label.enabled-transcripts');
-        isHiddenEnabledLabel = !$('div.custom-field-section-label.enabled-transcripts').length;
+        isHiddenEnabledLabel = $('div.custom-field-section-label.enabled-transcripts').hasClass('is-hidden');
         if (isHiddenEnabledLabel) { $enabledLabel.removeClass('is-hidden'); }
         // Create a default (enabled) transcript block
         $newEnabledTranscriptBlock = $('.enabled-default-transcripts-section:hidden').clone();
