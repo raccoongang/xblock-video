@@ -429,7 +429,6 @@ function StudioEditableXBlock(runtime, element) {
                     );
                 }
             }
-            runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
         });
     }
 
@@ -475,7 +474,7 @@ function StudioEditableXBlock(runtime, element) {
      * Bind upload listener to a newly created available transcript.
      */
     function bindUploadListenerAvailableTranscript(langCode, langLabel) {
-        var $uploadElement = $('.default-transcripts-action-link.upload-default-transcript:visible[data-lang-code=' + langCode + ']');
+        var $uploadElement = $('.default-transcripts-action-link.upload-default-transcript[data-lang-code=' + langCode + ']');
         $uploadElement.click(function () {
             // Get url for a transcript fetching from the API
             var downloadUrlApi = getTranscriptUrl(initialDefaultTranscripts, langCode);
@@ -490,7 +489,7 @@ function StudioEditableXBlock(runtime, element) {
      * Bind removal listener to a newly created enabled transcript.
      */
     function bindRemovalListenerEnabledTranscript(langCode, langLabel, downloadUrlServer) {
-        var $removeElement = $('.default-transcripts-action-link.remove-default-transcript:visible[data-lang-code=' + langCode + ']');
+        var $removeElement = $('.default-transcripts-action-link.remove-default-transcript[data-lang-code=' + langCode + ']');
         $removeElement.click(function() {
             var defaultTranscript = {'lang' : langCode, 'label' : langLabel, 'url': downloadUrlServer};
             // Affect default transcripts

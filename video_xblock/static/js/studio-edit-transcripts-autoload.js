@@ -152,12 +152,15 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
     var $hiddenEnabledTranscriptBlock;
     var $parentElement;
     var $insertedEnabledTranscriptBlock;
+    var $insertedEnabledTranscriptLabel;
     var $downloadElement;
     var $removeElement;
+    var areShownDefaultTranscripts = $('.default-transcripts-wrapper:visible').length > 0;
+    var areNotVisibleAvailableTranscripts = !$('div.available-default-transcripts-section:visible').length;
     // Remove a transcript of choice from the list of available ones
     $availableTranscriptBlock.remove();
-    // Hide label of available transcripts if no such items left
-    if (!$('div.available-default-transcripts-section:visible').length) {
+    // Hide label of available transcripts if no such items left and is default transcripts are shown
+    if (areNotVisibleAvailableTranscripts && areShownDefaultTranscripts) {
         $('div.custom-field-section-label:contains("Available transcripts")').addClass('is-hidden');
     }
     // Get all the currently enabled transcripts
@@ -182,13 +185,17 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
         }
         // Update attributes
         $insertedEnabledTranscriptBlock =
-            $('.enabled-default-transcripts-section .default-transcripts-label:visible').last();
-        $insertedEnabledTranscriptBlock.attr('value', langCode).text(langLabel);
-        $downloadElement = $('.default-transcripts-action-link.download-transcript.download-setting:visible').last();
+            $('.enabled-default-transcripts-section:not(.is-hidden)').last();
+        $insertedEnabledTranscriptLabel =
+            $insertedEnabledTranscriptBlock.find('.default-transcripts-label');
+        $insertedEnabledTranscriptLabel.attr('value', langCode).text(langLabel);
+        $downloadElement = $insertedEnabledTranscriptBlock
+            .find('.default-transcripts-action-link.download-transcript.download-setting');
         $downloadElement.attr(
             {'data-lang-code': langCode, 'data-lang-label': langLabel, href: downloadUrlServer}
         );
-        $removeElement = $('.default-transcripts-action-link.remove-default-transcript:visible').last();
+        $removeElement = $insertedEnabledTranscriptBlock
+            .find('.default-transcripts-action-link.remove-default-transcript');
         $removeElement.attr({'data-lang-code': langCode, 'data-lang-label': langLabel});
     }
 }
