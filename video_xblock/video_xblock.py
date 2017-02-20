@@ -321,6 +321,13 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         self.captions_enabled = state.get('captions_enabled', self.captions_enabled)
         self.captions_language = state.get('captions_language', self.captions_language)
 
+    @property
+    def editable_fields(self):
+        """
+        Return list of xblock's editable fields used by StudioEditableXBlockMixin.clean_studio_edits().
+        """
+        return self.get_player().editable_fields
+
     def validate_field_data(self, validation, data):
         """
         Validate data submitted via xblock edit pop-up.
