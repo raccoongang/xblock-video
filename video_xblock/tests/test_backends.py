@@ -3,7 +3,6 @@ Test cases for video_xblock backends.
 """
 # copy should be imported before requests
 import copy
-import requests
 import babelfish
 from ddt import ddt, data, unpack
 from lxml import etree
