@@ -13,8 +13,8 @@ function StudioEditableXBlock(runtime, element) {
     var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');  // TODO: Remove TinyMCE
     var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
     var $defaultTranscriptsSwitcher = $('input.default-transcripts-switch-input');
-    var $enabledLabel;
-    var $availableLabel;
+    var $enabledLabel = $('div.custom-field-section-label.enabled-transcripts');
+    var $availableLabel= $('div.custom-field-section-label.available-transcripts');
     var noEnabledTranscript;
     var noAvailableTranscript;
 
@@ -619,8 +619,6 @@ function StudioEditableXBlock(runtime, element) {
     });
 
     $defaultTranscriptsSwitcher.change(function(){
-        $enabledLabel = $('div.custom-field-section-label.enabled-transcripts');
-        $availableLabel = $('div.custom-field-section-label.available-transcripts');
         noEnabledTranscript = !$('.enabled-default-transcripts-section:visible').length;
         noAvailableTranscript = !$('.available-default-transcripts-section:visible').length;
         // Hide label of enabled default transcripts block if no transcript is enabled on video xblock, and vice versa
