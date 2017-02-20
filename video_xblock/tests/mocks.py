@@ -106,6 +106,17 @@ class BaseMock(Mock):
         """
         pass
 
+    @staticmethod
+    def base_apply_mock_data():
+        """
+        Return base data for mock.
+        """
+        return {
+            'obj': requests,
+            'attrs': ['get', ],
+            'value': [deepcopy(requests.get), ]
+        }
+
 
 class MockCourse(object):
     """
@@ -228,11 +239,7 @@ class WistiaAuthMock(BaseMock):
         """
         Save state of auth related entities before mocks are applied.
         """
-        return {
-            'obj': requests,
-            'attrs': ['get', ],
-            'value': [deepcopy(requests.get), ]
-        }
+        return BaseMock.base_apply_mock_data()
 
 
 class YoutubeDefaultTranscriptsMock(BaseMock):
@@ -536,11 +543,7 @@ class WistiaDefaultTranscriptsMock(BaseMock):
         requests.get = WistiaDefaultTranscriptsMock(
             mock_magic=requests.exceptions.RequestException, event=event
         ).get()
-        return {
-            'obj': requests,
-            'attrs': ['get', ],
-            'value': [deepcopy(requests.get), ]
-        }
+        return BaseMock.base_apply_mock_data()
 
 
 class VimeoDefaultTranscriptsMock(BaseMock):
@@ -563,11 +566,7 @@ class BaseDownloadTranscriptMock(BaseMock):
         """
         Save state of download transcript related entities before mocks are applied.
         """
-        return {
-            'obj': requests,
-            'attrs': ['get', ],
-            'value': [deepcopy(requests.get), ]
-        }
+        return BaseMock.base_apply_mock_data()
 
 
 class YoutubeDownloadTranscriptMock(BaseDownloadTranscriptMock):
