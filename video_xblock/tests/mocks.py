@@ -563,7 +563,6 @@ class BaseDownloadTranscriptMock(BaseMock):
         """
         Save state of download transcript related entities before mocks are applied.
         """
-        requests.get = YoutubeDownloadTranscriptMock(event=event).get()
         return {
             'obj': requests,
             'attrs': ['get', ],
@@ -621,6 +620,14 @@ Forse me la canto e me la suono da sola un po',
             self.return_value = ResponseStub(status_code=200, body=self._xml)
         return lambda x: self.return_value
 
+    @staticmethod
+    def apply_mock(event):
+        """
+        Save state of download transcript related entities before mocks are applied.
+        """
+        requests.get = YoutubeDownloadTranscriptMock(event=event).get()
+        return super(YoutubeDownloadTranscriptMock, YoutubeDownloadTranscriptMock).apply_mock(event)
+
 
 class BrightcoveDownloadTranscriptMock(BaseDownloadTranscriptMock):
     """
@@ -657,6 +664,14 @@ accessed from mobile devices."""
         """
         self.return_value = ResponseStub(status_code=200, body=self._vtt)
         return lambda x: self.return_value
+
+    @staticmethod
+    def apply_mock(event):
+        """
+        Save state of download transcript related entities before mocks are applied.
+        """
+        requests.get = BrightcoveDownloadTranscriptMock(event=event).get()
+        return super(BrightcoveDownloadTranscriptMock, BrightcoveDownloadTranscriptMock).apply_mock(event)
 
 
 class WistiaDownloadTranscriptMock(BaseMock):
