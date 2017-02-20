@@ -316,7 +316,7 @@ class BaseVideoPlayer(Plugin):
         get_values = operator.itemgetter('lang')
         default_transcripts.sort(key=get_values)
         distinct_transcripts = []
-        for key, group in itertools.groupby(default_transcripts, get_values):  # pylint: disable=unused-variable
+        for _key, group in itertools.groupby(default_transcripts, get_values):
             distinct_transcripts.append(group.next())
         return distinct_transcripts
 

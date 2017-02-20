@@ -159,7 +159,7 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
     var areNotVisibleAvailableTranscripts = !$('div.available-default-transcripts-section:visible').length;
     // Remove a transcript of choice from the list of available ones
     $availableTranscriptBlock.remove();
-    // Hide label of available transcripts if no such items left and is default transcripts are shown
+    // Hide label of available transcripts if no such items left and if default transcripts are shown
     if (areNotVisibleAvailableTranscripts && areShownDefaultTranscripts) {
         $('div.custom-field-section-label:contains("Available transcripts")').addClass('is-hidden');
     }
