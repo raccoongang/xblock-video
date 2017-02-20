@@ -147,7 +147,7 @@
                    </label>
 
                 <div class="default-transcripts-wrapper">
-                  <div class="custom-field-section-label">{% trans "Enabled transcripts" %}</div>
+                  <div class="custom-field-section-label enabled-transcripts">{% trans "Enabled transcripts" %}</div>
                   {% if transcripts  %}
                   <!-- Display a list of transcripts fetched from a video xblock -->
                     {% for transcript in transcripts %}
@@ -192,7 +192,7 @@
                 </div>
                 <!------------------------- End of a hidden block --------------------------->
 
-                <div class="custom-field-section-label">{% trans "Available transcripts" %}</div>
+                <div class="custom-field-section-label available-transcripts">{% trans "Available transcripts" %}</div>
                 {% if default_transcripts %}
                   <!-- Display a list of transcripts fetched from a video platform (API) -->
                     {% for default_transcript in default_transcripts %}

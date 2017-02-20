@@ -110,8 +110,8 @@ function createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscr
     var downloadUrlApi;
     if (isNotDisplayedAvailableTranscript && isStoredVideoPlatform) {
         // Show label of available transcripts if no such label is displayed
-        $availableLabel = $('div.custom-field-section-label:contains("Available transcripts")');
-        isHiddenAvailableLabel = !$('div.custom-field-section-label:contains("Available transcripts"):visible').length;
+        $availableLabel = $('div.custom-field-section-label.available-transcripts');
+        isHiddenAvailableLabel = !$('div.custom-field-section-label.available-transcripts:visible').length;
         if (isHiddenAvailableLabel) { $availableLabel.removeClass('is-hidden'); }
         // Create a default (available) transcript block
         $newAvailableTranscriptBlock = $('.available-default-transcripts-section:hidden').clone();
@@ -161,7 +161,7 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
     $availableTranscriptBlock.remove();
     // Hide label of available transcripts if no such items left and if default transcripts are shown
     if (areNotVisibleAvailableTranscripts && areShownDefaultTranscripts) {
-        $('div.custom-field-section-label:contains("Available transcripts")').addClass('is-hidden');
+        $('div.custom-field-section-label.available-transcripts').addClass('is-hidden');
     }
     // Get all the currently enabled transcripts
     allEnabledTranscripts = getDefaultTranscriptsArray('enabled');
@@ -169,8 +169,8 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
     isNotDisplayedEnabledTranscript = $.inArray(langCode, allEnabledTranscripts) === -1;
     if (isNotDisplayedEnabledTranscript) {
         // Display label of enabled transcripts if hidden
-        $enabledLabel = $('div.custom-field-section-label:contains("Enabled transcripts")');
-        isHiddenEnabledLabel = !$('div.custom-field-section-label:contains("Enabled transcripts"):visible').length;
+        $enabledLabel = $('div.custom-field-section-label.enabled-transcripts');
+        isHiddenEnabledLabel = !$('div.custom-field-section-label.enabled-transcripts').length;
         if (isHiddenEnabledLabel) { $enabledLabel.removeClass('is-hidden'); }
         // Create a default (enabled) transcript block
         $newEnabledTranscriptBlock = $('.enabled-default-transcripts-section:hidden').clone();
@@ -217,7 +217,7 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     $enabledTranscriptBlock.remove();
     // Hide label of enabled transcripts if no such items left
     if (!$('div.enabled-default-transcripts-section:visible').length) {
-        $('div.custom-field-section-label:contains("Enabled transcripts")').addClass('is-hidden');
+        $('div.custom-field-section-label.enabled-transcripts').addClass('is-hidden');
     }
     // Create elements to display status messages on enabled transcript removal
     createStatusMessageElement(langCode, 'remove-default-transcript');
