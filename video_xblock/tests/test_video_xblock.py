@@ -8,8 +8,6 @@ import mock
 
 from django.test import RequestFactory
 from django.conf import settings
-from xblock.test.tools import TestRuntime
-from xblock.field_data import DictFieldData
 
 from video_xblock import VideoXBlock
 from video_xblock.utils import ugettext as _

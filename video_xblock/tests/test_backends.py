@@ -203,7 +203,7 @@ class TestCustomBackends(VideoXBlockTestBase):
         """
         player = self.player[backend]
         for event in auth_mock.get_events():
-            mock_obj = auth_mock.apply_auth_mock(event)
+            mock_obj = auth_mock.apply_mock(event)
             self.mocked_objects.append(mock_obj)
             try:
                 auth_data, error = res = player(self.xblock).authenticate_api(
@@ -216,53 +216,6 @@ class TestCustomBackends(VideoXBlockTestBase):
                 error = ex.message
             expected_error = auth_mock.expected_value(event)[-1]
             self.assertIn(expected_error, error)
-
-    @XBlock.register_temp_plugin(youtube.YoutubePlayer, 'youtube')
-    def apply_transcripts_mock(self, backend, event):
-        """
-        Save state of default transcripts related entities before mocks are applied.
-        """
-        player = self.player[backend]
-        if backend == 'youtube':
-            player = XBlock.load_class('youtube')
-            player.fetch_default_transcripts_languages = YoutubeDefaultTranscriptsMock(event=event) \
-                .fetch_default_transcripts_languages()
-            self.mocked_objects.append({
-                'obj': player,
-                'attrs': ['fetch_default_transcripts_languages'],
-                'value': [player.fetch_default_transcripts_languages, ]
-            })
-            player.fetch_default_transcripts_languages = YoutubeDefaultTranscriptsMock(event=event) \
-                .fetch_default_transcripts_languages()
-        elif backend == 'brightcove':
-            self.mocked_objects.append({
-                'obj': brightcove.BrightcoveApiClient,
-                'attrs': ['get', ],
-                'value': [copy.deepcopy(brightcove.BrightcoveApiClient.get), ]
-            })
-            self.mocked_objects.append({
-                'obj': self.xblock,
-                'attrs': ['metadata', ],
-                'value': [copy.deepcopy(self.xblock.metadata), ]
-            })
-            self.xblock.metadata = BrightcoveDefaultTranscriptsMock(
-                mock_magic=self.xblock.metadata, event=event
-            ).no_credentials()
-            brightcove.BrightcoveApiClient.get = BrightcoveDefaultTranscriptsMock(
-                mock_magic=brightcove.BrightcoveApiClientError, event=event
-            ).api_client_get()
-        elif backend == 'wistia':
-            self.mocked_objects.append({
-                'obj': requests,
-                'attrs': ['get', ],
-                'value': [copy.deepcopy(requests.get), ]
-            })
-            requests.get = WistiaDefaultTranscriptsMock(
-                mock_magic=requests.exceptions.RequestException, event=event
-            ).get()
-        else:
-            # vimeo
-            pass
 
     @override_settings(ALL_LANGUAGES=ALL_LANGUAGES)
     @data(
@@ -278,7 +231,7 @@ class TestCustomBackends(VideoXBlockTestBase):
     def test_get_default_transcripts(self, backend, video_id, trans_mock):
         player = self.player[backend]
         for event in trans_mock.get_events():
-            mocked_object = trans_mock.apply_transcripts_mock(event)
+            mocked_object = trans_mock.apply_mock(event)
             if mocked_object:
                 self.mocked_objects.append(mocked_object)
             if backend == 'brightcove':
@@ -302,36 +255,6 @@ class TestCustomBackends(VideoXBlockTestBase):
             expected_message = trans_mock.expected_value(event)[-1]
             self.assertIn(expected_message, message)
             self.restore_mocked()
-
-    def apply_download_mock(self, backend, event):
-        """
-        Save state of download transcript related entities before mocks are applied.
-        """
-        player = self.player[backend]
-        if backend == 'wistia':
-            self.mocked_objects.append({
-                'obj': player,
-                'attrs': ['default_transcripts', ],
-                'value': [copy.deepcopy(player.default_transcripts), ]
-            })
-            player.default_transcripts = WistiaDownloadTranscriptMock(event=event).get()
-        elif backend == 'brightcove':
-            self.mocked_objects.append({
-                'obj': requests,
-                'attrs': ['get', ],
-                'value': [copy.deepcopy(requests.get), ]
-            })
-            requests.get = BrightcoveDownloadTranscriptMock(event=event).get()
-        elif backend == 'youtube':
-            self.mocked_objects.append({
-                'obj': requests,
-                'attrs': ['get', ],
-                'value': [copy.deepcopy(requests.get), ]
-            })
-            requests.get = YoutubeDownloadTranscriptMock(event=event).get()
-        else:
-            # place here vimeo mocks assignments
-            pass
 
     @data(
         *(
@@ -367,7 +290,7 @@ class TestCustomBackends(VideoXBlockTestBase):
         """
         player = self.player[backend]
         for index, event in enumerate(download_transcript_mock.get_events()):
-            mocked_object = download_transcript_mock.apply_download_mock(event)
+            mocked_object = download_transcript_mock.apply_mock(event)
             self.mocked_objects.append(mocked_object)
             try:
                 res = player(self.xblock).download_default_transcript(**params[index])

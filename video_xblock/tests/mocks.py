@@ -99,6 +99,13 @@ class BaseMock(Mock):
                 ret.append(key)
         return ret
 
+    @staticmethod
+    def apply_mock(event, *args):
+        """
+        Save state of object before mocks are applied.
+        """
+        pass
+
 
 class MockCourse(object):
     """
@@ -114,20 +121,7 @@ class MockCourse(object):
         self.language = 'en'
 
 
-class BaseAuthMock(BaseMock):
-    """
-    Base auth mock class.
-    """
-
-    @staticmethod
-    def apply_auth_mock(event):
-        """
-        Save state of auth related entities before mocks are applied.
-        """
-        pass
-
-
-class YoutubeAuthMock(BaseAuthMock):
+class YoutubeAuthMock(BaseMock):
     """
     Youtube auth mock class.
     """
@@ -135,7 +129,7 @@ class YoutubeAuthMock(BaseAuthMock):
     pass
 
 
-class VimeoAuthMock(BaseAuthMock):
+class VimeoAuthMock(BaseMock):
     """
     Vimeo auth mock class.
     """
@@ -143,7 +137,7 @@ class VimeoAuthMock(BaseAuthMock):
     pass
 
 
-class BrightcoveAuthMock(BaseAuthMock):
+class BrightcoveAuthMock(BaseMock):
     """
     Brightcove auth mock class.
     """
@@ -189,7 +183,7 @@ class BrightcoveAuthMock(BaseAuthMock):
         return ret, error
 
     @staticmethod
-    def apply_auth_mock(event):
+    def apply_mock(event):
         """
         Save state of auth related entities before mocks are applied.
         """
@@ -201,7 +195,7 @@ class BrightcoveAuthMock(BaseAuthMock):
         }
 
 
-class WistiaAuthMock(BaseAuthMock):
+class WistiaAuthMock(BaseMock):
     """
     Wistia auth mock class.
     """
@@ -230,7 +224,7 @@ class WistiaAuthMock(BaseAuthMock):
         return lambda x: self.return_value
 
     @staticmethod
-    def apply_auth_mock(event):
+    def apply_mock(event):
         """
         Save state of auth related entities before mocks are applied.
         """
@@ -241,20 +235,7 @@ class WistiaAuthMock(BaseAuthMock):
         }
 
 
-class BaseDefaultTranscriptsMock(BaseMock):
-    """
-    Base default transcrupts mock object.
-    """
-
-    @staticmethod
-    def apply_transcripts_mock(event, xblock=None):
-        """
-        Save state of default transcripts related entities before mocks are applied.
-        """
-        pass
-
-
-class YoutubeDefaultTranscriptsMock(BaseDefaultTranscriptsMock):
+class YoutubeDefaultTranscriptsMock(BaseMock):
     """
     Youtube default transcripts mock class.
     """
@@ -319,7 +300,7 @@ class YoutubeDefaultTranscriptsMock(BaseDefaultTranscriptsMock):
 
     @staticmethod
     @XBlock.register_temp_plugin(youtube.YoutubePlayer, 'youtube')
-    def apply_transcripts_mock(event, xblock=None):
+    def apply_mock(event):
         """
         Save state of default transcripts related entities before mocks are applied.
         """
@@ -333,7 +314,7 @@ class YoutubeDefaultTranscriptsMock(BaseDefaultTranscriptsMock):
         }
 
 
-class BrightcoveDefaultTranscriptsMock(BaseDefaultTranscriptsMock):
+class BrightcoveDefaultTranscriptsMock(BaseMock):
     """
     Brightcove default transcripts mock class.
     """
@@ -435,7 +416,7 @@ class BrightcoveDefaultTranscriptsMock(BaseDefaultTranscriptsMock):
             return self.mock
 
     @staticmethod
-    def apply_transcripts_mock(event, xblock=None):
+    def apply_mock(event):
         """
         Save state of default transcripts related entities before mocks are applied.
         """
@@ -449,7 +430,7 @@ class BrightcoveDefaultTranscriptsMock(BaseDefaultTranscriptsMock):
         }
 
 
-class WistiaDefaultTranscriptsMock(BaseDefaultTranscriptsMock):
+class WistiaDefaultTranscriptsMock(BaseMock):
     """
     Wistia default transcripts mock class.
     """
@@ -536,7 +517,7 @@ class WistiaDefaultTranscriptsMock(BaseDefaultTranscriptsMock):
         return lambda x: self.return_value
 
     @staticmethod
-    def apply_transcripts_mock(event, xblock=None):
+    def apply_mock(event):
         """
         Save state of default transcripts related entities before mocks are applied.
         """
@@ -550,7 +531,7 @@ class WistiaDefaultTranscriptsMock(BaseDefaultTranscriptsMock):
         }
 
 
-class VimeoDefaultTranscriptsMock(BaseDefaultTranscriptsMock):
+class VimeoDefaultTranscriptsMock(BaseMock):
     """
     Temporary mock for vimeo player. Need to be updated.
     """
@@ -560,18 +541,7 @@ class VimeoDefaultTranscriptsMock(BaseDefaultTranscriptsMock):
     to_return = [[], '']
 
 
-class BaseDownloadTranscriptMock(BaseMock):
-    """Base download transcript mock class."""
-
-    @staticmethod
-    def apply_download_mock(event):
-        """
-        Save state of download transcript related entities before mocks are applied.
-        """
-        pass
-
-
-class YoutubeDownloadTranscriptMock(BaseDownloadTranscriptMock):
+class YoutubeDownloadTranscriptMock(BaseMock):
     """
     Youtube download default transcript mock class.
     """
@@ -622,7 +592,7 @@ Forse me la canto e me la suono da sola un po',
         return lambda x: self.return_value
 
     @staticmethod
-    def apply_download_mock(event):
+    def apply_mock(event):
         """
         Save state of download transcript related entities before mocks are applied.
         """
@@ -634,7 +604,7 @@ Forse me la canto e me la suono da sola un po',
         }
 
 
-class BrightcoveDownloadTranscriptMock(BaseDownloadTranscriptMock):
+class BrightcoveDownloadTranscriptMock(BaseMock):
     """
     Brightcove download default transcript mock class.
     """
@@ -671,7 +641,7 @@ accessed from mobile devices."""
         return lambda x: self.return_value
 
     @staticmethod
-    def apply_download_mock(event):
+    def apply_mock(event):
         """
         Save state of download transcript related entities before mocks are applied.
         """
@@ -683,7 +653,7 @@ accessed from mobile devices."""
         }
 
 
-class WistiaDownloadTranscriptMock(BaseDownloadTranscriptMock):
+class WistiaDownloadTranscriptMock(BaseMock):
     """
     Brightcove download default transcript mock class.
     """
@@ -744,7 +714,7 @@ class WistiaDownloadTranscriptMock(BaseDownloadTranscriptMock):
 
     @staticmethod
     @XBlock.register_temp_plugin(wistia.WistiaPlayer, 'wistia')
-    def apply_download_mock(event):
+    def apply_mock(event):
         """
         Save state of download transcript related entities before mocks are applied.
         """
@@ -757,7 +727,7 @@ class WistiaDownloadTranscriptMock(BaseDownloadTranscriptMock):
         }
 
 
-class VimeoDownloadTranscriptMock(BaseDownloadTranscriptMock):
+class VimeoDownloadTranscriptMock(BaseMock):
     """
     Temporary vimeo download transcript mock object.
     """
