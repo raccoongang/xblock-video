@@ -61,6 +61,7 @@ function showStatus(message, type, successSelector, errorSelector) {
  *  Manage default transcripts labels display depending on enabled/available subs presence.
  */
 function setDisplayDefaultTranscriptsLabel(isNotDisplayedDefaultSub, labelElement) {
+    'use strict';
     if (isNotDisplayedDefaultSub) {
         labelElement.addClass('is-hidden');
     } else {
