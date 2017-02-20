@@ -58,6 +58,17 @@ function showStatus(message, type, successSelector, errorSelector) {
 }
 
 /**
+ *  Manage default transcripts labels display depending on enabled/available subs presence.
+ */
+function setDisplayDefaultTranscriptsLabel(isNotDisplayedDefaultSub, labelElement) {
+    if (isNotDisplayedDefaultSub) {
+        labelElement.addClass('is-hidden');
+    } else {
+        labelElement.removeClass('is-hidden');
+    }
+}
+
+/**
  *  Store all the default transcripts, fetched at document load, and their languages' codes.
  */
 function getInitialDefaultTranscriptsData() {
@@ -155,13 +166,12 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
     var $insertedEnabledTranscriptLabel;
     var $downloadElement;
     var $removeElement;
-    var areShownDefaultTranscripts = $('.default-transcripts-wrapper:visible').length > 0;
     var areNotVisibleAvailableTranscripts;
     // Remove a transcript of choice from the list of available ones
     $availableTranscriptBlock.remove();
     // Hide label of available transcripts if no such items left and if default transcripts are shown
     areNotVisibleAvailableTranscripts = !$('div.available-default-transcripts-section:visible').length;
-    if (areNotVisibleAvailableTranscripts && areShownDefaultTranscripts) {
+    if (areNotVisibleAvailableTranscripts) {
         $('div.custom-field-section-label.available-transcripts').addClass('is-hidden');
     }
     // Get all the currently enabled transcripts

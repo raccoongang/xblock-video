@@ -12,11 +12,11 @@ function StudioEditableXBlock(runtime, element) {
     // Studio includes a copy of tinyMCE and its jQuery plugin
     var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');  // TODO: Remove TinyMCE
     var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
-    var $enabledLabel = $('div.custom-field-section-label:contains("Enabled transcripts")');
-    var noEnabledTranscript = !$('.enabled-default-transcripts-section:visible').length;
-
-    // Hide label of enabled default transcripts block if no transcript is enabled
-    if (noEnabledTranscript) { $enabledLabel.addClass('is-hidden'); }
+    var $defaultTranscriptsSwitcher = $('input.default-transcripts-switch-input');
+    var $enabledLabel;
+    var $availableLabel;
+    var noEnabledTranscript;
+    var noAvailableTranscript;
 
     /** Wrapper function for dispatched ajax calls.
      */
@@ -616,6 +616,17 @@ function StudioEditableXBlock(runtime, element) {
         // Affect standard transcripts
         removeStandardTranscriptBlock(langCode, transcriptsValue, disabledLanguages);
         disableOption($langChoiceItem, disabledLanguages);
+    });
+
+    $defaultTranscriptsSwitcher.change(function(){
+        $enabledLabel = $('div.custom-field-section-label.enabled-transcripts');
+        $availableLabel = $('div.custom-field-section-label.available-transcripts');
+        noEnabledTranscript = !$('.enabled-default-transcripts-section:visible').length;
+        noAvailableTranscript = !$('.available-default-transcripts-section:visible').length;
+        // Hide label of enabled default transcripts block if no transcript is enabled on video xblock, and vice versa
+        setDisplayDefaultTranscriptsLabel(noEnabledTranscript, $enabledLabel);
+        // Hide label of available default transcripts block if no transcript is available on a platform, and vice versa
+        setDisplayDefaultTranscriptsLabel(noAvailableTranscript, $availableLabel);
     });
     // End of Raccoongang addons
 }
