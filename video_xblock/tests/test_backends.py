@@ -217,15 +217,11 @@ class TestCustomBackends(VideoXBlockTestBase):
             self.assertIn(expected_error, error)
 
     @override_settings(ALL_LANGUAGES=ALL_LANGUAGES)
-    @data(
-        *(
-            zip(
-                backends,
-                media_ids,  # video ids
-                default_trans_mocks
-            )
-        )
-    )
+    @data(*(zip(
+        backends,
+        media_ids,  # video ids
+        default_trans_mocks
+    )))
     @unpack
     def test_get_default_transcripts(self, backend, video_id, trans_mock):
         player = self.player[backend]

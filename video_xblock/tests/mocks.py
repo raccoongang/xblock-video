@@ -504,16 +504,28 @@ class WistiaDefaultTranscriptsMock(BaseMock):
         if self.event == 'request_data_exception':
             self.side_effect = self.mock()
             return self
-        elif self.event == 'success_and_data_lang_code':
-            self.return_value = ResponseStub(status_code=200, body=json.dumps(self._default_transcripts))
-        elif self.event == 'success_and_data_lang_code_exception':
+        else:
             default_transcripts = copy(self._default_transcripts)
             default_transcripts[0]['language'] = 'en'
-            self.return_value = ResponseStub(status_code=200, body=json.dumps(default_transcripts))
-        elif self.event == 'success_no_data':
-            self.return_value = ResponseStub(status_code=200, body='[]')
-        elif self.event == 'returned_not_found':
-            self.return_value = ResponseStub(status_code=404, body='{}')
+            return_value_by_event = {
+                'success_and_data_lang_code_exception': {
+                    'status_code': 200,
+                    'body': json.dumps(default_transcripts)
+                },
+                'success_and_data_lang_code': {
+                    'status_code': 200,
+                    'body': json.dumps(self._default_transcripts)
+                },
+                'success_no_data': {
+                    'status_code': 200,
+                    'body': '{}'
+                },
+                'returned_not_found': {
+                    'status_code': 404,
+                    'body': '{}'
+                },
+            }
+            self.return_value = ResponseStub(**return_value_by_event[self.event])
         return lambda x: self.return_value
 
     @staticmethod
@@ -541,7 +553,25 @@ class VimeoDefaultTranscriptsMock(BaseMock):
     to_return = [[], '']
 
 
-class YoutubeDownloadTranscriptMock(BaseMock):
+class BaseDownloadTranscriptMock(BaseMock):
+    """
+    Base download transcript mock class.
+    """
+
+    @staticmethod
+    def apply_mock(event):
+        """
+        Save state of download transcript related entities before mocks are applied.
+        """
+        requests.get = YoutubeDownloadTranscriptMock(event=event).get()
+        return {
+            'obj': requests,
+            'attrs': ['get', ],
+            'value': [deepcopy(requests.get), ]
+        }
+
+
+class YoutubeDownloadTranscriptMock(BaseDownloadTranscriptMock):
     """
     Youtube download default transcript mock class.
     """
@@ -591,20 +621,8 @@ Forse me la canto e me la suono da sola un po',
             self.return_value = ResponseStub(status_code=200, body=self._xml)
         return lambda x: self.return_value
 
-    @staticmethod
-    def apply_mock(event):
-        """
-        Save state of download transcript related entities before mocks are applied.
-        """
-        requests.get = YoutubeDownloadTranscriptMock(event=event).get()
-        return {
-            'obj': requests,
-            'attrs': ['get', ],
-            'value': [deepcopy(requests.get), ]
-        }
 
-
-class BrightcoveDownloadTranscriptMock(BaseMock):
+class BrightcoveDownloadTranscriptMock(BaseDownloadTranscriptMock):
     """
     Brightcove download default transcript mock class.
     """
@@ -639,18 +657,6 @@ accessed from mobile devices."""
         """
         self.return_value = ResponseStub(status_code=200, body=self._vtt)
         return lambda x: self.return_value
-
-    @staticmethod
-    def apply_mock(event):
-        """
-        Save state of download transcript related entities before mocks are applied.
-        """
-        requests.get = BrightcoveDownloadTranscriptMock(event=event).get()
-        return {
-            'obj': requests,
-            'attrs': ['get', ],
-            'value': [deepcopy(requests.get), ]
-        }
 
 
 class WistiaDownloadTranscriptMock(BaseMock):
