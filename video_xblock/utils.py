@@ -6,7 +6,7 @@ from HTMLParser import HTMLParser
 import os.path
 import pkg_resources
 
-from django.template import Engine, Context, Library, Template
+from django.template import Engine, Context, Template
 
 
 html_parser = HTMLParser()  # pylint: disable=invalid-name
@@ -40,9 +40,6 @@ def render_template(template_name, **context):
     """
     template_dirs = [os.path.join(os.path.dirname(__file__), 'static/html')]
     engine = Engine(dirs=template_dirs, debug=True)
-    # register = Library()
-    # t = engine.get_template('fields/base.html')
-    # register.inclusion_tag(t)(base_field)
     html = engine.get_template(template_name)
 
     return html_parser.unescape(
