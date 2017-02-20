@@ -26,7 +26,7 @@ from webob import Response
 from .backends.base import BaseVideoPlayer
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
-from .utils import render_resource, resource_string, ugettext as _
+from .utils import render_template, render_resource, resource_string, ugettext as _
 
 
 log = logging.getLogger(__name__)
@@ -426,7 +426,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             'default_transcripts': self.default_transcripts,
             'initial_default_transcripts': initial_default_transcripts,
             'auth_error_message': auth_error_message,
-            'transcripts_autoupload_message': transcripts_autoupload_message
+            'transcripts_autoupload_message': transcripts_autoupload_message,
+            'basic_fields': player.basic_fields,
+            'advanced_fields': player.advanced_fields,
         }
 
         # Customize display of the particular xblock fields per each video platform.
@@ -447,7 +449,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             if field_info is not None:
                 context["fields"].append(field_info)
 
-        fragment.content = render_resource('static/html/studio_edit.html', **context)
+        fragment.content = render_template('studio-edit.html', **context)
         fragment.add_css(resource_string("static/css/handout.css"))
         fragment.add_css(resource_string("static/css/transcripts-upload.css"))
         fragment.add_css(resource_string("static/css/studio-edit.css"))
