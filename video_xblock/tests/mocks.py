@@ -3,10 +3,14 @@
 Video XBlock mocks.
 """
 import json
-from copy import copy
+from copy import copy, deepcopy
 from mock import Mock
+import requests
+
+from xblock.core import XBlock
 
 from video_xblock.exceptions import VideoXBlockException
+from video_xblock.backends import brightcove, youtube, wistia
 
 
 class ResponseStub(object):
@@ -110,7 +114,20 @@ class MockCourse(object):
         self.language = 'en'
 
 
-class YoutubeAuthMock(BaseMock):
+class BaseAuthMock(BaseMock):
+    """
+    Base auth mock class.
+    """
+
+    @staticmethod
+    def apply_auth_mock(event):
+        """
+        Save state of auth related entities before mocks are applied.
+        """
+        pass
+
+
+class YoutubeAuthMock(BaseAuthMock):
     """
     Youtube auth mock class.
     """
@@ -118,7 +135,7 @@ class YoutubeAuthMock(BaseMock):
     pass
 
 
-class VimeoAuthMock(BaseMock):
+class VimeoAuthMock(BaseAuthMock):
     """
     Vimeo auth mock class.
     """
@@ -126,7 +143,7 @@ class VimeoAuthMock(BaseMock):
     pass
 
 
-class BrightcoveAuthMock(BaseMock):
+class BrightcoveAuthMock(BaseAuthMock):
     """
     Brightcove auth mock class.
     """
@@ -171,8 +188,20 @@ class BrightcoveAuthMock(BaseMock):
         error = ret.pop('error_message')
         return ret, error
 
+    @staticmethod
+    def apply_auth_mock(event):
+        """
+        Save state of auth related entities before mocks are applied.
+        """
+        brightcove.BrightcoveApiClient.create_credentials = BrightcoveAuthMock(event=event).create_credentials()
+        return {
+            'obj': brightcove.BrightcoveApiClient,
+            'attrs': ['create_credentials', ],
+            'value': [brightcove.BrightcoveApiClient.create_credentials, ]
+        }
 
-class WistiaAuthMock(BaseMock):
+
+class WistiaAuthMock(BaseAuthMock):
     """
     Wistia auth mock class.
     """
@@ -200,8 +229,32 @@ class WistiaAuthMock(BaseMock):
             self.return_value = ResponseStub(status_code=401)
         return lambda x: self.return_value
 
+    @staticmethod
+    def apply_auth_mock(event):
+        """
+        Save state of auth related entities before mocks are applied.
+        """
+        return {
+            'obj': requests,
+            'attrs': ['get', ],
+            'value': [deepcopy(requests.get), ]
+        }
 
-class YoutubeDefaultTranscriptsMock(BaseMock):
+
+class BaseDefaultTranscriptsMock(BaseMock):
+    """
+    Base default transcrupts mock object.
+    """
+
+    @staticmethod
+    def apply_transcripts_mock(event, xblock=None):
+        """
+        Save state of default transcripts related entities before mocks are applied.
+        """
+        pass
+
+
+class YoutubeDefaultTranscriptsMock(BaseDefaultTranscriptsMock):
     """
     Youtube default transcripts mock class.
     """
@@ -264,8 +317,23 @@ class YoutubeDefaultTranscriptsMock(BaseMock):
         )
         return self
 
+    @staticmethod
+    @XBlock.register_temp_plugin(youtube.YoutubePlayer, 'youtube')
+    def apply_transcripts_mock(event, xblock=None):
+        """
+        Save state of default transcripts related entities before mocks are applied.
+        """
+        player = XBlock.load_class('youtube')
+        player.fetch_default_transcripts_languages = YoutubeDefaultTranscriptsMock(event=event) \
+            .fetch_default_transcripts_languages()
+        return {
+            'obj': player,
+            'attrs': ['fetch_default_transcripts_languages'],
+            'value': [player.fetch_default_transcripts_languages, ]
+        }
 
-class BrightcoveDefaultTranscriptsMock(BaseMock):
+
+class BrightcoveDefaultTranscriptsMock(BaseDefaultTranscriptsMock):
     """
     Brightcove default transcripts mock class.
     """
@@ -366,8 +434,22 @@ class BrightcoveDefaultTranscriptsMock(BaseMock):
         else:
             return self.mock
 
+    @staticmethod
+    def apply_transcripts_mock(event, xblock=None):
+        """
+        Save state of default transcripts related entities before mocks are applied.
+        """
+        brightcove.BrightcoveApiClient.get = BrightcoveDefaultTranscriptsMock(
+            mock_magic=brightcove.BrightcoveApiClientError, event=event
+        ).api_client_get()
+        return {
+            'obj': brightcove.BrightcoveApiClient,
+            'attrs': ['get', ],
+            'value': [deepcopy(brightcove.BrightcoveApiClient.get), ]
+        }
 
-class WistiaDefaultTranscriptsMock(BaseMock):
+
+class WistiaDefaultTranscriptsMock(BaseDefaultTranscriptsMock):
     """
     Wistia default transcripts mock class.
     """
@@ -453,8 +535,43 @@ class WistiaDefaultTranscriptsMock(BaseMock):
             self.return_value = ResponseStub(status_code=404, body='{}')
         return lambda x: self.return_value
 
+    @staticmethod
+    def apply_transcripts_mock(event, xblock=None):
+        """
+        Save state of default transcripts related entities before mocks are applied.
+        """
+        requests.get = WistiaDefaultTranscriptsMock(
+            mock_magic=requests.exceptions.RequestException, event=event
+        ).get()
+        return {
+            'obj': requests,
+            'attrs': ['get', ],
+            'value': [deepcopy(requests.get), ]
+        }
 
-class YoutubeDownloadTranscriptMock(BaseMock):
+
+class VimeoDefaultTranscriptsMock(BaseDefaultTranscriptsMock):
+    """
+    Temporary mock for vimeo player. Need to be updated.
+    """
+
+    outcomes = [('get_transcripts', [])]
+
+    to_return = [[], '']
+
+
+class BaseDownloadTranscriptMock(BaseMock):
+    """Base download transcript mock class."""
+
+    @staticmethod
+    def apply_download_mock(event):
+        """
+        Save state of download transcript related entities before mocks are applied.
+        """
+        pass
+
+
+class YoutubeDownloadTranscriptMock(BaseDownloadTranscriptMock):
     """
     Youtube download default transcript mock class.
     """
@@ -504,8 +621,20 @@ Forse me la canto e me la suono da sola un po',
             self.return_value = ResponseStub(status_code=200, body=self._xml)
         return lambda x: self.return_value
 
+    @staticmethod
+    def apply_download_mock(event):
+        """
+        Save state of download transcript related entities before mocks are applied.
+        """
+        requests.get = YoutubeDownloadTranscriptMock(event=event).get()
+        return {
+            'obj': requests,
+            'attrs': ['get', ],
+            'value': [deepcopy(requests.get), ]
+        }
 
-class BrightcoveDownloadTranscriptMock(BaseMock):
+
+class BrightcoveDownloadTranscriptMock(BaseDownloadTranscriptMock):
     """
     Brightcove download default transcript mock class.
     """
@@ -541,8 +670,20 @@ accessed from mobile devices."""
         self.return_value = ResponseStub(status_code=200, body=self._vtt)
         return lambda x: self.return_value
 
+    @staticmethod
+    def apply_download_mock(event):
+        """
+        Save state of download transcript related entities before mocks are applied.
+        """
+        requests.get = BrightcoveDownloadTranscriptMock(event=event).get()
+        return {
+            'obj': requests,
+            'attrs': ['get', ],
+            'value': [deepcopy(requests.get), ]
+        }
 
-class WistiaDownloadTranscriptMock(BaseMock):
+
+class WistiaDownloadTranscriptMock(BaseDownloadTranscriptMock):
     """
     Brightcove download default transcript mock class.
     """
@@ -600,3 +741,26 @@ class WistiaDownloadTranscriptMock(BaseMock):
         Iter through default transcripts.
         """
         return iter(self._default_transcripts)
+
+    @staticmethod
+    @XBlock.register_temp_plugin(wistia.WistiaPlayer, 'wistia')
+    def apply_download_mock(event):
+        """
+        Save state of download transcript related entities before mocks are applied.
+        """
+        player = XBlock.load_class('wistia')
+        player.default_transcripts = WistiaDownloadTranscriptMock(event=event).get()
+        return {
+            'obj': player,
+            'attrs': ['default_transcripts', ],
+            'value': [deepcopy(player.default_transcripts), ]
+        }
+
+
+class VimeoDownloadTranscriptMock(BaseDownloadTranscriptMock):
+    """
+    Temporary vimeo download transcript mock object.
+    """
+
+    outcomes = [('success', '')]
+    to_return = ('', '')

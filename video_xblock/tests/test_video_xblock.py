@@ -24,17 +24,6 @@ class VideoXBlockTests(VideoXBlockTestBase):
     Test cases for video_xblock.
     """
 
-    def setUp(self):
-        """
-        Create a XBlock VideoXBlock for testing purpose.
-        """
-        result = super(VideoXBlockTests, self).setUp()
-        runtime = TestRuntime()  # pylint: disable=abstract-class-instantiated
-        self.xblock = VideoXBlock(runtime, DictFieldData({
-            'account_id': 'account_id',
-        }), mock.Mock())
-        return result
-
     def test_fields_xblock(self):
         """
         Test xblock fields consistency with their default values.
