@@ -198,13 +198,13 @@ class BrightcoveAuthMock(BaseMock):
         """
         Save state of auth related entities before mocks are applied.
         """
-        brightcove.BrightcoveApiClient.create_credentials = BrightcoveAuthMock(event=event).create_credentials()
-        return {
+        mocked_object = {
             'obj': brightcove.BrightcoveApiClient,
             'attrs': ['create_credentials', ],
             'value': [brightcove.BrightcoveApiClient.create_credentials, ]
         }
-
+        brightcove.BrightcoveApiClient.create_credentials = BrightcoveAuthMock(event=event).create_credentials()
+        return mocked_object
 
 class WistiaAuthMock(BaseMock):
     """
@@ -312,13 +312,14 @@ class YoutubeDefaultTranscriptsMock(BaseMock):
         Save state of default transcripts related entities before mocks are applied.
         """
         player = XBlock.load_class('youtube')
-        player.fetch_default_transcripts_languages = YoutubeDefaultTranscriptsMock(event=event) \
-            .fetch_default_transcripts_languages()
-        return {
+        mocked_object = {
             'obj': player,
             'attrs': ['fetch_default_transcripts_languages'],
             'value': [player.fetch_default_transcripts_languages, ]
         }
+        player.fetch_default_transcripts_languages = YoutubeDefaultTranscriptsMock(event=event) \
+            .fetch_default_transcripts_languages()
+        return mocked_object
 
 
 class BrightcoveDefaultTranscriptsMock(BaseMock):
@@ -427,14 +428,15 @@ class BrightcoveDefaultTranscriptsMock(BaseMock):
         """
         Save state of default transcripts related entities before mocks are applied.
         """
-        brightcove.BrightcoveApiClient.get = BrightcoveDefaultTranscriptsMock(
-            mock_magic=brightcove.BrightcoveApiClientError, event=event
-        ).api_client_get()
-        return {
+        mocked_object = {
             'obj': brightcove.BrightcoveApiClient,
             'attrs': ['get', ],
             'value': [deepcopy(brightcove.BrightcoveApiClient.get), ]
         }
+        brightcove.BrightcoveApiClient.get = BrightcoveDefaultTranscriptsMock(
+            mock_magic=brightcove.BrightcoveApiClientError, event=event
+        ).api_client_get()
+        return mocked_object
 
 
 class WistiaDefaultTranscriptsMock(BaseMock):
@@ -540,10 +542,12 @@ class WistiaDefaultTranscriptsMock(BaseMock):
         """
         Save state of default transcripts related entities before mocks are applied.
         """
+        mocked_object = BaseMock.base_apply_mock_data()
         requests.get = WistiaDefaultTranscriptsMock(
             mock_magic=requests.exceptions.RequestException, event=event
         ).get()
-        return BaseMock.base_apply_mock_data()
+        return mocked_object
+
 
 
 class VimeoDefaultTranscriptsMock(BaseMock):
@@ -624,8 +628,9 @@ Forse me la canto e me la suono da sola un po',
         """
         Save state of download transcript related entities before mocks are applied.
         """
+        mocked_object = super(YoutubeDownloadTranscriptMock, YoutubeDownloadTranscriptMock).apply_mock(event)
         requests.get = YoutubeDownloadTranscriptMock(event=event).get()
-        return super(YoutubeDownloadTranscriptMock, YoutubeDownloadTranscriptMock).apply_mock(event)
+        return mocked_object
 
 
 class BrightcoveDownloadTranscriptMock(BaseDownloadTranscriptMock):
@@ -669,8 +674,9 @@ accessed from mobile devices."""
         """
         Save state of download transcript related entities before mocks are applied.
         """
+        mocked_object = super(BrightcoveDownloadTranscriptMock, BrightcoveDownloadTranscriptMock).apply_mock(event)
         requests.get = BrightcoveDownloadTranscriptMock(event=event).get()
-        return super(BrightcoveDownloadTranscriptMock, BrightcoveDownloadTranscriptMock).apply_mock(event)
+        return mocked_object
 
 
 class WistiaDownloadTranscriptMock(BaseMock):
@@ -739,12 +745,13 @@ class WistiaDownloadTranscriptMock(BaseMock):
         Save state of download transcript related entities before mocks are applied.
         """
         player = XBlock.load_class('wistia')
-        player.default_transcripts = WistiaDownloadTranscriptMock(event=event).get()
-        return {
+        mocked_object = {
             'obj': player,
             'attrs': ['default_transcripts', ],
             'value': [deepcopy(player.default_transcripts), ]
         }
+        player.default_transcripts = WistiaDownloadTranscriptMock(event=event).get()
+        return mocked_object
 
 
 class VimeoDownloadTranscriptMock(BaseMock):
