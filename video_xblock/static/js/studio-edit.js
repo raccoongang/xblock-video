@@ -14,7 +14,7 @@ function StudioEditableXBlock(runtime, element) {
     var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
     var $defaultTranscriptsSwitcher = $('input.default-transcripts-switch-input');
     var $enabledLabel = $('div.custom-field-section-label.enabled-transcripts');
-    var $availableLabel= $('div.custom-field-section-label.available-transcripts');
+    var $availableLabel = $('div.custom-field-section-label.available-transcripts');
     var noEnabledTranscript;
     var noAvailableTranscript;
 
