@@ -307,6 +307,13 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
         'download_transcript_allowed', 'default_transcripts'
     )
 
+    @property
+    def editable_fields(self):
+        """
+        Return list of xblock's editable fields used by StudioEditableXBlockMixin.clean_studio_edits().
+        """
+        return self.get_player().editable_fields
+
     @staticmethod
     def get_brightcove_js_url(account_id, player_id):
         """

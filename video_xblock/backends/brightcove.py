@@ -330,6 +330,11 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
 
     @property
     def basic_fields(self):
+        """
+        Tuple of VideoXBlock fields to display in Basic tab of edit modal window.
+
+        Brightcove videos require Brightcove Account id.
+        """
         return super(BrightcovePlayer, self).basic_fields + ('account_id',)
 
     advanced_fields = (
