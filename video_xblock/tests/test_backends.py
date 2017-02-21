@@ -172,26 +172,6 @@ class TestCustomBackends(VideoXBlockTestBase):
 
     @data(*zip(
         backends,
-        [  # expected results per backend
-            ('player_name',),
-            ['account_id', 'player_id', 'token', 'player_name'],
-            ('token', 'player_name'),
-            ('player_name',)
-        ]
-    ))
-    @unpack
-    def test_customize_xblock_fields_display(self, backend, expected_result):
-        """
-        Check backend allows to edit only permitted fields.
-        """
-        editable_fields = ['account_id', 'player_id', 'token', 'player_name']
-        player = self.player[backend]
-        res = player.customize_xblock_fields_display(editable_fields)
-        self.assertIsInstance(res, tuple)
-        self.assertEqual(res[-1], expected_result)
-
-    @data(*zip(
-        backends,
         ['some_token'] * len(backends),  # tokens
         auth_mocks,
     ))
