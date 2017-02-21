@@ -92,7 +92,7 @@ class PlaybackStateMixin(XBlock):
     """
     PlaybackStateMixin encapsulates video-playback related data.
 
-    These data are not visible to end-user.
+    These fields are not visible to end-user.
     """
 
     current_time = Float(

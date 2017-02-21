@@ -42,10 +42,6 @@ class YoutubePlayer(BaseVideoPlayer):
         }
     }
 
-    fields_help = {
-        'token': 'This field is to be disabled.'
-    }
-
     # Stores default transcripts fetched from the Youtube captions API
     default_transcripts = []
 
