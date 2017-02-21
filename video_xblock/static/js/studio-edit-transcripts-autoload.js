@@ -145,7 +145,7 @@ function createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscr
  * Display a transcript in a list of enabled transcripts. Listeners on removal are bound in studio editor js.
  *
  * Arguments:
- * defaultTranscript (Array): Array containing transcript data.
+ * defaultTranscript (Array): Array containing transcript data (languages, urls).
  * downloadUrlServer (String): External url to download a resource from a server.
  *
  */
