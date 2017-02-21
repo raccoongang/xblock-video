@@ -206,6 +206,7 @@ class BrightcoveAuthMock(BaseMock):
         brightcove.BrightcoveApiClient.create_credentials = BrightcoveAuthMock(event=event).create_credentials()
         return mocked_object
 
+
 class WistiaAuthMock(BaseMock):
     """
     Wistia auth mock class.
@@ -547,7 +548,6 @@ class WistiaDefaultTranscriptsMock(BaseMock):
             mock_magic=requests.exceptions.RequestException, event=event
         ).get()
         return mocked_object
-
 
 
 class VimeoDefaultTranscriptsMock(BaseMock):
