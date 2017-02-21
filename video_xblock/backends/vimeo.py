@@ -62,14 +62,13 @@ class VimeoPlayer(BaseVideoPlayer):
         frag.add_content(
             self.render_resource('static/html/vimeo.html', **context)
         )
-
-        frag.add_javascript(self.resource_string(
-            'static/bower_components/videojs-vimeo/src/Vimeo.js'
-        ))
-
-        frag.add_javascript(self.resource_string(
+        js_files = [
+            'static/bower_components/videojs-vimeo/src/Vimeo.js',
             'static/bower_components/videojs-offset/dist/videojs-offset.min.js'
-        ))
+        ]
+
+        for js_file in js_files:
+            frag.add_javascript(self.resource_string(js_file))
 
         return frag
 
@@ -90,16 +89,3 @@ class VimeoPlayer(BaseVideoPlayer):
         Download default transcript in WebVVT format.
         """
         return u''
-
-    @staticmethod
-    def customize_xblock_fields_display(editable_fields):
-        """
-        Customise display of studio editor fields per a video platform.
-        """
-        message = 'This field is to be disabled.'
-        editable_fields = list(editable_fields)
-        editable_fields.remove('account_id')
-        editable_fields.remove('player_id')
-        editable_fields.remove('token')
-        customised_editable_fields = tuple(editable_fields)
-        return message, customised_editable_fields

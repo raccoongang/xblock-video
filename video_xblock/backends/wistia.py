@@ -24,6 +24,12 @@ class WistiaPlayer(BaseVideoPlayer):
     url_re = re.compile(
         r'https?:\/\/(.+)?(wistia.com|wi.st)\/(medias|embed)\/(?P<media_id>.*)'
     )
+
+    advanced_fields = (
+        'start_time', 'end_time', 'handout', 'transcripts',
+        'download_transcript_allowed', 'token', 'default_transcripts'
+    )
+
     # Token field is stored in metadata only if authentication was successful
     metadata_fields = ['token', ]
 
@@ -47,6 +53,12 @@ class WistiaPlayer(BaseVideoPlayer):
 
     # Stores default transcripts fetched from the captions API
     default_transcripts = []
+
+    fields_help = {
+        'token': 'You can get a master token following the guide of '
+                 '<a href="https://wistia.com/doc/data-api" target="_blank">Wistia</a>. '
+                 'Please ensure appropriate operations scope has been set on the video platform.'
+    }
 
     def media_id(self, href):
         """
@@ -90,31 +102,21 @@ class WistiaPlayer(BaseVideoPlayer):
         frag.add_content(
             self.render_resource('static/html/wistiavideo.html', **context)
         )
-        frag.add_javascript(self.resource_string(
-            'static/bower_components/videojs-wistia/src/wistia.js'
-        ))
 
-        frag.add_javascript(self.resource_string(
-            'static/bower_components/videojs-offset/dist/videojs-offset.min.js'
-        ))
+        frag.add_javascript(
+            self.render_resource('static/js/context.js', **context)
+        )
 
-        frag.add_javascript(self.render_resource('static/js/player-context-menu.js', **context))
+        js_files = [
+            'static/bower_components/videojs-wistia/src/wistia.js',
+            'static/bower_components/videojs-offset/dist/videojs-offset.min.js',
+            'static/js/player-context-menu.js'
+        ]
+
+        for js_file in js_files:
+            frag.add_javascript(self.resource_string(js_file))
 
         return frag
-
-    @staticmethod
-    def customize_xblock_fields_display(editable_fields):
-        """
-        Customize display of studio editor fields per a video platform.
-        """
-        message = 'You can get a master token following the guide of ' \
-                  '<a href="https://wistia.com/doc/data-api" target="_blank">Wistia</a>. ' \
-                  'Please ensure appropriate operations scope has been set on the video platform.'
-        editable_fields = list(editable_fields)
-        editable_fields.remove('account_id')
-        editable_fields.remove('player_id')
-        customised_editable_fields = tuple(editable_fields)
-        return message, customised_editable_fields
 
     def authenticate_api(self, **kwargs):
         """

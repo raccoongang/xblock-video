@@ -35,7 +35,9 @@ class BrightcoveApiClient(BaseApiClient):
     """
 
     def __init__(self, api_key, api_secret, token=None, account_id=None):
-        """Initialize Brightcove API client."""
+        """
+        Initialize Brightcove API client.
+        """
         if token and account_id:
             self.create_credentials(token, account_id)
         else:
@@ -326,6 +328,27 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
     # Stores default transcripts fetched from the captions API
     default_transcripts = []
 
+    @property
+    def basic_fields(self):
+        """
+        Tuple of VideoXBlock fields to display in Basic tab of edit modal window.
+
+        Brightcove videos require Brightcove Account id.
+        """
+        return super(BrightcovePlayer, self).basic_fields + ('account_id',)
+
+    advanced_fields = (
+        'player_id', 'start_time', 'end_time', 'handout', 'transcripts',
+        'download_transcript_allowed', 'token', 'default_transcripts'
+    )
+
+    fields_help = {
+        'token': 'You can generate a BC token following the guide of '
+                 '<a href="https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html" '
+                 'target="_blank">Brightcove</a>. Please ensure appropriate operations scope has been set '
+                 'on the video platform, and a BC token is valid.'
+    }
+
     def __init__(self, xblock):
         """
         Initialize Brightcove player class object.
@@ -356,34 +379,28 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         frag.add_css_url(
             'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'
         )
-        frag.add_content(
-            self.add_js_content('static/js/player_state.js', **context)
+        frag.add_javascript(
+            self.render_resource('static/js/context.js', **context)
         )
-        frag.add_content(
-            self.add_js_content('static/js/toggle-button.js')
-        )
+        js_files = [
+            'static/js/toggle-button.js'
+        ]
         if json.loads(context['player_state'])['transcripts']:
-            frag.add_content(
-                self.add_js_content('static/bower_components/videojs-transcript/dist/videojs-transcript.js')
-            )
-            frag.add_content(
-                self.add_js_content('static/js/videojs-transcript.js', **context)
-            )
-        frag.add_content(
-            self.add_js_content('static/js/videojs-tabindex.js', **context)
-        )
-        frag.add_content(
-            self.add_js_content('static/js/videojs_event_plugin.js', **context)
-        )
-        frag.add_content(
-            self.add_js_content('static/bower_components/videojs-offset/dist/videojs-offset.js')
-        )
-        frag.add_content(
-            self.add_js_content('static/js/videojs-speed-handler.js', **context)
-        )
-        frag.add_content(
-            self.add_js_content('static/js/brightcove-videojs-init.js', **context)
-        )
+            js_files += [
+                'static/bower_components/videojs-transcript/dist/videojs-transcript.js',
+                'static/js/videojs-transcript.js'
+            ]
+        js_files += [
+            'static/js/videojs-tabindex.js',
+            'static/js/videojs_event_plugin.js',
+            'static/bower_components/videojs-offset/dist/videojs-offset.js',
+            'static/js/videojs-speed-handler.js',
+            'static/js/brightcove-videojs-init.js'
+        ]
+
+        for js_file in js_files:
+            frag.add_javascript(self.resource_string(js_file))
+
         frag.add_css(
             self.resource_string('static/css/brightcove.css')
         )
@@ -441,17 +458,6 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             self.xblock.metadata.get('client_secret')
         )
         return {'canShow': can_show}
-
-    @staticmethod
-    def customize_xblock_fields_display(editable_fields):
-        """
-        Customise display of Brightcove's studio editor fields.
-        """
-        message = 'You can generate a BC token following the guide of ' \
-                  '<a href="https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html" ' \
-                  'target="_blank">Brightcove</a>. Please ensure appropriate operations scope has been set ' \
-                  'on the video platform, and a BC token is valid.'
-        return message, editable_fields
 
     def authenticate_api(self, **kwargs):
         """
