@@ -581,12 +581,30 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             return field.help
         return ''
 
+    def initialize_studio_field_info(self, field_name, field, field_type=None):
+        """
+        Initialize studio editor's field info.
+
+        Arguments:
+            field_name (str): Name of a video XBlock field whose info is to be made.
+            field (xblock.fields): Video XBlock field object.
+            field_type (str): Type of field.
+        Returns:
+            info (dict): Information on a field.
+        """
+        info = super(VideoXBlock, self)._make_field_info(field_name, field)
+        info['help'] = self._get_field_help(field_name, field)
+        if field_type:
+            info['type'] = field_type
+        return info
+
     def _make_field_info(self, field_name, field):
         """
         Override and extend data of built-in method.
 
+        Create the information that the template needs to render a form field for this field.
         Reference:
-            https://github.com/edx/xblock-utils/blob/79dbdcc8bbcb4d73ed9f9f578b2c9cd533e6550c/xblockutils/studio_editable.py#L96
+            https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/studio_editable.py#L96
 
         Arguments:
             field_name (str): Name of a video XBlock field whose info is to be made.
@@ -608,19 +626,18 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 'has_list_values': False,
                 'type': 'string',
             }
+        elif field_name == 'handout':
+            info = self.initialize_studio_field_info(field_name, field, field_type='file_uploader')
+            info['file_name'] = self.get_file_name_from_path(self.handout)
+            info['value'] = self.get_path_for(self.handout)
+        elif field_name == 'transcripts':
+            info = self.initialize_studio_field_info(field_name, field, field_type='transcript_uploader')
+        elif field_name == 'default_transcripts':
+            info = self.initialize_studio_field_info(field_name, field, field_type='default_transcript_uploader')
+        elif field_name == 'token':
+            info = self.initialize_studio_field_info(field_name, field, field_type='token_authorization')
         else:
-            info = super(VideoXBlock, self)._make_field_info(field_name, field)
-            info['help'] = self._get_field_help(field_name, field)
-            if field_name == 'handout':
-                info['type'] = 'file_uploader'
-                info['file_name'] = self.get_file_name_from_path(self.handout)
-                info['value'] = self.get_path_for(self.handout)
-            elif field_name == 'transcripts':
-                info['type'] = 'transcript_uploader'
-            elif field_name == 'default_transcripts':
-                info['type'] = 'default_transcript_uploader'
-            elif field_name == 'token':
-                info['type'] = 'token_authorization'
+            info = self.initialize_studio_field_info(field_name, field)
         return info
 
     def order_studio_editor_fields(self, fields):
