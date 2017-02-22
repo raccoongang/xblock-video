@@ -238,10 +238,6 @@
     color: #999;
 }
 
-.tab:focus {
-    outline: 0;
-}
-
 .tab:hover {
     background-color: #009fe6;
     color: #000;
