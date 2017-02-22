@@ -356,7 +356,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         if str(self.player_name) == 'brightcove-player' and not data.account_id:
             validation.add(ValidationMessage(
                 ValidationMessage.ERROR,
-                _(u"Account Id can not be empty. Please provide your Brightcove Account Id.")
+                _(u"Account Id can not be empty. Please provide a Brightcove Account Id.")
             ))
 
         if data.href == '':
