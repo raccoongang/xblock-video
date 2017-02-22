@@ -37,6 +37,16 @@
             {% elif field.type == 'file_uploader' %}
                 {% include "fields/file-uploader.html" with field=field %}
 
+            {% elif name == 'advanced' %}
+                {% if field.type == 'transcript_uploader' %}
+                    {% include 'studio-edit-transcripts.html' %}
+                {% elif field.type == 'default_transcript_uploader' %}
+                    {% include 'studio-edit-default-transcripts.html' %}
+                {% elif field.type == 'token_authorization' %}
+                    {% include 'studio-edit-token.html' %}
+                {% endif %}
+            <!-- TODO include -->
+            <!--{% include 'studio-edit-brightcove-encryption.html' %}-->
             {% endif %}
 
             {% if field.allow_reset %}
@@ -47,18 +57,6 @@
         </div>
         {% if field.help %}
             <span class="tip setting-help"> {{ field.help|safe }} </span>
-        {% endif %}
-
-        {% if name == 'advanced' %}
-            {% if field.type == 'transcript_uploader' %}
-                {% include 'studio-edit-transcripts.html' %}
-            {% elif field.type == 'default_transcript_uploader' %}
-                {% include 'studio-edit-default-transcripts.html' %}
-            {% elif field.type == 'token_authorization' %}
-                {% include 'studio-edit-token.html' %}
-            {% endif %}
-            <!-- TODO include -->
-            <!--{% include 'studio-edit-brightcove-encryption.html' %}-->
         {% endif %}
     </li>
 {% endfor %}
