@@ -13,6 +13,9 @@ class RelativeTimeTest(unittest.TestCase):
     delta = RelativeTime()
 
     def test_from_json(self):
+        """
+        Check convertation of data returned from json.
+        """
         self.assertEqual(
             RelativeTimeTest.delta.from_json('0:05:07'),
             datetime.timedelta(seconds=307)
@@ -34,6 +37,9 @@ class RelativeTimeTest(unittest.TestCase):
             RelativeTimeTest.delta.from_json("77:77:77")
 
     def test_enforce_type(self):
+        """
+        Check type validation.
+        """
         self.assertEqual(RelativeTimeTest.delta.enforce_type(None), None)
         self.assertEqual(
             RelativeTimeTest.delta.enforce_type(datetime.timedelta(days=1, seconds=46799)),
@@ -47,6 +53,9 @@ class RelativeTimeTest(unittest.TestCase):
             RelativeTimeTest.delta.enforce_type([1])
 
     def test_to_json(self):
+        """
+        Check convertation of data to json.
+        """
         self.assertEqual(
             "01:02:03",
             RelativeTimeTest.delta.to_json(datetime.timedelta(seconds=3723))
@@ -68,6 +77,9 @@ class RelativeTimeTest(unittest.TestCase):
             RelativeTimeTest.delta.to_json("123")
 
     def test_str(self):
+        """
+        Check data convertation to string.
+        """
         self.assertEqual(
             "01:02:03",
             RelativeTimeTest.delta.to_json(datetime.timedelta(seconds=3723))

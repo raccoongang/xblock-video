@@ -50,7 +50,7 @@ class VideoXBlockTestBase(unittest.TestCase):
 
     def tearDown(self):
         """
-        Restore mocket objects to default stay.
+        Restore mocked objects to default stay.
         """
         self.restore_mocked()
         super(VideoXBlockTestBase, self).tearDown()
