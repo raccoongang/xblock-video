@@ -1,5 +1,5 @@
 /**
-    Set up the Video xblock studio editor. Responsible for validating and sending data to backend.
+    Set up the Video xblock studio editor. This part is responsible for validating and sending data to a backend.
     Reference:
         https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/templates/studio_edit.html
 */
@@ -11,21 +11,23 @@ function StudioEditableXBlock(runtime, element) {
     var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');  // TODO: Remove TinyMCE
     var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
     var $modalHeaderTabs = $('.editor-modes.action-list.action-modes');
-    var $currentTab;
+    var currentTab;
 
-    // Create advanced and basic tabs toggle buttons
+    // Create advanced and basic tabs
     (function() {
-        $modalHeaderTabs.append('<li class="inner_tab_wrap"><button class="tab current" data-tab-name="Basic">Basic</button></li>');
-        $modalHeaderTabs.append('<li class="inner_tab_wrap"><button class="tab" data-tab-name="Advanced">Advanced</button></li>');
-        // Bind listener to toggle studio editor tab
+        $modalHeaderTabs
+            .append(
+                '<li class="inner_tab_wrap"><button class="tab current" data-tab-name="Basic">Basic</button></li>',
+                '<li class="inner_tab_wrap"><button class="tab" data-tab-name="Advanced">Advanced</button></li>');
+        // Bind listeners to the buttons
         $('.tab').click(function(event) {
-            $currentTab = $(event.currentTarget).attr('data-tab-name');
-            if ($currentTab === 'Basic') {
+            currentTab = $(event.currentTarget).attr('data-tab-name');
+            if (currentTab === 'Basic') {
                 $(event.currentTarget).addClass('current');
                 $('.tab[data-tab-name="Advanced"]').removeClass('current');
                 $(".list-input.settings-list.advanced").addClass('is-hidden');
                 $(".list-input.settings-list.basic").removeClass('is-hidden');
-            } else if ($currentTab === 'Advanced') {
+            } else if (currentTab === 'Advanced') {
                 $(event.currentTarget).addClass('current');
                 $('.tab[data-tab-name="Basic"]').removeClass('current');
                 $(".list-input.settings-list.basic").addClass('is-hidden');
