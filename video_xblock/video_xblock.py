@@ -596,6 +596,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         info['help'] = self._get_field_help(field_name, field)
         if field_type:
             info['type'] = field_type
+        if field_name == 'handout':
+            info['file_name'] = self.get_file_name_from_path(self.handout)
+            info['value'] = self.get_path_for(self.handout)
         return info
 
     def _make_field_info(self, field_name, field):
@@ -626,16 +629,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 'has_list_values': False,
                 'type': 'string',
             }
-        elif field_name == 'handout':
-            info = self.initialize_studio_field_info(field_name, field, field_type='file_uploader')
-            info['file_name'] = self.get_file_name_from_path(self.handout)
-            info['value'] = self.get_path_for(self.handout)
-        elif field_name == 'transcripts':
-            info = self.initialize_studio_field_info(field_name, field, field_type='transcript_uploader')
-        elif field_name == 'default_transcripts':
-            info = self.initialize_studio_field_info(field_name, field, field_type='default_transcript_uploader')
-        elif field_name == 'token':
-            info = self.initialize_studio_field_info(field_name, field, field_type='token_authorization')
+        elif field_name in ('handout', 'transcripts', 'default_transcripts', 'token'):
+            info = self.initialize_studio_field_info(field_name, field, field_type=field_name)
         else:
             info = self.initialize_studio_field_info(field_name, field)
         return info

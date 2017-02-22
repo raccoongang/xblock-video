@@ -8,7 +8,7 @@
       data-default="{% if field.type == 'boolean' %}{{ field.default|yesno:'1,0' }}{% else %}{{ field.default|default_if_none:"" }}{% endif %}"
       data-cast="{{field.type}}"
     >
-        <div class='wrapper-comp-setting {% if field.type == "set" %}metadata-list-enum{% endif %} {% if field.type == "file_uploader" %}file-uploader{% endif %}{% if field.type == "transcript_uploader" %}metadata-video-translations{% endif %}'>
+        <div class='wrapper-comp-setting {% if field.type == "set" %}metadata-list-enum{% endif %} {% if field.type == "handout" %}file-uploader{% endif %}{% if field.type == "transcripts" %}metadata-video-translations{% endif %}'>
             <label class="label setting-label" for="xb-field-edit-{{field.name}}">{{field.display_name}}</label>
 
             {% if field.type == "boolean" %}
@@ -35,15 +35,15 @@
             {% elif field.type == 'generic' or field.type == 'list' or field.type == 'set' %}
                 <span>generic</span>
 
-            {% elif field.type == 'file_uploader' %}
+            {% elif field.type == 'handout' %}
                 {% include "fields/file-uploader.html" with field=field %}
 
             {% elif name == 'advanced' %}
-                {% if field.type == 'transcript_uploader' %}
+                {% if field.type == 'transcripts' %}
                     {% include 'studio-edit-transcripts.html' %}
-                {% elif field.type == 'default_transcript_uploader' %}
+                {% elif field.type == 'default_transcripts' %}
                     {% include 'studio-edit-default-transcripts.html' %}
-                {% elif field.type == 'token_authorization' %}
+                {% elif field.type == 'token' %}
                     {% include 'studio-edit-token.html' %}
                 {% endif %}
             <!-- TODO include 'studio-edit-brightcove-encryption.html' -->
