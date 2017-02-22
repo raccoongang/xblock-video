@@ -25,16 +25,16 @@ function StudioEditableXBlock(runtime, element) {
             if (currentTab === 'Basic') {
                 $(event.currentTarget).addClass('current');
                 $('.tab[data-tab-name="Advanced"]').removeClass('current');
-                $(".list-input.settings-list.advanced").addClass('is-hidden');
-                $(".list-input.settings-list.basic").removeClass('is-hidden');
+                $('.list-input.settings-list.advanced').addClass('is-hidden');
+                $('.list-input.settings-list.basic').removeClass('is-hidden');
             } else if (currentTab === 'Advanced') {
                 $(event.currentTarget).addClass('current');
                 $('.tab[data-tab-name="Basic"]').removeClass('current');
-                $(".list-input.settings-list.basic").addClass('is-hidden');
-                $(".list-input.settings-list.advanced").removeClass('is-hidden');
+                $('.list-input.settings-list.basic').addClass('is-hidden');
+                $('.list-input.settings-list.advanced').removeClass('is-hidden');
             }
         });
-    })();
+    }());
 
     /** Wrapper function for dispatched ajax calls.
      */
