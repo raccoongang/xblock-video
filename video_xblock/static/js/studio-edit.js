@@ -10,31 +10,6 @@ function StudioEditableXBlock(runtime, element) {
     // Studio includes a copy of tinyMCE and its jQuery plugin
     var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');  // TODO: Remove TinyMCE
     var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
-    var $modalHeaderTabs = $('.editor-modes.action-list.action-modes');
-    var currentTab;
-
-    // Create advanced and basic tabs
-    (function() {
-        $modalHeaderTabs
-            .append(
-                '<li class="inner_tab_wrap"><button class="tab" data-tab-name="Advanced">Advanced</button></li>',
-                '<li class="inner_tab_wrap"><button class="tab current" data-tab-name="Basic">Basic</button></li>');
-        // Bind listeners to the buttons
-        $('.tab').click(function(event) {
-            currentTab = $(event.currentTarget).attr('data-tab-name');
-            if (currentTab === 'Basic') {
-                $(event.currentTarget).addClass('current');
-                $('.tab[data-tab-name="Advanced"]').removeClass('current');
-                $('.list-input.settings-list.advanced').addClass('is-hidden');
-                $('.list-input.settings-list.basic').removeClass('is-hidden');
-            } else if (currentTab === 'Advanced') {
-                $(event.currentTarget).addClass('current');
-                $('.tab[data-tab-name="Basic"]').removeClass('current');
-                $('.list-input.settings-list.basic').addClass('is-hidden');
-                $('.list-input.settings-list.advanced').removeClass('is-hidden');
-            }
-        });
-    }());
 
     /** Wrapper function for dispatched ajax calls.
      */

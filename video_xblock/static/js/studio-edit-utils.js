@@ -2,6 +2,15 @@
  * Auxiliary functions for studio editor modal's JS.
  */
 
+/** Run a callback when DOM is fully loaded */
+var domReady = function(callback) {
+    if (document.readyState === "interactive" || document.readyState === "complete") {
+        callback();
+    } else {
+        document.addEventListener("DOMContentLoaded", callback);
+    }
+};
+
 /**
  * Prepare data to be saved to video xblock.
  */

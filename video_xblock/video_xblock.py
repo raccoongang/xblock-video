@@ -403,8 +403,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         languages.sort(key=lambda l: l['label'])
         transcripts = json.loads(self.transcripts) if self.transcripts else []
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
-        basic_fields_ordered = collections.OrderedDict()
-        advanced_fields_ordered = collections.OrderedDict()
 
         # Authenticate to API of the player video platform and update metadata with auth information.
         # Note that there is no need to authenticate to Youtube API,
@@ -431,12 +429,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         if self.default_transcripts:
             self.default_transcripts.sort(key=lambda l: l['label'])
         # Order basic_fields and advanced_fields
-        for key in player.basic_fields:
-            basic_fields_ordered[key] = \
-                self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
-        for key in player.advanced_fields:
-            advanced_fields_ordered[key] = \
-                self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
+        basic_fields_ordered = self.order_studio_editor_fields(player.basic_fields)
+        advanced_fields_ordered = self.order_studio_editor_fields(player.advanced_fields)
 
         context = {
             'fields': [],
@@ -472,6 +466,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         fragment.add_javascript(resource_string("static/js/studio-edit-utils.js"))
         fragment.add_javascript(resource_string("static/js/studio-edit-transcripts-autoload.js"))
         fragment.add_javascript(resource_string("static/js/studio-edit-transcripts-manual-upload.js"))
+        fragment.add_javascript(resource_string("static/js/studio-edit-tabs.js"))
         fragment.initialize_js('StudioEditableXBlock')
         return fragment
 
@@ -628,6 +623,21 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             elif field_name == 'token':
                 info['type'] = 'token_authorization'
         return info
+
+    def order_studio_editor_fields(self, fields):
+        """
+        Order xblock fields in studio editor modal.
+
+        Arguments:
+            fields (tuple): Names of Xblock fields.
+        Returns:
+            fields_ordered (collections.OrderedDict): Ordered xblock fields.
+        """
+        fields_ordered = collections.OrderedDict()
+        for key in fields:
+            fields_ordered[key] = \
+                self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
+        return fields_ordered
 
     def get_file_name_from_path(self, field):
         """
