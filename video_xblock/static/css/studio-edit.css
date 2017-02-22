@@ -220,3 +220,25 @@
     background-color: #fff;
     font-weight: 400;
 }
+
+.tab {
+    display: inline-block;
+    text-transform: uppercase;
+    border: 1px solid #009fe6;
+
+    border-radius: 5px;
+    padding: 6px 0;
+    text-align: center;
+    margin-right: 2%;
+    font-weight: 600;
+    font-size: 1.2rem;
+    position: relative;
+}
+
+.tab:hover {
+    background-color: #009fe6;
+}
+.tab.current {
+    background-color: #666;
+}
+
