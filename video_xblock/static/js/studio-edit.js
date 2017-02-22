@@ -17,8 +17,8 @@ function StudioEditableXBlock(runtime, element) {
     (function() {
         $modalHeaderTabs
             .append(
-                '<li class="inner_tab_wrap"><button class="tab current" data-tab-name="Basic">Basic</button></li>',
-                '<li class="inner_tab_wrap"><button class="tab" data-tab-name="Advanced">Advanced</button></li>');
+                '<li class="inner_tab_wrap"><button class="tab" data-tab-name="Advanced">Advanced</button></li>',
+                '<li class="inner_tab_wrap"><button class="tab current" data-tab-name="Basic">Basic</button></li>');
         // Bind listeners to the buttons
         $('.tab').click(function(event) {
             currentTab = $(event.currentTarget).attr('data-tab-name');

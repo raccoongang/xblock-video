@@ -221,24 +221,33 @@
     font-weight: 400;
 }
 
-.tab {
-    display: inline-block;
-    text-transform: uppercase;
-    border: 1px solid #009fe6;
+.editor-modes.action-list.action-modes {
+    vertical-align: middle;
+}
 
+.tab {
+    float: right;
+    text-transform: uppercase;
+    border: 0;
     border-radius: 5px;
-    padding: 6px 0;
-    text-align: center;
+    padding: 5px 10px;
     margin-right: 2%;
     font-weight: 600;
     font-size: 1.2rem;
-    position: relative;
+    background-color: transparent;
+    color: #999;
+}
+
+.tab:focus {
+    outline: 0;
 }
 
 .tab:hover {
     background-color: #009fe6;
+    color: #000;
 }
 .tab.current {
-    background-color: #666;
+    background-color: #4c4c4c;
+    color: #fff;
 }
 
