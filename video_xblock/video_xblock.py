@@ -344,37 +344,18 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             message_text
         ))
 
-    def validate_field_data(self, validation, data):
+    def validate_account_id_data(self, validation, data):
         """
-        Validate data submitted via xblock edit pop-up.
-
-        Reference:
-            https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/studio_editable.py#L245
+        Validate account id value which is mandatory.
 
         Attributes:
             validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
             data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
         """
-        is_brightcove = str(self.player_name) == 'brightcove-player'
         is_provided_account_id = \
             data.account_id != self.fields['account_id'].default  # pylint: disable=unsubscriptable-object
-        is_not_provided_href = \
-            data.href == self.fields['href'].default  # pylint: disable=unsubscriptable-object
-        is_matched_href = len([
-            True for _player_name, player_class in BaseVideoPlayer.load_classes()
-            if player_class.match(data.href)
-        ]) > 0
-
-        # Account Id field is mandatory
-        if is_brightcove and not is_provided_account_id:
-            self.add_validation_message(
-                validation,
-                _(u"Account Id can not be empty. "
-                  u"Please provide a valid Brightcove Account Id.")
-            )
-
         # Validate provided account id
-        elif is_provided_account_id:
+        if is_provided_account_id:
             try:
                 response = requests.head(
                     VideoXBlock.get_brightcove_js_url(
@@ -392,13 +373,52 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                     _(u"Can't validate submitted account id at the moment. "
                       u"Please try to save settings one more time.")
                 )
+        # Account Id field is mandatory
+        else:
+            self.add_validation_message(
+                validation,
+                _(u"Account Id can not be empty. "
+                  u"Please provide a valid Brightcove Account Id.")
+            )
 
+    def validate_href_data(self, validation, data):
+        """
+        Validate href value.
+
+        Attributes:
+            validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
+            data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
+        """
+        is_not_provided_href = \
+            data.href == self.fields['href'].default  # pylint: disable=unsubscriptable-object
+        is_matched_href = False
+        for _player_name, player_class in BaseVideoPlayer.load_classes():
+            if player_class.match(data.href):
+                is_matched_href = True
         # Validate provided video href value
         if not (is_not_provided_href or is_matched_href):
             self.add_validation_message(
                 validation,
                 _(u"Incorrect or unsupported video URL, please recheck.")
             )
+
+    def validate_field_data(self, validation, data):
+        """
+        Validate data submitted via xblock edit pop-up.
+
+        Reference:
+            https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/studio_editable.py#L245
+
+        Attributes:
+            validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
+            data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
+        """
+        is_brightcove = str(self.player_name) == 'brightcove-player'
+
+        if is_brightcove:
+            self.validate_account_id_data(validation, data)
+
+        self.validate_href_data(validation, data)
 
     def student_view(self, context=None):  # pylint: disable=unused-argument
         """
