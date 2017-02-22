@@ -25,6 +25,7 @@ from pycaption import detect_format, WebVTTWriter
 from webob import Response
 
 from .backends.base import BaseVideoPlayer
+from .constants import status
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
 from .utils import render_template, render_resource, resource_string, ugettext as _
@@ -329,6 +330,20 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         """
         return self.get_player().editable_fields
 
+    @staticmethod
+    def add_validation_message(validation, message_text):
+        """
+        Add error message on xblock fields validation.
+
+        Attributes:
+            validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
+            message_text (unicode): Message text per se.
+        """
+        validation.add(ValidationMessage(
+            ValidationMessage.ERROR,
+            message_text
+        ))
+
     def validate_field_data(self, validation, data):
         """
         Validate data submitted via xblock edit pop-up.
@@ -340,35 +355,48 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
             data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
         """
-        if data.account_id and data.player_id:
+        is_brightcove = str(self.player_name) == 'brightcove-player'
+        is_provided_account_id = data.account_id != self.fields['account_id'].default
+        is_not_provided_href = data.href == self.fields['href'].default
+        is_matched_href = len([
+            True for _player_name, player_class in BaseVideoPlayer.load_classes()
+            if player_class.match(data.href)
+        ]) > 0
+
+        # Account Id field is mandatory
+        if is_brightcove and not is_provided_account_id:
+            self.add_validation_message(
+                validation,
+                _(u"Account Id can not be empty. "
+                  u"Please provide a valid Brightcove Account Id.")
+            )
+
+        # Validate provided account id
+        if is_provided_account_id:
             try:
-                response = requests.head(VideoXBlock.get_brightcove_js_url(data.account_id, data.player_id))
-                if response.status_code != 200:
-                    validation.add(ValidationMessage(
-                        ValidationMessage.ERROR,
-                        _(u"Invalid Player Id, please recheck")
-                    ))
+                response = requests.head(
+                    VideoXBlock.get_brightcove_js_url(
+                        data.account_id,
+                        data.player_id)
+                )
+                if response.status_code != status.HTTP_200_OK:
+                    self.add_validation_message(
+                        validation,
+                        _(u"Invalid Account Id, please recheck.")
+                    )
             except requests.ConnectionError:
-                validation.add(ValidationMessage(
-                    ValidationMessage.ERROR,
-                    _(u"Can't validate submitted player id at the moment. Please try to save settings one more time.")
-                ))
-        if str(self.player_name) == 'brightcove-player' and not data.account_id:
-            validation.add(ValidationMessage(
-                ValidationMessage.ERROR,
-                _(u"Account Id can not be empty. Please provide a Brightcove Account Id.")
-            ))
+                self.add_validation_message(
+                    validation,
+                    _(u"Can't validate submitted account id at the moment. "
+                      u"Please try to save settings one more time.")
+                )
 
-        if data.href == '':
-            return
-        for _player_name, player_class in BaseVideoPlayer.load_classes():
-            if player_class.match(data.href):
-                return
-
-        validation.add(ValidationMessage(
-            ValidationMessage.ERROR,
-            _(u"Incorrect or unsupported video URL, please recheck.")
-        ))
+        # Validate provided video href value
+        if not (is_not_provided_href or is_matched_href):
+            self.add_validation_message(
+                validation,
+                _(u"Incorrect or unsupported video URL, please recheck.")
+            )
 
     def student_view(self, context=None):  # pylint: disable=unused-argument
         """
