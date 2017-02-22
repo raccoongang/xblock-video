@@ -438,6 +438,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             'initial_default_transcripts': initial_default_transcripts,
             'auth_error_message': auth_error_message,
             'transcripts_autoupload_message': transcripts_autoupload_message,
+            # TODO order basic_fields and advanced_fields
             'basic_fields': {
                 key: self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
                 for key in player.basic_fields},
