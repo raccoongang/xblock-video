@@ -4,6 +4,7 @@ Video XBlock provides a convenient way to embed videos hosted on supported platf
 All you need to provide is video url, this XBlock does the rest for you.
 """
 
+import collections
 import datetime
 import functools
 import json
@@ -26,7 +27,7 @@ from webob import Response
 from .backends.base import BaseVideoPlayer
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
-from .utils import render_resource, resource_string, ugettext as _
+from .utils import render_template, render_resource, resource_string, ugettext as _
 
 
 log = logging.getLogger(__name__)
@@ -430,6 +431,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         self.default_transcripts = filtered_default_transcripts
         if self.default_transcripts:
             self.default_transcripts.sort(key=lambda l: l['label'])
+        # Order basic_fields and advanced_fields
+        basic_fields_ordered = self.order_studio_editor_fields(player.basic_fields)
+        advanced_fields_ordered = self.order_studio_editor_fields(player.advanced_fields)
 
         context = {
             'fields': [],
@@ -440,7 +444,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             'default_transcripts': self.default_transcripts,
             'initial_default_transcripts': initial_default_transcripts,
             'auth_error_message': auth_error_message,
-            'transcripts_autoupload_message': transcripts_autoupload_message
+            'transcripts_autoupload_message': transcripts_autoupload_message,
+            'basic_fields': basic_fields_ordered,
+            'advanced_fields': advanced_fields_ordered,
         }
 
         # Build a list of all the fields that can be edited:
@@ -455,7 +461,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             if field_info is not None:
                 context["fields"].append(field_info)
 
-        fragment.content = render_resource('static/html/studio_edit.html', **context)
+        fragment.content = render_template('studio-edit.html', **context)
         fragment.add_css(resource_string("static/css/handout.css"))
         fragment.add_css(resource_string("static/css/transcripts-upload.css"))
         fragment.add_css(resource_string("static/css/studio-edit.css"))
@@ -578,12 +584,33 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             return field.help
         return ''
 
+    def initialize_studio_field_info(self, field_name, field, field_type=None):
+        """
+        Initialize studio editor's field info.
+
+        Arguments:
+            field_name (str): Name of a video XBlock field whose info is to be made.
+            field (xblock.fields): Video XBlock field object.
+            field_type (str): Type of field.
+        Returns:
+            info (dict): Information on a field.
+        """
+        info = super(VideoXBlock, self)._make_field_info(field_name, field)
+        info['help'] = self._get_field_help(field_name, field)
+        if field_type:
+            info['type'] = field_type
+        if field_name == 'handout':
+            info['file_name'] = self.get_file_name_from_path(self.handout)
+            info['value'] = self.get_path_for(self.handout)
+        return info
+
     def _make_field_info(self, field_name, field):
         """
         Override and extend data of built-in method.
 
+        Create the information that the template needs to render a form field for this field.
         Reference:
-            https://github.com/edx/xblock-utils/blob/79dbdcc8bbcb4d73ed9f9f578b2c9cd533e6550c/xblockutils/studio_editable.py#L96
+            https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/studio_editable.py#L96
 
         Arguments:
             field_name (str): Name of a video XBlock field whose info is to be made.
@@ -605,20 +632,26 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 'has_list_values': False,
                 'type': 'string',
             }
+        elif field_name in ('handout', 'transcripts', 'default_transcripts', 'token'):
+            info = self.initialize_studio_field_info(field_name, field, field_type=field_name)
         else:
-            info = super(VideoXBlock, self)._make_field_info(field_name, field)
-            info['help'] = self._get_field_help(field_name, field)
-            if field_name == 'handout':
-                info['type'] = 'file_uploader'
-                info['file_name'] = self.get_file_name_from_path(self.handout)
-                info['value'] = self.get_path_for(self.handout)
-            elif field_name == 'transcripts':
-                info['type'] = 'transcript_uploader'
-            elif field_name == 'default_transcripts':
-                info['type'] = 'default_transcript_uploader'
-            elif field_name == 'token':
-                info['type'] = 'token_authorization'
+            info = self.initialize_studio_field_info(field_name, field)
         return info
+
+    def order_studio_editor_fields(self, fields):
+        """
+        Order xblock fields in studio editor modal.
+
+        Arguments:
+            fields (tuple): Names of Xblock fields.
+        Returns:
+            fields_ordered (collections.OrderedDict): Ordered xblock fields.
+        """
+        fields_ordered = collections.OrderedDict()
+        for key in fields:
+            fields_ordered[key] = \
+                self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
+        return fields_ordered
 
     def get_file_name_from_path(self, field):
         """
