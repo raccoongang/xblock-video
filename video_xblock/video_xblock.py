@@ -334,7 +334,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         Validate data submitted via xblock edit pop-up.
 
         Reference:
-            https://github.com/edx/xblock-utils/blob/60af41a8b7a7e6c1cb713e470d2a653669a30539/xblockutils/studio_editable.py#L245
+            https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/studio_editable.py#L245
 
         Attributes:
             validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
@@ -353,6 +353,11 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                     ValidationMessage.ERROR,
                     _(u"Can't validate submitted player id at the moment. Please try to save settings one more time.")
                 ))
+        if str(self.player_name) == 'brightcove-player' and not data.account_id:
+            validation.add(ValidationMessage(
+                ValidationMessage.ERROR,
+                _(u"Account Id can not be empty. Please provide your Brightcove Account Id.")
+            ))
 
         if data.href == '':
             return
