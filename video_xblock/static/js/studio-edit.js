@@ -52,7 +52,7 @@ function StudioEditableXBlock(runtime, element) {
                     '<button class="edit-menu-tab current" data-tab-name="Basic">Basic</button>' +
                     '</li>');
             // Bind listeners to the toggle buttons
-            $('.edit-menu-tab').click(function (event) {
+            $('.edit-menu-tab').click(function(event) {
                 currentTabName = $(event.currentTarget).attr('data-tab-name');
                 toggleEditorTab(currentTabName);
             });
