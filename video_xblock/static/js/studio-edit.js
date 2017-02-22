@@ -16,23 +16,22 @@ function StudioEditableXBlock(runtime, element) {
     /** Toggle studio editor's current tab.
      */
     function toggleEditorTab(currentTabName) {
-        'use strict';
-        var tabDisable;
-        var tabEnable;
-        var otherTabName;
+        var $tabDisable;
+        var $tabEnable;
+        var $otherTabName;
         if (currentTabName === 'Basic') {
-            tabEnable = $('.list-input.settings-list.basic');
-            tabDisable = $('.list-input.settings-list.advanced');
-            otherTabName = 'Advanced';
+            $tabEnable = $('.list-input.settings-list.basic');
+            $tabDisable = $('.list-input.settings-list.advanced');
+            $otherTabName = 'Advanced';
         } else if (currentTabName === 'Advanced') {
-            tabEnable = $('.list-input.settings-list.advanced');
-            tabDisable = $('.list-input.settings-list.basic');
-            otherTabName = 'Basic';
+            $tabEnable = $('.list-input.settings-list.advanced');
+            $tabDisable = $('.list-input.settings-list.basic');
+            $otherTabName = 'Basic';
         }
         $(event.currentTarget).addClass('current');
-        $('.tab[data-tab-name=' + otherTabName + ']').removeClass('current');
-        tabDisable.addClass('is-hidden');
-        tabEnable.removeClass('is-hidden');
+        $('.tab[data-tab-name=' + $otherTabName + ']').removeClass('current');
+        $tabDisable.addClass('is-hidden');
+        $tabEnable.removeClass('is-hidden');
     }
 
     // Create advanced and basic tabs
