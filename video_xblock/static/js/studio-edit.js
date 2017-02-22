@@ -1,9 +1,7 @@
 /**
-    StudioEditableXBlock function for setting up the Video xblock.
-    This function was copied from xblock-utils by link
-        https://github.com/edx/xblock-utils/blob/master/xblockutils/templates/studio_edit.html
-    and extended by Raccoon Gang company
-    It is responsible for a validating and sending data to backend
+    Set up the Video xblock studio editor. Responsible for validating and sending data to backend.
+    Reference:
+        https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/templates/studio_edit.html
 */
 function StudioEditableXBlock(runtime, element) {
     'use strict';
@@ -12,6 +10,29 @@ function StudioEditableXBlock(runtime, element) {
     // Studio includes a copy of tinyMCE and its jQuery plugin
     var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');  // TODO: Remove TinyMCE
     var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
+    var $modalHeaderTabs = $('.editor-modes.action-list.action-modes');
+    var $currentTab;
+
+    // Create advanced and basic tabs toggle buttons
+    (function() {
+        $modalHeaderTabs.append('<li class="inner_tab_wrap"><button class="tab current" data-tab-name="Basic">Basic</button></li>');
+        $modalHeaderTabs.append('<li class="inner_tab_wrap"><button class="tab" data-tab-name="Advanced">Advanced</button></li>');
+        // Bind listener to toggle studio editor tab
+        $('.tab').click(function(event) {
+            $currentTab = $(event.currentTarget).attr('data-tab-name');
+            if ($currentTab === 'Basic') {
+                $(event.currentTarget).addClass('current');
+                $('.tab[data-tab-name="Advanced"]').removeClass('current');
+                $(".list-input.settings-list.advanced").addClass('is-hidden');
+                $(".list-input.settings-list.basic").removeClass('is-hidden');
+            } else if ($currentTab === 'Advanced') {
+                $(event.currentTarget).addClass('current');
+                $('.tab[data-tab-name="Basic"]').removeClass('current');
+                $(".list-input.settings-list.basic").addClass('is-hidden');
+                $(".list-input.settings-list.advanced").removeClass('is-hidden');
+            }
+        });
+    })();
 
     /** Wrapper function for dispatched ajax calls.
      */

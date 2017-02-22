@@ -1,31 +1,18 @@
 {% load i18n %}
 
-<div class="xmodule_edit xmodule_VideoDescriptor">
-    <div class="editor-with-buttons editor-with-tabs">
-        <div class="edit-header">
-            <span class="component-name">Editing: Video</span>
-            <ul class="editor-tabs">
-                <li class="inner_tab_wrap"><a href="#tab-32d03e09c9764851927a745aad11fb25-0" class="tab current" data-tab_name="Basic">Basic</a></li>
-                <li class="inner_tab_wrap"><a href="#tab-32d03e09c9764851927a745aad11fb25-1" class="tab" data-tab_name="Advanced">Advanced</a></li>
-            </ul>
-        </div>
-
-        <div class="wrapper-comp-settings is-active editor-with-buttons" id="settings-tab">
-
+<div class="editor-with-buttons">
+    <div class="wrapper-comp-settings is-active editor-with-buttons" id="settings-tab">
         {% include "studio-edit-tab.html" with name='basic' fields=basic_fields %}
         {% include "studio-edit-tab.html" with name='advanced' fields=advanced_fields %}
-
-        </div>
-
-        <div class="xblock-actions">
-            <ul>
-                <li class="action-item">
-                    <a href="#" class="button action-primary save-button">{% trans "Save" %}</a>
-                </li
-                <li class="action-item">
-                    <a href="#" class="button cancel-button">{% trans "Cancel" %}</a>
-                </li>
-            </ul>
-        </div>
+    </div>
+    <div class="xblock-actions">
+        <ul>
+            <li class="action-item">
+                <a href="#" class="button action-primary save-button">{% trans "Save" %}</a>
+            </li>
+            <li class="action-item">
+                <a href="#" class="button cancel-button">{% trans "Cancel" %}</a>
+            </li>
+        </ul>
     </div>
 </div>
