@@ -17,6 +17,7 @@ function StudioEditableXBlock(runtime, element) {
     var noAvailableTranscript;
     var $modalHeaderTabs = $('.editor-modes.action-list.action-modes');
     var currentTabName;
+    var isNotDummy = $('#xb-field-edit-href').val() !== '';
 
     /** Toggle studio editor's current tab.
      */
@@ -41,19 +42,21 @@ function StudioEditableXBlock(runtime, element) {
 
     // Create advanced and basic tabs
     (function() {
-        $modalHeaderTabs
-            .append(
-                '<li class="inner_tab_wrap">' +
-                '<button class="edit-menu-tab" data-tab-name="Advanced">Advanced</button>' +
-                '</li>',
-                '<li class="inner_tab_wrap">' +
-                '<button class="edit-menu-tab current" data-tab-name="Basic">Basic</button>' +
-                '</li>');
-        // Bind listeners to the buttons
-        $('.edit-menu-tab').click(function(event) {
-            currentTabName = $(event.currentTarget).attr('data-tab-name');
-            toggleEditorTab(currentTabName);
-        });
+        if (isNotDummy) {
+            $modalHeaderTabs
+                .append(
+                    '<li class="inner_tab_wrap">' +
+                    '<button class="edit-menu-tab" data-tab-name="Advanced">Advanced</button>' +
+                    '</li>',
+                    '<li class="inner_tab_wrap">' +
+                    '<button class="edit-menu-tab current" data-tab-name="Basic">Basic</button>' +
+                    '</li>');
+            // Bind listeners to the toggle buttons
+            $('.edit-menu-tab').click(function (event) {
+                currentTabName = $(event.currentTarget).attr('data-tab-name');
+                toggleEditorTab(currentTabName);
+            });
+        }
     }());
 
     /** Wrapper function for dispatched ajax calls.
