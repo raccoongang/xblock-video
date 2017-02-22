@@ -15,15 +15,15 @@ function StudioEditableXBlock(runtime, element) {
 
     /** Toggle studio editor's current tab.
      */
-    function toggleEditorTab(currentTabName) {
+    function toggleEditorTab(tabName) {
         var $tabDisable;
         var $tabEnable;
         var $otherTabName;
-        if (currentTabName === 'Basic') {
+        if (tabName === 'Basic') {
             $tabEnable = $('.list-input.settings-list.basic');
             $tabDisable = $('.list-input.settings-list.advanced');
             $otherTabName = 'Advanced';
-        } else if (currentTabName === 'Advanced') {
+        } else if (tabName === 'Advanced') {
             $tabEnable = $('.list-input.settings-list.advanced');
             $tabDisable = $('.list-input.settings-list.basic');
             $otherTabName = 'Basic';

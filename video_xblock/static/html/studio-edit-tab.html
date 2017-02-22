@@ -46,8 +46,6 @@
                 {% elif field.type == 'token' %}
                     {% include 'studio-edit-token.html' %}
                 {% endif %}
-            <!-- TODO include 'studio-edit-brightcove-encryption.html' -->
-            <!--{% include 'studio-edit-brightcove-encryption.html' %}-->
             {% else %}
               Unsupported field type. This setting cannot be edited.
             {% endif %}
@@ -63,4 +61,9 @@
         {% endif %}
     </li>
 {% endfor %}
+
+{% if name == 'advanced' %}
+    {% include 'studio-edit-brightcove-encryption.html' %}
+{% endif %}
+
 </ul>
