@@ -356,8 +356,10 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
         """
         is_brightcove = str(self.player_name) == 'brightcove-player'
-        is_provided_account_id = data.account_id != self.fields['account_id'].default
-        is_not_provided_href = data.href == self.fields['href'].default
+        is_provided_account_id = \
+            data.account_id != self.fields['account_id'].default  # pylint: disable=unsubscriptable-object
+        is_not_provided_href = \
+            data.href == self.fields['href'].default  # pylint: disable=unsubscriptable-object
         is_matched_href = len([
             True for _player_name, player_class in BaseVideoPlayer.load_classes()
             if player_class.match(data.href)
@@ -372,7 +374,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             )
 
         # Validate provided account id
-        if is_provided_account_id:
+        elif is_provided_account_id:
             try:
                 response = requests.head(
                     VideoXBlock.get_brightcove_js_url(
