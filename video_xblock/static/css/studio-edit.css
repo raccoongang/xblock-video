@@ -225,7 +225,7 @@
     vertical-align: middle;
 }
 
-.tab {
+.edit-menu-tab {
     float: right;
     text-transform: uppercase;
     border: 0;
@@ -238,11 +238,11 @@
     color: #999;
 }
 
-.tab:hover {
+.edit-menu-tab:hover {
     background-color: #009fe6;
     color: #000;
 }
-.tab.current {
+.edit-menu-tab.current {
     background-color: #4c4c4c;
     color: #fff;
 }

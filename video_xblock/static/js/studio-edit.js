@@ -34,7 +34,7 @@ function StudioEditableXBlock(runtime, element) {
             $otherTabName = 'Basic';
         }
         $(event.currentTarget).addClass('current');
-        $('.tab[data-tab-name=' + $otherTabName + ']').removeClass('current');
+        $('.edit-menu-tab[data-tab-name=' + $otherTabName + ']').removeClass('current');
         $tabDisable.addClass('is-hidden');
         $tabEnable.removeClass('is-hidden');
     }
@@ -43,10 +43,10 @@ function StudioEditableXBlock(runtime, element) {
     (function() {
         $modalHeaderTabs
             .append(
-                '<li class="inner_tab_wrap"><button class="tab" data-tab-name="Advanced">Advanced</button></li>',
-                '<li class="inner_tab_wrap"><button class="tab current" data-tab-name="Basic">Basic</button></li>');
+                '<li class="inner_tab_wrap"><button class="edit-menu-tab" data-tab-name="Advanced">Advanced</button></li>',
+                '<li class="inner_tab_wrap"><button class="edit-menu-tab current" data-tab-name="Basic">Basic</button></li>');
         // Bind listeners to the buttons
-        $('.tab').click(function(event) {
+        $('.edit-menu-tab').click(function(event) {
             currentTabName = $(event.currentTarget).attr('data-tab-name');
             toggleEditorTab(currentTabName);
         });
