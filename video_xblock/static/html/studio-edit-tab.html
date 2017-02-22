@@ -10,6 +10,7 @@
     >
         <div class='wrapper-comp-setting {% if field.type == "set" %}metadata-list-enum{% endif %} {% if field.type == "file_uploader" %}file-uploader{% endif %}{% if field.type == "transcript_uploader" %}metadata-video-translations{% endif %}'>
             <label class="label setting-label" for="xb-field-edit-{{field.name}}">{{field.display_name}}</label>
+            <!-- TODO order fields appropriately -->
             {% if field.type == "boolean" %}
                 {% include "fields/boolean.html" with field=field %}
 
@@ -45,8 +46,10 @@
                 {% elif field.type == 'token_authorization' %}
                     {% include 'studio-edit-token.html' %}
                 {% endif %}
-            <!-- TODO include -->
+            <!-- TODO include 'studio-edit-brightcove-encryption.html' -->
             <!--{% include 'studio-edit-brightcove-encryption.html' %}-->
+            {% else %}
+              Unsupported field type. This setting cannot be edited.
             {% endif %}
 
             {% if field.allow_reset %}

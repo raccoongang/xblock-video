@@ -439,11 +439,11 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             'auth_error_message': auth_error_message,
             'transcripts_autoupload_message': transcripts_autoupload_message,
             'basic_fields': {
-                key: self._make_field_info(key, self.fields[key])
-                for key in player.basic_fields},  # pylint: disable=unsubscriptable-object
+                key: self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
+                for key in player.basic_fields},
             'advanced_fields': {
-                key: self._make_field_info(key, self.fields[key])
-                for key in player.advanced_fields},  # pylint: disable=unsubscriptable-object
+                key: self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
+                for key in player.advanced_fields},
         }
 
         # Build a list of all the fields that can be edited:

@@ -1,5 +1,5 @@
 /**
-    Set up the Video xblock studio editor. This part is responsible for validating and sending data to a backend.
+    Set up the Video xblock studio editor. This part is responsible for validation and sending of the data to a backend.
     Reference:
         https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/templates/studio_edit.html
 */
