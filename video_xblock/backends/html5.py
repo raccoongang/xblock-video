@@ -9,12 +9,21 @@ from video_xblock import BaseVideoPlayer
 
 class Html5Player(BaseVideoPlayer):
     """
-    Html5Player is used for videos by providing direct URL
+    Html5Player is used for videos by providing direct URL.
     """
 
     url_re = re.compile(r'^(https?|ftp)://[^\s/$.?#].[^\s]*.(mpeg|mp4|ogg|webm)')
 
     metadata_fields = []
+
+    @property
+    def advanced_fields(self):
+        """
+        Tuple of VideoXBlock fields to display in Advanced tab of edit modal window.
+
+        Hide `download_video_url` field for Html5Player.
+        """
+        return [field for field in super(Html5Player, self).advanced_fields if field != 'download_video_url']
 
     # Html API for requesting transcripts.
     captions_api = {}
