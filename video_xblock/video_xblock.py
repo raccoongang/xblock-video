@@ -4,6 +4,7 @@ Video XBlock provides a convenient way to embed videos hosted on supported platf
 All you need to provide is video url, this XBlock does the rest for you.
 """
 
+import collections
 import datetime
 import functools
 import json
@@ -402,6 +403,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         languages.sort(key=lambda l: l['label'])
         transcripts = json.loads(self.transcripts) if self.transcripts else []
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
+        basic_fields_ordered = collections.OrderedDict()
+        advanced_fields_ordered = collections.OrderedDict()
 
         # Authenticate to API of the player video platform and update metadata with auth information.
         # Note that there is no need to authenticate to Youtube API,
@@ -427,6 +430,13 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         self.default_transcripts = player.filter_default_transcripts(self.default_transcripts, transcripts)
         if self.default_transcripts:
             self.default_transcripts.sort(key=lambda l: l['label'])
+        # Order basic_fields and advanced_fields
+        for key in player.basic_fields:
+            basic_fields_ordered[key] = \
+                self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
+        for key in player.advanced_fields:
+            advanced_fields_ordered[key] = \
+                self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
 
         context = {
             'fields': [],
@@ -438,13 +448,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             'initial_default_transcripts': initial_default_transcripts,
             'auth_error_message': auth_error_message,
             'transcripts_autoupload_message': transcripts_autoupload_message,
-            # TODO order basic_fields and advanced_fields
-            'basic_fields': {
-                key: self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
-                for key in player.basic_fields},
-            'advanced_fields': {
-                key: self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
-                for key in player.advanced_fields},
+            'basic_fields': basic_fields_ordered,
+            'advanced_fields': advanced_fields_ordered,
         }
 
         # Build a list of all the fields that can be edited:
