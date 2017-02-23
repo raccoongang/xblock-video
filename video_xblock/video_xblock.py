@@ -4,7 +4,6 @@ Video XBlock provides a convenient way to embed videos hosted on supported platf
 All you need to provide is video url, this XBlock does the rest for you.
 """
 
-import collections
 import datetime
 import functools
 import json
@@ -475,10 +474,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         self.default_transcripts = filtered_default_transcripts
         if self.default_transcripts:
             self.default_transcripts.sort(key=lambda l: l['label'])
-        # Order basic_fields and advanced_fields
-        basic_fields_ordered = self.order_studio_editor_fields(player.basic_fields)
-        advanced_fields_ordered = self.order_studio_editor_fields(player.advanced_fields)
-
+        # Prepare basic_fields and advanced_fields for them to be rendered
+        basic_fields = self.prepare_studio_editor_fields(player.basic_fields)
+        advanced_fields = self.prepare_studio_editor_fields(player.advanced_fields)
         context = {
             'fields': [],
             'courseKey': self.location.course_key,  # pylint: disable=no-member
@@ -489,8 +487,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             'initial_default_transcripts': initial_default_transcripts,
             'auth_error_message': auth_error_message,
             'transcripts_autoupload_message': transcripts_autoupload_message,
-            'basic_fields': basic_fields_ordered,
-            'advanced_fields': advanced_fields_ordered,
+            'basic_fields': basic_fields,
+            'advanced_fields': advanced_fields,
         }
 
         # Build a list of all the fields that can be edited:
@@ -682,20 +680,19 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             info = self.initialize_studio_field_info(field_name, field)
         return info
 
-    def order_studio_editor_fields(self, fields):
+    def prepare_studio_editor_fields(self, fields):
         """
         Order xblock fields in studio editor modal.
 
         Arguments:
             fields (tuple): Names of Xblock fields.
         Returns:
-            fields_ordered (collections.OrderedDict): Ordered xblock fields.
+            made_fields (list): XBlock fields prepared to be rendered in a studio edit modal.
         """
-        fields_ordered = collections.OrderedDict()
+        made_fields = []
         for key in fields:
-            fields_ordered[key] = \
-                self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
-        return fields_ordered
+            made_fields.append(self._make_field_info(key, self.fields[key]))  # pylint: disable=unsubscriptable-object
+        return made_fields
 
     def get_file_name_from_path(self, field):
         """
