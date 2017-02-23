@@ -18,10 +18,10 @@
         </li>
     {% endif %}
     {% if download_transcript_allowed and transcripts %}
-        <li class="video-transcript video-download-button-custom"
-            {% if not transcript_download_link %}style="display:none"{% endif %}>
+        <li class="video-transcript video-download-button-custom
+            {% if not transcript_download_link %}is-hidden{% endif %}"
+            id="download-transcript-button">
             <a  class="download-transcript"
-                id="download-transcript-link"
                 href="{{ transcript_download_link }}">{% trans 'Download transcript' %}</a>
         </li>
     {% endif %}
