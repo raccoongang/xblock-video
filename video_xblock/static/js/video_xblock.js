@@ -47,6 +47,7 @@ function VideoXBlockStudentViewInit(runtime, element) {
             return;
         }
         try {
+            console.log(event.data.action);
             if (event.data.action === 'downloadTranscriptChanged') {
                 // eslint-disable-next-line no-use-before-define
                 updateTranscriptDownloadUrl(event.data.downloadTranscriptUrl);
@@ -62,13 +63,14 @@ function VideoXBlockStudentViewInit(runtime, element) {
     /** Updates transcript download url if it is enabled */
     function updateTranscriptDownloadUrl(downloadTranscriptUrl) {
         var downloadLinkEl = document.getElementById('download-transcript-link');
+        console.log(downloadTranscriptUrl);
         if (downloadLinkEl) {
             if (downloadTranscriptUrl) {
                 downloadLinkEl.href = downloadTranscriptHandlerUrl + '?' + downloadTranscriptUrl;
-                downloadLinkEl.classList.remove('is-disabled');
+                downloadLinkEl.style.display='block';
             } else {
                 downloadLinkEl.href = '#';
-                downloadLinkEl.classList.add('is-disabled');
+                downloadLinkEl.style.display='none';
             }
         }
     }
