@@ -12,9 +12,7 @@ class Html5Player(BaseVideoPlayer):
     Html5Player is used for videos by providing direct URL.
     """
 
-    url_re = re.compile(r'^(https?|ftp)://[^\s/$.?#].[^\s]*.(mpeg|mp4|ogg|webm)')
-
-    metadata_fields = []
+    url_re = url_re = re.compile(r'^(?P<protocol>https?|ftp)://[^\s/$.?#].[^\s]*.(?P<extension>mpeg|mp4|ogg|webm)')
 
     @property
     def advanced_fields(self):
@@ -30,9 +28,7 @@ class Html5Player(BaseVideoPlayer):
 
     def media_id(self, href):
         """
-        Extract Platform's media id from the video url.
-
-        E.g. https://example.wistia.com/medias/12345abcde -> 12345abcde
+        Return unique value for video. Url is unique enough.
         """
         return href
 
@@ -40,35 +36,15 @@ class Html5Player(BaseVideoPlayer):
         """
         Get file extension for video.js type property.
         """
-        return "video/" + self.url_re.search(href).groups()[-1]
+        return "video/" + self.url_re.search(href).group('extension')
 
     def get_frag(self, **context):
         """
         Return a Fragment required to render video player on the client side.
         """
-        context['data_setup'] = json.dumps({
-            "controlBar": {
-                "volumeMenuButton": {
-                    "inline": False,
-                    "vertical": True
-                }
-            },
-            "techOrder": ["html5"],
-            "sources": [{
-                "type": self.get_type(context['url']),
-                "src": context['url']
-            }],
-            "playbackRates": [0.5, 1, 1.5, 2],
-            "plugins": {
-                "xblockEventPlugin": {},
-                "offset": {
-                    "start": context['start_time'],
-                    "end": context['end_time'],
-                    "current_time": context['player_state']['current_time'],
-                },
-            },
-            "videoJSSpeedHandler": {},
-        })
+        data_setup = Html5Player.player_data_setup(context)
+        data_setup['sources']['type'] = self.get_type(context['url'])
+        context['data_setup'] = json.dumps(data_setup)
 
         frag = super(Html5Player, self).get_frag(**context)
         frag.add_content(
@@ -83,6 +59,19 @@ class Html5Player(BaseVideoPlayer):
             frag.add_javascript(self.resource_string(js_file))
 
         return frag
+
+    @staticmethod
+    def player_data_setup(context):
+        """
+        Html5 Player data setup.
+        """
+        return BaseVideoPlayer.player_data_setup(context).update({
+            "techOrder": ["html5"],
+            "sources": [{
+                "src": context['url']
+            }],
+            "playbackRates": [0.5, 1, 1.5, 2],
+        })
 
     def authenticate_api(self, **kwargs):  # pylint: disable=unused-argument
         """

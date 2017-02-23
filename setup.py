@@ -53,7 +53,7 @@ setup(
             'brightcove-player = video_xblock.backends.brightcove:BrightcovePlayer',
             'dummy-player = video_xblock.backends.dummy:DummyPlayer',
             'vimeo-player = video_xblock.backends.vimeo:VimeoPlayer',
-            'html5-player = video_xblock.backends.html5:Html5Player'
+            'html5-player = video_xblock.backends.html5:Html5Player',
         ]
     },
     package_data=package_data("video_xblock", ["static", ]),
