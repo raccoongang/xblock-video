@@ -690,8 +690,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             made_fields (list): XBlock fields prepared to be rendered in a studio edit modal.
         """
         made_fields = [
-            self._make_field_info(key, self.fields[key])
-            for key in fields  # pylint: disable=unsubscriptable-object
+            self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
+            for key in fields
         ]
         return made_fields
 
