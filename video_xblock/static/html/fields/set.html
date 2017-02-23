@@ -1,7 +1,3 @@
-{% comment %}
-  TODO: If len(list_values) is high, show an alternate editor
-  with a select box and a growing list of selected choices
-{% endcomment %}
 <div class="wrapper-list-settings">
   <ul class="list-settings list-set">
     {% for choice in field.list_values %}
@@ -11,7 +7,7 @@
           type="checkbox"
           value="{{choice.value}}"
           style="width:auto;min-width:auto;height:auto;float:left;margin-top:3px;"
-          {% if choice.value in field.value %}checked="checked"{% endif %}
+          {% if choice.value in field.value %}checked{% endif %}
         >
         <label for="xb-field-edit-{{field.name}}-{{forloop.counter}}" style="display:block;margin-left:1.1em;">
           {{choice.display_name}}

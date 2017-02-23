@@ -339,10 +339,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
             message_text (unicode): Message text per se.
         """
-        validation.add(ValidationMessage(
-            ValidationMessage.ERROR,
-            message_text
-        ))
+        validation.add(ValidationMessage(ValidationMessage.ERROR, message_text))
 
     def validate_account_id_data(self, validation, data):
         """
@@ -357,16 +354,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         # Validate provided account id
         if is_provided_account_id:
             try:
-                response = requests.head(
-                    VideoXBlock.get_brightcove_js_url(
-                        data.account_id,
-                        data.player_id)
-                )
+                response = requests.head(VideoXBlock.get_brightcove_js_url(data.account_id, data.player_id))
                 if response.status_code != status.HTTP_200_OK:
-                    self.add_validation_message(
-                        validation,
-                        _(u"Invalid Account Id, please recheck.")
-                    )
+                    self.add_validation_message(validation, _(u"Invalid Account Id, please recheck."))
             except requests.ConnectionError:
                 self.add_validation_message(
                     validation,
@@ -377,8 +367,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         else:
             self.add_validation_message(
                 validation,
-                _(u"Account Id can not be empty. "
-                  u"Please provide a valid Brightcove Account Id.")
+                _(u"Account Id can not be empty. Please provide a valid Brightcove Account Id.")
             )
 
     def validate_href_data(self, validation, data):
