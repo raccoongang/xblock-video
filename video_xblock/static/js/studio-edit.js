@@ -490,7 +490,6 @@ function StudioEditableXBlock(runtime, element) {
             $parentDiv = $('.file-uploader');
             $('.download-setting', $parentDiv).attr('href', downloadUrl).removeClass('is-hidden');
             $('a[data-change-field-name=' + fieldName + ']').text('Replace');
-            // TODO: create element to display error message
             displayStatusCaptions('success', successMessage, $parentDiv);
             $('input[data-field-name=' + fieldName + ']').val(url).change();
         } else if (fieldName == 'transcripts' && isValidated) {

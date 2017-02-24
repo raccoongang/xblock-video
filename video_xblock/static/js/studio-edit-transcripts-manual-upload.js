@@ -134,7 +134,7 @@ function validateTranscriptFile(event, fieldName, filename, $fileUploader) {
         isNotAccepted = true;
         console.log(errorMessage);
     }
-    // TODO test: Display validation error message if a transcript/caption file may not be not accepted
+    // Display validation error message if a transcript/caption file may not be not accepted
     if (isNotAccepted) {
         if (fieldName == 'handout') {
             $parentDiv = $('.file-uploader');
