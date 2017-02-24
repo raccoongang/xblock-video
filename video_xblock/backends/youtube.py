@@ -76,7 +76,8 @@ class YoutubePlayer(BaseVideoPlayer):
         """
         Youtube Player data setup.
         """
-        return BaseVideoPlayer.player_data_setup(context).update({
+        result = BaseVideoPlayer.player_data_setup(context)
+        result.update({
             "techOrder": ["youtube"],
             "sources": [{
                 "type": "video/youtube",
@@ -84,6 +85,7 @@ class YoutubePlayer(BaseVideoPlayer):
             }],
             "youtube": {"iv_load_policy": 1},
         })
+        return result
 
     def authenticate_api(self, **kwargs):
         """

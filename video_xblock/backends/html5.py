@@ -43,7 +43,7 @@ class Html5Player(BaseVideoPlayer):
         Return a Fragment required to render video player on the client side.
         """
         data_setup = Html5Player.player_data_setup(context)
-        data_setup['sources']['type'] = self.get_type(context['url'])
+        data_setup['sources'][0]['type'] = self.get_type(context['url'])
         context['data_setup'] = json.dumps(data_setup)
 
         frag = super(Html5Player, self).get_frag(**context)
@@ -65,13 +65,15 @@ class Html5Player(BaseVideoPlayer):
         """
         Html5 Player data setup.
         """
-        return BaseVideoPlayer.player_data_setup(context).update({
+        result = BaseVideoPlayer.player_data_setup(context)
+        result.update({
             "techOrder": ["html5"],
             "sources": [{
                 "src": context['url']
             }],
             "playbackRates": [0.5, 1, 1.5, 2],
         })
+        return result
 
     def authenticate_api(self, **kwargs):  # pylint: disable=unused-argument
         """

@@ -101,13 +101,15 @@ class WistiaPlayer(BaseVideoPlayer):
         """
         Wistia Player data setup.
         """
-        return BaseVideoPlayer.player_data_setup(context).update({
+        result = BaseVideoPlayer.player_data_setup(context)
+        result.update({
             "techOrder": ["wistia"],
             "sources": [{
                 "type": "video/wistia",
                 "src": context['url'] + "?controlsVisibleOnLoad=false"
             }],
         })
+        return result
 
     def authenticate_api(self, **kwargs):
         """

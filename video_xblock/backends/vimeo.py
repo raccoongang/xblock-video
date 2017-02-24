@@ -52,7 +52,10 @@ class VimeoPlayer(BaseVideoPlayer):
         """
         Vimeo Player data setup.
         """
-        result = BaseVideoPlayer.player_data_setup(context).update({
+        result = BaseVideoPlayer.player_data_setup(context)
+        del result["playbackRates"]
+        del result["plugins"]["videoJSSpeedHandler"]
+        result.update({
             "techOrder": ["vimeo"],
             "sources": [{
                 "type": "video/vimeo",
@@ -60,8 +63,6 @@ class VimeoPlayer(BaseVideoPlayer):
             }],
             "vimeo": {"iv_load_policy": 1},
         })
-        del result["playbackRates"]
-        del result["plugins"]["videoJSSpeedHandler"]
         return result
 
     def authenticate_api(self, **kwargs):  # pylint: disable=unused-argument
