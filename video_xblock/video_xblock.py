@@ -352,7 +352,6 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
             player_id=player_id
         )
 
-
     @property
     def editable_fields(self):
         """
