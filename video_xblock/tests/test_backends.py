@@ -2,7 +2,6 @@
 Test cases for video_xblock backends.
 """
 # copy should be imported before requests
-import copy
 import babelfish
 from ddt import ddt, data, unpack
 from lxml import etree
@@ -47,24 +46,26 @@ class TestCustomBackends(VideoXBlockTestBase):
         'https://wi.st/medias/HRrr784kH8932Z',
         'https://vimeo.com/202889234'
     ]
+
     auth_mocks = [
-        YoutubeAuthMock(),
-        BrightcoveAuthMock(),
-        WistiaAuthMock(),
-        VimeoAuthMock(),
+        YoutubeAuthMock,
+        BrightcoveAuthMock,
+        WistiaAuthMock,
+        VimeoAuthMock,
     ]
+
     default_trans_mocks = [
-        YoutubeDefaultTranscriptsMock(),
-        BrightcoveDefaultTranscriptsMock(),
-        WistiaDefaultTranscriptsMock(),
-        VimeoDefaultTranscriptsMock(),
+        YoutubeDefaultTranscriptsMock,
+        BrightcoveDefaultTranscriptsMock,
+        WistiaDefaultTranscriptsMock,
+        VimeoDefaultTranscriptsMock,
     ]
 
     download_transcript_mocks = [
-        YoutubeDownloadTranscriptMock(),
-        BrightcoveDownloadTranscriptMock(),
-        WistiaDownloadTranscriptMock(),
-        VimeoDownloadTranscriptMock(),
+        YoutubeDownloadTranscriptMock,
+        BrightcoveDownloadTranscriptMock,
+        WistiaDownloadTranscriptMock,
+        VimeoDownloadTranscriptMock,
     ]
 
     @XBlock.register_temp_plugin(brightcove.BrightcovePlayer, 'brightcove')
@@ -100,12 +101,7 @@ class TestCustomBackends(VideoXBlockTestBase):
             res = player(self.xblock).get_player_html(**context)
             self.assertIn('window.videojs', res.body)
 
-    @data(
-        *zip(
-            backends,
-            media_urls,
-        )
-    )
+    @data(*zip(backends, media_urls))
     @unpack
     def test_match(self, backend, url):
         """
@@ -139,8 +135,7 @@ class TestCustomBackends(VideoXBlockTestBase):
     @data(
         ('en', 'English'),
         ('to', 'Tonga (Tonga Islands)'),
-        ('unknown', '')
-    )
+        ('unknown', ''))
     @unpack
     def test_get_transcript_language_parameters(self, lng_abbr, lng_name):
         """
@@ -154,13 +149,7 @@ class TestCustomBackends(VideoXBlockTestBase):
             except VideoXBlockException as ex:
                 self.assertIn(_('Not all the languages of transcripts fetched from video platform'), ex.message)
 
-    @data(
-        *zip(
-            backends,
-            media_urls,
-            media_ids  # expected media ids
-        )
-    )
+    @data(*zip(backends, media_urls, media_ids))
     @unpack
     def test_media_id(self, backend, url, expected_media_id):
         """
@@ -170,11 +159,7 @@ class TestCustomBackends(VideoXBlockTestBase):
         res = player.media_id(url)
         self.assertEqual(res, expected_media_id)
 
-    @data(*zip(
-        backends,
-        ['some_token'] * len(backends),  # tokens
-        auth_mocks,
-    ))
+    @data(*zip(backends, ['some_token'] * len(backends), auth_mocks))
     @unpack
     def test_authenticate_api(self, backend, token, auth_mock):
         """
@@ -182,52 +167,38 @@ class TestCustomBackends(VideoXBlockTestBase):
         """
         player = self.player[backend]
         for event in auth_mock.get_events():
-            mock_obj = auth_mock.apply_mock(event)
-            self.mocked_objects.append(mock_obj)
+            mock = auth_mock(event=event)
+            self.mocked_objects = mock.apply_mock(self.mocked_objects)
             try:
                 auth_data, error = res = player(self.xblock).authenticate_api(
                     **{'token': token, 'account_id': 45263567468485}
                 )
-                expected_auth_data = auth_mock.expected_value(event)[0]
+                expected_auth_data = mock.expected_value(event)[0]
                 self.assertIsInstance(res, tuple)
                 self.assertEqual(auth_data, expected_auth_data)
             except VideoXBlockException as ex:
                 error = ex.message
-            expected_error = auth_mock.expected_value(event)[-1]
+            expected_error = mock.expected_value(event)[-1]
             self.assertIn(expected_error, error)
 
     @override_settings(ALL_LANGUAGES=ALL_LANGUAGES)
-    @data(*(zip(
-        backends,
-        media_ids,  # video ids
-        default_trans_mocks
-    )))
+    @data(*(zip(backends, media_ids, default_trans_mocks)))
     @unpack
     def test_get_default_transcripts(self, backend, video_id, trans_mock):
         player = self.player[backend]
         for event in trans_mock.get_events():
-            mocked_object = trans_mock.apply_mock(event)
-            if mocked_object:
-                self.mocked_objects.append(mocked_object)
-            if backend == 'brightcove':
-                self.mocked_objects.append({
-                    'obj': self.xblock,
-                    'attrs': ['metadata', ],
-                    'value': [copy.deepcopy(self.xblock.metadata), ]
-                })
-                self.xblock.metadata = BrightcoveDefaultTranscriptsMock(
-                    mock_magic=self.xblock.metadata, event=event
-                ).no_credentials()
+            mock = trans_mock(event=event, xblock=self.xblock, mock_magic=self.xblock.metadata)
+            self.mocked_objects = mock.apply_mock(self.mocked_objects)
             try:
                 default_transcripts, message = res = player(self.xblock).get_default_transcripts(video_id=video_id)
-                expected_default_transcripts = trans_mock.expected_value(event)[0]
+                expected_default_transcripts = mock.expected_value(event)[0]
                 self.assertIsInstance(res, tuple)
                 self.assertEqual(default_transcripts, expected_default_transcripts)
             except brightcove.BrightcoveApiClientError as ex:
                 message = ex.message
             except babelfish.converters.LanguageReverseError:
                 message = 'LanguageReverseError'
-            expected_message = trans_mock.expected_value(event)[-1]
+            expected_message = mock.expected_value(event)[-1]
             self.assertIn(expected_message, message)
             self.restore_mocked()
 
@@ -265,18 +236,18 @@ class TestCustomBackends(VideoXBlockTestBase):
         """
         player = self.player[backend]
         for index, event in enumerate(download_transcript_mock.get_events()):
-            mocked_object = download_transcript_mock.apply_mock(event)
-            self.mocked_objects.append(mocked_object)
+            mock = download_transcript_mock(event=event)
+            self.mocked_objects = mock.apply_mock(self.mocked_objects)
             try:
                 res = player(self.xblock).download_default_transcript(**params[index])
                 message = ''
-                expected_default_transcript = download_transcript_mock.expected_value(event)[0]
+                expected_default_transcript = mock.expected_value(event)[0]
                 self.assertIsInstance(res, unicode)
                 self.assertEqual(res, expected_default_transcript)
             except VideoXBlockException as ex:
                 message = ex.message
             except etree.XMLSyntaxError:
                 message = 'XMLSyntaxError exception'
-            expected_message = download_transcript_mock.expected_value(event)[-1]
+            expected_message = mock.expected_value(event)[-1]
             self.assertIn(expected_message, message)
             self.restore_mocked()
