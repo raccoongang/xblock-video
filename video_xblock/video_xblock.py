@@ -24,9 +24,10 @@ from pycaption import detect_format, WebVTTWriter
 from webob import Response
 
 from .backends.base import BaseVideoPlayer
+from .constants import PlayerName, status
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
-from .utils import render_resource, resource_string, ugettext as _
+from .utils import render_template, render_resource, resource_string, ugettext as _
 
 
 log = logging.getLogger(__name__)
@@ -209,6 +210,26 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
         scope=Scope.content
     )
 
+    download_video_allowed = Boolean(
+        default=False,
+        scope=Scope.content,
+        display_name=_('Video Download Allowed'),
+        help=_(
+            "Allow students to download this video if they cannot use the edX video player."
+            " A link to download the file appears below the video."
+        ),
+        resettable_editor=False
+    )
+
+    download_video_url = String(
+        default='',
+        display_name=_('Video file URL'),
+        help=_("The URL where you've posted non hosted versions of the video. URL must end in .mpeg, .mp4, .ogg, or"
+               " .webm. (For browser compatibility, we strongly recommend .mp4 and .webm format.) To allow students to"
+               " download these videos, set Video Download Allowed to True."),
+        scope=Scope.content
+    )
+
     account_id = String(
         default='',
         display_name=_('Account Id'),
@@ -225,7 +246,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
     )
 
     player_name = String(
-        default='dummy-player',
+        default=PlayerName.DUMMY,
         scope=Scope.content
     )
 
@@ -304,7 +325,8 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
 
     advanced_fields = (
         'start_time', 'end_time', 'handout', 'transcripts',
-        'download_transcript_allowed', 'default_transcripts'
+        'download_transcript_allowed', 'default_transcripts', 'download_video_allowed',
+        'download_video_url'
     )
 
     @property
@@ -330,41 +352,92 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
             player_id=player_id
         )
 
-    def validate_field_data(self, validation, data):
-        """
-        Validate data submitted via xblock edit pop-up.
 
-        Reference:
-            https://github.com/edx/xblock-utils/blob/60af41a8b7a7e6c1cb713e470d2a653669a30539/xblockutils/studio_editable.py#L245
+    @property
+    def editable_fields(self):
+        """
+        Return list of xblock's editable fields used by StudioEditableXBlockMixin.clean_studio_edits().
+        """
+        return self.get_player().editable_fields
+
+    @staticmethod
+    def add_validation_message(validation, message_text):
+        """
+        Add error message on xblock fields validation.
+
+        Attributes:
+            validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
+            message_text (unicode): Message text per se.
+        """
+        validation.add(ValidationMessage(ValidationMessage.ERROR, message_text))
+
+    def validate_account_id_data(self, validation, data):
+        """
+        Validate account id value which is mandatory.
 
         Attributes:
             validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
             data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
         """
-        if data.account_id and data.player_id:
+        is_provided_account_id = \
+            data.account_id != self.fields['account_id'].default  # pylint: disable=unsubscriptable-object
+        # Validate provided account id
+        if is_provided_account_id:
             try:
                 response = requests.head(VideoXBlock.get_brightcove_js_url(data.account_id, data.player_id))
-                if response.status_code != 200:
-                    validation.add(ValidationMessage(
-                        ValidationMessage.ERROR,
-                        _(u"Invalid Player Id, please recheck")
-                    ))
+                if response.status_code != status.HTTP_200_OK:
+                    self.add_validation_message(validation, _(u"Invalid Account Id, please recheck."))
             except requests.ConnectionError:
-                validation.add(ValidationMessage(
-                    ValidationMessage.ERROR,
-                    _(u"Can't validate submitted player id at the moment. Please try to save settings one more time.")
-                ))
+                self.add_validation_message(
+                    validation,
+                    _(u"Can't validate submitted account id at the moment. "
+                      u"Please try to save settings one more time.")
+                )
+        # Account Id field is mandatory
+        else:
+            self.add_validation_message(
+                validation,
+                _(u"Account Id can not be empty. Please provide a valid Brightcove Account Id.")
+            )
 
-        if data.href == '':
-            return
+    def validate_href_data(self, validation, data):
+        """
+        Validate href value.
+
+        Attributes:
+            validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
+            data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
+        """
+        is_not_provided_href = \
+            data.href == self.fields['href'].default  # pylint: disable=unsubscriptable-object
+        is_matched_href = False
         for _player_name, player_class in BaseVideoPlayer.load_classes():
             if player_class.match(data.href):
-                return
+                is_matched_href = True
+        # Validate provided video href value
+        if not (is_not_provided_href or is_matched_href):
+            self.add_validation_message(
+                validation,
+                _(u"Incorrect or unsupported video URL, please recheck.")
+            )
 
-        validation.add(ValidationMessage(
-            ValidationMessage.ERROR,
-            _(u"Incorrect or unsupported video URL, please recheck.")
-        ))
+    def validate_field_data(self, validation, data):
+        """
+        Validate data submitted via xblock edit pop-up.
+
+        Reference:
+            https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/studio_editable.py#L245
+
+        Attributes:
+            validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
+            data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
+        """
+        is_brightcove = str(self.player_name) == 'brightcove-player'
+
+        if is_brightcove:
+            self.validate_account_id_data(validation, data)
+
+        self.validate_href_data(validation, data)
 
     def student_view(self, context=None):  # pylint: disable=unused-argument
         """
@@ -374,6 +447,16 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
         transcript_download_link = self.get_transcript_download_link()
         full_transcript_download_link = ''
+
+        # Use field `href` for Html5 player.
+        # Use field `download_video_url` for other players. Don't show button if this field is empty.
+        download_video_url = False
+        if self.download_video_allowed:
+            if self.player_name == PlayerName.HTML5:
+                download_video_url = self.href
+            elif self.download_video_url:
+                download_video_url = self.download_video_url
+
         if transcript_download_link:
             full_transcript_download_link = download_transcript_handler_url + transcript_download_link
         frag = Fragment(
@@ -385,6 +468,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
                 handout=self.handout,
                 transcripts=self.route_transcripts(self.transcripts),
                 download_transcript_allowed=self.download_transcript_allowed,
+                download_video_url=download_video_url,
                 handout_file_name=self.get_file_name_from_path(self.handout),
                 transcript_download_link=full_transcript_download_link
             )
@@ -432,7 +516,9 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
         self.default_transcripts = filtered_default_transcripts
         if self.default_transcripts:
             self.default_transcripts.sort(key=lambda l: l['label'])
-
+        # Prepare basic_fields and advanced_fields for them to be rendered
+        basic_fields = self.prepare_studio_editor_fields(player.basic_fields)
+        advanced_fields = self.prepare_studio_editor_fields(player.advanced_fields)
         context = {
             'fields': [],
             'courseKey': self.location.course_key,  # pylint: disable=no-member
@@ -442,7 +528,9 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
             'default_transcripts': self.default_transcripts,
             'initial_default_transcripts': initial_default_transcripts,
             'auth_error_message': auth_error_message,
-            'transcripts_autoupload_message': transcripts_autoupload_message
+            'transcripts_autoupload_message': transcripts_autoupload_message,
+            'basic_fields': basic_fields,
+            'advanced_fields': advanced_fields,
         }
 
         # Build a list of all the fields that can be edited:
@@ -457,7 +545,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
             if field_info is not None:
                 context["fields"].append(field_info)
 
-        fragment.content = render_resource('static/html/studio_edit.html', **context)
+        fragment.content = render_template('studio-edit.html', **context)
         fragment.add_css(resource_string("static/css/handout.css"))
         fragment.add_css(resource_string("static/css/transcripts-upload.css"))
         fragment.add_css(resource_string("static/css/studio-edit.css"))
@@ -551,7 +639,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
         """
         data['player_name'] = self.fields['player_name'].default  # pylint: disable=unsubscriptable-object
         for player_name, player_class in BaseVideoPlayer.load_classes():
-            if player_name == 'dummy-player':
+            if player_name == PlayerName.DUMMY:
                 continue
             if player_class.match(data['href']):
                 data['player_name'] = player_name
@@ -580,12 +668,33 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
             return field.help
         return ''
 
+    def initialize_studio_field_info(self, field_name, field, field_type=None):
+        """
+        Initialize studio editor's field info.
+
+        Arguments:
+            field_name (str): Name of a video XBlock field whose info is to be made.
+            field (xblock.fields): Video XBlock field object.
+            field_type (str): Type of field.
+        Returns:
+            info (dict): Information on a field.
+        """
+        info = super(VideoXBlock, self)._make_field_info(field_name, field)
+        info['help'] = self._get_field_help(field_name, field)
+        if field_type:
+            info['type'] = field_type
+        if field_name == 'handout':
+            info['file_name'] = self.get_file_name_from_path(self.handout)
+            info['value'] = self.get_path_for(self.handout)
+        return info
+
     def _make_field_info(self, field_name, field):
         """
         Override and extend data of built-in method.
 
+        Create the information that the template needs to render a form field for this field.
         Reference:
-            https://github.com/edx/xblock-utils/blob/79dbdcc8bbcb4d73ed9f9f578b2c9cd533e6550c/xblockutils/studio_editable.py#L96
+            https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/studio_editable.py#L96
 
         Arguments:
             field_name (str): Name of a video XBlock field whose info is to be made.
@@ -607,20 +716,26 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
                 'has_list_values': False,
                 'type': 'string',
             }
+        elif field_name in ('handout', 'transcripts', 'default_transcripts', 'token'):
+            info = self.initialize_studio_field_info(field_name, field, field_type=field_name)
         else:
-            info = super(VideoXBlock, self)._make_field_info(field_name, field)
-            info['help'] = self._get_field_help(field_name, field)
-            if field_name == 'handout':
-                info['type'] = 'file_uploader'
-                info['file_name'] = self.get_file_name_from_path(self.handout)
-                info['value'] = self.get_path_for(self.handout)
-            elif field_name == 'transcripts':
-                info['type'] = 'transcript_uploader'
-            elif field_name == 'default_transcripts':
-                info['type'] = 'default_transcript_uploader'
-            elif field_name == 'token':
-                info['type'] = 'token_authorization'
+            info = self.initialize_studio_field_info(field_name, field)
         return info
+
+    def prepare_studio_editor_fields(self, fields):
+        """
+        Order xblock fields in studio editor modal.
+
+        Arguments:
+            fields (tuple): Names of Xblock fields.
+        Returns:
+            made_fields (list): XBlock fields prepared to be rendered in a studio edit modal.
+        """
+        made_fields = [
+            self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
+            for key in fields
+        ]
+        return made_fields
 
     def get_file_name_from_path(self, field):
         """
@@ -719,7 +834,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
             resp['data'] = {'metadata': self.metadata}
         elif suffix == 'can-show-backend-settings':
             player = self.get_player()
-            if str(self.player_name) == 'brightcove-player':
+            if str(self.player_name) == PlayerName.BRIGHTCOVE:
                 resp['data'] = player.can_show_settings()
             else:
                 resp['data'] = {'canShow': False}
@@ -740,7 +855,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
         # TODO move auth fields validation and kwargs population to specific backends
         # Handles a case where no token was provided by a user
         is_default_token = self.token == self.fields['token'].default  # pylint: disable=unsubscriptable-object
-        is_youtube_player = str(self.player_name) != 'youtube-player'  # pylint: disable=unsubscriptable-object
+        is_youtube_player = str(self.player_name) != PlayerName.YOUTUBE  # pylint: disable=unsubscriptable-object
         if is_default_token and is_youtube_player:
             error_message = 'In order to authenticate to a video platform\'s API, please provide a Video API Token.'
             return {}, error_message
@@ -750,16 +865,16 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
             kwargs = {'token': self.token}
 
         # Handles a case where no account_id was provided by a user
-        if str(self.player_name) == 'brightcove-player':
+        if str(self.player_name) == PlayerName.BRIGHTCOVE:
             if self.account_id == self.fields['account_id'].default:  # pylint: disable=unsubscriptable-object
                 error_message = 'In order to authenticate to a video platform\'s API, please provide an Account Id.'
                 return {}, error_message
             kwargs['account_id'] = self.account_id
 
         player = self.get_player()
-        if str(self.player_name) == 'brightcove-player' and not self.metadata.get('client_id'):
+        if str(self.player_name) == PlayerName.BRIGHTCOVE and not self.metadata.get('client_id'):
             auth_data, error_message = player.authenticate_api(**kwargs)
-        elif str(self.player_name) == 'brightcove-player' and self.metadata.get('client_id'):
+        elif str(self.player_name) == PlayerName.BRIGHTCOVE and self.metadata.get('client_id'):
             auth_data = {
                 'client_secret': self.metadata.get('client_secret'),
                 'client_id': self.metadata.get('client_id'),
