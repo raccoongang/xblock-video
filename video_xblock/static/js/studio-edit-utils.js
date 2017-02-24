@@ -26,3 +26,27 @@ function fillValues(fields) {
     }
     return {values: values, defaults: notSet};
 }
+
+
+/**
+ * Display message with results on a performed action (e.g. a transcript manual or automatic upload).
+ */
+function showStatus(message, type, successMessageElement, errorMessageElement) {
+    'use strict';
+    var elementToEmpty = '';
+    var elementToShow = '';
+    // Only one success message is to be displayed at once
+    $('.api-request').empty();
+    if (type === 'success') {
+        elementToEmpty = errorMessageElement;
+        elementToShow = successMessageElement;
+    } else if (type === 'error') {
+        elementToEmpty = successMessageElement;
+        elementToShow = errorMessageElement;
+    }
+    if (elementToEmpty) { elementToEmpty.empty(); }
+    elementToShow.text(message).show();
+    setTimeout(function() {
+        elementToShow.hide();
+    }, 5000);
+}

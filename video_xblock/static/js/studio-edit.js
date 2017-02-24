@@ -358,16 +358,16 @@ function StudioEditableXBlock(runtime, element) {
                     showStatus(
                         success_message,
                         'success',
-                        '.api-request.authenticate.status-success',
-                        '.api-request.authenticate.status-error');
+                        $('.api-request.authenticate.status-success'),
+                        $('.api-request.authenticate.status-error'));
                     showBackendSettings();
                 }
                 else if (error_message) {
                     showStatus(
                         error_message,
                         'error',
-                        '.api-request.authenticate.status-success',
-                        '.api-request.authenticate.status-error');
+                        $('.api-request.authenticate.status-success'),
+                        $('.api-request.authenticate.status-error'));
                 }
             }
         })
@@ -377,8 +377,8 @@ function StudioEditableXBlock(runtime, element) {
             showStatus(
                 message,
                 'error',
-                '.api-request.authenticate.status-success',
-                '.api-request.authenticate.status-error'
+                $('.api-request.authenticate.status-success'),
+                $('.api-request.authenticate.status-error')
             );
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
                 try {
@@ -389,16 +389,16 @@ function StudioEditableXBlock(runtime, element) {
                         showStatus(
                             message,
                             'error',
-                            '.api-request.authenticate.status-success',
-                            '.api-request.authenticate.status-error'
+                            $('.api-request.authenticate.status-success'),
+                            $('.api-request.authenticate.status-error')
                         );                   }
                 } catch (error) {
                     message = jqXHR.responseText.substr(0, 300);
                     showStatus(
                         message,
                         'error',
-                        '.api-request.authenticate.status-success',
-                        '.api-request.authenticate.status-error'
+                        $('.api-request.authenticate.status-success'),
+                        $('.api-request.authenticate.status-error')
                     );
                 }
             }
@@ -434,8 +434,8 @@ function StudioEditableXBlock(runtime, element) {
                     showStatus(
                         success_message,
                         'success',
-                        '.api-request.upload-default-transcript.' + newLang + '.status-success',
-                        '.api-request.upload-default-transcript.' + newLang + '.status-error');
+                        $('.api-request.upload-default-transcript.' + newLang + '.status-success'),
+                        $('.api-request.upload-default-transcript.' + newLang + '.status-error'));
                 }
             }
         })
@@ -445,8 +445,8 @@ function StudioEditableXBlock(runtime, element) {
             showStatus(
                 message,
                 'error',
-                '.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success',
-                '.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error'
+                $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success'),
+                $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error')
             );
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
                 try {
@@ -457,16 +457,16 @@ function StudioEditableXBlock(runtime, element) {
                         showStatus(
                             message,
                             'error',
-                            '.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success',
-                            '.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error'
+                            $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success'),
+                            $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error')
                         );                   }
                 } catch (error) {
                     message = jqXHR.responseText.substr(0, 300);
                     showStatus(
                         message,
                         'error',
-                        '.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success',
-                        '.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error'
+                        $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success'),
+                        $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error')
                     );
                 }
             }
@@ -476,18 +476,23 @@ function StudioEditableXBlock(runtime, element) {
     /**
      * Create new transcript, containing valid data, after successful form submit.
      */
-    function successHandler(response, statusText, xhr, fieldName, lang, label, currentLiTag) {
+    function successHandler(event, response, statusText, xhr, fieldName, lang, label, currentLiTag) {
         var url = '/' + response['asset']['id'];
         var regExp = /.*@(.+\..+)/;
         var filename = regExp.exec(url)[1];
         var downloadUrl = downloadTranscriptHandlerUrl + '?' + url;
-        if (fieldName == 'handout') {
-            var $parentDiv = $('.file-uploader', element);
+        var successMessage = 'File "' + filename + '" uploaded successfully';
+        var $parentDiv;
+        var downloadUrlServer;
+        var defaultTranscript;
+        var isValidated = validateTranscriptFile(event, fieldName, filename, $fileUploader);
+        if (fieldName == 'handout' && isValidated) {
+            $parentDiv = $('.file-uploader');
             $('.download-setting', $parentDiv).attr('href', downloadUrl).removeClass('is-hidden');
             $('a[data-change-field-name=' + fieldName + ']').text('Replace');
-            showUploadStatus($parentDiv, filename);
+            displayStatusCaptions('success', successMessage, $parentDiv);
             $('input[data-field-name=' + fieldName + ']').val(url).change();
-        } else {
+        } else if (fieldName == 'transcripts' && isValidated) {
             pushTranscript(lang, label, url, '', transcriptsValue);
             $('.add-transcript').removeClass('is-disabled');
             $('input[data-field-name=' + fieldName + ']').val(JSON.stringify(transcriptsValue)).change();
@@ -495,15 +500,17 @@ function StudioEditableXBlock(runtime, element) {
             $(currentLiTag).find('.download-transcript')
                 .removeClass('is-hidden')
                 .attr('href', downloadUrl);
-            showUploadStatus($(currentLiTag), filename);
-            // Affect default transcripts
-            // Update respective enabled transcript with an external url from a newly created standard transcript
-            var downloadUrlServer = $('.list-settings-buttons .upload-setting.upload-transcript[data-lang-code=' + lang + ']')
+            displayStatusTranscripts('success', successMessage, currentLiTag);
+            // Affect default transcripts: update a respective enabled transcript with an external url
+            // of a newly created standard transcript
+            downloadUrlServer =
+                $('.list-settings-buttons .upload-setting.upload-transcript[data-lang-code=' + lang + ']')
                 .siblings('a.download-transcript.download-setting').attr('href');
-            var defaultTranscript= {'lang': lang, 'label': label, 'url': downloadUrlServer};
+            defaultTranscript= {'lang': lang, 'label': label, 'url': downloadUrlServer};
             createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
             bindRemovalListenerEnabledTranscript(lang, label, downloadUrl);
         }
+        // Reset data on a transcript uploaded to a server
         $(event.currentTarget).attr({
             'data-change-field-name': '',
             'data-lang-code': '',
@@ -572,7 +579,7 @@ function StudioEditableXBlock(runtime, element) {
         $('.upload-setting', element).addClass('is-disabled');
         $('.file-uploader-form', element).ajaxSubmit({
             success: function(response, statusText, xhr) {
-                successHandler(response, statusText, xhr, fieldName, lang, label, currentLiTag)
+                successHandler(event, response, statusText, xhr, fieldName, lang, label, currentLiTag)
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 runtime.notify('error', {title: gettext('Unable to update settings'), message: textStatus});

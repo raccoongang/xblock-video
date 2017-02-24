@@ -1,17 +1,34 @@
 /**
- * Standard transcripts (manually uploaded) functionality is represented here.
+ * Standard transcripts (manually uploaded ones) and captions functionality is represented here.
+ * Transcripts and captions often share the same logic.
  */
 
 /**
- * Display message with results on a transcript manual upload.
+ * Display message with results on a performed action with captions.
  */
-function showUploadStatus($element, filename) {
+function displayStatusCaptions(statusType, statusMessage, $parentDiv) {
     'use strict';
-    $('.status-error', $element).empty();
-    $('.status-upload', $element).text('File ' + filename + ' uploaded successfully').show();
-    setTimeout(function() {
-        $('.status-upload', $element).hide();
-    }, 5000);
+    var $successElement = $('.status-upload', $parentDiv);
+    var $errorElement = $('.status-error', $parentDiv);
+    showStatus(
+        statusMessage,
+        statusType,
+        $successElement,
+        $errorElement);
+}
+
+/**
+ * Display message with results on a performed action with transcripts.
+ */
+function displayStatusTranscripts(statusType, statusMessage, currentLiTag) {
+    'use strict';
+    var $successElement = $('.status-upload', $(currentLiTag));
+    var $errorElement = $('.status-error', $(currentLiTag));
+    showStatus(
+        statusMessage,
+        statusType,
+        $successElement,
+        $errorElement);
 }
 
 /**
@@ -80,6 +97,59 @@ function validateTranscripts(e, $langChoiceItem) {
         }
     });
     return isValid.length === $visibleLangChoiceItems.length;
+}
+
+/**
+ * Validate extension and name of a transcript or a caption file before save it to video xblock.
+ *
+ * Returns:
+ * isValidated (Boolean): Result of a validation (true|false).
+ *
+ */
+function validateTranscriptFile(event, fieldName, filename, $fileUploader) {
+    'use strict';
+    // TODO handle a case: User may upload a file without extension. Reference: http://stackoverflow.com/a/1203361
+    // TODO handle a case: File name may contain multiple points
+    // e.g. `The.Lord.of.the.Rings.The.Fellowship.of.the.Rings.THEATRICAL.EDITION.2001.1080p.BrRip.x264.BOKUTOX.YIFY.srt`
+    var fileExtension = filename.substr((~-filename.lastIndexOf(".") >>> 0) + 2);
+    var fileSize = $fileUploader[0].files[0].size;
+    var acceptedFormats = $fileUploader[0].accept;
+    var isNotAcceptedFormat = acceptedFormats.indexOf(fileExtension) === -1;
+    var isNotAcceptedSize = fileSize > 307200;
+    var isNotAccepted = false;
+    var errorMessage = 'Couldn\'t upload "' + filename + '". ';
+    var $parentDiv;
+    var currentLiIndex;
+    var currentLiTag;
+    var isValidated;
+    // We still need to validate file extension, since a user can override an `accept` attribute,
+    // that is, choose file of any format to submit through a file upload
+    if (isNotAcceptedFormat) {
+        errorMessage = errorMessage + 'Please upload a file of "vtt" or "srt" format only. ';
+        isNotAccepted = true;
+        console.log(errorMessage);
+    }
+    if (isNotAcceptedSize) {
+        errorMessage = errorMessage + 'Please upload a file of 300 KB maximum.';
+        isNotAccepted = true;
+        console.log(errorMessage);
+    }
+    // TODO test: Display validation error message if a transcript/caption file may not be not accepted
+    if (isNotAccepted) {
+        if (fieldName == 'handout') {
+            $parentDiv = $('.file-uploader');
+            displayStatusCaptions('error', errorMessage, $parentDiv)
+        } else {
+            currentLiIndex = $(event.currentTarget).attr('data-li-index');
+            currentLiTag = $('.language-transcript-selector').children()[parseInt(currentLiIndex)];
+            displayStatusTranscripts('error', errorMessage, currentLiTag)
+        }
+        isValidated = false;
+    } else {
+        isValidated = true;
+    }
+
+    return isValidated;
 }
 
 /**
