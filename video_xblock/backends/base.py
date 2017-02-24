@@ -7,8 +7,9 @@ Base Video player plugin.
 """
 
 import abc
-from itertools import chain
+import itertools
 import json
+import operator
 import re
 
 from webob import Response
@@ -93,7 +94,6 @@ class BaseVideoPlayer(Plugin):
         """
         return {}
 
-    @abc.abstractproperty
     def metadata_fields(self):
         """
         List of keys (str) to be stored in the metadata xblock field.
@@ -112,7 +112,7 @@ class BaseVideoPlayer(Plugin):
 
         Defaults to contatenation of `basic_fields` and `advanced_fields`.
         """
-        return tuple(chain(self.basic_fields, self.advanced_fields))
+        return tuple(itertools.chain(self.basic_fields, self.advanced_fields))
 
     @property
     def basic_fields(self):
@@ -190,6 +190,32 @@ class BaseVideoPlayer(Plugin):
             frag.add_javascript(self.resource_string(js_file))
 
         return frag
+
+    @staticmethod
+    def player_data_setup(context):
+        """
+        Base Player setup.
+        """
+        return {
+            "controlBar": {
+                "volumeMenuButton": {
+                    "inline": False,
+                    "vertical": True
+                }
+            },
+            "controls": True,
+            "preload": 'auto',
+            "playbackRates": [0.5, 1, 1.5, 2],
+            "plugins": {
+                "xblockEventPlugin": {},
+                "offset": {
+                    "start": context['start_time'],
+                    "end": context['end_time'],
+                    "current_time": context['player_state']['current_time'],
+                },
+                "videoJSSpeedHandler": {},
+            }
+        }
 
     @abc.abstractmethod
     def media_id(self, href):  # pylint: disable=unused-argument
@@ -311,7 +337,8 @@ class BaseVideoPlayer(Plugin):
             lang_code (str): Pre-configured language code, e.g. 'br'
             lang_label (str): Pre-configured language label, e.g. 'Breton'
         """
-        # Delete region subtags; reference: https://github.com/edx/edx-platform/blob/master/lms/envs/common.py#L862
+        # Delete region subtags
+        # Reference: https://github.com/edx/edx-platform/blob/release-2017-02-16-12.24/lms/envs/common.py#L861
         lang_code = lang_code[0:2]
         # Check on consistency with the pre-configured ALL_LANGUAGES
         if lang_code not in [language[0] for language in settings.ALL_LANGUAGES]:
@@ -323,9 +350,29 @@ class BaseVideoPlayer(Plugin):
         return lang_code, lang_label
 
     @staticmethod
-    def filter_default_transcripts(default_transcripts, transcripts):
+    def clean_default_transcripts(default_transcripts):
         """
-        Exclude enabled transcripts (fetched from API) from the list of available ones (from video xblock).
+        Remove duplicates from default transcripts fetched from a video platform.
+
+        Default transcripts should contain transcripts of distinct languages only.
+        Reference:
+            http://stackoverflow.com/a/1280464
+
+        Arguments:
+            default_transcripts (list): Nested list of dictionaries with data on default transcripts.
+        Returns:
+            distinct_transcripts (list): Distinct default transcripts to be shown in studio editor.
+        """
+        get_values = operator.itemgetter('lang')
+        default_transcripts.sort(key=get_values)
+        distinct_transcripts = []
+        for _key, group in itertools.groupby(default_transcripts, get_values):
+            distinct_transcripts.append(group.next())
+        return distinct_transcripts
+
+    def filter_default_transcripts(self, default_transcripts, transcripts):
+        """
+        Exclude enabled transcripts (fetched from API) from the list of available ones (fetched from video xblock).
         """
         enabled_languages_codes = [t[u'lang'] for t in transcripts]
         default_transcripts = [
