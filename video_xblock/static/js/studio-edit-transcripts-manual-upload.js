@@ -108,13 +108,13 @@ function validateTranscripts(e, $langChoiceItem) {
  */
 function validateTranscriptFile(event, fieldName, filename, $fileUploader) {
     'use strict';
-    // TODO handle a case: User may upload a file without extension. Reference: http://stackoverflow.com/a/1203361
-    // TODO handle a case: File name may contain multiple points
-    // e.g. `The.Lord.of.the.Rings.The.Fellowship.of.the.Rings.THEATRICAL.EDITION.2001.1080p.BrRip.x264.BOKUTOX.YIFY.srt`
+    // User may upload a file without extension. Reference: http://stackoverflow.com/a/1203361
     var fileExtension = filename.substr((~-filename.lastIndexOf(".") >>> 0) + 2);
     var fileSize = $fileUploader[0].files[0].size;
-    var acceptedFormats = $fileUploader[0].accept;
-    var isNotAcceptedFormat = acceptedFormats.indexOf(fileExtension) === -1;
+    var acceptedFormats = $fileUploader[0].accept || '.vtt .srt';
+    var isEmptyExtension = fileExtension === '';
+    var isNotAcceptedExtension = acceptedFormats.indexOf(fileExtension) === -1;
+    var isNotAcceptedFormat = isEmptyExtension || isNotAcceptedExtension;
     var isNotAcceptedSize = fileSize > 307200;
     var isNotAccepted = false;
     var errorMessage = 'Couldn\'t upload "' + filename + '". ';

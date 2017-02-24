@@ -478,8 +478,8 @@ function StudioEditableXBlock(runtime, element) {
      */
     function successHandler(event, response, statusText, xhr, fieldName, lang, label, currentLiTag) {
         var url = '/' + response['asset']['id'];
-        var regExp = /.*@(.+\..+)/;
-        var filename = regExp.exec(url)[1];
+        // User may upload a file without extension
+        var filename = $fileUploader[0].files[0].name;
         var downloadUrl = downloadTranscriptHandlerUrl + '?' + url;
         var successMessage = 'File "' + filename + '" uploaded successfully';
         var $parentDiv;
@@ -490,6 +490,7 @@ function StudioEditableXBlock(runtime, element) {
             $parentDiv = $('.file-uploader');
             $('.download-setting', $parentDiv).attr('href', downloadUrl).removeClass('is-hidden');
             $('a[data-change-field-name=' + fieldName + ']').text('Replace');
+            // TODO: create element to display error message
             displayStatusCaptions('success', successMessage, $parentDiv);
             $('input[data-field-name=' + fieldName + ']').val(url).change();
         } else if (fieldName == 'transcripts' && isValidated) {
