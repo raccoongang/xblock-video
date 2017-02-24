@@ -1,18 +1,22 @@
+# -*- coding: utf-8 -*-
 """
-Wistia Video player plugin
+Wistia Video player plugin.
 """
 
+import HTMLParser
 import json
 import re
+
 import requests
 import babelfish
 
 from video_xblock import BaseVideoPlayer
+from video_xblock.constants import status
 
 
 class WistiaPlayer(BaseVideoPlayer):
     """
-    WistiaPlayer is used for videos hosted on the Wistia Video Cloud
+    WistiaPlayer is used for videos hosted on the Wistia Video Cloud.
     """
 
     # From official Wistia documentation. May change in the future
@@ -20,6 +24,12 @@ class WistiaPlayer(BaseVideoPlayer):
     url_re = re.compile(
         r'https?:\/\/(.+)?(wistia.com|wi.st)\/(medias|embed)\/(?P<media_id>.*)'
     )
+
+    advanced_fields = (
+        'start_time', 'end_time', 'handout', 'transcripts',
+        'download_transcript_allowed', 'token', 'default_transcripts'
+    )
+
     # Token field is stored in metadata only if authentication was successful
     metadata_fields = ['token', ]
 
@@ -44,9 +54,17 @@ class WistiaPlayer(BaseVideoPlayer):
     # Stores default transcripts fetched from the captions API
     default_transcripts = []
 
+    fields_help = {
+        'token': 'You can get a master token following the guide of '
+                 '<a href="https://wistia.com/doc/data-api" target="_blank">Wistia</a>. '
+                 'Please ensure appropriate operations scope has been set on the video platform.'
+    }
+
     def media_id(self, href):
         """
-        Wistia specific implementation of BaseVideoPlayer.media_id()
+        Extract Platform's media id from the video url.
+
+        E.g. https://example.wistia.com/medias/12345abcde -> 12345abcde
         """
         return self.url_re.search(href).group('media_id')
 
@@ -82,69 +100,60 @@ class WistiaPlayer(BaseVideoPlayer):
 
         frag = super(WistiaPlayer, self).get_frag(**context)
         frag.add_content(
-            self.render_resource('../static/html/wistiavideo.html', **context)
+            self.render_resource('static/html/wistiavideo.html', **context)
         )
-        frag.add_javascript(self.resource_string(
-            '../static/bower_components/videojs-wistia/src/wistia.js'
-        ))
 
-        frag.add_javascript(self.resource_string(
-            '../static/bower_components/videojs-offset/dist/videojs-offset.min.js'
-        ))
+        frag.add_javascript(
+            self.render_resource('static/js/context.js', **context)
+        )
 
-        frag.add_javascript(self.render_resource('../static/js/player-context-menu.js', **context))
+        js_files = [
+            'static/bower_components/videojs-wistia/src/wistia.js',
+            'static/bower_components/videojs-offset/dist/videojs-offset.min.js',
+            'static/js/player-context-menu.js'
+        ]
+
+        for js_file in js_files:
+            frag.add_javascript(self.resource_string(js_file))
 
         return frag
 
-    @staticmethod
-    def customize_xblock_fields_display(editable_fields):
-        """
-        Customises display of studio editor fields per a video platform.
-        """
-        message = 'You can get a master token following the guide of ' \
-                  '<a href="https://wistia.com/doc/data-api" target="_blank">Wistia</a>. ' \
-                  'Please ensure appropriate operations scope has been set on the video platform.'
-        editable_fields = list(editable_fields)
-        editable_fields.remove('account_id')
-        editable_fields.remove('player_id')
-        customised_editable_fields = tuple(editable_fields)
-        return message, customised_editable_fields
-
     def authenticate_api(self, **kwargs):
         """
-        Calls a sample Wistia API url to check on authentication success.
-        Reference: https://wistia.com/doc/data-api#authentication
+        Call a sample Wistia API url to check on authentication success.
+
+        Reference:
+            https://wistia.com/doc/data-api#authentication
 
         Arguments:
             kwargs (dict): Wistia master token key-value pair.
         Returns:
-            auth_data (dict): master token, provided by a user, is to be stored in Wistia's player metadata,
-                since no access token should be generated
-            error_status_message (str) for the sake of verbosity.
+            auth_data (dict): Master token, provided by a user, which is to be stored in Wistia's player metadata.
+            error_status_message (str): Message with authentication outcomes for the sake of verbosity.
         """
         token, media_id = kwargs.get('token'), kwargs.get('video_id')  # pylint: disable=unused-variable
         auth_data, error_message = {}, ''
         auth_data['token'] = token
         url = self.captions_api.get('auth_sample_url').format(token=str(token))
         response = requests.get('https://' + url)
-        if response.status_code == 401:
+        if response.status_code == status.HTTP_401_UNAUTHORIZED:
             error_message = "Authentication failed. " \
                             "Please ensure you have provided a valid master token, using Video API Token field."
         return auth_data, error_message
 
     def get_default_transcripts(self, **kwargs):
         """
-        Fetches transcripts list from Wistia API.
-        Reference: https://wistia.com/doc/data-api#captions_index
+        Fetch transcripts list from Wistia API.
 
-        Urls of transcipts are to be fetched later on with separate API calls.
-        Reference: https://wistia.com/doc/data-api#captions_show
+        Urls of transcripts are to be fetched later on with separate API calls.
+        References:
+            https://wistia.com/doc/data-api#captions_index
+            https://wistia.com/doc/data-api#captions_show
 
         Arguments:
-            kwargs (dict): key-value pairs with video_id (fetched from href field of studio editor),
-                           and token (fetched from Wistia API).
+            kwargs (dict): Key-value pairs with video_id, fetched from video xblock, and token, fetched from Wistia API.
         Returns:
-            list: List of dicts of transcripts.  Example:
+            list: List of dicts of transcripts. Example:
             [
                 {
                     'lang': 'en',
@@ -170,7 +179,7 @@ class WistiaPlayer(BaseVideoPlayer):
                       'Error: {}'.format(str(exception))
             return default_transcripts, message
 
-        if data.status_code == 200 and wistia_data:
+        if data.status_code == status.HTTP_200_OK and wistia_data:
             transcripts_data = [
                 [el.get('language'), el.get('english_name'), el.get('text')]
                 for el in wistia_data]
@@ -197,49 +206,48 @@ class WistiaPlayer(BaseVideoPlayer):
                 self.default_transcripts.append(default_transcript)
         # If captions do not exist for a video, the response will be an empty JSON array.
         # Reference: https://wistia.com/doc/data-api#captions_index
-        elif data.status_code == 200 and not wistia_data:
+        elif data.status_code == status.HTTP_200_OK and not wistia_data:
             message = 'For now, video platform doesn\'t have any timed transcript for this video.'
         # If a video does not exist, the response will be an empty HTTP 404 Not Found.
         # Reference: https://wistia.com/doc/data-api#captions_index
-        elif data.status_code == 404:
+        elif data.status_code == status.HTTP_404_NOT_FOUND:
             message = "Wistia video {video_id} doesn't exist.".format(video_id=str(video_id))
         return default_transcripts, message
 
     @staticmethod
     def format_transcript_text_line(line):
         """
-        Replaces comma with dot in timings, e.g. 00:00:10,500 should be 00:00:10.500
-
+        Replace comma with dot in timings, e.g. 00:00:10,500 should be 00:00:10.500.
         """
-        pattern = re.compile(r"\d{2}:\d{2}:\d{2},\d{3}")
         new_line = u""
         for token in line.split():
-            if pattern.match(str(token)) or pattern.match(unicode(token), re.UNICODE):
-                token = token.replace(",", ".")
-            new_line += token + u" "
+            decoded_token = token.encode('utf8', 'ignore')
+            formatted_token = re.sub(r'(\d{2}:\d{2}:\d{2}),(\d{3})', r'\1.\2', decoded_token)
+            new_line += unicode(formatted_token.decode('utf8')) + u" "
         return new_line
 
     def format_transcript_text(self, text):
         """
-        Prepares unicode transcripts to be converted to WebVTT format.
-
+        Prepare unicode transcripts to be converted to WebVTT format.
         """
         new_text = [
             self.format_transcript_text_line(line)
             for line in text[0].splitlines()
         ]
         new_text = '\n'.join(new_text)
+        html_parser = HTMLParser.HTMLParser()
+        unescaped_text = html_parser.unescape(new_text)
         if u"WEBVTT" not in text:
-            text = u"WEBVTT\n\n" + unicode(new_text)
+            text = u"WEBVTT\n\n" + unicode(unescaped_text)
         else:
-            text = unicode(new_text)
+            text = unicode(unescaped_text)
         return text
 
     def download_default_transcript(self, language_code, url=None):  # pylint: disable=unused-argument
         """
         Get default transcript fetched from a video platform API and formats it to WebVTT-like unicode.
 
-        Though Wistia provides a method for a transcript fetching, this is to avoid an API call.
+        Though Wistia provides a method for a transcript fetching, this is to avoid API call.
         References:
             https://wistia.com/doc/data-api#captions_index
             https://wistia.com/doc/data-api#captions_show
@@ -247,10 +255,8 @@ class WistiaPlayer(BaseVideoPlayer):
         Arguments:
             url (str): API url to fetch a default transcript from.
             language_code (str): Language code of a default transcript to be downloaded.
-
         Returns:
-            unicode: text of transcripts.
-
+            text (unicode): Text of transcripts.
         """
         text = [
             sub.get(u'text')
