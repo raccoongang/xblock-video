@@ -109,7 +109,7 @@ function validateTranscripts(e, $langChoiceItem) {
 function validateTranscriptFile(event, fieldName, filename, $fileUploader) {
     'use strict';
     // User may upload a file without extension. Reference: http://stackoverflow.com/a/1203361
-    var fileExtension = filename.substr((~-filename.lastIndexOf(".") >>> 0) + 2);
+    var fileExtension = filename.substr((~-filename.lastIndexOf('.') >>> 0) + 2);
     var fileSize = $fileUploader[0].files[0].size;
     var acceptedFormats = $fileUploader[0].accept || '.vtt .srt';
     var isEmptyExtension = fileExtension === '';
@@ -127,22 +127,20 @@ function validateTranscriptFile(event, fieldName, filename, $fileUploader) {
     if (isNotAcceptedFormat) {
         errorMessage = errorMessage + 'Please upload a file of "vtt" or "srt" format only. ';
         isNotAccepted = true;
-        console.log(errorMessage);
     }
     if (isNotAcceptedSize) {
         errorMessage = errorMessage + 'Please upload a file of 300 KB maximum.';
         isNotAccepted = true;
-        console.log(errorMessage);
     }
     // Display validation error message if a transcript/caption file may not be not accepted
     if (isNotAccepted) {
-        if (fieldName == 'handout') {
+        if (fieldName === 'handout') {
             $parentDiv = $('.file-uploader');
-            displayStatusCaptions('error', errorMessage, $parentDiv)
+            displayStatusCaptions('error', errorMessage, $parentDiv);
         } else {
             currentLiIndex = $(event.currentTarget).attr('data-li-index');
-            currentLiTag = $('.language-transcript-selector').children()[parseInt(currentLiIndex)];
-            displayStatusTranscripts('error', errorMessage, currentLiTag)
+            currentLiTag = $('.language-transcript-selector').children()[parseInt(currentLiIndex, 10)];
+            displayStatusTranscripts('error', errorMessage, currentLiTag);
         }
         isValidated = false;
     } else {
