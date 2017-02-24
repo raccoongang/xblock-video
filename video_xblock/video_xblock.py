@@ -411,7 +411,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 _(u"Incorrect or unsupported video URL, please recheck.")
             )
 
-
     def validate_field_data(self, validation, data):
         """
         Validate data submitted via xblock edit pop-up.
