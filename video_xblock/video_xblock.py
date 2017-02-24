@@ -398,7 +398,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         # Use field `href` for Html5 player.
         # Use field `download_video_url` for other players. Don't show button if this field is empty.
         download_video_url = False
-        if self.download_transcript_allowed:
+        if self.download_video_allowed:
             if self.player_name == PlayerName.HTML5:
                 download_video_url = self.href
             elif self.download_video_url:
