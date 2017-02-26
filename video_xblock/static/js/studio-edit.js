@@ -1,9 +1,7 @@
 /**
-    StudioEditableXBlock function for setting up the Video xblock.
-    This function was copied from xblock-utils by link
-        https://github.com/edx/xblock-utils/blob/master/xblockutils/templates/studio_edit.html
-    and extended by Raccoon Gang company
-    It is responsible for a validating and sending data to backend
+    Set up the Video xblock studio editor. This part is responsible for validation and sending of the data to a backend.
+    Reference:
+        https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/templates/studio_edit.html
 */
 function StudioEditableXBlock(runtime, element) {
     'use strict';
@@ -12,6 +10,54 @@ function StudioEditableXBlock(runtime, element) {
     // Studio includes a copy of tinyMCE and its jQuery plugin
     var tinyMceAvailable = (typeof $.fn.tinymce !== 'undefined');  // TODO: Remove TinyMCE
     var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
+    var $defaultTranscriptsSwitcher = $('input.default-transcripts-switch-input');
+    var $enabledLabel = $('div.custom-field-section-label.enabled-transcripts');
+    var $availableLabel = $('div.custom-field-section-label.available-transcripts');
+    var noEnabledTranscript;
+    var noAvailableTranscript;
+    var $modalHeaderTabs = $('.editor-modes.action-list.action-modes');
+    var currentTabName;
+    var isNotDummy = $('#xb-field-edit-href').val() !== '';
+
+    /** Toggle studio editor's current tab.
+     */
+    function toggleEditorTab(tabName) {
+        var $tabDisable;
+        var $tabEnable;
+        var $otherTabName;
+        if (tabName === 'Basic') {
+            $tabEnable = $('.list-input.settings-list.basic');
+            $tabDisable = $('.list-input.settings-list.advanced');
+            $otherTabName = 'Advanced';
+        } else if (tabName === 'Advanced') {
+            $tabEnable = $('.list-input.settings-list.advanced');
+            $tabDisable = $('.list-input.settings-list.basic');
+            $otherTabName = 'Basic';
+        }
+        $(event.currentTarget).addClass('current');
+        $('.edit-menu-tab[data-tab-name=' + $otherTabName + ']').removeClass('current');
+        $tabDisable.addClass('is-hidden');
+        $tabEnable.removeClass('is-hidden');
+    }
+
+    // Create advanced and basic tabs
+    (function() {
+        if (isNotDummy) {
+            $modalHeaderTabs
+                .append(
+                    '<li class="inner_tab_wrap">' +
+                    '<button class="edit-menu-tab" data-tab-name="Advanced">Advanced</button>' +
+                    '</li>',
+                    '<li class="inner_tab_wrap">' +
+                    '<button class="edit-menu-tab current" data-tab-name="Basic">Basic</button>' +
+                    '</li>');
+            // Bind listeners to the toggle buttons
+            $('.edit-menu-tab').click(function(event) {
+                currentTabName = $(event.currentTarget).attr('data-tab-name');
+                toggleEditorTab(currentTabName);
+            });
+        }
+    }());
 
     /** Wrapper function for dispatched ajax calls.
      */
@@ -149,6 +195,8 @@ function StudioEditableXBlock(runtime, element) {
             $field.val($wrapper.attr('data-default')); // Use attr instead of data to force treating the default value as a string
             $wrapper.removeClass('is-set');
             $resetButton.removeClass('active').addClass('inactive');
+            // Remove all enabled default transcripts
+            removeAllEnabledTranscripts(initialDefaultTranscriptsData, bindUploadListenerAvailableTranscript);
         });
         if (type == 'html' && tinyMceAvailable) {
             tinyMCE.baseURL = baseUrl + '/js/vendor/tinymce/js/tinymce';
@@ -212,6 +260,8 @@ function StudioEditableXBlock(runtime, element) {
             });
             $wrapper.removeClass('is-set');
             $resetButton.removeClass('active').addClass('inactive');
+            // Remove all enabled default transcripts
+            removeAllEnabledTranscripts(initialDefaultTranscriptsData, bindUploadListenerAvailableTranscript);
         });
     });
 
@@ -485,7 +535,6 @@ function StudioEditableXBlock(runtime, element) {
                     );
                 }
             }
-            runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
         });
     }
 
@@ -531,7 +580,7 @@ function StudioEditableXBlock(runtime, element) {
      * Bind upload listener to a newly created available transcript.
      */
     function bindUploadListenerAvailableTranscript(langCode, langLabel) {
-        var $uploadElement = $('.default-transcripts-action-link.upload-default-transcript:visible[data-lang-code=' + langCode + ']');
+        var $uploadElement = $('.default-transcripts-action-link.upload-default-transcript[data-lang-code=' + langCode + ']');
         $uploadElement.click(function () {
             // Get url for a transcript fetching from the API
             var downloadUrlApi = getTranscriptUrl(initialDefaultTranscripts, langCode);
@@ -546,7 +595,7 @@ function StudioEditableXBlock(runtime, element) {
      * Bind removal listener to a newly created enabled transcript.
      */
     function bindRemovalListenerEnabledTranscript(langCode, langLabel, downloadUrlServer) {
-        var $removeElement = $('.default-transcripts-action-link.remove-default-transcript:visible[data-lang-code=' + langCode + ']');
+        var $removeElement = $('.default-transcripts-action-link.remove-default-transcript[data-lang-code=' + langCode + ']');
         $removeElement.click(function() {
             var defaultTranscript = {'lang' : langCode, 'label' : langLabel, 'url': downloadUrlServer};
             // Affect default transcripts
@@ -693,6 +742,15 @@ function StudioEditableXBlock(runtime, element) {
         // Affect standard transcripts
         removeStandardTranscriptBlock(langCode, transcriptsValue, disabledLanguages);
         disableOption($langChoiceItem, disabledLanguages);
+    });
+
+    $defaultTranscriptsSwitcher.change(function(){
+        noEnabledTranscript = !$('.enabled-default-transcripts-section:visible').length;
+        noAvailableTranscript = !$('.available-default-transcripts-section:visible').length;
+        // Hide label of enabled default transcripts block if no transcript is enabled on video xblock, and vice versa
+        setDisplayDefaultTranscriptsLabel(noEnabledTranscript, $enabledLabel);
+        // Hide label of available default transcripts block if no transcript is available on a platform, and vice versa
+        setDisplayDefaultTranscriptsLabel(noAvailableTranscript, $availableLabel);
     });
     // End of Raccoongang addons
 }
