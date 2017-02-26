@@ -275,10 +275,12 @@ function StudioEditableXBlock(runtime, element) {
     var $standardTranscriptRemover = $('.remove-action');
     var $langChoiceItem = $('.language-transcript-selector', element);
     var $videoApiAuthenticator = $('#video-api-authenticate', element);
+    var $3playmediaTranscriptsApi = $('#threeplaymedia-api-transcripts', element);
     var gotTranscriptsValue = $('input[data-field-name="transcripts"]').val();
     var downloadTranscriptHandlerUrl = runtime.handlerUrl(element, 'download_transcript');
     var authenticateVideoApiHandlerUrl = runtime.handlerUrl(element, 'authenticate_video_api_handler');
     var uploadDefaultTranscriptHandlerUrl = runtime.handlerUrl(element, 'upload_default_transcript_handler');
+    var getTranscripts3playmediaApiHandlerUrl = runtime.handlerUrl(element, 'get_transcripts_3playmedia_api_handler');
     var currentLanguageCode;
     var currentLanguageLabel;
     var initialDefaultTranscriptsData = getInitialDefaultTranscriptsData();
@@ -291,6 +293,69 @@ function StudioEditableXBlock(runtime, element) {
     transcriptsValue.forEach(function(transcriptValue) {
         disabledLanguages.push(transcriptValue.lang)
     });
+
+    /**
+     * Get transcripts from 3playmedia's API and show result message.
+     */
+    function getTranscripts3playmediaApi(data) {
+        return $.ajax({
+            type: 'POST',
+            url: getTranscripts3playmediaApiHandlerUrl,
+            data: JSON.stringify(data),
+            dataType: 'json',
+            success: function(response) {
+                var error_message = response['error_message'];
+                var success_message = response['success_message'];
+                if (success_message) {
+                    showStatus(
+                        success_message,
+                        'success',
+                        '.api-request.threeplaymedia.status-success',
+                        '.api-request.threeplaymedia.status-error');
+                    showBackendSettings();
+                }
+                else if (error_message) {
+                    showStatus(
+                        error_message,
+                        'error',
+                        '.api-request.threeplaymedia.status-success',
+                        '.api-request.threeplaymedia.status-error');
+                }
+            }
+        })
+        .fail(function(jqXHR) {
+            var message = gettext('This may be happening because of an error with our server or your ' +
+                'internet connection. Try refreshing the page or making sure you are online.');
+            showStatus(
+                message,
+                'error',
+                '.api-request.threeplaymedia.status-success',
+                '.api-request.threeplaymedia.status-error'
+            );
+            if (jqXHR.responseText) { // Is there a more specific error message we can show?
+                try {
+                    message = JSON.parse(jqXHR.responseText).error;
+                    if (typeof message === 'object' && message.messages) {
+                        message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
+                        showStatus(
+                            message,
+                            'error',
+                            '.api-request.threeplaymedia.status-success',
+                            '.api-request.threeplaymedia.status-error'
+                        );                   }
+                } catch (error) {
+                    message = jqXHR.responseText.substr(0, 300);
+                    showStatus(
+                        message,
+                        'error',
+                        '.api-request.threeplaymedia.status-success',
+                        '.api-request.threeplaymedia.status-error'
+                    );
+                }
+            }
+            runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
+        });
+    }
 
     /**
      * Authenticate to video platform's API and show result message.
@@ -537,6 +602,26 @@ function StudioEditableXBlock(runtime, element) {
         event.stopPropagation();
         var $data = $('.token', element).val();
         authenticateVideoApi($data);
+    });
+
+    $3playmediaTranscriptsApi.on('click', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var $data = $('.threeplaymedia-api-key', element).val();
+        var transcripts = getTranscripts3playmediaApi($data);
+        transcripts.done(
+            function(response) {
+                console.log(response);
+                response.transcripts.forEach(function transcript(item) {
+                    createTranscriptBlock(
+                        item.lang,
+                        item.label,
+                        transcriptsValue,
+                        downloadTranscriptHandlerUrl
+                    );
+                });
+            }
+        );
     });
 
     $('.lang-select').on('change', function(event) {

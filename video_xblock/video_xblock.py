@@ -5,7 +5,6 @@ All you need to provide is video url, this XBlock does the rest for you.
 """
 
 import datetime
-import functools
 import json
 import logging
 import os.path
@@ -30,6 +29,35 @@ from .utils import render_resource, resource_string, ugettext as _
 
 
 log = logging.getLogger(__name__)
+
+
+@XBlock.wants('contentstore')
+class ContentStoreMixin(XBlock):
+    """
+    Proxy to future `contentstore` service.
+    If `contentstore` service is not provided by `runtime` it returns classes
+    from `xmodule.contentstore`
+    """
+
+    @property
+    def contentstore(self):
+        """
+        Proxy to `xmodule.contentstore.contentstore` class.
+        """
+        contentstore_service = self.runtime.service(self, 'contentstore')
+        if contentstore_service:
+            return contentstore_service.contentstore
+        return contentstore
+
+    @property
+    def static_content(self):
+        """
+        Proxy to `xmodule.contentstore.StaticContent` class.
+        """
+        contentstore_service = self.runtime.service(self, 'contentstore')
+        if contentstore_service:
+            return contentstore_service.StaticContent
+        return StaticContent
 
 
 class TranscriptsMixin(XBlock):
@@ -88,7 +116,7 @@ class TranscriptsMixin(XBlock):
         return Response(self.convert_caps_to_vtt(caps))
 
 
-class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
+class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin, XBlock):
     """
     Main VideoXBlock class, responsible for saving video settings and rendering it for students.
     """
@@ -188,6 +216,14 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             'Default transcripts are uploaded automatically from a video platform '
             'to the list of available transcripts.'
         ),
+        resettable_editor=False
+    )
+
+    playmedia_apikey = String(
+        default='default',
+        display_name=_('API Key'),
+        help=_('You can generate a client token following official documentation of your video platform\'s API.'),
+        scope=Scope.content,
         resettable_editor=False
     )
 
@@ -615,6 +651,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 info['type'] = 'default_transcript_uploader'
             elif field_name == 'token':
                 info['type'] = 'token_authorization'
+            elif field_name == 'playmedia_apikey':
+                info['type'] = 'playmedia_apikey_authorization'
+
         return info
 
     def get_file_name_from_path(self, field):
@@ -656,6 +695,34 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             if transcript.get('lang') == self.captions_language:
                 return transcript.get('url')
         return ''
+
+    def create_transcript_file(self, ext='.vtt', trans_str='', reference_name=''):
+        """
+        Upload a transcript, fetched from a video platform's API, to video xblock.
+        Arguments:
+            ext (str): format of transcript file, default is vtt.
+            trans_str (str): multiple string for convert to vtt file.
+            reference_name (str): name of transcript file.
+        Returns:
+            File's file_name and external_url.
+        """
+
+        # Define location of default transcript as a future asset and prepare content to store in assets
+        file_name = reference_name.replace(" ", "_") + ext
+        course_key = self.location.course_key  # pylint: disable=no-member
+        content_loc = self.static_content.compute_location(course_key, file_name)  # AssetLocator object
+        content = self.static_content(
+            content_loc,
+            file_name,
+            'application/json',
+            trans_str.encode('UTF-8')
+        )  # StaticContent object
+        external_url = '/' + str(content_loc)
+
+        # Commit the content
+        self.contentstore().save(content)
+
+        return file_name, external_url
 
     @XBlock.handler
     def download_transcript(self, request, suffix=''):  # pylint: disable=unused-argument
@@ -768,6 +835,62 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         return auth_data, error_message
 
     @XBlock.json_handler
+    def get_transcripts_3playmedia_api_handler(self, data, suffix=''):  # pylint: disable=unused-argument
+        """
+        Xblock handler to authenticate to a video platform's API. Called by JavaScript of `studio_view`.
+
+        Arguments:
+            data (dict): Data from frontend, necessary for authentication (tokens, account id, etc).
+            suffix (str): Slug used for routing.
+        Returns:
+            response (dict): Status messages key-value pairs.
+        """
+
+        print(data, self.transcripts)
+        error_message, file_id = '', ''
+        # Fetch a token provided by a user before the save button was clicked.
+        if str(data) != self.playmedia_apikey:
+            apikey = str(data)
+        else:
+            apikey = self.playmedia_apikey or ''
+
+        transcripts_3playmedia = requests.get(
+            'http://static.3playmedia.com/files/{{file_id}}/transcript.json?apikey={{api_key}}'.format(
+                file_id=file_id, api_key=apikey
+            )
+        ).text
+        print(transcripts_3playmedia)
+        player = self.get_player()
+        video_id = player.media_id(self.href)
+        for sub_unicode in json.loads(transcripts_3playmedia):
+            lang_label = str(data.get(u'label'))
+            # File name format is <language label>_captions_video_<video_id>, e.g.
+            # "English_captions_video_456g68"
+            reference_name = "{}_captions_video_{}".format(
+                lang_label, video_id
+            ).encode('utf8')
+            sub = self.convert_caps_to_vtt(caps=sub_unicode)
+            file_name, external_url = self.create_transcript_file(
+                trans_str=sub, reference_name=reference_name
+            )
+
+        _transcripts = [
+            {"lang": "ak",
+             "url": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@captions.ar.vtt",
+             "label": "Akan"}
+        ]
+        #  self.transcripts = json.dumps(_transcripts)
+
+        # return Response(self.convert_caps_to_vtt(caps))
+        if error_message:
+            response = {'error_message': error_message}
+        else:
+            success_message = 'Successfully authenticated to the video platform.'
+            response = {'success_message': success_message}
+        response['transcripts'] = _transcripts
+        return response
+
+    @XBlock.json_handler
     def authenticate_video_api_handler(self, data, suffix=''):  # pylint: disable=unused-argument
         """
         Xblock handler to authenticate to a video platform's API. Called by JavaScript of `studio_view`.
@@ -834,20 +957,14 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         reference_name = "{}_captions_video_{}".format(lang_label, video_id).encode('utf8')
 
         # Fetch default transcript
-        sub_unicode = player.download_default_transcript(url=sub_url, language_code=lang_code)
+        sub_unicode = player.download_default_transcript(
+            url=sub_url, language_code=lang_code
+        )
         sub = self.convert_caps_to_vtt(caps=sub_unicode)
 
-        # Define location of default transcript as a future asset and prepare content to store in assets
-        ext = '.vtt'
-        file_name = reference_name.replace(" ", "_") + ext
-        course_key = self.location.course_key  # pylint: disable=no-member
-        content_loc = StaticContent.compute_location(course_key, file_name)  # AssetLocator object
-        sc_partial = functools.partial(StaticContent, content_loc, file_name, 'application/json')
-        content = sc_partial(sub.encode('UTF-8'))  # StaticContent object
-        external_url = '/' + str(content_loc)
-
-        # Commit the content
-        contentstore().save(content)
+        file_name, external_url = self.create_transcript_file(
+            trans_str=sub, reference_name=reference_name
+        )
 
         # Exceptions are handled on the frontend
         success_message = 'Successfully uploaded "{}".'.format(file_name)

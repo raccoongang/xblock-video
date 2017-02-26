@@ -26,7 +26,7 @@ class WistiaPlayer(BaseVideoPlayer):
     )
 
     advanced_fields = (
-        'start_time', 'end_time', 'handout', 'transcripts',
+        'start_time', 'end_time', 'handout', 'transcripts', 'playmedia_apikey',
         'download_transcript_allowed', 'token', 'default_transcripts'
     )
 

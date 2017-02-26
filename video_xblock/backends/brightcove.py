@@ -338,8 +338,9 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         return super(BrightcovePlayer, self).basic_fields + ('account_id',)
 
     advanced_fields = (
-        'player_id', 'start_time', 'end_time', 'handout', 'transcripts',
-        'download_transcript_allowed', 'token', 'default_transcripts'
+        'player_id', 'start_time', 'end_time', 'handout', 'playmedia_apikey',
+        'transcripts', 'download_transcript_allowed', 'token',
+        'default_transcripts'
     )
 
     fields_help = {
