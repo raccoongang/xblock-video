@@ -4,8 +4,8 @@ Video XBlock mocks.
 """
 import json
 from copy import copy, deepcopy
-from mock import Mock
 from collections import OrderedDict
+from mock import Mock
 import requests
 
 from xblock.core import XBlock
@@ -52,15 +52,21 @@ class ResponseStub(object):
                 pass
 
 
-class classproperty(object):
+class Classproperty(object):
     """
     Allow to get iterable class property.
     """
 
     def __init__(self, fget):
+        """
+        Store decorated function.
+        """
         self.fget = fget
 
     def __get__(self, owner_self, owner_cls):
+        """
+        Return function result as class property.
+        """
         return self.fget(owner_cls)
 
 
@@ -108,13 +114,11 @@ class BaseMock(Mock):
         ret = []
         if self.event in self.ordered_results.keys():
             for item in self.to_return:
-                print(item)
-                print(self.ordered_results[self.event][item])
                 ret.append(self.ordered_results[self.event][item])
         return tuple(ret)
 
-    @classproperty
-    def get_outcomes(cls):
+    @Classproperty
+    def get_outcomes(cls):  # pylint: disable=no-self-argument
         """
         Return available events. Ensures that outcomes have correct data format.
         """
@@ -177,6 +181,7 @@ class BrightcoveAuthMock(BaseMock):
     """
     Brightcove auth mock class.
     """
+
     outcomes = (
         (
             'credentials_created',
