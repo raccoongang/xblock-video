@@ -13,6 +13,7 @@ source ~/edxapp_env
 # Clone and install xblock
 git clone https://github.com/raccoongang/xblock-video.git
 cd xblock-video
+pip install -e .
 # Install Python and JavaScript dependencies
 make deps
 ```
