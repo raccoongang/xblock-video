@@ -1,4 +1,6 @@
-"""Tests for classes defined in fields.py."""
+"""
+Tests for classes defined in fields.py.
+"""
 
 import datetime
 import unittest
@@ -14,7 +16,7 @@ class RelativeTimeTest(unittest.TestCase):
 
     def test_from_json(self):
         """
-        Check convertation of data returned from json.
+        Check conversion of data returned from json.
         """
         self.assertEqual(
             RelativeTimeTest.delta.from_json('0:05:07'),
@@ -54,7 +56,7 @@ class RelativeTimeTest(unittest.TestCase):
 
     def test_to_json(self):
         """
-        Check convertation of data to json.
+        Check conversion of data to json.
         """
         self.assertEqual(
             "01:02:03",
@@ -78,7 +80,7 @@ class RelativeTimeTest(unittest.TestCase):
 
     def test_str(self):
         """
-        Check data convertation to string.
+        Check data conversion to string.
         """
         self.assertEqual(
             "01:02:03",

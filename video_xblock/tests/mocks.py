@@ -5,6 +5,7 @@ Video XBlock mocks.
 import json
 from copy import copy, deepcopy
 from mock import Mock
+from collections import OrderedDict
 import requests
 
 from xblock.core import XBlock
@@ -51,6 +52,18 @@ class ResponseStub(object):
                 pass
 
 
+class classproperty(object):
+    """
+    Allow to get iterable class property.
+    """
+
+    def __init__(self, fget):
+        self.fget = fget
+
+    def __get__(self, owner_self, owner_cls):
+        return self.fget(owner_cls)
+
+
 class BaseMock(Mock):
     """
     Base custom mock class.
@@ -69,38 +82,53 @@ class BaseMock(Mock):
         super(BaseMock, self).__init__()
         if 'mock_magic' in kwargs:
             self.mock = kwargs['mock_magic']
-        self.xblock = kwargs['xblock'] if 'xblock' in kwargs else None
-        if 'event' in kwargs and kwargs['event'] in self.get_events():
-            self.event = kwargs['event']
-        else:
-            raise VideoXBlockMockException("`event` parameter is not provided or not in %s." % self.get_events())
+        self.xblock = kwargs.get('xblock')
+        event = kwargs.get('event')
+        if not event:
+            raise VideoXBlockMockException(
+                "%s: `event` parameter is not provided or not in %s." % (
+                    self.__class__.__name__, self.ordered_results.keys()
+                )
+            )
+        if event and event in self.get_outcomes:
+            self.event = event
 
     @property
     def ordered_results(self):
         """
         Transform `outcomes` to dict.
         """
-        return dict(self.outcomes)
+        return OrderedDict(self.outcomes)
 
-    def expected_value(self, event):
+    @property
+    def expected_value(self):
         """
         Should return expected value after mock is applied.
         """
         ret = []
-        if event in self.get_events():
+        if self.event in self.ordered_results.keys():
             for item in self.to_return:
-                ret.append(self.ordered_results[event][item])
+                print(item)
+                print(self.ordered_results[self.event][item])
+                ret.append(self.ordered_results[self.event][item])
         return tuple(ret)
 
-    @classmethod
-    def get_events(cls):
+    @classproperty
+    def get_outcomes(cls):
         """
-        Return available events.
+        Return available events. Ensures that outcomes have correct data format.
         """
         ret = []
-        for key, val in cls.outcomes:
-            if isinstance(key, str) and isinstance(val, dict):
-                ret.append(key)
+        if cls.outcomes:
+            for key, val in cls.outcomes:
+                if isinstance(key, str) and isinstance(val, dict) and key:
+                    ret.append(key)
+                else:
+                    raise VideoXBlockMockException(
+                        "%s.outcomes have invalid data format: container=%s, item=%s" % (
+                            cls.__name__, type(cls.outcomes), type(cls.outcomes[0])
+                        )
+                    )
         return ret
 
     def apply_mock(self, mocked_objects):  # pylint: disable=unused-argument
@@ -123,7 +151,6 @@ class MockCourse(object):
     def __init__(self, course_id):
         """
         Delegate course_id to class property and set course's language.
-
         """
         self.course_id = course_id
         self.language = 'en'
@@ -150,7 +177,6 @@ class BrightcoveAuthMock(BaseMock):
     """
     Brightcove auth mock class.
     """
-
     outcomes = (
         (
             'credentials_created',
@@ -183,11 +209,12 @@ class BrightcoveAuthMock(BaseMock):
         )
         return self
 
-    def expected_value(self, event):
+    @property
+    def expected_value(self):
         """
         Return expected value of `authenticate_api` after mock is applied.
         """
-        ret = copy(self.ordered_results[event])
+        ret = copy(self.ordered_results[self.event])
         error = ret.pop('error_message')
         return ret, error
 
@@ -558,9 +585,7 @@ class VimeoDefaultTranscriptsMock(BaseMock):
     Temporary mock for vimeo player. Need to be updated.
     """
 
-    outcomes = [('get_transcripts', [])]
-
-    to_return = [[], '']
+    pass
 
 
 # Download transcripts mocks
@@ -744,8 +769,7 @@ class WistiaDownloadTranscriptMock(BaseMock):
 
 class VimeoDownloadTranscriptMock(BaseMock):
     """
-    Temporary vimeo download transcript mock object.
+    Vimeo download transcript mock class.
     """
 
-    outcomes = [('success', '')]
-    to_return = ('', '')
+    pass
