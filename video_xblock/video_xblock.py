@@ -35,16 +35,16 @@ log = logging.getLogger(__name__)
 @XBlock.wants('contentstore')
 class ContentStoreMixin(XBlock):
     """
-    Proxy to future `contentstore` service.
+    Proxy to `runtime.contentstore` service.
 
     If `contentstore` service is not provided by `runtime` it returns classes
-    from `xmodule.contentstore`
+    from `xmodule.contentstore` module.
     """
 
     @property
     def contentstore(self):
         """
-        Proxy to `xmodule.contentstore.contentstore` class.
+        Proxy to `xmodule.contentstore.django.contentstore` class.
         """
         contentstore_service = self.runtime.service(self, 'contentstore')
         if contentstore_service:
@@ -54,7 +54,7 @@ class ContentStoreMixin(XBlock):
     @property
     def static_content(self):
         """
-        Proxy to `xmodule.contentstore.StaticContent` class.
+        Proxy to `xmodule.contentstore.content.StaticContent` class.
         """
         contentstore_service = self.runtime.service(self, 'contentstore')
         if contentstore_service:
