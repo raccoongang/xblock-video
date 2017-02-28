@@ -169,7 +169,7 @@ class RequestsMock(BaseMock):
         """
         Mock method that substitutes `requests.get` one.
         """
-        raise NotImErrorplementedError
+        raise NotImplementedError
 
     def apply_mock(self, mocked_objects):
         """
