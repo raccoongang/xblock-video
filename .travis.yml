@@ -13,8 +13,8 @@ addons:
 
 cache:
   pip: true
-  directories:
-    - node_modules # NPM packages
+#  directories:
+#    - node_modules # NPM packages
 
 before_install:
   # Install latest stable NodeJS version. Required for eslint.
