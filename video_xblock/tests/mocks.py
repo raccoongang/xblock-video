@@ -160,6 +160,26 @@ class MockCourse(object):
         self.language = 'en'
 
 
+class RequestsMock(BaseMock):
+    """
+    Base class for mocking `requests.get`.
+    """
+
+    def get(self):
+        """
+        Mock method that substitutes `requests.get` one.
+        """
+        raise NotImErrorplementedError
+
+    def apply_mock(self, mocked_objects):
+        """
+        Save state of auth related entities before mocks are applied.
+        """
+        super(RequestsMock, self).apply_mock(mocked_objects)
+        requests.get = self.get()
+        return mocked_objects
+
+
 # Auth mocks
 class YoutubeAuthMock(BaseMock):
     """
@@ -236,7 +256,7 @@ class BrightcoveAuthMock(BaseMock):
         return mocked_objects
 
 
-class WistiaAuthMock(BaseMock):
+class WistiaAuthMock(RequestsMock):
     """
     Wistia auth mock class.
     """
@@ -263,14 +283,6 @@ class WistiaAuthMock(BaseMock):
         if self.event == 'not_authorized':
             self.return_value = ResponseStub(status_code=401)
         return lambda x: self.return_value
-
-    def apply_mock(self, mocked_objects):
-        """
-        Save state of auth related entities before mocks are applied.
-        """
-        super(WistiaAuthMock, self).apply_mock(mocked_objects)
-        requests.get = self.get()
-        return mocked_objects
 
 
 # Default transcripts mocks
@@ -594,7 +606,7 @@ class VimeoDefaultTranscriptsMock(BaseMock):
 
 
 # Download transcripts mocks
-class YoutubeDownloadTranscriptMock(BaseMock):
+class YoutubeDownloadTranscriptMock(RequestsMock):
     """
     Youtube download default transcript mock class.
     """
@@ -644,16 +656,8 @@ Forse me la canto e me la suono da sola un po',
             self.return_value = ResponseStub(status_code=200, body=self._xml)
         return lambda x: self.return_value
 
-    def apply_mock(self, mocked_objects):
-        """
-        Save state of download transcript related entities before mocks are applied.
-        """
-        super(YoutubeDownloadTranscriptMock, self).apply_mock(mocked_objects)
-        requests.get = self.get()
-        return mocked_objects
 
-
-class BrightcoveDownloadTranscriptMock(BaseMock):
+class BrightcoveDownloadTranscriptMock(RequestsMock):
     """
     Brightcove download default transcript mock class.
     """
@@ -688,14 +692,6 @@ accessed from mobile devices."""
         """
         self.return_value = ResponseStub(status_code=200, body=self._vtt)
         return lambda x: self.return_value
-
-    def apply_mock(self, mocked_objects):
-        """
-        Save state of download transcript related entities before mocks are applied.
-        """
-        super(BrightcoveDownloadTranscriptMock, self).apply_mock(mocked_objects)
-        requests.get = self.get()
-        return mocked_objects
 
 
 class WistiaDownloadTranscriptMock(BaseMock):
