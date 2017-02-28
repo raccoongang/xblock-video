@@ -1,8 +1,9 @@
 {
-    "extends": "eslint-config-edx",
+    "extends": "eslint-config-edx-es5",
     "globals": {
         "videojs": true,
-        "domReady": true
+        "domReady": true,
+        "getTranscriptUrl": true
     },
     "rules": {
         "no-underscore-dangle": [
