@@ -26,6 +26,7 @@ install:
 
 before_script:
   # Install bower, eslint, eslint-config-edx and their dependencies
+  - make clean
   - make tools
   - make deps-test
   # Prepare for js tests
