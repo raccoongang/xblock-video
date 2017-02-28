@@ -2,6 +2,9 @@
 /** Javascript for VideoXBlock.student_view() */
 function VideoXBlockStudentViewInit(runtime, element) {
     'use strict';
+    if (typeof(element[0] != 'undefined')) {
+        element = element[0];
+    }
     var stateHandlerUrl = runtime.handlerUrl(element, 'save_player_state');
     var eventHandlerUrl = runtime.handlerUrl(element, 'publish_event');
     var downloadTranscriptHandlerUrl = runtime.handlerUrl(element, 'download_transcript');
