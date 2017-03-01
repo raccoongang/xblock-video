@@ -27,14 +27,14 @@ quality-js:
 	eslint video_xblock/static/js/
 
 deps:
-	pip install -r requirements.txt
+	pip install --process-dependency-links -r requirements.txt
 
 deps-test:
 	pip install -r test_requirements.txt
 	bower install
 
 tools:
-	npm install bower "eslint@^2.12.0" eslint-config-edx "eslint-plugin-dollar-sign@0.0.5" "eslint-plugin-import@^1.9.2"
+	npm install bower "eslint@^2.12.0" "eslint-config-edx-es5@2.0.0" "eslint-plugin-dollar-sign@0.0.5" "eslint-plugin-import@^1.9.2"
 
 coveralls:
 	coveralls-lcov -v -n video_xblock/static/coverage/PhantomJS\ 2.1.1\ \(Linux\ 0.0.0\)/lcov.info > coverage.json

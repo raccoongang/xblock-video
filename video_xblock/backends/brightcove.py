@@ -384,6 +384,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             self.render_resource('static/js/context.js', **context)
         )
         js_files = [
+            'static/js/base.js',
             'static/js/toggle-button.js'
         ]
         if json.loads(context['player_state'])['transcripts']:
