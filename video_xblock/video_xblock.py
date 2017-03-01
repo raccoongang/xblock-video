@@ -970,7 +970,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
         player = self.get_player()
         video_id = player.media_id(self.href)
         for sub_unicode in json.loads(transcripts_3playmedia):
-            lang_label = str(data.get(u'label'))
+            lang_label = ''#str(data.get(u'label'))
             # File name format is <language label>_captions_video_<video_id>, e.g.
             # "English_captions_video_456g68"
             reference_name = "{}_captions_video_{}".format(
@@ -986,9 +986,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
              "url": "/asset-v1:edX+DemoX+Demo_Course+type@asset+block@captions.ar.vtt",
              "label": "Akan"}
         ]
-        #  self.transcripts = json.dumps(_transcripts)
-
-        # return Response(self.convert_caps_to_vtt(caps))
         if error_message:
             response = {'error_message': error_message}
         else:
