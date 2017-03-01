@@ -166,7 +166,7 @@ class TestCustomBackends(VideoXBlockTestBase):
         Check that backend can successfully pass authentication.
         """
         player = self.player[backend]
-        for event in auth_mock.get_outcomes:
+        for event in auth_mock.get_outcomes():
             mock = auth_mock(event=event)
             self.mocked_objects = mock.apply_mock(self.mocked_objects)
             try:
@@ -186,7 +186,7 @@ class TestCustomBackends(VideoXBlockTestBase):
     @unpack
     def test_get_default_transcripts(self, backend, media_id, trans_mock):
         player = self.player[backend]
-        for event in trans_mock.get_outcomes:
+        for event in trans_mock.get_outcomes():
             mock = trans_mock(event=event, xblock=self.xblock, mock_magic=self.xblock.metadata)
             self.mocked_objects = mock.apply_mock(self.mocked_objects)
             try:
@@ -235,7 +235,7 @@ class TestCustomBackends(VideoXBlockTestBase):
         Check default transcript is downloaded from a video platform API.
         """
         player = self.player[backend]
-        for index, event in enumerate(download_transcript_mock.get_outcomes):
+        for index, event in enumerate(download_transcript_mock.get_outcomes()):
             mock = download_transcript_mock(event=event)
             self.mocked_objects = mock.apply_mock(self.mocked_objects)
             try:

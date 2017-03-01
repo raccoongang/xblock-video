@@ -52,24 +52,6 @@ class ResponseStub(object):
                 pass
 
 
-class Classproperty(object):
-    """
-    Allow to get iterable class property.
-    """
-
-    def __init__(self, fget):
-        """
-        Store decorated function.
-        """
-        self.fget = fget
-
-    def __get__(self, owner_self, owner_cls):
-        """
-        Return function result as class property.
-        """
-        return self.fget(owner_cls)
-
-
 class BaseMock(Mock):
     """
     Base custom mock class.
@@ -96,7 +78,7 @@ class BaseMock(Mock):
                     self.__class__.__name__, self.ordered_results.keys()
                 )
             )
-        if event and event in self.get_outcomes:
+        if event and event in self.get_outcomes():
             self.event = event
 
     @property
@@ -112,28 +94,26 @@ class BaseMock(Mock):
         Should return expected value after mock is applied.
         """
         ret = []
-        if self.event in self.ordered_results.keys():
+        if self.event in self.ordered_results:
             for item in self.to_return:
                 ret.append(self.ordered_results[self.event][item])
         return tuple(ret)
 
-    @Classproperty
-    def get_outcomes(cls):  # pylint: disable=no-self-argument
+    @classmethod
+    def get_outcomes(cls):
         """
         Return available events. Ensures that outcomes have correct data format.
         """
-        ret = []
         if cls.outcomes:
             for key, val in cls.outcomes:
                 if isinstance(key, str) and isinstance(val, dict) and key:
-                    ret.append(key)
+                    yield key
                 else:
                     raise VideoXBlockMockException(
                         "%s.outcomes have invalid data format: container=%s, item=%s" % (
                             cls.__name__, type(cls.outcomes), type(cls.outcomes[0])
                         )
                     )
-        return ret
 
     def apply_mock(self, mocked_objects):  # pylint: disable=unused-argument
         """
