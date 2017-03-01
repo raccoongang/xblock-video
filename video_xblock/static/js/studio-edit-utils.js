@@ -29,7 +29,7 @@ function fillValues(fields) {
 
 
 /**
- * Display message with results on a performed action (e.g. a transcript manual or automatic upload).
+ * Display message with results of a performed action (e.g. a transcript manual or automatic upload).
  */
 function showStatus(message, type, successMessageElement, errorMessageElement) {
     'use strict';

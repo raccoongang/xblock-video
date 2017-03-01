@@ -184,7 +184,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         scope=Scope.content,
         display_name=_('Upload transcript'),
         help=_(
-            'Add transcripts in different languages. Click below to specify a language and upload an .srt or an .vtt'
+            'Add transcripts in different languages. Click below to specify a language and upload a .srt or a .vtt'
             'transcript file for that language. Maximum file size is 300 KB.'
         )
     )

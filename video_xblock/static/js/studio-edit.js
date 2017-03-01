@@ -474,11 +474,21 @@ function StudioEditableXBlock(runtime, element) {
     }
 
     /**
-     * Create new transcript, containing valid data, after successful form submit.
+     * Create a new transcript, containing valid data, after successful form submit.
+     *
+     * Arguments:
+     *  event (jQuery.Event): Initial event provoked a form submitting.
+     *  response (Object): Object containing information on an uploaded transcript and an upload status message.
+     *  statusText (String): Information on an upload status (either "success" or "error").
+     *  xhr (Object): XMLHttpRequest object.
+     *  fieldName (String): String indicating type of uploaded subtitles (whether "transcripts" or "caption").
+     *  lang (String): Subtitle language code (e.g. "uk").
+     *  label (String): Subtitle language label (e.g. "Ukrainian").
+     *  currentLiTag (Object): DOM element containing information on an uploaded subtitle.
      */
     function successHandler(event, response, statusText, xhr, fieldName, lang, label, currentLiTag) {
         var url = '/' + response['asset']['id'];
-        // User may upload a file without extension
+        // User can upload a file without extension
         var filename = $fileUploader[0].files[0].name;
         var downloadUrl = downloadTranscriptHandlerUrl + '?' + url;
         var successMessage = 'File "' + filename + '" uploaded successfully';
@@ -510,7 +520,7 @@ function StudioEditableXBlock(runtime, element) {
             createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
             bindRemovalListenerEnabledTranscript(lang, label, downloadUrl);
         }
-        // Reset data on a transcript uploaded to a server
+        // Reset data on a transcript, uploaded to a server
         $(event.currentTarget).attr({
             'data-change-field-name': '',
             'data-lang-code': '',

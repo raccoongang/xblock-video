@@ -218,7 +218,7 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     allEnabledTranscripts = getDefaultTranscriptsArray('enabled');
     isSuccessfulRemoval = $.inArray(langCode, allEnabledTranscripts) === -1; // Is not in array
     isStoredVideoPlatform = $.inArray(langCode, initialDefaultTranscriptsLangCodes) !== -1;  // Is in array
-    // Display message with results on removal
+    // Display message with results of removal
     if (isSuccessfulRemoval && isStoredVideoPlatform) {
         showStatus(
             successMessageRemoval,

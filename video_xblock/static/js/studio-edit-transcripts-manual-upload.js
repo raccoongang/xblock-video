@@ -4,7 +4,7 @@
  */
 
 /**
- * Display message with results on a performed action with captions.
+ * Display message with results of a performed action with captions.
  */
 function displayStatusCaptions(statusType, statusMessage, $parentDiv) {
     'use strict';
@@ -18,7 +18,7 @@ function displayStatusCaptions(statusType, statusMessage, $parentDiv) {
 }
 
 /**
- * Display message with results on a performed action with transcripts.
+ * Display message with results of a performed action with transcripts.
  */
 function displayStatusTranscripts(statusType, statusMessage, currentLiTag) {
     'use strict';
@@ -100,7 +100,7 @@ function validateTranscripts(e, $langChoiceItem) {
 }
 
 /**
- * Validate extension and name of a transcript or a caption file before save it to video xblock.
+ * Validate extension, name, and size of a transcript or a caption file before save it to video xblock.
  *
  * Returns:
  * isValidated (Boolean): Result of a validation (true|false).
@@ -109,13 +109,15 @@ function validateTranscripts(e, $langChoiceItem) {
 function validateTranscriptFile(event, fieldName, filename, $fileUploader) {
     'use strict';
     // User may upload a file without extension. Reference: http://stackoverflow.com/a/1203361
-    var fileExtension = filename.substr((~-filename.lastIndexOf('.') >>> 0) + 2);
+    var fileExtension = filename.split('.').pop();
     var fileSize = $fileUploader[0].files[0].size;
     var acceptedFormats = $fileUploader[0].accept || '.vtt .srt';
     var isEmptyExtension = fileExtension === '';
     var isNotAcceptedExtension = acceptedFormats.indexOf(fileExtension) === -1;
     var isNotAcceptedFormat = isEmptyExtension || isNotAcceptedExtension;
-    var isNotAcceptedSize = fileSize > 307200;
+    // The maximum file size allowed is 300 KB
+    var maxFileSize = 307200;
+    var isNotAcceptedSize = fileSize > maxFileSize;
     var isNotAccepted = false;
     var errorMessage = 'Couldn\'t upload "' + filename + '". ';
     var $parentDiv;
