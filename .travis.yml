@@ -25,6 +25,8 @@ install:
   - pip install --process-dependency-links -r requirements.txt
 
 before_script:
+  # Run DangerCI
+  - rbenv global 2.3.1 && gem install danger --version '~> 4.0' && danger
   # Install bower, eslint, eslint-config-edx-es5 and their dependencies
   - make tools
   - make deps-test
