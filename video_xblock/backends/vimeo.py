@@ -16,8 +16,6 @@ class VimeoPlayer(BaseVideoPlayer):
     # Reference: https://vimeo.com/153979733
     url_re = re.compile(r'https?:\/\/(.+)?(vimeo.com)\/(?P<media_id>.*)')
 
-    metadata_fields = []
-
     # Vimeo API for requesting transcripts.
     captions_api = {}
 
@@ -33,45 +31,39 @@ class VimeoPlayer(BaseVideoPlayer):
         """
         Return a Fragment required to render video player on the client side.
         """
-        context['data_setup'] = json.dumps({
-            "controlBar": {
-                "volumeMenuButton": {
-                    "inline": False,
-                    "vertical": True
-                }
-            },
+        context['data_setup'] = json.dumps(VimeoPlayer.player_data_setup(context))
+
+        frag = super(VimeoPlayer, self).get_frag(**context)
+        frag.add_content(
+            self.render_resource('static/html/vimeo.html', **context)
+        )
+        js_files = [
+            'static/bower_components/videojs-vimeo/src/Vimeo.js',
+            'static/bower_components/videojs-offset/dist/videojs-offset.min.js'
+        ]
+
+        for js_file in js_files:
+            frag.add_javascript(self.resource_string(js_file))
+
+        return frag
+
+    @staticmethod
+    def player_data_setup(context):
+        """
+        Vimeo Player data setup.
+        """
+        result = BaseVideoPlayer.player_data_setup(context)
+        del result["playbackRates"]
+        del result["plugins"]["videoJSSpeedHandler"]
+        result.update({
             "techOrder": ["vimeo"],
             "sources": [{
                 "type": "video/vimeo",
                 "src": context['url']
             }],
             "vimeo": {"iv_load_policy": 1},
-            "controls": True,
-            "preload": 'auto',
-            "plugins": {
-                "xblockEventPlugin": {},
-                "offset": {
-                    "start": context['start_time'],
-                    "end": context['end_time'],
-                    "current_time": context['player_state']['current_time'],
-                },
-            }
         })
-
-        frag = super(VimeoPlayer, self).get_frag(**context)
-        frag.add_content(
-            self.render_resource('static/html/vimeo.html', **context)
-        )
-
-        frag.add_javascript(self.resource_string(
-            'static/bower_components/videojs-vimeo/src/Vimeo.js'
-        ))
-
-        frag.add_javascript(self.resource_string(
-            'static/bower_components/videojs-offset/dist/videojs-offset.min.js'
-        ))
-
-        return frag
+        return result
 
     def authenticate_api(self, **kwargs):  # pylint: disable=unused-argument
         """
@@ -90,16 +82,3 @@ class VimeoPlayer(BaseVideoPlayer):
         Download default transcript in WebVVT format.
         """
         return u''
-
-    @staticmethod
-    def customize_xblock_fields_display(editable_fields):
-        """
-        Customise display of studio editor fields per a video platform.
-        """
-        message = 'This field is to be disabled.'
-        editable_fields = list(editable_fields)
-        editable_fields.remove('account_id')
-        editable_fields.remove('player_id')
-        editable_fields.remove('token')
-        customised_editable_fields = tuple(editable_fields)
-        return message, customised_editable_fields
