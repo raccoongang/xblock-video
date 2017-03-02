@@ -656,18 +656,35 @@ function StudioEditableXBlock(runtime, element) {
     $3playmediaTranscriptsApi.on('click', function(event) {
         event.preventDefault();
         event.stopPropagation();
+        var includeLang;
         var $data = $('.threeplaymedia-api-key', element).val();
         var transcripts = getTranscripts3playmediaApi($data);
         transcripts.done(
             function(response) {
                 console.log(response);
+                console.log(transcriptsValue);
+                console.log($("#dialog-form"));
                 response.transcripts.forEach(function transcript(item) {
-                    createTranscriptBlock(
-                        item.lang,
-                        item.label,
-                        transcriptsValue,
-                        downloadTranscriptHandlerUrl
+                    includeLang = transcriptsValue.find(
+                        function existLanguage(element) {
+                            return element.lang == item.lang;
+                        }
                     );
+                    if (!includeLang) {
+                        createTranscriptBlock(
+                            item.lang,
+                            item.label,
+                            transcriptsValue,
+                            downloadTranscriptHandlerUrl
+                        );
+                        pushTranscript(
+                            item.lang,
+                            item.label,
+                            downloadTranscriptHandlerUrl,
+                            '',
+                            transcriptsValue
+                        );
+                    }
                 });
             }
         );
