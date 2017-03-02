@@ -104,16 +104,15 @@ class BaseMock(Mock):
         """
         Return available events. Ensures that outcomes have correct data format.
         """
-        if cls.outcomes:
-            for key, val in cls.outcomes:
-                if isinstance(key, str) and isinstance(val, dict) and key:
-                    yield key
-                else:
-                    raise VideoXBlockMockException(
-                        "%s.outcomes have invalid data format: container=%s, item=%s" % (
-                            cls.__name__, type(cls.outcomes), type(cls.outcomes[0])
-                        )
+        for key, val in cls.outcomes:
+            if isinstance(key, str) and isinstance(val, dict) and key:
+                yield key
+            else:
+                raise VideoXBlockMockException(
+                    "%s.outcomes have invalid data format: container=%s, item=%s" % (
+                        cls.__name__, type(cls.outcomes), type(cls.outcomes[0])
                     )
+                )
 
     def apply_mock(self, mocked_objects):  # pylint: disable=unused-argument
         """
