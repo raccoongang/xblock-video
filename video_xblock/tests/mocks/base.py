@@ -1,5 +1,5 @@
 """
-Base Video Xblock mocks
+Base Video Xblock mocks.
 """
 import json
 from copy import deepcopy

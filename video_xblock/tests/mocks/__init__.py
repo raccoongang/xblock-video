@@ -1,3 +1,3 @@
 """
-Mocks for Video Xblock testing
+Mocks for Video Xblock testing.
 """

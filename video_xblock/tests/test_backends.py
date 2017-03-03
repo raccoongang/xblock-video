@@ -24,6 +24,7 @@ from video_xblock.tests.mocks import (
     youtube as youtube_mock
 )
 
+
 @ddt
 class TestCustomBackends(VideoXBlockTestBase):
     """
