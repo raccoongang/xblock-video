@@ -35,12 +35,14 @@ function showStatus(message, type, successMessageElement, errorMessageElement) {
     'use strict';
     var elementToEmpty = '';
     var elementToShow = '';
+    var SUCCESS = 'success';
+    var ERROR = 'error';
     // Only one success message is to be displayed at once
     $('.api-request').empty();
-    if (type === 'success') {
+    if (type === SUCCESS) {
         elementToEmpty = errorMessageElement;
         elementToShow = successMessageElement;
-    } else if (type === 'error') {
+    } else if (type === ERROR) {
         elementToEmpty = successMessageElement;
         elementToShow = errorMessageElement;
     }

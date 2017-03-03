@@ -18,6 +18,9 @@ function StudioEditableXBlock(runtime, element) {
     var $modalHeaderTabs = $('.editor-modes.action-list.action-modes');
     var currentTabName;
     var isNotDummy = $('#xb-field-edit-href').val() !== '';
+    var SUCCESS = 'success';
+    var ERROR = 'error';
+
 
     /** Toggle studio editor's current tab.
      */
@@ -360,12 +363,12 @@ function StudioEditableXBlock(runtime, element) {
             var message, status;
             if (success_message) {
                 message = success_message;
-                status = 'success';
+                status = SUCCESS;
                 showBackendSettings();
             }
             else if (error_message) {
                 message = error_message;
-                status = 'error';
+                status = ERROR;
             };
             showStatus(
                 message,
@@ -378,7 +381,7 @@ function StudioEditableXBlock(runtime, element) {
                 'internet connection. Try refreshing the page or making sure you are online.');
             showStatus(
                 message,
-                'error',
+                ERROR,
                 $('.api-request.authenticate.status-success'),
                 $('.api-request.authenticate.status-error')
             );
@@ -394,7 +397,7 @@ function StudioEditableXBlock(runtime, element) {
                 } finally {
                     showStatus(
                         message,
-                        'error',
+                        ERROR,
                         $('.api-request.authenticate.status-success'),
                         $('.api-request.authenticate.status-error')
                     );
@@ -432,7 +435,7 @@ function StudioEditableXBlock(runtime, element) {
             if (success_message) {
                 showStatus(
                     success_message,
-                    'success',
+                    SUCCESS,
                     $('.api-request.upload-default-transcript.' + newLang + '.status-success'),
                     $('.api-request.upload-default-transcript.' + newLang + '.status-error'));
             }
@@ -442,7 +445,7 @@ function StudioEditableXBlock(runtime, element) {
                 'internet connection. Try refreshing the page or making sure you are online.');
             showStatus(
                 message,
-                'error',
+                ERROR,
                 $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success'),
                 $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error')
             );
@@ -458,7 +461,7 @@ function StudioEditableXBlock(runtime, element) {
                 } finally {
                     showStatus(
                         message,
-                        'error',
+                        ERROR,
                         $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success'),
                         $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error')
                     );
@@ -494,7 +497,7 @@ function StudioEditableXBlock(runtime, element) {
             $parentDiv = $('.file-uploader');
             $('.download-setting', $parentDiv).attr('href', downloadUrl).removeClass('is-hidden');
             $('a[data-change-field-name=' + fieldName + ']').text('Replace');
-            displayStatusCaptions('success', successMessage, $parentDiv);
+            displayStatusCaptions(SUCCESS, successMessage, $parentDiv);
             $('input[data-field-name=' + fieldName + ']').val(url).change();
         } else if (fieldName == 'transcripts' && isValidated) {
             pushTranscript(lang, label, url, '', transcriptsValue);
@@ -504,7 +507,7 @@ function StudioEditableXBlock(runtime, element) {
             $(currentLiTag).find('.download-transcript')
                 .removeClass('is-hidden')
                 .attr('href', downloadUrl);
-            displayStatusTranscripts('success', successMessage, currentLiTag);
+            displayStatusTranscripts(SUCCESS, successMessage, currentLiTag);
             // Affect default transcripts: update a respective enabled transcript with an external url
             // of a newly created standard transcript
             downloadUrlServer =
