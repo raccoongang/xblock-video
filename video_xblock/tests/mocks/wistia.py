@@ -97,6 +97,13 @@ class WistiaDefaultTranscriptsMock(BaseMock):
             }
         ),
         (
+            'success_invalid_json',
+            {
+                'default_transcripts': [],
+                'message': 'For now, video platform doesn\'t have any timed transcript for this video.'
+            }
+        ),
+        (
             'returned_not_found',
             {
                 'default_transcripts': [],
@@ -136,6 +143,10 @@ class WistiaDefaultTranscriptsMock(BaseMock):
                 'success_no_data': {
                     'status_code': 200,
                     'body': '{}'
+                },
+                'success_invalid_json': {
+                    'status_code': 200,
+                    'body': '{{invalid_json'
                 },
                 'returned_not_found': {
                     'status_code': 404,
