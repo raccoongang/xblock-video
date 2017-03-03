@@ -206,6 +206,7 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     var isSuccessfulRemoval;
     var isStoredVideoPlatform;
     var isNotPresentEnabledTranscripts;
+    var message, status;
     $enabledTranscriptBlock.remove();
     isNotPresentEnabledTranscripts = !$('div.enabled-default-transcripts-section:visible').length;
     // Hide label of enabled transcripts if no such items left
@@ -220,24 +221,21 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     isStoredVideoPlatform = $.inArray(langCode, initialDefaultTranscriptsLangCodes) !== -1;  // Is in array
     // Display message with results of removal
     if (isSuccessfulRemoval && isStoredVideoPlatform) {
-        showStatus(
-            successMessageRemoval,
-            'success',
-            $('.api-request.remove-default-transcript.' + langCode + '.status-success'),
-            $('.api-request.remove-default-transcript.' + langCode + '.status-error'));
+        message = successMessageRemoval;
+        status = 'success';
     } else if (isSuccessfulRemoval && !isStoredVideoPlatform) {
-        showStatus(
-            errorMessage,
-            'error',
-            $('.api-request.remove-default-transcript.' + langCode + '.status-success'),
-            $('.api-request.remove-default-transcript.' + langCode + '.status-error'));
+        status = 'error';
+        message = errorMessage;
     } else {
-        showStatus(
-            failureMessage,
-            'error',
-            $('.api-request.remove-default-transcript.' + langCode + '.status-success'),
-            $('.api-request.remove-default-transcript.' + langCode + '.status-error'));
+        status = 'error';
+        message = failureMessage;
     }
+    showStatus(
+        message,
+        status,
+        $('.api-request.remove-default-transcript.' + langCode + '.status-success'),
+        $('.api-request.remove-default-transcript.' + langCode + '.status-error')
+    );
 }
 
 /**

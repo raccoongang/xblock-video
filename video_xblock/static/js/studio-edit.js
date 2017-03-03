@@ -516,7 +516,7 @@ function StudioEditableXBlock(runtime, element) {
             downloadUrlServer =
                 $('.list-settings-buttons .upload-setting.upload-transcript[data-lang-code=' + lang + ']')
                 .siblings('a.download-transcript.download-setting').attr('href');
-            defaultTranscript= {'lang': lang, 'label': label, 'url': downloadUrlServer};
+            defaultTranscript = {'lang': lang, 'label': label, 'url': downloadUrlServer};
             createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
             bindRemovalListenerEnabledTranscript(lang, label, downloadUrl);
         }

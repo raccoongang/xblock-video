@@ -103,7 +103,7 @@ function validateTranscripts(e, $langChoiceItem) {
  * Validate extension, name, and size of a transcript or a caption file before save it to video xblock.
  *
  * Returns:
- * isValidated (Boolean): Result of a validation (true|false).
+ * isValid (Boolean): Result of a validation (true|false).
  *
  */
 function validateTranscriptFile(event, fieldName, filename, $fileUploader) {
@@ -115,27 +115,26 @@ function validateTranscriptFile(event, fieldName, filename, $fileUploader) {
     var isEmptyExtension = fileExtension === '';
     var isNotAcceptedExtension = acceptedFormats.indexOf(fileExtension) === -1;
     var isNotAcceptedFormat = isEmptyExtension || isNotAcceptedExtension;
-    // The maximum file size allowed is 300 KB
+    // The maximum file size allowed is 300 KB. Tripple size of LoTR subtitles
     var maxFileSize = 307200;
     var isNotAcceptedSize = fileSize > maxFileSize;
-    var isNotAccepted = false;
     var errorMessage = 'Couldn\'t upload "' + filename + '". ';
     var $parentDiv;
     var currentLiIndex;
     var currentLiTag;
-    var isValidated;
+    var isValid = true;
     // We still need to validate file extension, since a user can override an `accept` attribute,
     // that is, choose file of any format to submit through a file upload
     if (isNotAcceptedFormat) {
         errorMessage = errorMessage + 'Please upload a file of "vtt" or "srt" format only. ';
-        isNotAccepted = true;
+        isValid = false;
     }
     if (isNotAcceptedSize) {
         errorMessage = errorMessage + 'Please upload a file of 300 KB maximum.';
-        isNotAccepted = true;
+        isValid = false;
     }
     // Display validation error message if a transcript/caption file may not be not accepted
-    if (isNotAccepted) {
+    if (!isValid) {
         if (fieldName === 'handout') {
             $parentDiv = $('.file-uploader');
             displayStatusCaptions('error', errorMessage, $parentDiv);
@@ -144,12 +143,9 @@ function validateTranscriptFile(event, fieldName, filename, $fileUploader) {
             currentLiTag = $('.language-transcript-selector').children()[parseInt(currentLiIndex, 10)];
             displayStatusTranscripts('error', errorMessage, currentLiTag);
         }
-        isValidated = false;
-    } else {
-        isValidated = true;
     }
 
-    return isValidated;
+    return isValid;
 }
 
 /**
