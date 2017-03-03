@@ -213,6 +213,8 @@ class WistiaPlayer(BaseVideoPlayer):
         # Reference: https://wistia.com/doc/data-api#captions_index
         elif data.status_code == status.HTTP_404_NOT_FOUND:
             message = "Wistia video {video_id} doesn't exist.".format(video_id=str(video_id))
+        else:
+            message = "Invalid request."
         return default_transcripts, message
 
     @staticmethod

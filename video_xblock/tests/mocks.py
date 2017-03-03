@@ -529,6 +529,13 @@ class WistiaDefaultTranscriptsMock(BaseMock):
                 'default_transcripts': [],
                 'message': 'doesn\'t exist.'
             }
+        ),
+        (
+            'invalid_request',
+            {
+                'default_transcripts': [],
+                'message': 'Invalid request.'
+            }
         )
     )
 
@@ -561,6 +568,10 @@ class WistiaDefaultTranscriptsMock(BaseMock):
                     'status_code': 404,
                     'body': '{}'
                 },
+                'invalid_request': {
+                    'status_code': 400,
+                    'body': 'Invalid request.'
+                }
             }
             self.return_value = ResponseStub(**return_value_by_event[self.event])
         return lambda x: self.return_value
