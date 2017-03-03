@@ -286,7 +286,9 @@ function StudioEditableXBlock(runtime, element) {
                         // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
                         message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
                     }
-                } catch (error) { message = jqXHR.responseText.substr(0, 300); }
+                } catch (error) {
+                    message = jqXHR.responseText.substr(0, 300);
+                }
             }
             runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
         });
@@ -350,26 +352,26 @@ function StudioEditableXBlock(runtime, element) {
             type: 'POST',
             url: authenticateVideoApiHandlerUrl,
             data: JSON.stringify(data),
-            dataType: 'json',
-            success: function(response) {
-                var error_message = response['error_message'];
-                var success_message = response['success_message'];
-                if (success_message) {
-                    showStatus(
-                        success_message,
-                        'success',
-                        $('.api-request.authenticate.status-success'),
-                        $('.api-request.authenticate.status-error'));
-                    showBackendSettings();
-                }
-                else if (error_message) {
-                    showStatus(
-                        error_message,
-                        'error',
-                        $('.api-request.authenticate.status-success'),
-                        $('.api-request.authenticate.status-error'));
-                }
+            dataType: 'json'
+        })
+        .done(function(response) {
+            var error_message = response['error_message'];
+            var success_message = response['success_message'];
+            var message, status;
+            if (success_message) {
+                message = success_message;
+                status = 'success';
+                showBackendSettings();
             }
+            else if (error_message) {
+                message = error_message;
+                status = 'error';
+            };
+            showStatus(
+                message,
+                status,
+                $('.api-request.authenticate.status-success'),
+                $('.api-request.authenticate.status-error'));
         })
         .fail(function(jqXHR) {
             var message = gettext('This may be happening because of an error with our server or your ' +
@@ -386,14 +388,10 @@ function StudioEditableXBlock(runtime, element) {
                     if (typeof message === 'object' && message.messages) {
                         // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
                         message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
-                        showStatus(
-                            message,
-                            'error',
-                            $('.api-request.authenticate.status-success'),
-                            $('.api-request.authenticate.status-error')
-                        );                   }
+                    }
                 } catch (error) {
                     message = jqXHR.responseText.substr(0, 300);
+                } finally {
                     showStatus(
                         message,
                         'error',
@@ -414,29 +412,29 @@ function StudioEditableXBlock(runtime, element) {
             type: 'POST',
             url: uploadDefaultTranscriptHandlerUrl,
             data: JSON.stringify(data),
-            dataType: 'json',
-            success: function(response) {
-                var newLang = response['lang'];
-                var newLabel = response['label'];
-                var newUrl = response['url'];
-                // Create a standard transcript
-                pushTranscript(newLang, newLabel, newUrl, '', transcriptsValue);
-                pushTranscriptsValue(transcriptsValue);
-                // Add a default transcript to the list of enabled ones
-                var downloadUrl = downloadTranscriptHandlerUrl + '?' + newUrl;
-                var defaultTranscript= {'lang': newLang, 'label': newLabel, 'url': downloadUrl};
-                createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
-                bindRemovalListenerEnabledTranscript(newLang, newLabel, newUrl);
-                // Display status messages
-                // var error_message = response['error_message'];
-                var success_message = response['success_message'];
-                if (success_message) {
-                    showStatus(
-                        success_message,
-                        'success',
-                        $('.api-request.upload-default-transcript.' + newLang + '.status-success'),
-                        $('.api-request.upload-default-transcript.' + newLang + '.status-error'));
-                }
+            dataType: 'json'
+        })
+        .done(function(response) {
+            var newLang = response['lang'];
+            var newLabel = response['label'];
+            var newUrl = response['url'];
+            // Create a standard transcript
+            pushTranscript(newLang, newLabel, newUrl, '', transcriptsValue);
+            pushTranscriptsValue(transcriptsValue);
+            // Add a default transcript to the list of enabled ones
+            var downloadUrl = downloadTranscriptHandlerUrl + '?' + newUrl;
+            var defaultTranscript= {'lang': newLang, 'label': newLabel, 'url': downloadUrl};
+            createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
+            bindRemovalListenerEnabledTranscript(newLang, newLabel, newUrl);
+            // Display status messages
+            // var error_message = response['error_message'];
+            var success_message = response['success_message'];
+            if (success_message) {
+                showStatus(
+                    success_message,
+                    'success',
+                    $('.api-request.upload-default-transcript.' + newLang + '.status-success'),
+                    $('.api-request.upload-default-transcript.' + newLang + '.status-error'));
             }
         })
         .fail(function(jqXHR) {
@@ -454,14 +452,10 @@ function StudioEditableXBlock(runtime, element) {
                     if (typeof message === 'object' && message.messages) {
                         // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
                         message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
-                        showStatus(
-                            message,
-                            'error',
-                            $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success'),
-                            $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error')
-                        );                   }
-                } catch (error) {
+                    }
+                } catch (error) { // SyntaxError thrown by JSON.parse()
                     message = jqXHR.responseText.substr(0, 300);
+                } finally {
                     showStatus(
                         message,
                         'error',
