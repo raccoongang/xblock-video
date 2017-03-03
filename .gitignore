@@ -93,5 +93,8 @@ ENV/
 # Bower components
 bower_components/
 
+# Locally installed npm packages
+node_modules/
+
 #Pycharm
 .idea/
