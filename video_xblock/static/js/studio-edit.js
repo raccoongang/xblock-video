@@ -268,6 +268,18 @@ function StudioEditableXBlock(runtime, element) {
         });
     });
 
+    function extractErrorMessage(responseText) {
+        try {
+            message = JSON.parse(responseText).error;
+            if (typeof message === 'object' && message.messages) {
+                // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
+                message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
+            }
+            return message;
+        } catch (error) { // SyntaxError thrown by JSON.parse
+            return responseText.substr(0, 300);
+        }
+    }
     /** Submit studio editor settings.
      */
     function studio_submit(data) {
@@ -283,15 +295,7 @@ function StudioEditableXBlock(runtime, element) {
         }).fail(function(jqXHR) {
             var message = gettext('This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.');
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
-                try {
-                    message = JSON.parse(jqXHR.responseText).error;
-                    if (typeof message === 'object' && message.messages) {
-                        // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
-                        message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
-                    }
-                } catch (error) {
-                    message = jqXHR.responseText.substr(0, 300);
-                }
+                message = extractErrorMessage(jqXHR.responseText);
             }
             runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
         });
@@ -386,22 +390,13 @@ function StudioEditableXBlock(runtime, element) {
                 $('.api-request.authenticate.status-error')
             );
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
-                try {
-                    message = JSON.parse(jqXHR.responseText).error;
-                    if (typeof message === 'object' && message.messages) {
-                        // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
-                        message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
-                    }
-                } catch (error) {
-                    message = jqXHR.responseText.substr(0, 300);
-                } finally {
-                    showStatus(
-                        message,
-                        ERROR,
-                        $('.api-request.authenticate.status-success'),
-                        $('.api-request.authenticate.status-error')
-                    );
-                }
+                message = extractErrorMessage(jqXHR.responseText);
+                showStatus(
+                    message,
+                    ERROR,
+                    $('.api-request.authenticate.status-success'),
+                    $('.api-request.authenticate.status-error')
+                );
             }
             runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
         });
@@ -450,22 +445,13 @@ function StudioEditableXBlock(runtime, element) {
                 $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error')
             );
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
-                try {
-                    message = JSON.parse(jqXHR.responseText).error;
-                    if (typeof message === 'object' && message.messages) {
-                        // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
-                        message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
-                    }
-                } catch (error) { // SyntaxError thrown by JSON.parse()
-                    message = jqXHR.responseText.substr(0, 300);
-                } finally {
-                    showStatus(
-                        message,
-                        ERROR,
-                        $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success'),
-                        $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error')
-                    );
-                }
+                message = extractErrorMessage(jqXHR.responseText);
+                showStatus(
+                    message,
+                    ERROR,
+                    $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success'),
+                    $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error')
+                );
             }
         });
     }
