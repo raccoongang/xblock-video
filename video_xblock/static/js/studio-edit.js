@@ -355,6 +355,8 @@ function StudioEditableXBlock(runtime, element) {
      * Authenticate to video platform's API and show result message.
      */
     function authenticateVideoApi(data) {
+        var message, status;
+
         $.ajax({
             type: 'POST',
             url: authenticateVideoApiHandlerUrl,
@@ -364,7 +366,6 @@ function StudioEditableXBlock(runtime, element) {
         .done(function(response) {
             var error_message = response['error_message'];
             var success_message = response['success_message'];
-            var message, status;
             if (success_message) {
                 message = success_message;
                 status = SUCCESS;
@@ -374,31 +375,24 @@ function StudioEditableXBlock(runtime, element) {
                 message = error_message;
                 status = ERROR;
             };
+        })
+        .fail(function(jqXHR) {
+            message = gettext('This may be happening because of an error with our server or your ' +
+                'internet connection. Try refreshing the page or making sure you are online.');
+            status = ERROR;
+
+            if (jqXHR.responseText) { // Is there a more specific error message we can show?
+                message += extractErrorMessage(jqXHR.responseText);
+            }
+            runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
+        })
+        .always(function() {
             showStatus(
                 message,
                 status,
                 $('.api-request.authenticate.status-success'),
-                $('.api-request.authenticate.status-error'));
-        })
-        .fail(function(jqXHR) {
-            var message = gettext('This may be happening because of an error with our server or your ' +
-                'internet connection. Try refreshing the page or making sure you are online.');
-            showStatus(
-                message,
-                ERROR,
-                $('.api-request.authenticate.status-success'),
                 $('.api-request.authenticate.status-error')
             );
-            if (jqXHR.responseText) { // Is there a more specific error message we can show?
-                message = extractErrorMessage(jqXHR.responseText);
-                showStatus(
-                    message,
-                    ERROR,
-                    $('.api-request.authenticate.status-success'),
-                    $('.api-request.authenticate.status-error')
-                );
-            }
-            runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
         });
     }
 
@@ -406,6 +400,8 @@ function StudioEditableXBlock(runtime, element) {
      * Upload a transcript available on a video platform to video xblock and update displayed default transcripts.
      */
     function uploadDefaultTranscriptsToServer(data) {
+        var message, status;
+
         $.ajax({
             type: 'POST',
             url: uploadDefaultTranscriptHandlerUrl,
@@ -426,33 +422,24 @@ function StudioEditableXBlock(runtime, element) {
             bindRemovalListenerEnabledTranscript(newLang, newLabel, newUrl);
             // Display status messages
             // var error_message = response['error_message'];
-            var success_message = response['success_message'];
-            if (success_message) {
-                showStatus(
-                    success_message,
-                    SUCCESS,
-                    $('.api-request.upload-default-transcript.' + newLang + '.status-success'),
-                    $('.api-request.upload-default-transcript.' + newLang + '.status-error'));
-            }
+            message = response['success_message'];
+            status = SUCCESS;
         })
         .fail(function(jqXHR) {
-            var message = gettext('This may be happening because of an error with our server or your ' +
+            message = gettext('This may be happening because of an error with our server or your ' +
                 'internet connection. Try refreshing the page or making sure you are online.');
+            if (jqXHR.responseText) { // Is there a more specific error message we can show?
+                message += extractErrorMessage(jqXHR.responseText);
+            }
+            status = ERROR;
+        })
+        .always(function() {
             showStatus(
                 message,
-                ERROR,
+                status,
                 $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success'),
                 $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error')
             );
-            if (jqXHR.responseText) { // Is there a more specific error message we can show?
-                message = extractErrorMessage(jqXHR.responseText);
-                showStatus(
-                    message,
-                    ERROR,
-                    $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success'),
-                    $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error')
-                );
-            }
         });
     }
 
