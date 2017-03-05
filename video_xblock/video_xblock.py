@@ -563,6 +563,22 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             'static/html/transcripts.html',
             transcripts=self.route_transcripts(self.transcripts)
         )
+        brightcove_js_scripts = render_resource(
+            'static/html/brightcove_js_scripts.html',
+            transcripts=transcripts,
+            videojs_transcript_plugin=resource_string(
+                'static/bower_components/videojs-transcript/dist/videojs-transcript.js'
+            ),
+            videojs_transcript=resource_string(
+                'static/js/videojs-transcript.js'
+            ),
+            videojs_offset=resource_string(
+                'static/bower_components/videojs-offset/dist/videojs-offset.js'
+            ),
+            videojs_speed_handler=resource_string(
+                'static/js/videojs-speed-handler.js'
+            )
+        )
         return player.get_player_html(
             url=self.href, autoplay=False, account_id=self.account_id, player_id=self.player_id,
             video_id=player.media_id(self.href),
@@ -572,7 +588,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             start_time=int(self.start_time.total_seconds()),  # pylint: disable=no-member
             end_time=int(self.end_time.total_seconds()),  # pylint: disable=no-member
             brightcove_js_url=VideoXBlock.get_brightcove_js_url(self.account_id, self.player_id),
-            transcripts=transcripts
+            transcripts=transcripts,
+            brightcove_js_scripts=brightcove_js_scripts
         )
 
     @XBlock.json_handler

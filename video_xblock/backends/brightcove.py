@@ -386,16 +386,9 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             'static/js/base.js',
             'static/js/toggle-button.js'
         ]
-        if json.loads(context['player_state'])['transcripts']:
-            js_files += [
-                'static/bower_components/videojs-transcript/dist/videojs-transcript.js',
-                'static/js/videojs-transcript.js'
-            ]
         js_files += [
             'static/js/videojs-tabindex.js',
             'static/js/videojs_event_plugin.js',
-            'static/bower_components/videojs-offset/dist/videojs-offset.js',
-            'static/js/videojs-speed-handler.js',
             'static/js/brightcove-videojs-init.js'
         ]
 
