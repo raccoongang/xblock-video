@@ -16,6 +16,6 @@
       {{ transcripts }}
     </video>
     <script src="{{ brightcove_js_url }}"></script>
-    {{ brightcove_js_scripts }}
+    {% include "brightcove_js_scripts.html" %}
     <div id="transcript"></div>
 </div>

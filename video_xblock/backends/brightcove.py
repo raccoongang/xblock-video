@@ -373,7 +373,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         context['player_state'] = json.dumps(context['player_state'])
 
         frag = Fragment(
-            self.render_resource('static/html/brightcove.html', **context)
+            self.render_template('brightcove.html', **context)
         )
         frag.add_css_url(
             'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'
@@ -398,6 +398,26 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             self.resource_string('static/css/brightcove.css')
         )
         return frag
+
+    def get_player_html(self, **context):
+        """
+        Add VideoJS plugins to the context and render player html using base class logic.
+        """
+        context.update({
+            'videojs_transcript_plugin': self.resource_string(
+                'static/bower_components/videojs-transcript/dist/videojs-transcript.js'
+            ),
+            'videojs_transcript': self.resource_string(
+                'static/js/videojs-transcript.js'
+            ),
+            'videojs_offset': self.resource_string(
+                'static/bower_components/videojs-offset/dist/videojs-offset.js'
+            ),
+            'videojs_speed_handler': self.resource_string(
+                'static/js/videojs-speed-handler.js'
+            )
+        })
+        return super(BrightcovePlayer, self).get_player_html(**context)
 
     def dispatch(self, _request, suffix):
         """
