@@ -10,10 +10,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
     - Split Video XBlock settings into Basic & Advanced tabs.
     - Display only fields relevant to selected video
 - Manual uploaded transcripts validation: file extension and size.
+- Code stabilization:
+    - Python unit tests.
+    - JS unit tests foundation.
 
 ### Fixed
 - Various bugs.
-- Code stabilization.
 
 ## [v0.4.0] - 2017-02-07
 
