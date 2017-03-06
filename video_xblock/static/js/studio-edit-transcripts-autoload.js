@@ -207,6 +207,7 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     var isStoredVideoPlatform;
     var isNotPresentEnabledTranscripts;
     var message, status;
+    var SUCCESS = 'success', ERROR = 'error';
     $enabledTranscriptBlock.remove();
     isNotPresentEnabledTranscripts = !$('div.enabled-default-transcripts-section:visible').length;
     // Hide label of enabled transcripts if no such items left
@@ -222,12 +223,12 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     // Display message with results of removal
     if (isSuccessfulRemoval && isStoredVideoPlatform) {
         message = successMessageRemoval;
-        status = 'success';
+        status = SUCCESS;
     } else if (isSuccessfulRemoval && !isStoredVideoPlatform) {
-        status = 'error';
+        status = ERROR;
         message = errorMessage;
     } else {
-        status = 'error';
+        status = ERROR;
         message = failureMessage;
     }
     showStatus(

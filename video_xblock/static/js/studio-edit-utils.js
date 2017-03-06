@@ -40,6 +40,7 @@ function showStatus(message, type, successMessageElement, errorMessageElement) {
     // Only one success message is to be displayed at once
     $('.api-request').empty();
     if (type === SUCCESS) {
+        // TODO: Use one element to display status with appropriate styling
         elementToEmpty = errorMessageElement;
         elementToShow = successMessageElement;
     } else if (type === ERROR) {
