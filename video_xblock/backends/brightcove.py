@@ -403,20 +403,20 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         """
         Add VideoJS plugins to the context and render player html using base class logic.
         """
-        context.update({
-            'videojs_transcript_plugin': self.resource_string(
-                'static/bower_components/videojs-transcript/dist/videojs-transcript.js'
-            ),
-            'videojs_transcript': self.resource_string(
-                'static/js/videojs-transcript.js'
-            ),
-            'videojs_offset': self.resource_string(
+        vjs_plugins = [
+            self.resource_string(
                 'static/bower_components/videojs-offset/dist/videojs-offset.js'
             ),
-            'videojs_speed_handler': self.resource_string(
-                'static/js/videojs-speed-handler.js'
-            )
-        })
+            self.resource_string('static/js/videojs-speed-handler.js')
+        ]
+        if context['transcripts']:
+            vjs_plugins += [
+                self.resource_string(
+                    'static/bower_components/videojs-transcript/dist/videojs-transcript.js'
+                ),
+                self.resource_string('static/js/videojs-transcript.js')
+            ]
+        context['vjs_plugins'] = vjs_plugins
         return super(BrightcovePlayer, self).get_player_html(**context)
 
     def dispatch(self, _request, suffix):
