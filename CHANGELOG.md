@@ -44,4 +44,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   upload can work.
 
 ### Fixed
+
 - Various bugfixes and improvements.
