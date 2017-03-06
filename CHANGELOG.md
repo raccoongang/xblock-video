@@ -10,13 +10,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Html5 video support.
-- UI improvements in Studio:
-  - Split Video XBlock settings into Basic & Advanced tabs.
-  - Display only fields relevant to selected video
 - Manual uploaded transcripts validation: file extension and size.
 - Code stabilization:
   - Python unit tests.
   - JS unit tests foundation.
+
+### Changed
+
+- UI improvements in Studio:
+  - Split Video XBlock settings into Basic & Advanced tabs.
+  - Display only fields relevant to selected video.
 
 ### Fixed
 
