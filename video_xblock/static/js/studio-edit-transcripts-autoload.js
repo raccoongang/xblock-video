@@ -207,7 +207,8 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     var isStoredVideoPlatform;
     var isNotPresentEnabledTranscripts;
     var message, status;
-    var SUCCESS = 'success', ERROR = 'error';
+    var SUCCESS = 'success';
+    var ERROR = 'error';
     $enabledTranscriptBlock.remove();
     isNotPresentEnabledTranscripts = !$('div.enabled-default-transcripts-section:visible').length;
     // Hide label of enabled transcripts if no such items left

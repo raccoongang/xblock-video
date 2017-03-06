@@ -268,6 +268,11 @@ function StudioEditableXBlock(runtime, element) {
         });
     });
 
+    /**
+     * Is there a more specific error message we can show?
+     * @param  {String} responseText JSON received from ajax call
+     * @return {String}              Error message extracted from input JSON or a portion of input text
+     */
     function extractErrorMessage(responseText) {
         try {
             message = JSON.parse(responseText).error;
