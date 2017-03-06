@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
     - JS unit tests foundation.
 
 ### Fixed
+- Move all python dependencies into setup.py to simplify XBlock installation.
 - Various bugs.
 
 ## [v0.4.0] - 2017-02-07
