@@ -1,10 +1,14 @@
 # Change Log
+
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
+The format is based on [Keep a Changelog](http://keepachangelog.com/)
+and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
 ### Added
+
 - Html5 video support.
 - UI improvements in Studio:
   - Split Video XBlock settings into Basic & Advanced tabs.
@@ -15,12 +19,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - JS unit tests foundation.
 
 ### Fixed
+
 - Move all python dependencies into setup.py to simplify XBlock installation.
 - Various bugs.
 
 ## [v0.4.0] - 2017-02-07
 
 ### Added
+
 - Brightcove content protection and auto-quality
   - On API authentication uploads two custom Ingest Profiles:
     - Creates new API credentials with required permissions
@@ -34,7 +40,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Default transcripts upload
   - Allows to fetch transcripts from the platform and store them into XBlock.
   - Supports: Brightcove, Youtube & Wistia.
-  - Brightcove & Wistia require API authentication before default transcripts upload can work.
+  - Brightcove & Wistia require API authentication before default transcripts
+  upload can work.
 
 ### Fixed
 - Various bugfixes and improvements.
