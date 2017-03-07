@@ -409,7 +409,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             ),
             self.resource_string('static/js/videojs-speed-handler.js')
         ]
-        if context['transcripts']:
+        if context.get('transcripts'):
             vjs_plugins += [
                 self.resource_string(
                     'static/bower_components/videojs-transcript/dist/videojs-transcript.js'
