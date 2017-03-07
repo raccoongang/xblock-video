@@ -207,19 +207,19 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
 /** Remove enabled transcript of choice. */
 function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscriptsData) {
     'use strict';
-    var status;
-    var message = '';
     var langCode = enabledTranscript.lang;
     var langLabel = enabledTranscript.label;
     var initialDefaultTranscriptsLangCodes = initialDefaultTranscriptsData[1];
     // Remove enabled transcript of choice
     var $enabledTranscriptBlock = $('div[value=' + langCode + ']').closest('div.enabled-default-transcripts-section');
     var $enabledLabel = $('div.custom-field-section-label.enabled-transcripts');
-
     var allEnabledTranscripts;
     var isSuccessfulRemoval;
     var isStoredVideoPlatform;
     var isNotPresentEnabledTranscripts;
+    var message, status;
+    var SUCCESS = 'success';
+    var ERROR = 'error';
     $enabledTranscriptBlock.remove();
     isNotPresentEnabledTranscripts = !$('div.enabled-default-transcripts-section:visible').length;
     // Hide label of enabled transcripts if no such items left
@@ -232,16 +232,16 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     allEnabledTranscripts = getDefaultTranscriptsArray('enabled');
     isSuccessfulRemoval = $.inArray(langCode, allEnabledTranscripts) === -1; // Is not in array
     isStoredVideoPlatform = $.inArray(langCode, initialDefaultTranscriptsLangCodes) !== -1;  // Is in array
-    // Display message with results on removal
+    // Display message with results of removal
     if (isSuccessfulRemoval && isStoredVideoPlatform) {
         message = langLabel + ' transcripts are successfully removed from the list of enabled ones.';
-        status = 'success';
+        status = SUCCESS;
     } else if (isSuccessfulRemoval && !isStoredVideoPlatform) {
         message = langLabel + ' transcripts are removed, but can not be uploaded from the video platform.';
-        status = 'error';
+        status = ERROR;
     } else {
         message = langLabel + ' transcripts are not neither removed nor added to the list of available ones.';
-        status = 'error';
+        status = ERROR;
     }
     showStatus(
         message,

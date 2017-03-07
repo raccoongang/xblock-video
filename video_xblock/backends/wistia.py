@@ -12,6 +12,8 @@ import babelfish
 
 from video_xblock import BaseVideoPlayer
 from video_xblock.constants import status
+from video_xblock.utils import ugettext as _
+from video_xblock.exceptions import VideoXBlockException
 
 
 class WistiaPlayer(BaseVideoPlayer):
@@ -120,6 +122,7 @@ class WistiaPlayer(BaseVideoPlayer):
 
         Arguments:
             kwargs (dict): Wistia master token key-value pair.
+
         Returns:
             auth_data (dict): Master token, provided by a user, which is to be stored in Wistia's player metadata.
             error_status_message (str): Message with authentication outcomes for the sake of verbosity.
@@ -177,7 +180,9 @@ class WistiaPlayer(BaseVideoPlayer):
                 wistia_data = False
 
             if wistia_data:
-                transcripts_data = [[el.get('language'), el.get('english_name'), el.get('text')] for el in wistia_data]
+                transcripts_data = [
+                    [el.get('language'), el.get('english_name'), el.get('text')]
+                    for el in wistia_data]
                 # Populate default_transcripts
                 for lang_code, lang_label, text in transcripts_data:
                     # lang_code, fetched from Wistia API, is a 3 character language code as specified by ISO-639-2.
@@ -205,6 +210,8 @@ class WistiaPlayer(BaseVideoPlayer):
         # Reference: https://wistia.com/doc/data-api#captions_index
         elif data.status_code == status.HTTP_404_NOT_FOUND:
             message = "Wistia video {video_id} doesn't exist.".format(video_id=str(video_id))
+        else:
+            message = "Invalid request."
         return self.default_transcripts, message
 
     @staticmethod
@@ -236,7 +243,7 @@ class WistiaPlayer(BaseVideoPlayer):
             text = unicode(unescaped_text)
         return text
 
-    def download_default_transcript(self, language_code, url=None):  # pylint: disable=unused-argument
+    def download_default_transcript(self, url=None, language_code=None):  # pylint: disable=unused-argument
         """
         Get default transcript fetched from a video platform API and formats it to WebVTT-like unicode.
 
@@ -251,6 +258,8 @@ class WistiaPlayer(BaseVideoPlayer):
         Returns:
             text (unicode): Text of transcripts.
         """
+        if language_code is None:
+            raise VideoXBlockException(_('`language_code` parameter is required.'))
         text = [
             sub.get(u'text')
             for sub in self.default_transcripts
