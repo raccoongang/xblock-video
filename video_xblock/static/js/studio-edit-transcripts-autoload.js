@@ -25,30 +25,6 @@ function createStatusMessageElement(langCode, actionSelector) {
 }
 
 /**
- * Display message with results on a performed action.
- */
-function showStatus(message, type, statusSelector) {
-    'use strict';
-    var hideIn = 5000;
-    var successClass = 'status-success';
-    var errorClass = 'status-error';
-
-    // Only one success message is to be displayed at once
-    $('.api-response').empty();
-
-    if (type === 'success') {
-        $(statusSelector).removeClass(errorClass).addClass(successClass);
-    } else if (type === 'error') {
-        $(statusSelector).removeClass(successClass).addClass(errorClass);
-    }
-
-    $(statusSelector).show().text(message);
-    setTimeout(function() {
-        $(statusSelector).hide();
-    }, hideIn);
-}
-
-/**
  *  Manage default transcripts labels display depending on enabled/available subs presence.
  */
 function setDisplayDefaultTranscriptsLabel(isNotDisplayedDefaultSub, labelElement) {
@@ -246,7 +222,7 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     showStatus(
         message,
         status,
-        '.api-response.remove-default-transcript.' + langCode + '.status'
+        $('.api-response.remove-default-transcript.' + langCode + '.status')
     );
 }
 

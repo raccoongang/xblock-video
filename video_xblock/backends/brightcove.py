@@ -6,6 +6,7 @@ Brightcove Video player plugin.
 import base64
 from datetime import datetime
 import json
+import httplib
 import re
 from xml.sax.saxutils import unescape
 
@@ -13,7 +14,6 @@ import requests
 from xblock.fragment import Fragment
 
 from video_xblock.backends.base import BaseVideoPlayer, BaseApiClient
-from video_xblock.constants import status
 from video_xblock.exceptions import ApiClientError, VideoXBlockException
 from video_xblock.utils import ugettext as _
 
@@ -78,7 +78,7 @@ class BrightcoveApiClient(BaseApiClient):
         response = requests.post(url, json=data, headers=headers)
         response_data = response.json()
         # New resource must have been created.
-        if response.status_code == status.HTTP_201_CREATED and response_data:
+        if response.status_code == httplib.CREATED and response_data:
             client_secret = response_data.get('client_secret')
             client_id = response_data.get('client_id')
             error_message = ''
@@ -103,7 +103,7 @@ class BrightcoveApiClient(BaseApiClient):
             "Authorization": "Basic " + auth_string
         }
         resp = requests.post(url, headers=headers, data=params)
-        if resp.status_code == status.HTTP_200_OK:
+        if resp.status_code == httplib.OK:
             result = resp.json()
             return result['access_token']
 
@@ -122,9 +122,9 @@ class BrightcoveApiClient(BaseApiClient):
         if headers is not None:
             headers_.update(headers)
         resp = requests.get(url, headers=headers_)
-        if resp.status_code == status.HTTP_200_OK:
+        if resp.status_code == httplib.OK:
             return resp.json()
-        elif resp.status_code == status.HTTP_401_UNAUTHORIZED and can_retry:
+        elif resp.status_code == httplib.UNAUTHORIZED and can_retry:
             self.access_token = self._refresh_access_token()
             return self.get(url, headers, can_retry=False)
         else:
@@ -150,9 +150,9 @@ class BrightcoveApiClient(BaseApiClient):
             headers_.update(headers)
 
         resp = requests.post(url, data=payload, headers=headers_)
-        if resp.status_code in (status.HTTP_200_OK, status.HTTP_201_CREATED):
+        if resp.status_code in (httplib.OK, httplib.CREATED):
             return resp.json()
-        elif resp.status_code == status.HTTP_401_UNAUTHORIZED and can_retry:
+        elif resp.status_code == httplib.UNAUTHORIZED and can_retry:
             self.access_token = self._refresh_access_token()
             return self.post(url, payload, headers, can_retry=False)
         else:
