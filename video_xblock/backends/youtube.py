@@ -13,7 +13,7 @@ import requests
 from lxml import etree
 
 from video_xblock import BaseVideoPlayer
-from video_xblock.utils import ugettext as _g
+from video_xblock.utils import ugettext as _
 from video_xblock.exceptions import VideoXBlockException
 
 
