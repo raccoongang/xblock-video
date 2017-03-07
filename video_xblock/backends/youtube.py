@@ -13,7 +13,7 @@ import requests
 from lxml import etree
 
 from video_xblock import BaseVideoPlayer
-from video_xblock.utils import ugettext as _g
+from video_xblock.utils import ugettext as _
 from video_xblock.exceptions import VideoXBlockException
 
 
@@ -142,7 +142,7 @@ class YoutubePlayer(BaseVideoPlayer):
         # Fetch available transcripts' languages from API
         video_id = kwargs.get('video_id')
         available_languages, message = self.fetch_default_transcripts_languages(video_id)
-
+        self.default_transcripts = []
         for lang_code, lang_translated, transcript_name in available_languages:  # pylint: disable=unused-variable
             self.captions_api['params']['lang'] = lang_code
             self.captions_api['params']['name'] = transcript_name

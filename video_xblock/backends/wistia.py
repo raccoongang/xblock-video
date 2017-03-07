@@ -163,7 +163,7 @@ class WistiaPlayer(BaseVideoPlayer):
         token = kwargs.get('token')
         url = self.captions_api['url'].format(token=token, media_id=video_id)
         message = ''
-
+        self.default_transcripts = []
         # Fetch available transcripts' languages (codes and English labels), and assign its' urls.
         try:
             data = requests.get('https://' + url)

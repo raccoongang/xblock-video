@@ -526,6 +526,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         account_id = kwargs.get('account_id')
         url = self.captions_api['url'].format(account_id=account_id, media_id=video_id)
         message = ''
+        self.default_transcripts = []
         # Fetch available transcripts' languages and urls if authentication succeeded.
         try:
             text = self.api_client.get(url)
