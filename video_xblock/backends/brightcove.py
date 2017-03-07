@@ -513,21 +513,20 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         video_id = kwargs.get('video_id')
         account_id = kwargs.get('account_id')
         url = self.captions_api['url'].format(account_id=account_id, media_id=video_id)
-        default_transcripts = []
         message = ''
         # Fetch available transcripts' languages and urls if authentication succeeded.
         try:
             text = self.api_client.get(url)
         except BrightcoveApiClientError:
             message = 'No timed transcript may be fetched from a video platform.'
-            return default_transcripts, message
+            return self.default_transcripts, message
 
         if text:
             captions_data = text.get('text_tracks')
             # Handle empty response (no subs uploaded on a platform)
             if not captions_data:
                 message = 'For now, video platform doesn\'t have any timed transcript for this video.'
-                return default_transcripts, message
+                return self.default_transcripts, message
             transcripts_data = [
                 [el.get('src'), el.get('srclang')]
                 for el in captions_data
@@ -535,19 +534,17 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             # Populate default_transcripts
             for transcript_url, lang_code in transcripts_data:
                 lang_label = self.get_transcript_language_parameters(lang_code)[1]
-                default_transcript = {
+                self.default_transcripts.append({
                     'lang': lang_code,
                     'label': lang_label,
                     'url': transcript_url,
-                }
-                default_transcripts.append(default_transcript)
-                self.default_transcripts.append(default_transcript)
+                })
         else:
             try:
                 message = str(text[0].get('message'))
             except AttributeError:
                 message = 'No timed transcript may be fetched from a video platform. '
-        return default_transcripts, message
+        return self.default_transcripts, message
 
     def download_default_transcript(self, url, language_code=None):  # pylint: disable=unused-argument
         """

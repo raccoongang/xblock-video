@@ -358,16 +358,16 @@ function StudioEditableXBlock(runtime, element) {
                     showStatus(
                         success_message,
                         'success',
-                        '.api-request.authenticate.status-success',
-                        '.api-request.authenticate.status-error');
+                        '.api-response.authenticate.status'
+                    );
                     showBackendSettings();
                 }
                 else if (error_message) {
                     showStatus(
                         error_message,
                         'error',
-                        '.api-request.authenticate.status-success',
-                        '.api-request.authenticate.status-error');
+                        '.api-response.authenticate.status'
+                    );
                 }
             }
         })
@@ -377,8 +377,7 @@ function StudioEditableXBlock(runtime, element) {
             showStatus(
                 message,
                 'error',
-                '.api-request.authenticate.status-success',
-                '.api-request.authenticate.status-error'
+                '.api-response.authenticate.status'
             );
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
                 try {
@@ -389,16 +388,14 @@ function StudioEditableXBlock(runtime, element) {
                         showStatus(
                             message,
                             'error',
-                            '.api-request.authenticate.status-success',
-                            '.api-request.authenticate.status-error'
+                            '.api-response.authenticate.status'
                         );                   }
                 } catch (error) {
                     message = jqXHR.responseText.substr(0, 300);
                     showStatus(
                         message,
                         'error',
-                        '.api-request.authenticate.status-success',
-                        '.api-request.authenticate.status-error'
+                        '.api-response.authenticate.status'
                     );
                 }
             }
@@ -434,8 +431,7 @@ function StudioEditableXBlock(runtime, element) {
                     showStatus(
                         success_message,
                         'success',
-                        '.api-request.upload-default-transcript.' + newLang + '.status-success',
-                        '.api-request.upload-default-transcript.' + newLang + '.status-error');
+                        '.api-response.upload-default-transcript.' + newLang + '.status');
                 }
             }
         })
@@ -445,8 +441,7 @@ function StudioEditableXBlock(runtime, element) {
             showStatus(
                 message,
                 'error',
-                '.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success',
-                '.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error'
+                '.api-response.upload-default-transcript.' + currentLanguageCode + '.status'
             );
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
                 try {
@@ -457,16 +452,14 @@ function StudioEditableXBlock(runtime, element) {
                         showStatus(
                             message,
                             'error',
-                            '.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success',
-                            '.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error'
+                            '.api-response.upload-default-transcript.' + currentLanguageCode + '.status'
                         );                   }
                 } catch (error) {
                     message = jqXHR.responseText.substr(0, 300);
                     showStatus(
                         message,
                         'error',
-                        '.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success',
-                        '.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error'
+                        '.api-response.upload-default-transcript.' + currentLanguageCode + '.status'
                     );
                 }
             }
@@ -531,7 +524,7 @@ function StudioEditableXBlock(runtime, element) {
      */
     function bindRemovalListenerEnabledTranscript(langCode, langLabel, downloadUrlServer) {
         var $removeElement = $('.default-transcripts-action-link.remove-default-transcript[data-lang-code=' + langCode + ']');
-        $removeElement.click(function() {
+        $removeElement.click(function(e) {
             var defaultTranscript = {'lang' : langCode, 'label' : langLabel, 'url': downloadUrlServer};
             // Affect default transcripts
             removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
@@ -540,6 +533,7 @@ function StudioEditableXBlock(runtime, element) {
             // Affect standard transcripts
             removeStandardTranscriptBlock(langCode, transcriptsValue, disabledLanguages);
             disableOption($langChoiceItem, disabledLanguages);
+            e.preventDefault();
         });
     }
 
@@ -657,6 +651,7 @@ function StudioEditableXBlock(runtime, element) {
         // Affect standard transcripts
         removeStandardTranscriptBlock(langCode, transcriptsValue, disabledLanguages);
         disableOption($langChoiceItem, disabledLanguages);
+        event.preventDefault();
     });
 
     $defaultTranscriptsSwitcher.change(function(){

@@ -87,12 +87,6 @@ class YoutubePlayer(BaseVideoPlayer):
         })
         return result
 
-    def authenticate_api(self, **kwargs):
-        """
-        Current Youtube captions API doesn't require authentication, but this may change.
-        """
-        return {}, ''
-
     def fetch_default_transcripts_languages(self, video_id):
         """
         Fetch available transcripts languages from a Youtube server.
@@ -147,7 +141,6 @@ class YoutubePlayer(BaseVideoPlayer):
         video_id = kwargs.get('video_id')
         available_languages, message = self.fetch_default_transcripts_languages(video_id)
 
-        default_transcripts = []
         for lang_code, lang_translated, transcript_name in available_languages:  # pylint: disable=unused-variable
             self.captions_api['params']['lang'] = lang_code
             self.captions_api['params']['name'] = transcript_name
@@ -157,14 +150,12 @@ class YoutubePlayer(BaseVideoPlayer):
             )
             # Update default transcripts languages parameters in accordance with pre-configured language settings
             lang_code, lang_label = self.get_transcript_language_parameters(lang_code)
-            default_transcript = {
+            self.default_transcripts.append({
                 'lang': lang_code,
                 'label': lang_label,
                 'url': transcript_url,
-            }
-            default_transcripts.append(default_transcript)
-        self.default_transcripts = default_transcripts
-        return default_transcripts, message
+            })
+        return self.default_transcripts, message
 
     @staticmethod
     def format_transcript_timing(sec, period_type=None):
@@ -176,10 +167,10 @@ class YoutubePlayer(BaseVideoPlayer):
             period_type (str): Timing period type (whether `end` or `start`).
         """
         # Get rid of overlapping periods.
-        if period_type == 'end' and float(sec) >= 0.001:
-            float_sec = float(sec) - 0.001
-            sec = float_sec
-        mins, secs = divmod(sec, 60)  # pylint: disable=unused-variable
+        float_sec = float(sec)
+        sec = float_sec - 0.001 if period_type == 'end' and float_sec >= 0.001 else sec
+
+        mins, secs = divmod(sec, 60)
         hours, mins = divmod(mins, 60)
         hours_formatted = str(int(hours)).zfill(2)
         mins_formatted = str(int(mins)).zfill(2)
