@@ -19,7 +19,7 @@ from xblock.plugin import Plugin
 from django.conf import settings
 
 from video_xblock.exceptions import VideoXBlockException
-from video_xblock.utils import render_resource, resource_string, ugettext as _
+from video_xblock.utils import render_resource, render_template, resource_string, ugettext as _
 
 
 class BaseApiClient(object):
@@ -238,7 +238,7 @@ class BaseVideoPlayer(Plugin):
         """
         frag = self.get_frag(**context)
         return Response(
-            self.render_resource('static/html/base.html', frag=frag),
+            self.render_template('base.html', frag=frag),
             content_type='text/html'
         )
 
@@ -256,6 +256,15 @@ class BaseVideoPlayer(Plugin):
             django.utils.safestring.SafeText
         """
         return render_resource(path, **context)
+
+    def render_template(self, name, **context):
+        """
+        Render static template using provided context.
+
+        Returns:
+            django.utils.safestring.SafeText
+        """
+        return render_template(name, **context)
 
     @classmethod
     def match(cls, href):
@@ -285,6 +294,7 @@ class BaseVideoPlayer(Plugin):
         Arguments:
             kwargs (dict): Key-value pairs of API-specific identifiers (account_id, video_id, etc.) and tokens,
                 necessary for API calls.
+
         Returns:
             list: List of dicts of transcripts. Example:
             [
@@ -320,6 +330,7 @@ class BaseVideoPlayer(Plugin):
         Arguments:
             url (str): API url to fetch a default transcript from.
             language_code (str): Language code of a transcript to be downloaded.
+
         Returns:
             unicode: Transcripts formatted in WebVTT.
         """

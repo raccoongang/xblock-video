@@ -24,6 +24,7 @@ from webob import Response
 
 from .backends.base import BaseVideoPlayer
 from .constants import PlayerName, status
+from .exceptions import ApiClientError
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
 from .utils import render_template, render_resource, resource_string, ugettext as _
@@ -212,8 +213,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
         scope=Scope.content,
         display_name=_('Upload transcript'),
         help=_(
-            'Add transcripts in different languages. Click below to specify a language and upload an .srt transcript'
-            ' file for that language.'
+            'Add transcripts in different languages. Click below to '
+            'specify a language and upload a .srt or a .vtt transcript '
+            'file for that language. Maximum file size is 300 KB.'
         )
     )
 
@@ -532,7 +534,10 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
         if is_not_default_account_id:  # pylint: disable=unsubscriptable-object
             kwargs['account_id'] = self.account_id
         # Fetch captions list (available/default transcripts list) from video platform API
-        default_transcripts, transcripts_autoupload_message = player.get_default_transcripts(**kwargs)
+        try:
+            default_transcripts, transcripts_autoupload_message = player.get_default_transcripts(**kwargs)
+        except ApiClientError:
+            default_transcripts, transcripts_autoupload_message = [], _('Failed to fetch default transcripts.')
         # Default transcripts should contain transcripts of distinct languages only
         distinct_default_transcripts = player.clean_default_transcripts(default_transcripts)
         # Needed for frontend
@@ -598,7 +603,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
         transcripts = render_resource(
             'static/html/transcripts.html',
             transcripts=self.route_transcripts(self.transcripts)
-        )
+        ).strip()
         return player.get_player_html(
             url=self.href, autoplay=False, account_id=self.account_id, player_id=self.player_id,
             video_id=player.media_id(self.href),
@@ -608,7 +613,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
             start_time=int(self.start_time.total_seconds()),  # pylint: disable=no-member
             end_time=int(self.end_time.total_seconds()),  # pylint: disable=no-member
             brightcove_js_url=VideoXBlock.get_brightcove_js_url(self.account_id, self.player_id),
-            transcripts=transcripts
+            transcripts=transcripts,
         )
 
     @XBlock.json_handler
