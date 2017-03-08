@@ -14,7 +14,7 @@ from xblock.fragment import Fragment
 
 from video_xblock.backends.base import BaseVideoPlayer, BaseApiClient
 from video_xblock.constants import status
-from video_xblock.exceptions import ApiClientError
+from video_xblock.exceptions import ApiClientError, VideoXBlockException
 from video_xblock.utils import ugettext as _
 
 
@@ -237,7 +237,6 @@ class BrightcoveHlsMixin(object):
             - default - re-transcode using default DI profile;
             - autoquality - re-transcode using HLS only profile;
             - encryption - re-transcode using HLS with encryption profile;
-
         """
         url = 'https://ingest.api.brightcove.com/v1/accounts/{account_id}/videos/{video_id}/ingest-requests'.format(
             account_id=account_id, video_id=video_id
@@ -374,7 +373,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         context['player_state'] = json.dumps(context['player_state'])
 
         frag = Fragment(
-            self.render_resource('static/html/brightcove.html', **context)
+            self.render_template('brightcove.html', **context)
         )
         frag.add_css_url(
             'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'
@@ -386,16 +385,9 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             'static/js/base.js',
             'static/js/toggle-button.js'
         ]
-        if json.loads(context['player_state'])['transcripts']:
-            js_files += [
-                'static/bower_components/videojs-transcript/dist/videojs-transcript.js',
-                'static/js/videojs-transcript.js'
-            ]
         js_files += [
             'static/js/videojs-tabindex.js',
             'static/js/videojs_event_plugin.js',
-            'static/bower_components/videojs-offset/dist/videojs-offset.js',
-            'static/js/videojs-speed-handler.js',
             'static/js/brightcove-videojs-init.js'
         ]
 
@@ -406,6 +398,26 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             self.resource_string('static/css/brightcove.css')
         )
         return frag
+
+    def get_player_html(self, **context):
+        """
+        Add VideoJS plugins to the context and render player html using base class logic.
+        """
+        vjs_plugins = [
+            self.resource_string(
+                'static/bower_components/videojs-offset/dist/videojs-offset.js'
+            ),
+            self.resource_string('static/js/videojs-speed-handler.js')
+        ]
+        if context.get('transcripts'):
+            vjs_plugins += [
+                self.resource_string(
+                    'static/bower_components/videojs-transcript/dist/videojs-transcript.js'
+                ),
+                self.resource_string('static/js/videojs-transcript.js')
+            ]
+        context['vjs_plugins'] = vjs_plugins
+        return super(BrightcovePlayer, self).get_player_html(**context)
 
     def dispatch(self, _request, suffix):
         """
@@ -507,7 +519,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
                 ]
             message (str): Message for a user with details on default transcripts fetching outcomes.
         """
-        if not self.api_key and self.api_secret:
+        if not self.api_key and not self.api_secret:
             raise BrightcoveApiClientError(_('No API credentials provided'))
 
         video_id = kwargs.get('video_id')
@@ -544,12 +556,14 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
                 self.default_transcripts.append(default_transcript)
         else:
             try:
+                # no way this code could be executed
+                # TODO: refactor this code
                 message = str(text[0].get('message'))
             except AttributeError:
-                message = 'No timed transcript may be fetched from a video platform. '
+                message = 'No timed transcript may be fetched from a video platform.'
         return default_transcripts, message
 
-    def download_default_transcript(self, url, language_code=None):  # pylint: disable=unused-argument
+    def download_default_transcript(self, url=None, language_code=None):  # pylint: disable=unused-argument
         """
         Download default transcript from a video platform API in WebVVT format.
 
@@ -558,6 +572,8 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         Returns:
             sub (unicode): Transcripts formatted per WebVTT format https://w3c.github.io/webvtt/
         """
+        if url is None:
+            raise VideoXBlockException(_('`url` parameter is required.'))
         data = requests.get(url)
         text = data.content.decode('utf8')
         # To clean subs text from special symbols here, we need `unescape()` from xml.sax.saxutils
