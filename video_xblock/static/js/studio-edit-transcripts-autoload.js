@@ -220,7 +220,7 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
         status = ERROR;
     }
     showStatus(
-        message.replace("{langLabel}", langLabel),
+        message.replace('{langLabel}', langLabel),
         status,
         $('.api-response.remove-default-transcript.' + langCode + '.status')
     );
