@@ -214,8 +214,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
         scope=Scope.content,
         display_name=_('Upload transcript'),
         help=_(
-            'Add transcripts in different languages. Click below to specify a language and upload a .srt or a .vtt'
-            'transcript file for that language. Maximum file size is 300 KB.'
+            'Add transcripts in different languages. Click below to '
+            'specify a language and upload a .srt or a .vtt transcript '
+            'file for that language. Maximum file size is 300 KB.'
         )
     )
 
@@ -595,7 +596,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
         transcripts = render_resource(
             'static/html/transcripts.html',
             transcripts=self.route_transcripts(self.transcripts)
-        )
+        ).strip()
         return player.get_player_html(
             url=self.href, autoplay=False, account_id=self.account_id, player_id=self.player_id,
             video_id=player.media_id(self.href),
@@ -605,7 +606,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
             start_time=int(self.start_time.total_seconds()),  # pylint: disable=no-member
             end_time=int(self.end_time.total_seconds()),  # pylint: disable=no-member
             brightcove_js_url=VideoXBlock.get_brightcove_js_url(self.account_id, self.player_id),
-            transcripts=transcripts
+            transcripts=transcripts,
         )
 
     @XBlock.json_handler
