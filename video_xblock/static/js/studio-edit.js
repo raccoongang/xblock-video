@@ -521,7 +521,7 @@ function StudioEditableXBlock(runtime, element) {
      */
     function bindRemovalListenerEnabledTranscript(langCode, langLabel, downloadUrlServer) {
         var $removeElement = $('.default-transcripts-action-link.remove-default-transcript[data-lang-code=' + langCode + ']');
-        $removeElement.click(function(e) {
+        $removeElement.click(function(event) {
             var defaultTranscript = {'lang' : langCode, 'label' : langLabel, 'url': downloadUrlServer};
             // Affect default transcripts
             removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
@@ -530,7 +530,7 @@ function StudioEditableXBlock(runtime, element) {
             // Affect standard transcripts
             removeStandardTranscriptBlock(langCode, transcriptsValue, disabledLanguages);
             disableOption($langChoiceItem, disabledLanguages);
-            e.preventDefault();
+            event.preventDefault();
         });
     }
 
