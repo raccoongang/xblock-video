@@ -7,6 +7,7 @@ All you need to provide is video url, this XBlock does the rest for you.
 import datetime
 import functools
 import json
+import httplib
 import logging
 import os.path
 import requests
@@ -24,7 +25,7 @@ from pycaption import detect_format, WebVTTWriter
 from webob import Response
 
 from .backends.base import BaseVideoPlayer
-from .constants import PlayerName, status
+from .constants import PlayerName
 from .exceptions import ApiClientError
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
@@ -185,8 +186,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         scope=Scope.content,
         display_name=_('Upload transcript'),
         help=_(
-            'Add transcripts in different languages. Click below to specify a language and upload a .srt or a .vtt'
-            'transcript file for that language. Maximum file size is 300 KB.'
+            'Add transcripts in different languages. Click below to '
+            'specify a language and upload a .srt or a .vtt transcript '
+            'file for that language. Maximum file size is 300 KB.'
         )
     )
 
@@ -376,7 +378,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         if is_provided_account_id:
             try:
                 response = requests.head(VideoXBlock.get_brightcove_js_url(data.account_id, data.player_id))
-                if response.status_code != status.HTTP_200_OK:
+                if response.status_code != httplib.OK:
                     self.add_validation_message(validation, _(u"Invalid Account Id, please recheck."))
             except requests.ConnectionError:
                 self.add_validation_message(
@@ -465,7 +467,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             )
         )
         frag.add_javascript(resource_string("static/js/video_xblock.js"))
-        frag.add_css(resource_string("static/css/handout.css"))
+        frag.add_css(resource_string("static/css/student-view.css"))
         frag.initialize_js('VideoXBlockStudentViewInit')
         return frag
 
@@ -540,7 +542,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 context["fields"].append(field_info)
 
         fragment.content = render_template('studio-edit.html', **context)
-        fragment.add_css(resource_string("static/css/handout.css"))
+        fragment.add_css(resource_string("static/css/student-view.css"))
         fragment.add_css(resource_string("static/css/transcripts-upload.css"))
         fragment.add_css(resource_string("static/css/studio-edit.css"))
         fragment.add_javascript(resource_string("static/js/studio-edit.js"))
@@ -566,7 +568,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         transcripts = render_resource(
             'static/html/transcripts.html',
             transcripts=self.route_transcripts(self.transcripts)
-        )
+        ).strip()
         return player.get_player_html(
             url=self.href, autoplay=False, account_id=self.account_id, player_id=self.player_id,
             video_id=player.media_id(self.href),
@@ -576,7 +578,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             start_time=int(self.start_time.total_seconds()),  # pylint: disable=no-member
             end_time=int(self.end_time.total_seconds()),  # pylint: disable=no-member
             brightcove_js_url=VideoXBlock.get_brightcove_js_url(self.account_id, self.player_id),
-            transcripts=transcripts
+            transcripts=transcripts,
         )
 
     @XBlock.json_handler
