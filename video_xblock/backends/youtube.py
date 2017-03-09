@@ -168,7 +168,8 @@ class YoutubePlayer(BaseVideoPlayer):
             sec (str): Transcript timing in seconds with milliseconds resolution.
             period_type (str): Timing period type (whether `end` or `start`).
         """
-        # Get rid of overlapping periods.
+        # Youtube returns transcripts with the equal endtime and startime for previous and next transcript blocks
+        # respectively. That is why transcript blocks are overlapping. Get rid of it by decreasing timing on 0.001.
         float_sec = float(sec)
         sec = float_sec - 0.001 if period_type == 'end' and float_sec >= 0.001 else sec
 

@@ -31,21 +31,21 @@ function fillValues(fields) {
 /**
  * Display message with results of a performed action (e.g. a transcript manual or automatic upload).
  */
-function showStatus(message, type, statusElement) {
+function showStatus(message, type, $statusElement) {
     'use strict';
-    var hideIn = 5000;
+    var hideIn = 5000; // 5 seconds
     var successClass = 'status-success';
     var errorClass = 'status-error';
     // Only one success message is to be displayed at once
     $('.api-response').empty();
     if (type === 'success') {
-        statusElement.removeClass(errorClass).addClass(successClass);
+        $statusElement.removeClass(errorClass).addClass(successClass);
     } else if (type === 'error') {
-        statusElement.removeClass(successClass).addClass(errorClass);
+        $statusElement.removeClass(successClass).addClass(errorClass);
     }
 
-    statusElement.show().text(message);
+    $statusElement.show().text(message);
     setTimeout(function() {
-        statusElement.hide();
+        $statusElement.hide();
     }, hideIn);
 }

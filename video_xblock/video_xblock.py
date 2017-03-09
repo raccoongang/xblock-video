@@ -467,7 +467,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             )
         )
         frag.add_javascript(resource_string("static/js/video_xblock.js"))
-        frag.add_css(resource_string("static/css/student_view.css"))
+        frag.add_css(resource_string("static/css/student-view.css"))
         frag.initialize_js('VideoXBlockStudentViewInit')
         return frag
 
@@ -542,7 +542,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 context["fields"].append(field_info)
 
         fragment.content = render_template('studio-edit.html', **context)
-        fragment.add_css(resource_string("static/css/student_view.css"))
+        fragment.add_css(resource_string("static/css/student-view.css"))
         fragment.add_css(resource_string("static/css/transcripts-upload.css"))
         fragment.add_css(resource_string("static/css/studio-edit.css"))
         fragment.add_javascript(resource_string("static/js/studio-edit.js"))

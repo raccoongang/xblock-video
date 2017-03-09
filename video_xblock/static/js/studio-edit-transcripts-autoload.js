@@ -210,17 +210,17 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     isStoredVideoPlatform = $.inArray(langCode, initialDefaultTranscriptsLangCodes) !== -1;  // Is in array
     // Display message with results of removal
     if (isSuccessfulRemoval && isStoredVideoPlatform) {
-        message = langLabel + ' transcripts are successfully removed from the list of enabled ones.';
+        message = gettext('{langLabel} transcripts are successfully removed from the list of enabled ones.');
         status = SUCCESS;
     } else if (isSuccessfulRemoval && !isStoredVideoPlatform) {
-        message = langLabel + ' transcripts are removed, but can not be uploaded from the video platform.';
+        message = gettext('{langLabel} transcripts are removed, but can not be uploaded from the video platform.');
         status = ERROR;
     } else {
-        message = langLabel + ' transcripts are not neither removed nor added to the list of available ones.';
+        message = gettext('{langLabel} transcripts are not neither removed nor added to the list of available ones.');
         status = ERROR;
     }
     showStatus(
-        message,
+        message.replace("{langLabel}", langLabel),
         status,
         $('.api-response.remove-default-transcript.' + langCode + '.status')
     );
