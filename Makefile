@@ -27,6 +27,7 @@ quality-js:
 	eslint video_xblock/static/js/
 
 dev-install:
+	# Install package using pip to leverage pip's cache and shorten CI build time
 	pip install --process-dependency-links -e .
 
 deps-test:
