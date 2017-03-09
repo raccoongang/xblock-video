@@ -22,7 +22,7 @@ before_install:
   - gem install coveralls-lcov
 
 install:
-  - make install
+  - make dev-install
 
 before_script:
   # Install bower, eslint, eslint-config-edx-es5 and their dependencies
