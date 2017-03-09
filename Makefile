@@ -27,7 +27,7 @@ quality-js:
 	eslint video_xblock/static/js/
 
 install:
-	python setup.py install
+	pip install --process-dependency-links -e .
 
 deps-test:
 	pip install -r test_requirements.txt
