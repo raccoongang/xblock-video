@@ -196,7 +196,7 @@ class WistiaPlayer(BaseVideoPlayer):
                         # Reference: https://en.wikipedia.org/wiki/List_of_ISO_639-2_codes
                         lang_code = babelfish.Language.fromalpha3b(lang_code).alpha2   # pylint: disable=no-member
                     lang_label = self.get_transcript_language_parameters(lang_code)[1]
-                    # Transcript's text has already got. Don't need another one call to API
+                    # We already have transcript’s text by now. Don't need another one call to API
                     # The structure of default_transcripts requires to have `url`. Added it with an empty value
                     self.default_transcripts.append({
                         'lang': lang_code,
