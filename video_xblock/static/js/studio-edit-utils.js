@@ -27,9 +27,9 @@ function fillValues(fields) {
 
 /**
  * Display message with results of a performed action (e.g. a transcript manual or automatic upload).
- * @param {jQuery Element} $el     Container element where message should be displayed.
- * @param {String}         type    Message type: 'success' or 'error'.
- * @param {String}         message Status message for user to be displayed.
+ * @param {jQuery Elements} $el     Container elements where message should be displayed.
+ * @param {String}          type    Message type: 'success' or 'error'.
+ * @param {String}          message Status message for user to be displayed.
  */
 function showStatus($el, type, message) {
     'use strict';
