@@ -383,12 +383,12 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         )
         js_files = [
             'static/js/base.js',
-            'static/js/toggle-button.js'
+            'static/js/videojs/toggle-button.js'
         ]
         js_files += [
-            'static/js/videojs-tabindex.js',
-            'static/js/videojs_event_plugin.js',
-            'static/js/brightcove-videojs-init.js'
+            'static/js/videojs/videojs-tabindex.js',
+            'static/js/videojs/videojs_event_plugin.js',
+            'static/js/videojs/brightcove-videojs-init.js'
         ]
 
         for js_file in js_files:
@@ -407,14 +407,14 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             self.resource_string(
                 'static/bower_components/videojs-offset/dist/videojs-offset.js'
             ),
-            self.resource_string('static/js/videojs-speed-handler.js')
+            self.resource_string('static/js/videojs/videojs-speed-handler.js')
         ]
         if context.get('transcripts'):
             vjs_plugins += [
                 self.resource_string(
                     'static/bower_components/videojs-transcript/dist/videojs-transcript.js'
                 ),
-                self.resource_string('static/js/videojs-transcript.js')
+                self.resource_string('static/js/videojs/videojs-transcript.js')
             ]
         context['vjs_plugins'] = vjs_plugins
         return super(BrightcovePlayer, self).get_player_html(**context)

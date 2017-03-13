@@ -52,7 +52,7 @@ class Html5Player(BaseVideoPlayer):
         )
         js_files = [
             'static/bower_components/videojs-offset/dist/videojs-offset.min.js',
-            'static/js/player-context-menu.js'
+            'static/js/videojs/player-context-menu.js'
         ]
 
         for js_file in js_files:

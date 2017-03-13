@@ -466,7 +466,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 transcript_download_link=full_transcript_download_link
             )
         )
-        frag.add_javascript(resource_string("static/js/video_xblock.js"))
+        frag.add_javascript(resource_string("static/js/student-view/video_xblock.js"))
         frag.add_css(resource_string("static/css/student-view.css"))
         frag.initialize_js('VideoXBlockStudentViewInit')
         return frag
@@ -545,10 +545,10 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         fragment.add_css(resource_string("static/css/student-view.css"))
         fragment.add_css(resource_string("static/css/transcripts-upload.css"))
         fragment.add_css(resource_string("static/css/studio-edit.css"))
-        fragment.add_javascript(resource_string("static/js/studio-edit-utils.js"))
-        fragment.add_javascript(resource_string("static/js/studio-edit.js"))
-        fragment.add_javascript(resource_string("static/js/studio-edit-transcripts-autoload.js"))
-        fragment.add_javascript(resource_string("static/js/studio-edit-transcripts-manual-upload.js"))
+        fragment.add_javascript(resource_string("static/js/studio-view/studio-edit-utils.js"))
+        fragment.add_javascript(resource_string("static/js/studio-view/studio-edit.js"))
+        fragment.add_javascript(resource_string("static/js/studio-view/studio-edit-transcripts-autoload.js"))
+        fragment.add_javascript(resource_string("static/js/studio-view/studio-edit-transcripts-manual-upload.js"))
         fragment.initialize_js('StudioEditableXBlock')
         return fragment
 

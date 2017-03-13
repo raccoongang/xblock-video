@@ -169,22 +169,22 @@ class BaseVideoPlayer(Plugin):
             'static/bower_components/video.js/dist/video.min.js',
             'static/bower_components/videojs-contextmenu/dist/videojs-contextmenu.min.js',
             'static/bower_components/videojs-contextmenu-ui/dist/videojs-contextmenu-ui.min.js',
-            'static/js/video-speed.js',
-            'static/js/player_state.js',
-            'static/js/videojs-speed-handler.js'
+            'static/js/videojs/video-speed.js',
+            'static/js/student-view/player_state.js',
+            'static/js/videojs/videojs-speed-handler.js'
         ]
 
         if json.loads(context['player_state'])['transcripts']:
             js_files += [
                 'static/bower_components/videojs-transcript/dist/videojs-transcript.js',
-                'static/js/transcript-download.js',
-                'static/js/videojs-transcript.js'
+                'static/js/student-view/transcript-download.js',
+                'static/js/videojs/videojs-transcript.js'
             ]
 
         js_files += [
-            'static/js/videojs-tabindex.js',
-            'static/js/toggle-button.js',
-            'static/js/videojs_event_plugin.js'
+            'static/js/videojs/videojs-tabindex.js',
+            'static/js/videojs/toggle-button.js',
+            'static/js/videojs/videojs_event_plugin.js'
         ]
 
         for js_file in js_files:

@@ -18,7 +18,7 @@ module.exports = function (config) {
             'js/base.js',
             'bower_components/video-js/dist/video.js',
             'js/spec/test_context.js',
-            'js/player_state.js',
+            'js/student-view/player_state.js',
             'js/spec/*_spec.js'
         ],
         plugins: [
