@@ -47,9 +47,9 @@ function showStatus(message, type, successMessageElement, errorMessageElement) {
         elementToEmpty = successMessageElement;
         elementToShow = errorMessageElement;
     }
-    if (elementToEmpty) { elementToEmpty.empty(); }
-    elementToShow.text(message).show();
+    if (elementToEmpty) { $(elementToEmpty).empty(); }
+    $(elementToShow).text(message).show();
     setTimeout(function() {
-        elementToShow.hide();
+        $(elementToShow).hide();
     }, 5000);
 }
