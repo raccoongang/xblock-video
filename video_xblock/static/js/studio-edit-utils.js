@@ -9,10 +9,7 @@ function fillValues(fields) {
     'use strict';
     var values = {};
     var notSet = []; // List of field names that should be set to default values
-    var i;
-    var field;
-    for (i = 0; i < fields.length; i++) {
-        field = fields[i];
+    fields.forEach(function(field) {
         if (field.isSet()) {
             values[field.name] = field.val();
         } else {
@@ -23,33 +20,27 @@ function fillValues(fields) {
         if (field.hasEditor()) {
             field.removeEditor();
         }
-    }
+    });
     return {values: values, defaults: notSet};
 }
 
 
 /**
  * Display message with results of a performed action (e.g. a transcript manual or automatic upload).
+ * @param {String}         message Status message for user to be displayed.
+ * @param {String}         type    Message type: 'success' or 'error'.
+ * @param {jQuery Element} $el     Container element where message should be displayed.
  */
-function showStatus(message, type, successMessageElement, errorMessageElement) {
+function showStatus($el, type, message) {
     'use strict';
-    var elementToEmpty = '';
-    var elementToShow = '';
-    var SUCCESS = 'success';
-    var ERROR = 'error';
+    var msgShowTime = 5000; // 5 seconds
     // Only one success message is to be displayed at once
-    $('.api-request').empty();
-    if (type === SUCCESS) {
-        // TODO: Use one element to display status with appropriate styling
-        elementToEmpty = errorMessageElement;
-        elementToShow = successMessageElement;
-    } else if (type === ERROR) {
-        elementToEmpty = successMessageElement;
-        elementToShow = errorMessageElement;
-    }
-    if (elementToEmpty) { $(elementToEmpty).empty(); }
-    $(elementToShow).text(message).show();
+    $('.api-response').empty();
+
+    $el.removeClass('status-error status-success is-hidden').addClass('status-' + type)
+       .text(message);
+
     setTimeout(function() {
-        $(elementToShow).hide();
-    }, 5000);
+        $el.addClass('is-hidden');
+    }, msgShowTime);
 }
