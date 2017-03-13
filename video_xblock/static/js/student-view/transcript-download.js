@@ -7,7 +7,7 @@ domReady(function() {
     videojs(window.videoPlayerId).ready(function() {
         var player = this;
         var transcripts = window.playerStateObj.transcripts_object;
-        var xblockUsageId = window.location.hash.slice(1);
+        var xblockUsageId = getXblockUsageId();
         /** Get transcript url for current caption language */
         var getDownloadTranscriptUrl = function() {
             var downloadTranscriptUrl;

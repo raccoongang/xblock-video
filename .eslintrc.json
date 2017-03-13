@@ -3,6 +3,7 @@
     "globals": {
         "videojs": true,
         "domReady": true,
+        "getXblockUsageId": true,
         "getTranscriptUrl": true,
         "showStatus": true,
         "gettext": true

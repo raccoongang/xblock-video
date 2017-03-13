@@ -7,3 +7,10 @@ var domReady = function(callback) {
         document.addEventListener('DOMContentLoaded', callback);
     }
 };
+
+/** Get XblockUsageId from xblock's url. */
+var getXblockUsageId = function() {
+    'use strict';
+    return window.location.hash.slice(1);
+};
+
