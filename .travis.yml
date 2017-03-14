@@ -8,7 +8,7 @@ addons:
   apt:
     packages:
     # Install binary package for lxml to speed up build
-    - ruby1.9.3
+    - ruby2.3.1
     - python-lxml
 
 cache:
@@ -25,6 +25,8 @@ install:
   - make dev-install
 
 before_script:
+  # Run DangerCI
+  - gem install danger --version '~> 4.0' && danger
   # Install bower, eslint, eslint-config-edx-es5 and their dependencies
   - make tools
   - make deps-test
