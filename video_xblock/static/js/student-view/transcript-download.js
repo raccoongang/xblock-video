@@ -16,7 +16,7 @@ var TranscriptDownload = function(player) {
     };
 
     if (!transcripts[player.captionsLanguage]) {
-        player.captionsEnabled = player.transcriptsEnabled = false;
+        player.captionsEnabled = player.transcriptsEnabled = false; // eslint-disable-line no-param-reassign
         // Need to trigger two events to disable active buttons in control bar
         player.trigger('transcriptdisabled');
         player.trigger('captiondisabled');

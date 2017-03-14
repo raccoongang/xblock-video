@@ -16,6 +16,7 @@ var getXblockUsageId = function() {
 
 /** Get transcript url for current caption language */
 var getDownloadTranscriptUrl = function(transcripts, player) {
+    'use strict';
     var downloadTranscriptUrl;
     if (transcripts[player.captionsLanguage]) {
         downloadTranscriptUrl = transcripts[player.captionsLanguage].url;

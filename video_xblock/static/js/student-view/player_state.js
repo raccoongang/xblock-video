@@ -22,7 +22,6 @@ var PlayerState = function(player, playerStateObj) {
         captionsLanguage: playerStateObj.captions_language
     };
     var xblockUsageId = getXblockUsageId();
-    var transcripts;
 
     /** Create hashmap with all transcripts */
     var getTranscipts = function(transcriptsData) {
@@ -36,7 +35,7 @@ var PlayerState = function(player, playerStateObj) {
         return result;
     };
 
-    transcripts = getTranscipts(playerStateObj.transcripts);
+    var transcripts = getTranscipts(playerStateObj.transcripts);
 
     /** Restore default or previously saved player state */
     var setInitialState = function(state) {
@@ -55,12 +54,12 @@ var PlayerState = function(player, playerStateObj) {
             .volume(state.volume)
             .muted(state.muted)
             .playbackRate(state.playbackRate);
-        player.transcriptsEnabled = state.transcriptsEnabled;
-        player.captionsEnabled = state.captionsEnabled;
-        player.captionsLanguage = state.captionsLanguage;
+        player.transcriptsEnabled = state.transcriptsEnabled;  // eslint-disable-line no-param-reassign
+        player.captionsEnabled = state.captionsEnabled;  // eslint-disable-line no-param-reassign
+        player.captionsLanguage = state.captionsLanguage;  // eslint-disable-line no-param-reassign
         // To switch off transcripts and captions state if doesn`t have transcripts with current captions language
         if (!transcripts[player.captionsLanguage]) {
-            player.captionsEnabled = player.transcriptsEnabled = false;
+            player.captionsEnabled = player.transcriptsEnabled = false; // eslint-disable-line no-param-reassign
         }
     };
 
@@ -70,7 +69,7 @@ var PlayerState = function(player, playerStateObj) {
      */
     var saveState = function() {
         var playerObj = this;
-        var transcript_url = getDownloadTranscriptUrl(transcripts, playerObj)
+        var transcriptUrl = getDownloadTranscriptUrl(transcripts, playerObj);
 
         var newState = {
             volume: playerObj.volume(),
@@ -88,7 +87,7 @@ var PlayerState = function(player, playerStateObj) {
                 action: 'saveState',
                 info: newState,
                 xblockUsageId: xblockUsageId,
-                downloadTranscriptUrl: transcript_url ? transcript_url : '#'
+                downloadTranscriptUrl: transcriptUrl || '#'
             },
             document.location.protocol + '//' + document.location.host
             );
