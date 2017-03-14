@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 .PHONY=all,quality,test
 
 all: quality test
