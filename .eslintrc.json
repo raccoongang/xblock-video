@@ -5,6 +5,7 @@
         "domReady": true,
         "getXblockUsageId": true,
         "getTranscriptUrl": true,
+        "getDownloadTranscriptUrl": true,
         "showStatus": true,
         "gettext": true
     },

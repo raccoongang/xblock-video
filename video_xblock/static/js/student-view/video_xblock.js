@@ -14,7 +14,8 @@ function VideoXBlockStudentViewInit(runtime, element) {
     var handlers = window.videoXBlockState.handlers =  // eslint-disable-line vars-on-top
         window.videoXBlockState.handlers || {
             saveState: {},
-            analytics: {}
+            analytics: {},
+            downloadTranscriptChanged:{}
         };
     handlers.saveState[usageId] = stateHandlerUrl;
     handlers.analytics[usageId] = eventHandlerUrl;
@@ -54,6 +55,7 @@ function VideoXBlockStudentViewInit(runtime, element) {
             if (event.data.action === 'downloadTranscriptChanged') {
                 // eslint-disable-next-line no-use-before-define
                 updateTranscriptDownloadUrl(event.data.downloadTranscriptUrl);
+
             }
             var url = handlers[event.data.action][event.data.xblockUsageId];  // eslint-disable-line vars-on-top
             if (url) {

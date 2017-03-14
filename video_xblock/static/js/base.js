@@ -14,3 +14,11 @@ var getXblockUsageId = function() {
     return window.location.hash.slice(1);
 };
 
+/** Get transcript url for current caption language */
+var getDownloadTranscriptUrl = function(transcripts, player) {
+    var downloadTranscriptUrl;
+    if (transcripts[player.captionsLanguage]) {
+        downloadTranscriptUrl = transcripts[player.captionsLanguage].url;
+    }
+    return downloadTranscriptUrl;
+};

@@ -10,10 +10,9 @@
  * State is saved at certain events.
  */
 
-var PlayerState = function(playerObj, playerStateObj) {
+var PlayerState = function(player, playerStateObj) {
     'use strict';
-    this.player = playerObj;
-    this.player_state = {
+    var playerState = {
         volume: playerStateObj.volume,
         currentTime: playerStateObj.current_time,
         playbackRate: playerStateObj.playback_rate,
@@ -22,11 +21,13 @@ var PlayerState = function(playerObj, playerStateObj) {
         captionsEnabled: playerStateObj.captions_enabled,
         captionsLanguage: playerStateObj.captions_language
     };
+    var xblockUsageId = getXblockUsageId();
+    var transcripts;
 
     /** Create hashmap with all transcripts */
-    this.getTranscipts = function(transcripts) {
+    var getTranscipts = function(transcriptsData) {
         var result = {};
-        transcripts.forEach(function(transcript) {
+        transcriptsData.forEach(function(transcript) {
             result[transcript.lang] = {
                 label: transcript.label,
                 url: transcript.url
@@ -34,10 +35,11 @@ var PlayerState = function(playerObj, playerStateObj) {
         });
         return result;
     };
-    this.transcripts = this.getTranscipts(playerStateObj.transcripts);
+
+    transcripts = getTranscipts(playerStateObj.transcripts);
 
     /** Restore default or previously saved player state */
-    this.setInitialState = function(state) {
+    var setInitialState = function(state) {
         var stateCurrentTime = state.currentTime;
         var playbackProgress = localStorage.getItem('playbackProgress');
         if (playbackProgress) {
@@ -47,101 +49,78 @@ var PlayerState = function(playerObj, playerStateObj) {
             }
         }
         if (stateCurrentTime > 0) {
-            this.player.currentTime(stateCurrentTime);
+            player.currentTime(stateCurrentTime);
         }
-        this.player
+        player
             .volume(state.volume)
             .muted(state.muted)
             .playbackRate(state.playbackRate);
-        this.player.transcriptsEnabled = state.transcriptsEnabled;
-        this.player.captionsEnabled = state.captionsEnabled;
-        this.player.captionsLanguage = state.captionsLanguage;
+        player.transcriptsEnabled = state.transcriptsEnabled;
+        player.captionsEnabled = state.captionsEnabled;
+        player.captionsLanguage = state.captionsLanguage;
         // To switch off transcripts and captions state if doesn`t have transcripts with current captions language
-        if (!this.transcripts[this.player.captionsLanguage]) {
-            this.player.captionsEnabled = this.player.transcriptsEnabled = false;
+        if (!transcripts[player.captionsLanguage]) {
+            player.captionsEnabled = player.transcriptsEnabled = false;
         }
     };
 
     /**
-     *  Add new triggers to player's events
+     * Save player state by posting it in a message to parent frame.
+     * Parent frame passes it to a server by calling VideoXBlock.save_state() handler.
      */
-    this.initTriggers = function() {
-        /**
-         * Save player state by posting it in a message to parent frame.
-         * Parent frame passes it to a server by calling VideoXBlock.save_state() handler.
-         */
-        var playerState = this.player_state;
-        var xblockUsageId = getXblockUsageId();
-        var transcripts = this.transcripts;
+    var saveState = function() {
+        var playerObj = this;
+        var transcript_url = getDownloadTranscriptUrl(transcripts, playerObj)
 
-        /** Get transcript url for current caption language */
-        var getDownloadTranscriptUrl = function(player) {
-            var downloadTranscriptUrl;
-            if (transcripts[player.captionsLanguage]) {
-                downloadTranscriptUrl = transcripts[player.captionsLanguage].url;
-            } else {
-                downloadTranscriptUrl = '#';
-            }
-            return downloadTranscriptUrl;
+        var newState = {
+            volume: playerObj.volume(),
+            currentTime: playerObj.ended() ? 0 : playerObj.currentTime(),
+            playbackRate: playerObj.playbackRate(),
+            muted: playerObj.muted(),
+            transcriptsEnabled: playerObj.transcriptsEnabled,
+            captionsEnabled: playerObj.captionsEnabled,
+            captionsLanguage: playerObj.captionsLanguage
         };
-
-        /**
-         * Save player state by posting it in a message to parent frame.
-         * Parent frame passes it to a server by calling VideoXBlock.save_state() handler.
-         */
-        var saveState = function() {
-            var player = this;
-            var newState = {
-                volume: player.volume(),
-                currentTime: player.ended() ? 0 : player.currentTime(),
-                playbackRate: player.playbackRate(),
-                muted: player.muted(),
-                transcriptsEnabled: player.transcriptsEnabled,
-                captionsEnabled: player.captionsEnabled,
-                captionsLanguage: player.captionsLanguage
-            };
-            if (JSON.stringify(newState) !== JSON.stringify(playerState)) {
-                console.log('Starting saving player state');  // eslint-disable-line no-console
-                playerState = newState;
-                parent.postMessage({
-                    action: 'saveState',
-                    info: newState,
-                    xblockUsageId: xblockUsageId,
-                    downloadTranscriptUrl: getDownloadTranscriptUrl(player)
-                },
-                document.location.protocol + '//' + document.location.host
-                );
-            }
-        };
-
-        /**
-         *  Save player progress in browser's local storage.
-         *  We need it when user is switching between tabs.
-         */
-        var saveProgressToLocalStore = function saveProgressToLocalStore() {
-            var player = this;
-            var playbackProgress = localStorage.getItem('playbackProgress');
-            if (!playbackProgress) {
-                playbackProgress = '{}';
-            }
-            playbackProgress = JSON.parse(playbackProgress);
-            playbackProgress[window.videoPlayerId] = player.ended() ? 0 : player.currentTime();
-            localStorage.setItem('playbackProgress', JSON.stringify(playbackProgress));
-        };
-
-        this.player
-            .on('timeupdate', saveProgressToLocalStore)
-            .on('volumechange', saveState)
-            .on('ratechange', saveState)
-            .on('play', saveState)
-            .on('pause', saveState)
-            .on('ended', saveState)
-            .on('transcriptstatechanged', saveState)
-            .on('captionstatechanged', saveState)
-            .on('languagechange', saveState);
+        if (JSON.stringify(newState) !== JSON.stringify(playerState)) {
+            console.log('Starting saving player state');  // eslint-disable-line no-console
+            playerState = newState;
+            parent.postMessage({
+                action: 'saveState',
+                info: newState,
+                xblockUsageId: xblockUsageId,
+                downloadTranscriptUrl: transcript_url ? transcript_url : '#'
+            },
+            document.location.protocol + '//' + document.location.host
+            );
+        }
     };
-    this.setInitialState(this.player_state);
-    this.initTriggers();
+
+    /**
+     *  Save player progress in browser's local storage.
+     *  We need it when user is switching between tabs.
+     */
+    var saveProgressToLocalStore = function saveProgressToLocalStore() {
+        var playerObj = this;
+        var playbackProgress = localStorage.getItem('playbackProgress');
+        if (!playbackProgress) {
+            playbackProgress = '{}';
+        }
+        playbackProgress = JSON.parse(playbackProgress);
+        playbackProgress[window.videoPlayerId] = playerObj.ended() ? 0 : playerObj.currentTime();
+        localStorage.setItem('playbackProgress', JSON.stringify(playbackProgress));
+    };
+
+    setInitialState(playerState);
+    player
+        .on('timeupdate', saveProgressToLocalStore)
+        .on('volumechange', saveState)
+        .on('ratechange', saveState)
+        .on('play', saveState)
+        .on('pause', saveState)
+        .on('ended', saveState)
+        .on('transcriptstatechanged', saveState)
+        .on('captionstatechanged', saveState)
+        .on('languagechange', saveState);
 };
 
 domReady(function() {
