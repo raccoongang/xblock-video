@@ -27,20 +27,21 @@ function fillValues(fields) {
 
 /**
  * Display message with results of a performed action (e.g. a transcript manual or automatic upload).
- * @param {String}         message Status message for user to be displayed.
- * @param {String}         type    Message type: 'success' or 'error'.
- * @param {jQuery Element} $el     Container element where message should be displayed.
+ * @param {jQuery Elements} $el     Container elements where message should be displayed.
+ * @param {String}          type    Message type: 'success' or 'error'.
+ * @param {String}          message Status message for user to be displayed.
  */
-function showStatus(message, type, $el) {
+function showStatus($el, type, message) {
     'use strict';
-    var fiveSeconds = 5000;
-    // Only one success message is to be displayed at once
-    $('.api-response').empty();
+    // TODO: Convert into class and ensure previously set timeouts are cleared
+    //       before setting new timeout
+
+    var msgShowTime = 5000; // 5 seconds
 
     $el.removeClass('status-error status-success is-hidden').addClass('status-' + type)
        .text(message);
 
     setTimeout(function() {
         $el.addClass('is-hidden');
-    }, fiveSeconds);
+    }, msgShowTime);
 }
