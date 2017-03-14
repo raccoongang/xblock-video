@@ -1,5 +1,5 @@
 {
-    "extends": "eslint-config-edx-es5",
+    "extends": "eslint-config-edx",
     "globals": {
         "videojs": true,
         "domReady": true,
@@ -7,7 +7,11 @@
         "showStatus": true,
         "gettext": true
     },
+    "parserOptions": {
+        "sourceType": "module"
+    },
     "rules": {
+        "indent": ["error", 4],
         "no-underscore-dangle": [
             "error", {"allow": [
                 // VideoJS components' attributes

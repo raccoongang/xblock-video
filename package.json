@@ -1,11 +1,10 @@
 {
   "devDependencies": {
     "bower": "^1.8.0",
-    "eslint": "^2.12.0",
+    "eslint": "^3.16.1",
     "eslint-config-edx": "^2.0.0",
-    "eslint-config-edx-es5": "^2.0.0",
     "eslint-plugin-dollar-sign": "0.0.5",
-    "eslint-plugin-import": "^1.9.2",
+    "eslint-plugin-import": "^2.2.0",
     "jasmine-core": "^2.5.2 ",
     "karma": "^1.5.0",
     "karma-jasmine": "^1.1.0",
