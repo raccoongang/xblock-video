@@ -58,4 +58,17 @@ setup(
         ]
     },
     package_data=package_data("video_xblock", ["static", ]),
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Plugins',
+        'Environment :: Web Environment',
+        'Intended Audience :: Education',
+        'Intended Audience :: System Administrators',
+        'License :: OSI Approved :: GNU Affero General Public License v3',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
+        'Topic :: Education',
+        'Topic :: Multimedia :: Video :: Display',
+
+    ],
 )
