@@ -315,7 +315,7 @@ function StudioEditableXBlock(runtime, element) {
         }
     });
 
-    $(element).find('.cancel-button').bind('click', function(e) {
+    $(element).find('.cancel-button').bind('click', function(event) {
         // Remove TinyMCE instances to make sure jQuery does not try to access stale instances
         // when loading editor for another block:
         for (var i in fields) {
@@ -324,7 +324,7 @@ function StudioEditableXBlock(runtime, element) {
                 field.removeEditor();
             }
         }
-        e.preventDefault();
+        event.preventDefault();
         runtime.notify('cancel', {});
     });
     // End of Raccoongang changes
@@ -393,10 +393,9 @@ function StudioEditableXBlock(runtime, element) {
         })
         .always(function() {
             showStatus(
-                message,
+                $('.api-response.authenticate.status'),
                 status,
-                $('.api-request.authenticate.status-success'),
-                $('.api-request.authenticate.status-error')
+                message
             );
         });
     }
@@ -440,10 +439,9 @@ function StudioEditableXBlock(runtime, element) {
         })
         .always(function() {
             showStatus(
-                message,
+                $('.api-response.upload-default-transcript.' + currentLanguageCode + '.status'),
                 status,
-                $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-success'),
-                $('.api-request.upload-default-transcript.' + currentLanguageCode + '.status-error')
+                message
             );
         });
     }
@@ -523,7 +521,7 @@ function StudioEditableXBlock(runtime, element) {
      */
     function bindRemovalListenerEnabledTranscript(langCode, langLabel, downloadUrlServer) {
         var $removeElement = $('.default-transcripts-action-link.remove-default-transcript[data-lang-code=' + langCode + ']');
-        $removeElement.click(function() {
+        $removeElement.click(function(event) {
             var defaultTranscript = {'lang' : langCode, 'label' : langLabel, 'url': downloadUrlServer};
             // Affect default transcripts
             removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
@@ -532,6 +530,7 @@ function StudioEditableXBlock(runtime, element) {
             // Affect standard transcripts
             removeStandardTranscriptBlock(langCode, transcriptsValue, disabledLanguages);
             disableOption($langChoiceItem, disabledLanguages);
+            event.preventDefault();
         });
     }
 
@@ -649,6 +648,7 @@ function StudioEditableXBlock(runtime, element) {
         // Affect standard transcripts
         removeStandardTranscriptBlock(langCode, transcriptsValue, disabledLanguages);
         disableOption($langChoiceItem, disabledLanguages);
+        event.preventDefault();
     });
 
     $defaultTranscriptsSwitcher.change(function(){

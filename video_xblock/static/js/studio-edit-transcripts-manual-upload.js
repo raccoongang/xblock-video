@@ -8,13 +8,11 @@
  */
 function displayStatusCaptions(statusType, statusMessage, $parentDiv) {
     'use strict';
-    var $successElement = $('.status-upload', $parentDiv);
-    var $errorElement = $('.status-error', $parentDiv);
     showStatus(
-        statusMessage,
+        $('.status', $parentDiv),
         statusType,
-        $successElement,
-        $errorElement);
+        statusMessage
+    );
 }
 
 /**
@@ -22,13 +20,11 @@ function displayStatusCaptions(statusType, statusMessage, $parentDiv) {
  */
 function displayStatusTranscripts(statusType, statusMessage, currentLiTag) {
     'use strict';
-    var $successElement = $('.status-upload', $(currentLiTag));
-    var $errorElement = $('.status-error', $(currentLiTag));
     showStatus(
-        statusMessage,
+        $('.status', $(currentLiTag)),
         statusType,
-        $successElement,
-        $errorElement);
+        statusMessage
+    );
 }
 
 /**
