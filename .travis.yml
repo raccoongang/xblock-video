@@ -19,7 +19,6 @@ cache:
 before_install:
 # Install latest stable NodeJS version. Required for eslint.
 - nvm install stable
-- gem install coveralls-lcov
 
 install:
 - make dev-install
@@ -32,7 +31,8 @@ before_script:
 script:
 - make quality-py
 - make quality-js
-- make test
+- make test-py coverage
+- make test-js coverage
 
 after_success:
 - make coveralls
