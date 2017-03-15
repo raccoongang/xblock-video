@@ -1,9 +1,10 @@
-describe('Player state', function() {
+describe('Base javascript', function() {
     'use strict';
     var playerId = 'test_id';
     var player = {
         captionsLanguage: 'en'
     };
+    var transcripts = window.playerStateObj.transcripts_object;
     window.videoPlayerId = playerId;
     beforeEach(function() {
         var video = document.createElement('video');
@@ -11,8 +12,9 @@ describe('Player state', function() {
         video.className = 'video-js vjs-default-skin';
         document.body.appendChild(video);
     });
+    console.log(transcripts.en);
     it('return download transcript url', function() {
         // TODO avoid the eslint shutdown for the implicity got variables
-        expect(getDownloadTranscriptUrl(player)).toBe(transcripts.en.url); // eslint-disable-line
+        expect(getDownloadTranscriptUrl(transcripts, player)).toBe(transcripts.en.url); // eslint-disable-line
     });
 });
