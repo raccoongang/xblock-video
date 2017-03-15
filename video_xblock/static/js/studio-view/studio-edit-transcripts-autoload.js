@@ -49,10 +49,8 @@ function getInitialDefaultTranscriptsData() {
 function getDefaultTranscriptsArray(defaultTranscriptType) {
     'use strict';
     var defaultTranscriptsArray = [];
-    var code;
     $('.' + defaultTranscriptType + '-default-transcripts-section .default-transcripts-label:visible').each(function() {
-        code = $(this).attr('value');
-        defaultTranscriptsArray.push(code);
+        defaultTranscriptsArray.push($(this).attr('value'));
     });
     return defaultTranscriptsArray;
 }
@@ -67,7 +65,6 @@ function createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscr
     // Create a new available transcript if stored on a platform and doesn't already exist on video xblock
     var isNotDisplayedAvailableTranscript = $.inArray(langCode, getDefaultTranscriptsArray('available')) === -1;
     var isStoredVideoPlatform = $.inArray(langCode, initialDefaultTranscriptsLangCodes) !== -1;
-    var downloadUrlApi;
     if (isNotDisplayedAvailableTranscript && isStoredVideoPlatform) {
         // Show label of available transcripts if no such label is displayed
         if (!$('div.custom-field-section-label.available-transcripts:visible').length) {
@@ -81,11 +78,13 @@ function createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscr
         $('.default-transcripts-label:visible').last()
             .attr('value', langCode)
             .text(langLabel);
-        // Get url for a transcript fetching from the API
-        downloadUrlApi = getTranscriptUrl(initialDefaultTranscripts, langCode); // External url for API call
         // Update attributes
         $('.default-transcripts-action-link.upload-default-transcript').last()
-            .attr({'data-lang-code': langCode, 'data-lang-label': langLabel, 'data-download-url': downloadUrlApi});
+            .attr({
+                'data-lang-code': langCode,
+                'data-lang-label': langLabel,
+                'data-download-url': getTranscriptUrl(initialDefaultTranscripts, langCode)
+            });
         // Create elements to display status messages on available transcript upload
         createStatusMessageElement(langCode, 'upload-default-transcript');
     }
@@ -121,8 +120,7 @@ function createEnabledTranscriptBlock(defaultTranscript, downloadUrlServer) {
     // Create a new enabled transcript if it doesn't already exist in a video xblock
     if ($.inArray(langCode, getDefaultTranscriptsArray('enabled')) === -1) {
         // Display label of enabled transcripts if hidden
-        isHiddenEnabledLabel = $('div.custom-field-section-label.enabled-transcripts').hasClass('is-hidden');
-        if (isHiddenEnabledLabel) { $enabledLabel.removeClass('is-hidden'); }
+        $enabledLabel.removeClass('is-hidden');
         // Create a default (enabled) transcript block
         $newEnabledTranscriptBlock = $('.enabled-default-transcripts-section:hidden').clone();
         // Insert a new default transcript block

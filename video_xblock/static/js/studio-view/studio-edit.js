@@ -1,8 +1,8 @@
 /* global createAvailableTranscriptBlock disableOption removeStandardTranscriptBlock getInitialDefaultTranscriptsData
 removeEnabledTranscriptBlock bindUploadListenerAvailableTranscript pushTranscript pushTranscriptsValue
 createEnabledTranscriptBlock createTranscriptBlock parseRelativeTime removeAllEnabledTranscripts tinyMCE baseUrl
-validateTranscripts fillValues validateTranscriptFile displdisplayStatusCaptionsayStatusCaptions
-displayStatusTranscripts removeTranscriptBlock clickUploader languageChecker displayStatusCaptions */
+validateTranscripts fillValues validateTranscriptFile removeTranscriptBlock clickUploader
+languageChecker */
 /**
     Set up the Video xblock studio editor. This part is responsible for validation and sending of the data to a backend.
     Reference:
@@ -512,7 +512,7 @@ function StudioEditableXBlock(runtime, element) {
             $parentDiv = $('.file-uploader');
             $('.download-setting', $parentDiv).attr('href', downloadUrl).removeClass('is-hidden');
             $('a[data-change-field-name=' + fieldName + ']').text('Replace');
-            displayStatusCaptions(SUCCESS, successMessage, $parentDiv);
+            showStatus($('.status', $parentDiv), SUCCESS, successMessage);
             $('input[data-field-name=' + fieldName + ']').val(url).change();
         } else if (fieldName === 'transcripts' && isValidated) {
             pushTranscript(lang, label, url, '', transcriptsValue);
@@ -522,7 +522,11 @@ function StudioEditableXBlock(runtime, element) {
             $(currentLiTag).find('.download-transcript')
                 .removeClass('is-hidden')
                 .attr('href', downloadUrl);
-            displayStatusTranscripts(SUCCESS, successMessage, currentLiTag);
+            showStatus(
+                $('.status', $(currentLiTag)),
+                SUCCESS,
+                successMessage
+            );
             // Affect default transcripts: update a respective enabled transcript with an external url
             // of a newly created standard transcript
             downloadUrlServer =
