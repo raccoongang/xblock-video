@@ -372,18 +372,18 @@ function StudioEditableXBlock(runtime, element) {
                 var success_message = response['success_message'];
                 if (success_message) {
                     showStatus(
-                        success_message,
+                        $('.api-request.threeplaymedia.status-success'),
                         'success',
-                        '.api-request.threeplaymedia.status-success',
-                        '.api-request.threeplaymedia.status-error');
+                        success_message
+                    );
                     showBackendSettings();
                 }
                 else if (error_message) {
                     showStatus(
-                        error_message,
+                        $('.api-request.threeplaymedia.status-error'),
                         'error',
-                        '.api-request.threeplaymedia.status-success',
-                        '.api-request.threeplaymedia.status-error');
+                        error_message
+                    );
                 }
             }
         })
@@ -391,10 +391,9 @@ function StudioEditableXBlock(runtime, element) {
             var message = gettext('This may be happening because of an error with our server or your ' +
                 'internet connection. Try refreshing the page or making sure you are online.');
             showStatus(
-                message,
+                $('.api-request.threeplaymedia.status-error'),
                 'error',
-                '.api-request.threeplaymedia.status-success',
-                '.api-request.threeplaymedia.status-error'
+                message
             );
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
                 try {
@@ -402,18 +401,17 @@ function StudioEditableXBlock(runtime, element) {
                     if (typeof message === 'object' && message.messages) {
                         message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
                         showStatus(
-                            message,
+                            $('.api-request.threeplaymedia.status-error'),
                             'error',
-                            '.api-request.threeplaymedia.status-success',
-                            '.api-request.threeplaymedia.status-error'
-                        );                   }
+                            message
+                        );
+                    }
                 } catch (error) {
                     message = jqXHR.responseText.substr(0, 300);
                     showStatus(
-                        message,
+                        $('.api-request.threeplaymedia.status-error'),
                         'error',
-                        '.api-request.threeplaymedia.status-success',
-                        '.api-request.threeplaymedia.status-error'
+                        message
                     );
                 }
             }
@@ -648,35 +646,29 @@ function StudioEditableXBlock(runtime, element) {
         event.preventDefault();
         event.stopPropagation();
         var includeLang;
-        var $data = $('.threeplaymedia-api-key', element).val();
-        var transcripts = getTranscripts3playmediaApi($data);
+        var $api_key = $('.threeplaymedia-api-key', element).val();
+        var $file_id = $('#xb-field-edit-playmedia_file_id', element).val();
+        var transcripts = getTranscripts3playmediaApi({api_key: $api_key, file_id: $file_id});
         transcripts.done(
             function(response) {
-                console.log(response);
-                console.log(transcriptsValue);
-                console.log($("#dialog-form"));
-                response.transcripts.forEach(function transcript(item) {
-                    includeLang = transcriptsValue.find(
-                        function existLanguage(element) {
-                            return element.lang == item.lang;
+                if (response.transcripts) {
+                    response.transcripts.forEach(function transcript(item) {
+                        includeLang = transcriptsValue.find(
+                            function existLanguage(element) {
+                                return element.lang == item.lang;
+                            }
+                        );
+                        if (!includeLang) {
+                            createTranscriptBlock(
+                                item.lang, item.label, transcriptsValue, item.url
+                            );
+                            pushTranscript(
+                                item.lang, item.label, item.url, '', transcriptsValue
+                            );
+                            pushTranscriptsValue(transcriptsValue);
                         }
-                    );
-                    if (!includeLang) {
-                        createTranscriptBlock(
-                            item.lang,
-                            item.label,
-                            transcriptsValue,
-                            downloadTranscriptHandlerUrl
-                        );
-                        pushTranscript(
-                            item.lang,
-                            item.label,
-                            downloadTranscriptHandlerUrl,
-                            '',
-                            transcriptsValue
-                        );
-                    }
-                });
+                    });
+                }
             }
         );
     });

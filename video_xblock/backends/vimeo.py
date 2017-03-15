@@ -18,7 +18,8 @@ class VimeoPlayer(BaseVideoPlayer):
 
     advanced_fields = (
         'start_time', 'end_time', 'handout', 'transcripts', 'playmedia_apikey',
-        'download_transcript_allowed', 'token', 'default_transcripts'
+        'playmedia_file_id', 'download_transcript_allowed', 'token',
+        'default_transcripts'
     )
 
     metadata_fields = []

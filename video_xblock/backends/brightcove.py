@@ -338,8 +338,8 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
 
     advanced_fields = (
         'player_id', 'start_time', 'end_time', 'handout', 'playmedia_apikey',
-        'transcripts', 'download_transcript_allowed', 'token',
-        'default_transcripts'
+        'playmedia_file_id', 'transcripts', 'download_transcript_allowed',
+        'token', 'default_transcripts'
     )
 
     fields_help = {
