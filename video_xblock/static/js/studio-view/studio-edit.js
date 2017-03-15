@@ -268,6 +268,12 @@ function StudioEditableXBlock(runtime, element) {
             createTranscriptBlock(langCode, langLabel, transcriptsValue, downloadTranscriptHandlerUrl);
         });
     }
+    /** Field Changed event */
+    function fieldChanged($wrapper, $resetButton) {
+        // Field value has been modified:
+        $wrapper.addClass('is-set');
+        $resetButton.removeClass('inactive').addClass('active');
+    }
 
     $(element).find('.field-data-control').each(function() {
         var $field = $(this);
@@ -275,11 +281,6 @@ function StudioEditableXBlock(runtime, element) {
         var $resetButton = $wrapper.find('button.setting-clear');
         var type = $wrapper.data('cast');
         var contextId = $wrapper.context.id;
-        var fieldChanged = function() {
-            // Field value has been modified:
-            $wrapper.addClass('is-set');
-            $resetButton.removeClass('inactive').addClass('active');
-        };
         fields.push({
             name: $wrapper.data('field-name'),
             isSet: function() { return $wrapper.hasClass('is-set'); },
@@ -313,7 +314,7 @@ function StudioEditableXBlock(runtime, element) {
                 $field.tinymce().remove();
             }
         });
-        $field.bind('change input paste', fieldChanged);
+        $field.bind('change input paste', fieldChanged($wrapper, $resetButton));
         $resetButton.click(function() {
             // Use attr instead of data to force treating the default value as a string
             $field.val($wrapper.attr('data-default'));
@@ -339,7 +340,7 @@ function StudioEditableXBlock(runtime, element) {
                 ' outdent indent blockquote | link unlink | code',
                 resize: 'both',
                 setup: function(ed) {
-                    ed.on('change', fieldChanged);
+                    ed.on('change', fieldChanged($wrapper, $resetButton));
                 }
             });
         }
@@ -355,12 +356,6 @@ function StudioEditableXBlock(runtime, element) {
         var $checkboxes = $optionList.find('input');
         var $wrapper = $optionList.closest('li');
         var $resetButton = $wrapper.find('button.setting-clear');
-        var fieldChanged = function() {
-            // Field value has been modified:
-            $wrapper.addClass('is-set');
-            $resetButton.removeClass('inactive').addClass('active');
-        };
-
         fields.push({
             name: $wrapper.data('field-name'),
             isSet: function() { return $wrapper.hasClass('is-set'); },
@@ -375,7 +370,7 @@ function StudioEditableXBlock(runtime, element) {
                 return val;
             }
         });
-        $checkboxes.bind('change input', fieldChanged);
+        $checkboxes.bind('change input', fieldChanged($wrapper, $resetButton));
 
         $resetButton.click(function() {
             var defaults = JSON.parse($wrapper.attr('data-default'));
