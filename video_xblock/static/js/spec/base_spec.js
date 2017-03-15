@@ -12,7 +12,6 @@ describe('Base javascript', function() {
         video.className = 'video-js vjs-default-skin';
         document.body.appendChild(video);
     });
-    console.log(transcripts.en);
     it('return download transcript url', function() {
         // TODO avoid the eslint shutdown for the implicity got variables
         expect(getDownloadTranscriptUrl(transcripts, player)).toBe(transcripts.en.url); // eslint-disable-line

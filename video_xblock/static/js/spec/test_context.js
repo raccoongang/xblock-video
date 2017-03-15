@@ -8,7 +8,7 @@ window.playerStateObj = {
     playback_rate: 1,
     muted: false,
     transcripts_object: {
-        'en': {
+        en: {
             label: 'English',
             url: 'http://test.url'
         }
