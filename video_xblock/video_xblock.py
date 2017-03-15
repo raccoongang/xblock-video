@@ -243,7 +243,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
         resettable_editor=False
     )
 
-    playmedia_apikey = String(
+    threeplaymedia_apikey = String(
         default='default',
         display_name=_('API Key'),
         help=_('You can generate a client token following official documentation of your video platform\'s API.'),
@@ -251,7 +251,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
         resettable_editor=False
     )
 
-    playmedia_file_id = String(
+    threeplaymedia_file_id = String(
         default='default',
         display_name=_('File Id'),
         help=_('3playmedia file id for download bind transcripts.'),
@@ -325,8 +325,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
 
     advanced_fields = (
         'start_time', 'end_time', 'handout', 'transcripts',
-        'download_transcript_allowed', 'default_transcripts', 'download_video_allowed',
-        'download_video_url'
+        'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+        'default_transcripts', 'download_video_allowed', 'download_video_url'
     )
 
     player_state_fields = (
@@ -756,7 +756,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
                 'has_list_values': False,
                 'type': 'string',
             }
-        elif field_name in ('handout', 'transcripts', 'default_transcripts', 'token', 'playmedia_apikey'):
+        elif field_name in ('handout', 'transcripts', 'default_transcripts', 'token', 'threeplaymedia_apikey'):
             info = self.initialize_studio_field_info(field_name, field, field_type=field_name)
         else:
             info = self.initialize_studio_field_info(field_name, field)
@@ -860,7 +860,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
                 url (str)   : External url for vtt file.
                 label (str) : Name of language.
         """
-        out = []
+        out, response = [], {}
         for item in caps.splitlines():
             if item == '':
                 item = ' \n'
@@ -876,7 +876,50 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
         file_name, external_url = self.create_transcript_file(
             trans_str=sub, reference_name=reference_name
         )
-        return {"lang": lang, "url": external_url, "label": lang_label}
+        if file_name:
+            response = {"lang": lang, "url": external_url, "label": lang_label}
+        return response
+
+    def get_translations_from_3playmedia(self, file_id, apikey):
+        """
+        Method to fetched from 3playmedia translations for file_id.
+
+        Arguments:
+            file_id (str) : File id on 3playmedia.
+            apikey (str)  : Authentication key on 3playmedia.
+        Returns:
+            response (tuple)    : status, translations or status, error_message
+            status (str)        : Status response error or success.
+            translations (list) : List of translations (dict) .
+            error_message (dict): Description of error.
+        """
+        domain = 'https://static.3playmedia.com/'
+        transcripts_3playmedia = requests.get(
+            '{domain}files/{file_id}/translations?apikey={api_key}'.format(
+                domain=domain, file_id=file_id, api_key=apikey
+            )
+        ).json()
+        errors = isinstance(transcripts_3playmedia, dict) and transcripts_3playmedia.get('errors')
+        if errors:
+            return 'error', {'error_message': u'\n'.join(errors.values())}
+
+        translations = []
+        for transcript in transcripts_3playmedia:
+            tid = transcript.get('id', '')
+            sub_unicode = requests.get(
+                '{domain}files/{file_id}/translations/{tid}/captions.vtt?apikey={api_key}'.format(
+                    domain=domain, file_id=file_id, api_key=apikey, tid=tid
+                )
+            ).text
+            translations.append(
+                self.convert_3playmedia_caps_to_vtt(
+                    caps=sub_unicode,
+                    video_id=self.get_player().media_id(self.href),
+                    lang=transcript.get('target_language_iso_639_1_code', ''),
+                    lang_label=transcript.get('target_language_name', '')
+                )
+            )
+        return 'success', translations
 
     @XBlock.handler
     def download_transcript(self, request, suffix=''):  # pylint: disable=unused-argument
@@ -999,57 +1042,31 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin
         Returns:
             response (dict): Status messages key-value pairs.
         """
-        domain = 'http://static.3playmedia.com/'
-        video_id = self.get_player().media_id(self.href)
-        error_message = ''
-        _transcripts = []
-        apikey = data.get('api_key', self.playmedia_apikey) or ''
+        apikey = data.get('api_key', self.threeplaymedia_apikey) or ''
         file_id = data.get('file_id', '')
-
-        transcripts_3playmedia = requests.get(
-            '{domain}files/{file_id}/translations?apikey={api_key}'.format(
-                domain=domain, file_id=file_id, api_key=apikey
-            )
-        ).json()
-        errors = isinstance(transcripts_3playmedia, dict) and transcripts_3playmedia.get('errors')
-        if errors:
-            return {'error_message': u'\n'.join(errors.values())}
+        status, _transcripts = self.get_translations_from_3playmedia(
+            apikey=apikey, file_id=file_id
+        )
+        if status == 'error':
+            return _transcripts
 
         transcript_original = requests.get(
-            '{domain}files/{file_id}/transcript.vtt?apikey={api_key}'.format(
-                domain=domain, file_id=file_id, api_key=apikey
+            'https://static.3playmedia.com/files/{file_id}/transcript.vtt?apikey={api_key}'.format(
+                file_id=file_id, api_key=apikey
             )
         ).text
         _transcripts.append(
             self.convert_3playmedia_caps_to_vtt(
-                caps=transcript_original, video_id=video_id
+                caps=transcript_original,
+                video_id=self.get_player().media_id(self.href)
             )
         )
-        for transcript in transcripts_3playmedia:
-            tid = transcript.get('id', '')
-            # File name format is <language label>_captions_video_<video_id>, e.g.
-            # "English_captions_video_456g68"
-            sub_unicode = requests.get(
-                '{domain}files/{file_id}/translations/{tid}/captions.vtt?apikey={api_key}'.format(
-                    domain=domain, file_id=file_id, api_key=apikey, tid=tid
-                )
-            ).text
-            _transcripts.append(
-                self.convert_3playmedia_caps_to_vtt(
-                    caps=sub_unicode,
-                    video_id=video_id,
-                    lang=transcript.get('target_language_iso_639_1_code', ''),
-                    lang_label=transcript.get('target_language_name', '')
-                )
+        return {
+            'transcripts': _transcripts,
+            'success_message': _(
+                'Successfully fetched transcripts from 3playMedia. Please check transcripts list above.'
             )
-
-        if error_message:
-            response = {'error_message': error_message}
-        else:
-            success_message = 'Successfully authenticated to the video platform.'
-            response = {'success_message': success_message}
-        response['transcripts'] = _transcripts
-        return response
+        }
 
     @XBlock.json_handler
     def authenticate_video_api_handler(self, data, suffix=''):  # pylint: disable=unused-argument

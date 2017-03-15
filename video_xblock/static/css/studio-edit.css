@@ -64,7 +64,7 @@
 
 .upload-transcript:hover,
 .add-transcript:hover,
-#video-api-authenticate:hover
+#video-api-authenticate:hover,
 #threeplaymedia-api-transcripts:hover {
   border: 1px solid #009fe6;
   background-color: #009fe6;

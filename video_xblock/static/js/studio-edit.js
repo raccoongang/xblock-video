@@ -362,60 +362,62 @@ function StudioEditableXBlock(runtime, element) {
      * Get transcripts from 3playmedia's API and show result message.
      */
     function getTranscripts3playmediaApi(data) {
-        return $.ajax({
+        var message, status, includeLang;
+
+        $.ajax({
             type: 'POST',
             url: getTranscripts3playmediaApiHandlerUrl,
             data: JSON.stringify(data),
             dataType: 'json',
-            success: function(response) {
-                var error_message = response['error_message'];
-                var success_message = response['success_message'];
-                if (success_message) {
-                    showStatus(
-                        $('.api-request.threeplaymedia.status-success'),
-                        'success',
-                        success_message
-                    );
-                    showBackendSettings();
+        })
+        .done(function(response) {
+            var error_message = response['error_message'];
+            var success_message = response['success_message'];
+            if (success_message) {
+                if (response.transcripts) {
+                    response.transcripts.forEach(function transcript(item) {
+                        includeLang = transcriptsValue.find(
+                            function existLanguage(element) {
+                                return element.lang == item.lang;
+                            }
+                        );
+                        if (!includeLang) {
+                            createTranscriptBlock(
+                                item.lang, item.label, transcriptsValue, item.url
+                            );
+                            pushTranscript(
+                                item.lang, item.label, item.url, '', transcriptsValue
+                            );
+                            pushTranscriptsValue(transcriptsValue);
+                        }
+                    });
                 }
-                else if (error_message) {
-                    showStatus(
-                        $('.api-request.threeplaymedia.status-error'),
-                        'error',
-                        error_message
-                    );
-                }
+                message = success_message;
+                status = SUCCESS;
+            }
+            else if (error_message) {
+                message = error_message;
+                status = ERROR;
             }
         })
         .fail(function(jqXHR) {
-            var message = gettext('This may be happening because of an error with our server or your ' +
+            message = gettext('This may be happening because of an error with our server or your ' +
                 'internet connection. Try refreshing the page or making sure you are online.');
-            showStatus(
-                $('.api-request.threeplaymedia.status-error'),
-                'error',
-                message
-            );
+            status = ERROR;
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
                 try {
                     message = JSON.parse(jqXHR.responseText).error;
                     if (typeof message === 'object' && message.messages) {
                         message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
-                        showStatus(
-                            $('.api-request.threeplaymedia.status-error'),
-                            'error',
-                            message
-                        );
                     }
                 } catch (error) {
                     message = jqXHR.responseText.substr(0, 300);
-                    showStatus(
-                        $('.api-request.threeplaymedia.status-error'),
-                        'error',
-                        message
-                    );
                 }
             }
             runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
+        })
+        .always(function() {
+            showStatus($('.threeplaymedia.status'), status, message);
         });
     }
 
@@ -645,32 +647,9 @@ function StudioEditableXBlock(runtime, element) {
     $3playmediaTranscriptsApi.on('click', function(event) {
         event.preventDefault();
         event.stopPropagation();
-        var includeLang;
         var $api_key = $('.threeplaymedia-api-key', element).val();
-        var $file_id = $('#xb-field-edit-playmedia_file_id', element).val();
-        var transcripts = getTranscripts3playmediaApi({api_key: $api_key, file_id: $file_id});
-        transcripts.done(
-            function(response) {
-                if (response.transcripts) {
-                    response.transcripts.forEach(function transcript(item) {
-                        includeLang = transcriptsValue.find(
-                            function existLanguage(element) {
-                                return element.lang == item.lang;
-                            }
-                        );
-                        if (!includeLang) {
-                            createTranscriptBlock(
-                                item.lang, item.label, transcriptsValue, item.url
-                            );
-                            pushTranscript(
-                                item.lang, item.label, item.url, '', transcriptsValue
-                            );
-                            pushTranscriptsValue(transcriptsValue);
-                        }
-                    });
-                }
-            }
-        );
+        var $file_id = $('#xb-field-edit-threeplaymedia_file_id', element).val();
+        getTranscripts3playmediaApi({api_key: $api_key, file_id: $file_id});
     });
 
     $('.lang-select').on('change', function(event) {
