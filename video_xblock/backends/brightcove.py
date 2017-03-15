@@ -387,7 +387,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         ]
         js_files += [
             'static/js/videojs/videojs-tabindex.js',
-            'static/js/videojs/videojs_event_plugin.js',
+            'static/js/videojs/videojs-event-plugin.js',
             'static/js/videojs/brightcove-videojs-init.js'
         ]
 

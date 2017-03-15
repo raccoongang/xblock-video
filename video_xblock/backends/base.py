@@ -170,7 +170,7 @@ class BaseVideoPlayer(Plugin):
             'static/bower_components/videojs-contextmenu/dist/videojs-contextmenu.min.js',
             'static/bower_components/videojs-contextmenu-ui/dist/videojs-contextmenu-ui.min.js',
             'static/js/videojs/video-speed.js',
-            'static/js/student-view/player_state.js',
+            'static/js/student-view/player-state.js',
             'static/js/videojs/videojs-speed-handler.js'
         ]
 
@@ -184,7 +184,7 @@ class BaseVideoPlayer(Plugin):
         js_files += [
             'static/js/videojs/videojs-tabindex.js',
             'static/js/videojs/toggle-button.js',
-            'static/js/videojs/videojs_event_plugin.js'
+            'static/js/videojs/videojs-event-plugin.js'
         ]
 
         for js_file in js_files:

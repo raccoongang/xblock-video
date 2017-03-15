@@ -230,8 +230,6 @@ function StudioEditableXBlock(runtime, element) {
             pushTranscriptsValue(transcriptsValue);
             createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
             bindRemovalListenerEnabledTranscript(newLang, newLabel, newUrl);
-            // Display status messages
-            // var error_message = response['error_message'];
             message = response.success_message;
             status = SUCCESS;
         })

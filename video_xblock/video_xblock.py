@@ -466,7 +466,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
                 transcript_download_link=full_transcript_download_link
             )
         )
-        frag.add_javascript(resource_string("static/js/student-view/video_xblock.js"))
+        frag.add_javascript(resource_string("static/js/student-view/video-xblock.js"))
         frag.add_css(resource_string("static/css/student-view.css"))
         frag.initialize_js('VideoXBlockStudentViewInit')
         return frag
