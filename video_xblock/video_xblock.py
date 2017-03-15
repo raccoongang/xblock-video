@@ -5,7 +5,6 @@ All you need to provide is video url, this XBlock does the rest for you.
 """
 
 import datetime
-import functools
 import json
 import httplib
 import logging
@@ -33,6 +32,36 @@ from .utils import render_template, render_resource, resource_string, ugettext a
 
 
 log = logging.getLogger(__name__)
+
+
+@XBlock.wants('contentstore')
+class ContentStoreMixin(XBlock):
+    """
+    Proxy to `runtime.contentstore` service.
+
+    If `contentstore` service is not provided by `runtime` it returns classes
+    from `xmodule.contentstore` module.
+    """
+
+    @property
+    def contentstore(self):
+        """
+        Proxy to `xmodule.contentstore.django.contentstore` class.
+        """
+        contentstore_service = self.runtime.service(self, 'contentstore')
+        if contentstore_service:
+            return contentstore_service.contentstore
+        return contentstore
+
+    @property
+    def static_content(self):
+        """
+        Proxy to `xmodule.contentstore.content.StaticContent` class.
+        """
+        contentstore_service = self.runtime.service(self, 'contentstore')
+        if contentstore_service:
+            return contentstore_service.StaticContent
+        return StaticContent
 
 
 class TranscriptsMixin(XBlock):
@@ -91,7 +120,7 @@ class TranscriptsMixin(XBlock):
         return Response(self.convert_caps_to_vtt(caps))
 
 
-class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
+class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, ContentStoreMixin, XBlock):
     """
     Main VideoXBlock class, responsible for saving video settings and rendering it for students.
     """
@@ -957,13 +986,14 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         ext = '.vtt'
         file_name = reference_name.replace(" ", "_") + ext
         course_key = self.location.course_key  # pylint: disable=no-member
-        content_loc = StaticContent.compute_location(course_key, file_name)  # AssetLocator object
-        sc_partial = functools.partial(StaticContent, content_loc, file_name, 'application/json')
-        content = sc_partial(sub.encode('UTF-8'))  # StaticContent object
+        content_loc = self.static_content.compute_location(course_key, file_name)  # AssetLocator object
+        content = self.static_content(
+            content_loc, file_name, 'application/json', sub.encode('UTF-8')
+        )  # StaticContent object
         external_url = '/' + str(content_loc)
 
         # Commit the content
-        contentstore().save(content)
+        self.contentstore().save(content)
 
         # Exceptions are handled on the frontend
         success_message = 'Successfully uploaded "{}".'.format(file_name)
