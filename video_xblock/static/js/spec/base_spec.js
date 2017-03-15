@@ -4,10 +4,10 @@ describe('Base javascript', function() {
     var player = {
         captionsLanguage: 'en'
     };
-    var testXblcokUsageId = "block-v1:test+test+test+type@video_xblock+block@test"
+    var testXblcokUsageId = 'block-v1:test+test+test+type@video_xblock+block@test';
     var transcripts = window.playerStateObj.transcripts_object;
     window.videoPlayerId = playerId;
-    window.location.hash = "#" + testXblcokUsageId;
+    window.location.hash = '#' + testXblcokUsageId;
     beforeEach(function() {
         var video = document.createElement('video');
         video.id = playerId;
@@ -15,7 +15,7 @@ describe('Base javascript', function() {
         document.body.appendChild(video);
     });
     it('return getXblockUsageId', function() {
-       expect(getXblockUsageId(),testXblcokUsageId);
+        expect(getXblockUsageId(), testXblcokUsageId);
     });
     it('return download transcript url', function() {
         // TODO avoid the eslint shutdown for the implicity got variables

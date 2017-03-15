@@ -196,7 +196,7 @@ function disableOption($langChoiceItem, disabledLanguages) {
 function pushTranscriptsValue(transcriptsValue) {
     'use strict';
     transcriptsValue.forEach(function(transcriptValue, index) {
-        if ([transcriptValue.lang, transcriptValue.label, transcriptValue.url].indexOf('')!=-1) {
+        if ([transcriptValue.lang, transcriptValue.label, transcriptValue.url].indexOf('') !== -1) {
             transcriptsValue.splice(index, 1);
         }
     });
