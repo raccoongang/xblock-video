@@ -346,13 +346,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         self.captions_enabled = state.get('captions_enabled', self.captions_enabled)
         self.captions_language = state.get('captions_language', self.captions_language)
 
-    @property
-    def editable_fields(self):
-        """
-        Return list of xblock's editable fields used by StudioEditableXBlockMixin.clean_studio_edits().
-        """
-        return self.get_player().editable_fields
-
     @staticmethod
     def add_validation_message(validation, message_text):
         """
@@ -516,7 +509,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         basic_fields = self.prepare_studio_editor_fields(player.basic_fields)
         advanced_fields = self.prepare_studio_editor_fields(player.advanced_fields)
         context = {
-            'fields': [],
             'courseKey': self.location.course_key,  # pylint: disable=no-member
             'languages': languages,
             'transcripts': transcripts,
@@ -528,18 +520,6 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             'basic_fields': basic_fields,
             'advanced_fields': advanced_fields,
         }
-
-        # Build a list of all the fields that can be edited:
-        for field_name in self.get_player().editable_fields:
-            field = self.fields[field_name]  # pylint: disable=unsubscriptable-object
-            assert field.scope in (Scope.content, Scope.settings), (
-                "Only Scope.content or Scope.settings fields can be used with "
-                "StudioEditableXBlockMixin. Other scopes are for user-specific data and are "
-                "not generally created/configured by content authors in Studio."
-            )
-            field_info = self._make_field_info(field_name, field)
-            if field_info is not None:
-                context["fields"].append(field_info)
 
         fragment.content = render_template('studio-edit.html', **context)
         fragment.add_css(resource_string("static/css/student-view.css"))
