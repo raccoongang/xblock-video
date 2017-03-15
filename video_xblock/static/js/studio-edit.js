@@ -405,14 +405,7 @@ function StudioEditableXBlock(runtime, element) {
                 'internet connection. Try refreshing the page or making sure you are online.');
             status = ERROR;
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
-                try {
-                    message = JSON.parse(jqXHR.responseText).error;
-                    if (typeof message === 'object' && message.messages) {
-                        message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
-                    }
-                } catch (error) {
-                    message = jqXHR.responseText.substr(0, 300);
-                }
+                message = extractErrorMessage(jqXHR.responseText);
             }
             runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
         })
