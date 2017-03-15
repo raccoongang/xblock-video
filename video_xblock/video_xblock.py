@@ -867,7 +867,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
                 item = ' \n'
             elif '-->' in item:
                 # This line is deltatime stamp 00:05:55.030 --> 00:05:57.200.
-                # Length this line is 29 сharacters.
+                # Length this line is 29 characters.
                 item = item[:29]
             out.append(item)
 

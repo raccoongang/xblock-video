@@ -363,13 +363,14 @@ function StudioEditableXBlock(runtime, element) {
      */
     function getTranscripts3playmediaApi(data) {
         var message, status, includeLang;
-
-        $.ajax({
+        var options = {
             type: 'POST',
             url: getTranscripts3playmediaApiHandlerUrl,
-            data: JSON.stringify(data),
             dataType: 'json',
-        })
+            data: JSON.stringify(data),
+        };
+
+        $.ajax(options)
         .done(function(response) {
             var error_message = response['error_message'];
             var success_message = response['success_message'];
