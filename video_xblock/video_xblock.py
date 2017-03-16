@@ -398,6 +398,11 @@ class PlaybackStateMixin(XBlock):
 class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixin, ContentStoreMixin, XBlock):
     """
     Main VideoXBlock class, responsible for saving video settings and rendering it for students.
+
+    VideoXBlock only provide a storage falicities for fields data, but not
+    decide what fields to show to user. `BaseVideoPlayer` and it's subclassess
+    declare what fields are required for proper configuration of a video.
+    See `BaseVideoPlayer.basic_fields` and `BaseVideoPlayer.advanced_fields`.
     """
 
     icon_class = "video"
@@ -539,16 +544,6 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
                'If new metadata item is designed, this is to add an appropriate key to backend\'s '
                '`metadata_fields` property.'),
         scope=Scope.content
-    )
-
-    basic_fields = (
-        'display_name', 'href'
-    )
-
-    advanced_fields = (
-        'start_time', 'end_time', 'handout', 'transcripts',
-        'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
-        'default_transcripts', 'download_video_allowed', 'download_video_url'
     )
 
     @staticmethod

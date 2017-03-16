@@ -112,7 +112,7 @@ class BaseVideoPlayer(Plugin):
 
         Subclasses can extend or redefine list if needed. Defaults to a tuple defined by VideoXBlock.
         """
-        return self.xblock.basic_fields
+        return ('display_name', 'href')
 
     @property
     def advanced_fields(self):
@@ -121,7 +121,11 @@ class BaseVideoPlayer(Plugin):
 
         Subclasses can extend or redefine list if needed. Defaults to a tuple defined by VideoXBlock.
         """
-        return self.xblock.advanced_fields
+        return (
+            'start_time', 'end_time', 'handout', 'transcripts',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'default_transcripts', 'download_video_allowed', 'download_video_url'
+        )
 
     @property
     def fields_help(self):
