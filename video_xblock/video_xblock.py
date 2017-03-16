@@ -830,7 +830,6 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
         Returns:
             File's file_name and external_url.
         """
-
         # Define location of default transcript as a future asset and prepare content to store in assets
         file_name = reference_name.replace(" ", "_") + ext
         course_key = self.location.course_key  # pylint: disable=no-member
