@@ -107,6 +107,54 @@ class TestCustomBackends(VideoXBlockTestBase):
         res = player.match('http://wrong.url')
         self.assertFalse(bool(res))
 
+    expected_basic_fields = [
+        ('display_name', 'href'),
+        ('display_name', 'href', 'account_id'),
+        ('display_name', 'href'),
+        ('display_name', 'href'),
+    ]
+
+    @data(*zip(backends, expected_basic_fields))
+    @unpack
+    def test_basic_fields(self, backend, expected_basic_fields):
+        """
+        Test basic_fields for {0} {1} backend
+        """
+        player = self.player[backend](self.xblock)
+        self.assertTupleEqual(player.basic_fields, expected_basic_fields)
+
+    expected_advanced_fields = [
+        (
+            'start_time', 'end_time', 'handout', 'transcripts',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'default_transcripts', 'download_video_allowed', 'download_video_url'
+        ),
+        (
+            'start_time', 'end_time', 'handout', 'transcripts',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'default_transcripts', 'download_video_allowed', 'download_video_url'
+        ),
+        (
+            'start_time', 'end_time', 'handout', 'transcripts',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'default_transcripts', 'download_video_allowed', 'download_video_url'
+        ),
+        (
+            'start_time', 'end_time', 'handout', 'transcripts',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'default_transcripts', 'download_video_allowed', 'download_video_url'
+        ),
+    ]
+
+    @data(*zip(backends, expected_advanced_fields))
+    @unpack
+    def test_advanced_fields(self, backend, expected_advanced_fields):
+        """
+        Test advanced_fields for {0} backend
+        """
+        player = self.player[backend](self.xblock)
+        self.assertEqual(player.advanced_fields, expected_advanced_fields)
+
     @data(
         ([{'lang': 'ru'}], [{'lang': 'en'}, {'lang': 'uk'}]),
         ([{'lang': 'en'}, {'lang': 'uk'}], [{'lang': 'ru'}]),
