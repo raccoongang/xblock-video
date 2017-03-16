@@ -13,6 +13,7 @@ from video_xblock.exceptions import VideoXBlockException
 from video_xblock.tests.base import VideoXBlockTestBase
 from video_xblock.backends import (
     brightcove,
+    html5,
     wistia,
     youtube,
     vimeo
@@ -30,7 +31,7 @@ class TestCustomBackends(VideoXBlockTestBase):
     """
     Unit tests for custom video xblock backends.
     """
-    backends = ['youtube', 'brightcove', 'wistia', 'vimeo']
+    backends = ['youtube', 'brightcove', 'wistia', 'vimeo', 'html5']
     media_ids = ['44zaxzFsthY', '45263567468485', 'HRrr784kH8932Z', '202889234']
     media_urls = [
         'https://www.youtube.com/watch?v=44zaxzFsthY',
@@ -64,6 +65,7 @@ class TestCustomBackends(VideoXBlockTestBase):
     @XBlock.register_temp_plugin(wistia.WistiaPlayer, 'wistia')
     @XBlock.register_temp_plugin(youtube.YoutubePlayer, 'youtube')
     @XBlock.register_temp_plugin(vimeo.VimeoPlayer, 'vimeo')
+    @XBlock.register_temp_plugin(html5.Html5Player, 'html5')
     def setUp(self):
         super(TestCustomBackends, self).setUp()
         self.player = {}
@@ -84,7 +86,7 @@ class TestCustomBackends(VideoXBlockTestBase):
                 }],
                 'current_time': ''
             },
-            'url': '',
+            'url': 'https://example.com/video.mp4',
             'start_time': '',
             'end_time': ''
         }
@@ -110,6 +112,7 @@ class TestCustomBackends(VideoXBlockTestBase):
     expected_basic_fields = [
         ('display_name', 'href'),
         ('display_name', 'href', 'account_id'),
+        ('display_name', 'href'),
         ('display_name', 'href'),
         ('display_name', 'href'),
     ]
@@ -143,6 +146,11 @@ class TestCustomBackends(VideoXBlockTestBase):
             'start_time', 'end_time', 'handout', 'transcripts',
             'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
             'default_transcripts', 'download_video_allowed', 'download_video_url'
+        ),
+        (
+            'start_time', 'end_time', 'handout', 'transcripts',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'download_video_allowed',
         ),
     ]
 
