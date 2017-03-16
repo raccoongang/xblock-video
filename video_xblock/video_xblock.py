@@ -289,7 +289,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
 
         self.validate_href_data(validation, data)
 
-    def student_view(self, context=None):  # pylint: disable=unused-argument
+    def student_view(self, _context=None):
         """
         The primary view of the `VideoXBlock`, shown to students when viewing courses.
         """
@@ -328,7 +328,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
         frag.initialize_js('VideoXBlockStudentViewInit')
         return frag
 
-    def studio_view(self, context):  # pylint: disable=unused-argument
+    def studio_view(self, _context):
         """
         Render a form for XBlock editing.
         """
@@ -410,7 +410,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
         return fragment
 
     @XBlock.handler
-    def render_player(self, request, suffix=''):  # pylint: disable=unused-argument
+    def render_player(self, _request, _suffix=''):
         """
         View `student_view` loads this handler as an iframe to display actual video player.
 
@@ -439,7 +439,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
         )
 
     @XBlock.json_handler
-    def save_player_state(self, request, suffix=''):  # pylint: disable=unused-argument
+    def save_player_state(self, request, _suffix=''):
         """
         Xblock handler to save playback player state. Called by JavaScript of `student_view`.
 
@@ -463,7 +463,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
         return {'success': True}
 
     @XBlock.json_handler
-    def publish_event(self, data, suffix=''):  # pylint: disable=unused-argument
+    def publish_event(self, data, _suffix=''):
         """
         Handler to publish XBlock event from frontend. Called by JavaScript of `student_view`.
 
@@ -474,11 +474,11 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
             Data on result (dict).
         """
         try:
-            eventType = data.pop('eventType')  # pylint: disable=invalid-name
+            event_type = data.pop('eventType')
         except KeyError:
             return {'result': 'error', 'message': 'Missing eventType in JSON data'}
 
-        self.runtime.publish(self, eventType, data)
+        self.runtime.publish(self, event_type, data)
         return {'result': 'success'}
 
     def clean_studio_edits(self, data):
@@ -709,7 +709,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
         return auth_data, error_message
 
     @XBlock.json_handler
-    def authenticate_video_api_handler(self, data, suffix=''):  # pylint: disable=unused-argument
+    def authenticate_video_api_handler(self, data, _suffix=''):
         """
         Xblock handler to authenticate to a video platform's API. Called by JavaScript of `studio_view`.
 
@@ -755,7 +755,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
             self.metadata['client_secret'] = ''  # Brightcove API
 
     @XBlock.json_handler
-    def upload_default_transcript_handler(self, data, suffix=''):  # pylint: disable=unused-argument
+    def upload_default_transcript_handler(self, data, _suffix=''):
         """
         Upload a transcript, fetched from a video platform's API, to video xblock.
 

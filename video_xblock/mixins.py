@@ -202,7 +202,7 @@ class TranscriptsMixin(XBlock):
         return 'success', translations
 
     @XBlock.json_handler
-    def get_transcripts_3playmedia_api_handler(self, data, suffix=''):  # pylint: disable=unused-argument
+    def get_transcripts_3playmedia_api_handler(self, data, _suffix=''):
         """
         Xblock handler to authenticate to a video platform's API. Called by JavaScript of `studio_view`.
 
@@ -239,7 +239,7 @@ class TranscriptsMixin(XBlock):
         }
 
     @XBlock.handler
-    def download_transcript(self, request, suffix=''):  # pylint: disable=unused-argument
+    def download_transcript(self, request, _suffix=''):
         """
         Download a transcript.
 
@@ -261,7 +261,7 @@ class TranscriptsMixin(XBlock):
         return response
 
     @XBlock.handler
-    def srt_to_vtt(self, request, suffix=''):  # pylint: disable=unused-argument
+    def srt_to_vtt(self, request, _suffix=''):
         """
         Fetch raw transcripts, convert them into WebVTT format and return back.
 
