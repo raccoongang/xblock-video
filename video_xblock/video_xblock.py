@@ -38,6 +38,7 @@ log = logging.getLogger(__name__)
 class ContentStoreMixin(XBlock):
     """
     Proxy to future `contentstore` service.
+
     If `contentstore` service is not provided by `runtime` it returns classes
     from `xmodule.contentstore`
     """
@@ -821,6 +822,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
     def create_transcript_file(self, ext='.vtt', trans_str='', reference_name=''):
         """
         Upload a transcript, fetched from a video platform's API, to video xblock.
+
         Arguments:
             ext (str): format of transcript file, default is vtt.
             trans_str (str): multiple string for convert to vtt file.
