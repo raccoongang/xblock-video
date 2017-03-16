@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+
+## [0.6.0] - 2017-03-17
+
+### Added
+
+- 3PlayMedia support. Now you can fetch transcripts for your video from 3PM.
+
+### Changed
+
+- Swith from Coveralls to Codecov for better code coverage.
+
 ## [0.5.0] - 2017-03-14
 
 ### Added
