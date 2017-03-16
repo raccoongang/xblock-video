@@ -118,7 +118,7 @@ class TestCustomBackends(VideoXBlockTestBase):
     @unpack
     def test_basic_fields(self, backend, expected_basic_fields):
         """
-        Test basic_fields for {0} {1} backend
+        Test basic_fields for {0} backend
         """
         player = self.player[backend](self.xblock)
         self.assertTupleEqual(player.basic_fields, expected_basic_fields)
@@ -130,7 +130,7 @@ class TestCustomBackends(VideoXBlockTestBase):
             'default_transcripts', 'download_video_allowed', 'download_video_url'
         ),
         (
-            'start_time', 'end_time', 'handout', 'transcripts',
+            'player_id', 'start_time', 'end_time', 'handout', 'transcripts',
             'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
             'default_transcripts', 'download_video_allowed', 'download_video_url'
         ),
