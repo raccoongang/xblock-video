@@ -117,15 +117,6 @@ class TestCustomBackends(VideoXBlockTestBase):
         ('display_name', 'href'),
     ]
 
-    @data(*zip(backends, expected_basic_fields))
-    @unpack
-    def test_basic_fields(self, backend, expected_basic_fields):
-        """
-        Test basic_fields for {0} backend
-        """
-        player = self.player[backend](self.xblock)
-        self.assertTupleEqual(player.basic_fields, expected_basic_fields)
-
     expected_advanced_fields = [
         (
             'start_time', 'end_time', 'handout', 'transcripts',
@@ -154,14 +145,15 @@ class TestCustomBackends(VideoXBlockTestBase):
         ),
     ]
 
-    @data(*zip(backends, expected_advanced_fields))
+    @data(*zip(backends, expected_basic_fields, expected_advanced_fields))
     @unpack
-    def test_advanced_fields(self, backend, expected_advanced_fields):
+    def test_basic_advanced_fields(self, backend, expected_basic_fields, expected_advanced_fields):
         """
-        Test advanced_fields for {0} backend
+        Test basic_fields & advanced_fields for {0} backend
         """
         player = self.player[backend](self.xblock)
-        self.assertEqual(player.advanced_fields, expected_advanced_fields)
+        self.assertTupleEqual(player.basic_fields, expected_basic_fields)
+        self.assertTupleEqual(player.advanced_fields, expected_advanced_fields)
 
     @data(
         ([{'lang': 'ru'}], [{'lang': 'en'}, {'lang': 'uk'}]),
