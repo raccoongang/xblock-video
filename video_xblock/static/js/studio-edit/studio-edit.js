@@ -438,6 +438,63 @@ function StudioEditableXBlock(runtime, element) {
     });
 
     /**
+     * Get transcripts from 3playmedia's API and show result message.
+     */
+    function getTranscripts3playmediaApi(data) {
+        var message, status, includeLang;
+        var options = {
+            type: 'POST',
+            url: getTranscripts3playmediaApiHandlerUrl,
+            dataType: 'json',
+            data: JSON.stringify(data),
+        };
+
+        $.ajax(options)
+        .done(function(response) {
+            var error_message = response['error_message'];
+            var success_message = response['success_message'];
+            if (success_message) {
+                if (response.transcripts) {
+                    response.transcripts.forEach(function transcript(item) {
+                        includeLang = transcriptsValue.find(
+                            function existLanguage(element) {
+                                return element.lang == item.lang;
+                            }
+                        );
+                        if (!includeLang) {
+                            createTranscriptBlock(
+                                item.lang, item.label, transcriptsValue, item.url
+                            );
+                            pushTranscript(
+                                item.lang, item.label, item.url, '', transcriptsValue
+                            );
+                            pushTranscriptsValue(transcriptsValue);
+                        }
+                    });
+                }
+                message = success_message;
+                status = SUCCESS;
+            }
+            else if (error_message) {
+                message = error_message;
+                status = ERROR;
+            }
+        })
+        .fail(function(jqXHR) {
+            message = gettext('This may be happening because of an error with our server or your ' +
+                'internet connection. Try refreshing the page or making sure you are online.');
+            status = ERROR;
+            if (jqXHR.responseText) { // Is there a more specific error message we can show?
+                message = extractErrorMessage(jqXHR.responseText);
+            }
+            runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
+        })
+        .always(function() {
+            showStatus($('.threeplaymedia.status'), status, message);
+        });
+    }
+
+    /**
      * Authenticate to video platform's API and show result message.
      */
     function authenticateVideoApi(data) {
@@ -591,6 +648,14 @@ function StudioEditableXBlock(runtime, element) {
         event.preventDefault();
         event.stopPropagation();
         authenticateVideoApi($data);
+    });
+
+    $3playmediaTranscriptsApi.on('click', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var $api_key = $('.threeplaymedia-api-key', element).val();
+        var $file_id = $('#xb-field-edit-threeplaymedia_file_id', element).val();
+        getTranscripts3playmediaApi({api_key: $api_key, file_id: $file_id});
     });
 
     $('.lang-select').on('change', function(event) {
