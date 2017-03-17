@@ -106,12 +106,12 @@ function validateTranscriptFile(event, fieldName, filename, $fileUploader) {
     // Display validation error message if a transcript/caption file may not be not accepted
     if (!isValid) {
         if (fieldName === 'handout') {
-            showStatus($('.status', $('.file-uploader')), 'error', errorMessage);
+            showStatus($('.file-uploader .status'), 'error', errorMessage);
         } else {
             currentLiIndex = $(event.currentTarget).attr('data-li-index');
             currentLiTag = $('.language-transcript-selector').children()[parseInt(currentLiIndex, 10)];
             showStatus(
-                $('.status', $(currentLiTag)),
+                $(currentLiTag).find($('.status')),
                 'error',
                 errorMessage
             );
@@ -221,7 +221,7 @@ function createTranscriptBlock(langCode, langLabel, transcriptsValue, downloadTr
     $createdLi.val(langLabel);
     $createdLi.find('a.upload-setting.upload-transcript:hidden')
         .removeClass('is-hidden')
-        .html('Replace')
+        .html(gettext('Replace'))
         .attr({'data-lang-code': langCode, 'data-lang-label': langLabel});
     $createdDownload = $createdLi.find('a.download-transcript.download-setting:hidden');
     $createdDownload.removeClass('is-hidden');

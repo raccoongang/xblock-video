@@ -212,7 +212,7 @@ class BaseVideoPlayer(Plugin):
                 "offset": {
                     "start": context['start_time'],
                     "end": context['end_time'],
-                    "current_time": context['player_state']['current_time'],
+                    "current_time": context['player_state']['currentTime'],
                 },
                 "videoJSSpeedHandler": {},
             }

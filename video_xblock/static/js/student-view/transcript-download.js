@@ -5,7 +5,7 @@
 var TranscriptDownload = function(player) {
     'use strict';
     /** Send message of changing transcript to parent window */
-    var transcripts = window.playerStateObj.transcripts_object;
+    var transcripts = window.playerStateObj.transcriptsObject;
     var sendMessage = function() {
         var playerObj = this;
         parent.postMessage({

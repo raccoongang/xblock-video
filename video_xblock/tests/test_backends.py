@@ -82,7 +82,7 @@ class TestCustomBackends(VideoXBlockTestBase):
                     'label': 'English',
                     'url': 'http://test.url'
                 }],
-                'current_time': ''
+                'currentTime': ''
             },
             'url': '',
             'start_time': '',

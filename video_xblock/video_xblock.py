@@ -29,8 +29,7 @@ from .constants import PlayerName
 from .exceptions import ApiClientError
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
-from .utils import render_template, render_resource, resource_string, ugettext as _
-
+from .utils import render_template, render_resource, resource_string, underscore_to_camelcase, ugettext as _
 
 log = logging.getLogger(__name__)
 
@@ -286,8 +285,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
     )
 
     player_state_fields = (
-        'current_time', 'muted', 'playback_rate', 'volume',
-        'transcripts_enabled', 'captions_enabled', 'captions_language'
+        'current_time', 'muted', 'playback_rate', 'volume', 'transcripts_enabled',
+        'captions_enabled', 'captions_language', 'transcripts'
     )
 
     @property
@@ -300,18 +299,17 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         transcripts_object = {
             trans['lang']: {'url': trans['url'], 'label': trans['label']}
             for trans in transcripts
-        }
-        return {
-            'current_time': self.current_time,
-            'muted': self.muted,
-            'playback_rate': self.playback_rate,
-            'volume': self.volume,
-            'transcripts': transcripts,
-            'transcripts_enabled': self.transcripts_enabled,
-            'captions_enabled': self.captions_enabled,
-            'captions_language': self.captions_language or course.language,
-            'transcripts_object': transcripts_object
-        }
+            }
+        result = dict()
+        result['captionsLanguage'] = self.captions_language or course.language
+        result['transcripts'] = transcripts
+        result['transcriptsObject'] = transcripts_object
+        for field_name in self.player_state_fields:
+            camelcase_field_name = underscore_to_camelcase(field_name)
+            if camelcase_field_name not in result:
+                result[camelcase_field_name] = getattr(self, field_name)
+
+        return result
 
     @staticmethod
     def get_brightcove_js_url(account_id, player_id):
@@ -337,14 +335,8 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         Arguments:
             state (dict): Video player state key-value pairs.
         """
-        self.current_time = state.get('current_time', self.current_time)
-        self.muted = state.get('muted', self.muted)
-        self.playback_rate = state.get('playback_rate', self.playback_rate)
-        self.volume = state.get('volume', self.volume)
-        self.transcripts = state.get('transcripts', self.transcripts)
-        self.transcripts_enabled = state.get('transcripts_enabled', self.transcripts_enabled)
-        self.captions_enabled = state.get('captions_enabled', self.captions_enabled)
-        self.captions_language = state.get('captions_language', self.captions_language)
+        for field_name in self.player_state_fields:
+            setattr(self, field_name, state.get(underscore_to_camelcase(field_name), getattr(self, field_name)))
 
     @property
     def editable_fields(self):
@@ -545,10 +537,10 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         fragment.add_css(resource_string("static/css/student-view.css"))
         fragment.add_css(resource_string("static/css/transcripts-upload.css"))
         fragment.add_css(resource_string("static/css/studio-edit.css"))
-        fragment.add_javascript(resource_string("static/js/studio-view/studio-edit-utils.js"))
-        fragment.add_javascript(resource_string("static/js/studio-view/studio-edit.js"))
-        fragment.add_javascript(resource_string("static/js/studio-view/studio-edit-transcripts-autoload.js"))
-        fragment.add_javascript(resource_string("static/js/studio-view/studio-edit-transcripts-manual-upload.js"))
+        fragment.add_javascript(resource_string("static/js/studio-edit/utils.js"))
+        fragment.add_javascript(resource_string("static/js/studio-edit/studio-edit.js"))
+        fragment.add_javascript(resource_string("static/js/studio-edit/transcripts-autoload.js"))
+        fragment.add_javascript(resource_string("static/js/studio-edit/transcripts-manual-upload.js"))
         fragment.initialize_js('StudioEditableXBlock')
         return fragment
 
@@ -593,15 +585,13 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
             Data on success (dict).
         """
         player_state = {
-            'current_time': request['currentTime'],
-            'playback_rate': request['playbackRate'],
-            'volume': request['volume'],
-            'muted': request['muted'],
-            'transcripts': self.transcripts,
-            'transcripts_enabled': request['transcriptsEnabled'],
-            'captions_enabled': request['captionsEnabled'],
-            'captions_language': request['captionsLanguage']
+            'transcripts': self.transcripts
         }
+
+        for field_name in self.player_state_fields:
+            if field_name not in player_state:
+                player_state[field_name] = request[underscore_to_camelcase(field_name)]
+
         self.player_state = player_state
         return {'success': True}
 
@@ -730,7 +720,7 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         made_fields = [
             self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
             for key in fields
-        ]
+            ]
         return made_fields
 
     def get_file_name_from_path(self, field):
@@ -924,9 +914,9 @@ class VideoXBlock(TranscriptsMixin, StudioEditableXBlockMixin, XBlock):
         # If the last authentication effort was not successful, metadata should be updated as well.
         # Since video xblock metadata may store various information, this is to update the auth data only.
         if not auth_data:
-            self.metadata['token'] = ''          # Wistia API
-            self.metadata['access_token'] = ''   # Brightcove API
-            self.metadata['client_id'] = ''      # Brightcove API
+            self.metadata['token'] = ''  # Wistia API
+            self.metadata['access_token'] = ''  # Brightcove API
+            self.metadata['client_id'] = ''  # Brightcove API
             self.metadata['client_secret'] = ''  # Brightcove API
 
     @XBlock.json_handler

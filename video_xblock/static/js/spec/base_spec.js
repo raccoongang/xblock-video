@@ -5,7 +5,7 @@ describe('Base javascript', function() {
         captionsLanguage: 'en'
     };
     var testXblcokUsageId = 'block-v1:test+test+test+type@video_xblock+block@test';
-    var transcripts = window.playerStateObj.transcripts_object;
+    var transcriptsObject = window.playerStateObj.transcriptsObject;
     window.videoPlayerId = playerId;
     window.location.hash = '#' + testXblcokUsageId;
     beforeEach(function() {
@@ -18,7 +18,7 @@ describe('Base javascript', function() {
         expect(getXblockUsageId(), testXblcokUsageId);
     });
     it('return download transcript url', function() {
-        // TODO avoid the eslint shutdown for the implicity got variables
-        expect(getDownloadTranscriptUrl(transcripts, player)).toBe(transcripts.en.url); // eslint-disable-line
+        // TODO avoid the eslint shutdown for the implicitly received variables
+        expect(getDownloadTranscriptUrl(transcriptsObject, player)).toBe(transcriptsObject.en.url); // eslint-disable-line
     });
 });

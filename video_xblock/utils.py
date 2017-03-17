@@ -52,3 +52,14 @@ def ugettext(text):
     Dummy ugettext method that doesn't do anything.
     """
     return text
+
+
+def underscore_to_camelcase(value):
+    """Convert variables with underscore to camelcase style"""
+    def camelcase():
+        yield str.lower
+        while True:
+            yield str.capitalize
+
+    c = camelcase()
+    return "".join(c.next()(x) if x else '_' for x in value.split("_"))

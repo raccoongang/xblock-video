@@ -10,17 +10,8 @@
  * State is saved at certain events.
  */
 
-var PlayerState = function(player, playerStateObj) {
+var PlayerState = function(player, playerState) {
     'use strict';
-    var playerState = {
-        volume: playerStateObj.volume,
-        currentTime: playerStateObj.current_time,
-        playbackRate: playerStateObj.playback_rate,
-        muted: playerStateObj.muted,
-        transcriptsEnabled: playerStateObj.transcripts_enabled,
-        captionsEnabled: playerStateObj.captions_enabled,
-        captionsLanguage: playerStateObj.captions_language
-    };
     var xblockUsageId = getXblockUsageId();
 
     /** Create hashmap with all transcripts */
@@ -35,7 +26,7 @@ var PlayerState = function(player, playerStateObj) {
         return result;
     };
 
-    var transcripts = getTranscipts(playerStateObj.transcripts);
+    var transcripts = getTranscipts(playerState.transcripts);
 
     /** Restore default or previously saved player state */
     var setInitialState = function(state) {
@@ -54,12 +45,13 @@ var PlayerState = function(player, playerStateObj) {
             .volume(state.volume)
             .muted(state.muted)
             .playbackRate(state.playbackRate);
-        player.transcriptsEnabled = state.transcriptsEnabled;  // eslint-disable-line no-param-reassign
-        player.captionsEnabled = state.captionsEnabled;  // eslint-disable-line no-param-reassign
         player.captionsLanguage = state.captionsLanguage;  // eslint-disable-line no-param-reassign
         // To switch off transcripts and captions state if doesn`t have transcripts with current captions language
         if (!transcripts[player.captionsLanguage]) {
             player.captionsEnabled = player.transcriptsEnabled = false; // eslint-disable-line no-param-reassign
+        } else {
+            player.transcriptsEnabled = state.transcriptsEnabled; // eslint-disable-line no-param-reassign
+            player.captionsEnabled = state.captionsEnabled; // eslint-disable-line no-param-reassign
         }
     };
 
@@ -84,12 +76,12 @@ var PlayerState = function(player, playerStateObj) {
             console.log('Starting saving player state');  // eslint-disable-line no-console
             playerState = newState;
             parent.postMessage({
-                action: 'saveState',
-                info: newState,
-                xblockUsageId: xblockUsageId,
-                downloadTranscriptUrl: transcriptUrl || '#'
-            },
-            document.location.protocol + '//' + document.location.host
+                    action: 'saveState',
+                    info: newState,
+                    xblockUsageId: xblockUsageId,
+                    downloadTranscriptUrl: transcriptUrl || '#'
+                },
+                document.location.protocol + '//' + document.location.host
             );
         }
     };
@@ -98,11 +90,13 @@ var PlayerState = function(player, playerStateObj) {
      *  Save player progress in browser's local storage.
      *  We need it when user is switching between tabs.
      */
-    var saveProgressToLocalStore = function saveProgressToLocalStore() {
+    var saveProgressToLocalStore = function() {
         var playerObj = this;
-        var playbackProgress = localStorage.getItem('playbackProgress');
-        if (!playbackProgress) {
-            playbackProgress = '{}';
+        var playbackProgress;
+        try {
+            playbackProgress = JSON.parse(localStorage.getItem('playbackProgress'));
+        } catch (err) {
+            playbackProgress = {};
         }
         playbackProgress = JSON.parse(playbackProgress);
         playbackProgress[window.videoPlayerId] = playerObj.ended() ? 0 : playerObj.currentTime();
