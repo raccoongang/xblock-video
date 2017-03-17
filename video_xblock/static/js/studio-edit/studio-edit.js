@@ -2,7 +2,7 @@
 removeEnabledTranscriptBlock bindUploadListenerAvailableTranscript pushTranscript pushTranscriptsValue
 createEnabledTranscriptBlock createTranscriptBlock parseRelativeTime removeAllEnabledTranscripts tinyMCE baseUrl
 validateTranscripts fillValues validateTranscriptFile removeTranscriptBlock clickUploader
-languageChecker */
+languageChecker $3playmediaTranscriptsApi getTranscripts3playmediaApiHandlerUrl*/
 /**
     Set up the Video xblock studio editor. This part is responsible for validation and sending of the data to a backend.
     Reference:
@@ -170,7 +170,6 @@ function StudioEditableXBlock(runtime, element) {
     function extractErrorMessage(responseText) {
         var message;
         try {
-            console.log('*************5');
             message = JSON.parse(responseText).error;
             if (typeof message === 'object' && message.messages) {
                 // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
@@ -300,7 +299,6 @@ function StudioEditableXBlock(runtime, element) {
                     if (val === '') {
                         val = null;
                     } else {
-                        console.log('*************6');
                         val = JSON.parse(val); // TODO: handle parse errors
                     }
                     return val;
@@ -375,10 +373,8 @@ function StudioEditableXBlock(runtime, element) {
         $checkboxes.bind('change input', fieldChanged($wrapper, $resetButton));
 
         $resetButton.click(function() {
-            console.log('*************7');
             var defaults = JSON.parse($wrapper.attr('data-default'));
             $checkboxes.each(function() {
-                console.log('*************8');
                 var val = JSON.parse($(this).val());
                 $(this).prop('checked', defaults.indexOf(val) > -1);
             });
@@ -434,7 +430,6 @@ function StudioEditableXBlock(runtime, element) {
     // End of Raccoongang changes
 
     if (gotTranscriptsValue) {
-        console.log('*************9');
         transcriptsValue = JSON.parse(gotTranscriptsValue);
     }
 
@@ -451,19 +446,19 @@ function StudioEditableXBlock(runtime, element) {
             type: 'POST',
             url: getTranscripts3playmediaApiHandlerUrl,
             dataType: 'json',
-            data: JSON.stringify(data),
+            data: JSON.stringify(data)
         };
 
         $.ajax(options)
         .done(function(response) {
-            var error_message = response['error_message'];
-            var success_message = response['success_message'];
-            if (success_message) {
+            var errorMessage = response.error_message;
+            var successMessage = response.success_message;
+            if (successMessage) {
                 if (response.transcripts) {
                     response.transcripts.forEach(function transcript(item) {
                         includeLang = transcriptsValue.find(
-                            function existLanguage(element) {
-                                return element.lang == item.lang;
+                            function existLanguage(element) { // eslint-disable-line no-shadow
+                                return element.lang === item.lang;
                             }
                         );
                         if (!includeLang) {
@@ -477,11 +472,10 @@ function StudioEditableXBlock(runtime, element) {
                         }
                     });
                 }
-                message = success_message;
+                message = successMessage;
                 status = SUCCESS;
-            }
-            else if (error_message) {
-                message = error_message;
+            } else if (errorMessage) {
+                message = errorMessage;
                 status = ERROR;
             }
         })
@@ -656,11 +650,11 @@ function StudioEditableXBlock(runtime, element) {
     });
 
     $3playmediaTranscriptsApi.on('click', function(event) {
+        var $apiKey = $('.threeplaymedia-api-key', element).val();
+        var $fileId = $('#xb-field-edit-threeplaymedia_file_id', element).val();
         event.preventDefault();
         event.stopPropagation();
-        var $api_key = $('.threeplaymedia-api-key', element).val();
-        var $file_id = $('#xb-field-edit-threeplaymedia_file_id', element).val();
-        getTranscripts3playmediaApi({api_key: $api_key, file_id: $file_id});
+        getTranscripts3playmediaApi({api_key: $apiKey, file_id: $fileId});
     });
 
     $('.lang-select').on('change', function(event) {

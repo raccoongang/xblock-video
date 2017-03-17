@@ -33,7 +33,6 @@ var PlayerState = function(player, playerState) {
         var stateCurrentTime = state.currentTime;
         var playbackProgress = localStorage.getItem('playbackProgress');
         if (playbackProgress) {
-            console.log('*************2');
             playbackProgress = JSON.parse(playbackProgress);
             if (playbackProgress[window.videoPlayerId]) {
                 stateCurrentTime = playbackProgress[window.videoPlayerId];
@@ -75,8 +74,9 @@ var PlayerState = function(player, playerState) {
         };
         if (JSON.stringify(newState) !== JSON.stringify(playerState)) {
             console.log('Starting saving player state');  // eslint-disable-line no-console
-            playerState = newState;
-            parent.postMessage({
+            playerState = newState; // eslint-disable-line no-param-reassign
+            parent.postMessage(
+                {
                     action: 'saveState',
                     info: newState,
                     xblockUsageId: xblockUsageId,
@@ -95,13 +95,10 @@ var PlayerState = function(player, playerState) {
         var playerObj = this;
         var playbackProgress;
         try {
-            console.log('*************3');
             playbackProgress = JSON.parse(localStorage.getItem('playbackProgress'));
         } catch (err) {
             playbackProgress = {};
         }
-        console.log('*************4');
-        console.log(playbackProgress)
         playbackProgress[window.videoPlayerId] = playerObj.ended() ? 0 : playerObj.currentTime();
         localStorage.setItem('playbackProgress', JSON.stringify(playbackProgress));
     };

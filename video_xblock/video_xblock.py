@@ -368,7 +368,7 @@ class PlaybackStateMixin(XBlock):
         transcripts_object = {
             trans['lang']: {'url': trans['url'], 'label': trans['label']}
             for trans in transcripts
-            }
+        }
         result = dict()
         result['captionsLanguage'] = self.captions_language or course.language
         result['transcripts'] = transcripts
@@ -921,7 +921,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
         made_fields = [
             self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
             for key in fields
-            ]
+        ]
         return made_fields
 
     def get_file_name_from_path(self, field):

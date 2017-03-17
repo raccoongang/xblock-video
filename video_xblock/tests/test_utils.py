@@ -3,7 +3,7 @@ Test utils.
 """
 
 import unittest
-from ddt import ddt, data, unpack
+from ddt import ddt, data
 
 from video_xblock.utils import underscore_to_camelcase
 
@@ -16,7 +16,7 @@ class UtilsTest(unittest.TestCase):
 
     @data({
         'test': 'test',
-        'test_var': 'testVar',
+        'test_variable': 'testVariable',
         'long_test_variable': 'longTestVariable'
     })
     def test_underscore_to_camelcase(self, test_data):

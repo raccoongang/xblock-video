@@ -14,7 +14,6 @@
 domReady(function() {
     'use strict';
     var videoPlayer = document.getElementById(window.videoPlayerId);
-    console.log('*************10');
     var dataSetup = JSON.parse(videoPlayer.getAttribute('data-setup'));
     var playbackRates = dataSetup.playbackRates;
     var docfrag = document.createDocumentFragment();
