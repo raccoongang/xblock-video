@@ -6,6 +6,7 @@ Brightcove Video player plugin.
 import base64
 from datetime import datetime
 import json
+import httplib
 import re
 from xml.sax.saxutils import unescape
 
@@ -13,7 +14,6 @@ import requests
 from xblock.fragment import Fragment
 
 from video_xblock.backends.base import BaseVideoPlayer, BaseApiClient
-from video_xblock.constants import status
 from video_xblock.exceptions import ApiClientError, VideoXBlockException
 from video_xblock.utils import ugettext as _
 
@@ -78,7 +78,7 @@ class BrightcoveApiClient(BaseApiClient):
         response = requests.post(url, json=data, headers=headers)
         response_data = response.json()
         # New resource must have been created.
-        if response.status_code == status.HTTP_201_CREATED and response_data:
+        if response.status_code == httplib.CREATED and response_data:
             client_secret = response_data.get('client_secret')
             client_id = response_data.get('client_id')
             error_message = ''
@@ -103,7 +103,7 @@ class BrightcoveApiClient(BaseApiClient):
             "Authorization": "Basic " + auth_string
         }
         resp = requests.post(url, headers=headers, data=params)
-        if resp.status_code == status.HTTP_200_OK:
+        if resp.status_code == httplib.OK:
             result = resp.json()
             return result['access_token']
 
@@ -122,9 +122,9 @@ class BrightcoveApiClient(BaseApiClient):
         if headers is not None:
             headers_.update(headers)
         resp = requests.get(url, headers=headers_)
-        if resp.status_code == status.HTTP_200_OK:
+        if resp.status_code == httplib.OK:
             return resp.json()
-        elif resp.status_code == status.HTTP_401_UNAUTHORIZED and can_retry:
+        elif resp.status_code == httplib.UNAUTHORIZED and can_retry:
             self.access_token = self._refresh_access_token()
             return self.get(url, headers, can_retry=False)
         else:
@@ -150,9 +150,9 @@ class BrightcoveApiClient(BaseApiClient):
             headers_.update(headers)
 
         resp = requests.post(url, data=payload, headers=headers_)
-        if resp.status_code in (status.HTTP_200_OK, status.HTTP_201_CREATED):
+        if resp.status_code in (httplib.OK, httplib.CREATED):
             return resp.json()
-        elif resp.status_code == status.HTTP_401_UNAUTHORIZED and can_retry:
+        elif resp.status_code == httplib.UNAUTHORIZED and can_retry:
             self.access_token = self._refresh_access_token()
             return self.post(url, payload, headers, can_retry=False)
         else:
@@ -336,10 +336,14 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         """
         return super(BrightcovePlayer, self).basic_fields + ('account_id',)
 
-    advanced_fields = (
-        'player_id', 'start_time', 'end_time', 'handout', 'transcripts',
-        'download_transcript_allowed', 'token', 'default_transcripts'
-    )
+    @property
+    def advanced_fields(self):
+        """
+        Tuple of VideoXBlock fields to display in Basic tab of edit modal window.
+
+        Brightcove videos require Brightcove Account id.
+        """
+        return ('player_id',) + super(BrightcovePlayer, self).advanced_fields
 
     fields_help = {
         'token': 'You can generate a BC token following the guide of '
@@ -373,7 +377,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         context['player_state'] = json.dumps(context['player_state'])
 
         frag = Fragment(
-            self.render_resource('static/html/brightcove.html', **context)
+            self.render_template('brightcove.html', **context)
         )
         frag.add_css_url(
             'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'
@@ -385,16 +389,9 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             'static/js/base.js',
             'static/js/toggle-button.js'
         ]
-        if json.loads(context['player_state'])['transcripts']:
-            js_files += [
-                'static/bower_components/videojs-transcript/dist/videojs-transcript.js',
-                'static/js/videojs-transcript.js'
-            ]
         js_files += [
             'static/js/videojs-tabindex.js',
             'static/js/videojs_event_plugin.js',
-            'static/bower_components/videojs-offset/dist/videojs-offset.js',
-            'static/js/videojs-speed-handler.js',
             'static/js/brightcove-videojs-init.js'
         ]
 
@@ -405,6 +402,26 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             self.resource_string('static/css/brightcove.css')
         )
         return frag
+
+    def get_player_html(self, **context):
+        """
+        Add VideoJS plugins to the context and render player html using base class logic.
+        """
+        vjs_plugins = [
+            self.resource_string(
+                'static/bower_components/videojs-offset/dist/videojs-offset.js'
+            ),
+            self.resource_string('static/js/videojs-speed-handler.js')
+        ]
+        if context.get('transcripts'):
+            vjs_plugins += [
+                self.resource_string(
+                    'static/bower_components/videojs-transcript/dist/videojs-transcript.js'
+                ),
+                self.resource_string('static/js/videojs-transcript.js')
+            ]
+        context['vjs_plugins'] = vjs_plugins
+        return super(BrightcovePlayer, self).get_player_html(**context)
 
     def dispatch(self, _request, suffix):
         """
@@ -512,21 +529,21 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         video_id = kwargs.get('video_id')
         account_id = kwargs.get('account_id')
         url = self.captions_api['url'].format(account_id=account_id, media_id=video_id)
-        default_transcripts = []
         message = ''
+        self.default_transcripts = []
         # Fetch available transcripts' languages and urls if authentication succeeded.
         try:
             text = self.api_client.get(url)
         except BrightcoveApiClientError:
             message = 'No timed transcript may be fetched from a video platform.'
-            return default_transcripts, message
+            return self.default_transcripts, message
 
         if text:
             captions_data = text.get('text_tracks')
             # Handle empty response (no subs uploaded on a platform)
             if not captions_data:
                 message = 'For now, video platform doesn\'t have any timed transcript for this video.'
-                return default_transcripts, message
+                return self.default_transcripts, message
             transcripts_data = [
                 [el.get('src'), el.get('srclang')]
                 for el in captions_data
@@ -534,13 +551,11 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             # Populate default_transcripts
             for transcript_url, lang_code in transcripts_data:
                 lang_label = self.get_transcript_language_parameters(lang_code)[1]
-                default_transcript = {
+                self.default_transcripts.append({
                     'lang': lang_code,
                     'label': lang_label,
                     'url': transcript_url,
-                }
-                default_transcripts.append(default_transcript)
-                self.default_transcripts.append(default_transcript)
+                })
         else:
             try:
                 # no way this code could be executed
@@ -548,7 +563,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
                 message = str(text[0].get('message'))
             except AttributeError:
                 message = 'No timed transcript may be fetched from a video platform.'
-        return default_transcripts, message
+        return self.default_transcripts, message
 
     def download_default_transcript(self, url=None, language_code=None):  # pylint: disable=unused-argument
         """

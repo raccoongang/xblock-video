@@ -13,23 +13,16 @@ from video_xblock.exceptions import VideoXBlockException
 from video_xblock.tests.base import VideoXBlockTestBase
 from video_xblock.backends import (
     brightcove,
+    html5,
     wistia,
     youtube,
     vimeo
 )
 from video_xblock.tests.mocks import (
-    YoutubeAuthMock,
-    WistiaAuthMock,
-    BrightcoveAuthMock,
-    VimeoAuthMock,
-    YoutubeDefaultTranscriptsMock,
-    BrightcoveDefaultTranscriptsMock,
-    WistiaDefaultTranscriptsMock,
-    VimeoDefaultTranscriptsMock,
-    YoutubeDownloadTranscriptMock,
-    BrightcoveDownloadTranscriptMock,
-    WistiaDownloadTranscriptMock,
-    VimeoDownloadTranscriptMock
+    brightcove as brightcove_mock,
+    vimeo as vimeo_mock,
+    wistia as wistia_mock,
+    youtube as youtube_mock
 )
 
 
@@ -38,7 +31,7 @@ class TestCustomBackends(VideoXBlockTestBase):
     """
     Unit tests for custom video xblock backends.
     """
-    backends = ['youtube', 'brightcove', 'wistia', 'vimeo']
+    backends = ['youtube', 'brightcove', 'wistia', 'vimeo', 'html5']
     media_ids = ['44zaxzFsthY', '45263567468485', 'HRrr784kH8932Z', '202889234']
     media_urls = [
         'https://www.youtube.com/watch?v=44zaxzFsthY',
@@ -48,30 +41,31 @@ class TestCustomBackends(VideoXBlockTestBase):
     ]
 
     auth_mocks = [
-        YoutubeAuthMock,
-        BrightcoveAuthMock,
-        WistiaAuthMock,
-        VimeoAuthMock,
+        youtube_mock.YoutubeAuthMock,
+        brightcove_mock.BrightcoveAuthMock,
+        wistia_mock.WistiaAuthMock,
+        vimeo_mock.VimeoAuthMock,
     ]
 
     default_trans_mocks = [
-        YoutubeDefaultTranscriptsMock,
-        BrightcoveDefaultTranscriptsMock,
-        WistiaDefaultTranscriptsMock,
-        VimeoDefaultTranscriptsMock,
+        youtube_mock.YoutubeDefaultTranscriptsMock,
+        brightcove_mock.BrightcoveDefaultTranscriptsMock,
+        wistia_mock.WistiaDefaultTranscriptsMock,
+        vimeo_mock.VimeoDefaultTranscriptsMock,
     ]
 
     download_transcript_mocks = [
-        YoutubeDownloadTranscriptMock,
-        BrightcoveDownloadTranscriptMock,
-        WistiaDownloadTranscriptMock,
-        VimeoDownloadTranscriptMock,
+        youtube_mock.YoutubeDownloadTranscriptMock,
+        brightcove_mock.BrightcoveDownloadTranscriptMock,
+        wistia_mock.WistiaDownloadTranscriptMock,
+        vimeo_mock.VimeoDownloadTranscriptMock,
     ]
 
     @XBlock.register_temp_plugin(brightcove.BrightcovePlayer, 'brightcove')
     @XBlock.register_temp_plugin(wistia.WistiaPlayer, 'wistia')
     @XBlock.register_temp_plugin(youtube.YoutubePlayer, 'youtube')
     @XBlock.register_temp_plugin(vimeo.VimeoPlayer, 'vimeo')
+    @XBlock.register_temp_plugin(html5.Html5Player, 'html5')
     def setUp(self):
         super(TestCustomBackends, self).setUp()
         self.player = {}
@@ -92,7 +86,7 @@ class TestCustomBackends(VideoXBlockTestBase):
                 }],
                 'current_time': ''
             },
-            'url': '',
+            'url': 'https://example.com/video.mp4',
             'start_time': '',
             'end_time': ''
         }
@@ -114,6 +108,52 @@ class TestCustomBackends(VideoXBlockTestBase):
         # test wrong data
         res = player.match('http://wrong.url')
         self.assertFalse(bool(res))
+
+    expected_basic_fields = [
+        ('display_name', 'href'),
+        ('display_name', 'href', 'account_id'),
+        ('display_name', 'href'),
+        ('display_name', 'href'),
+        ('display_name', 'href'),
+    ]
+
+    expected_advanced_fields = [
+        (
+            'start_time', 'end_time', 'handout', 'transcripts',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'default_transcripts', 'download_video_allowed', 'download_video_url'
+        ),
+        (
+            'player_id', 'start_time', 'end_time', 'handout', 'transcripts',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'default_transcripts', 'download_video_allowed', 'download_video_url'
+        ),
+        (
+            'start_time', 'end_time', 'handout', 'transcripts',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'default_transcripts', 'download_video_allowed', 'download_video_url'
+        ),
+        (
+            'start_time', 'end_time', 'handout', 'transcripts',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'default_transcripts', 'download_video_allowed', 'download_video_url'
+        ),
+        (
+            'start_time', 'end_time', 'handout', 'transcripts',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'download_video_allowed',
+        ),
+    ]
+
+    @data(*zip(backends, expected_basic_fields, expected_advanced_fields))
+    @unpack
+    def test_basic_advanced_fields(self, backend, expected_basic_fields, expected_advanced_fields):
+        """
+        Test basic_fields & advanced_fields for {0} backend
+        """
+        player = self.player[backend](self.xblock)
+        self.assertTupleEqual(player.basic_fields, expected_basic_fields)
+        self.assertTupleEqual(player.advanced_fields, expected_advanced_fields)
 
     @data(
         ([{'lang': 'ru'}], [{'lang': 'en'}, {'lang': 'uk'}]),
@@ -185,6 +225,9 @@ class TestCustomBackends(VideoXBlockTestBase):
     @data(*(zip(backends, media_ids, default_trans_mocks)))
     @unpack
     def test_get_default_transcripts(self, backend, media_id, trans_mock):
+        """
+        Check getting list of default transcripts.
+        """
         player = self.player[backend]
         for event in trans_mock.get_outcomes():
             mock = trans_mock(event=event, xblock=self.xblock, mock_magic=self.xblock.metadata)

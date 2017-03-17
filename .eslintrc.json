@@ -3,7 +3,9 @@
     "globals": {
         "videojs": true,
         "domReady": true,
-        "getTranscriptUrl": true
+        "getTranscriptUrl": true,
+        "showStatus": true,
+        "gettext": true
     },
     "rules": {
         "no-underscore-dangle": [

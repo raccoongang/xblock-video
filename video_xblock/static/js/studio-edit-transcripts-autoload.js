@@ -7,54 +7,21 @@
  */
 function createStatusMessageElement(langCode, actionSelector) {
     'use strict';
-    var errorMessageElementParentSelector = '';
-    var successMessageElementParentSelector = '';
-    var isNotDisplayedErrorMessageElement;
-    var isNotDisplayedSuccessMessageElement;
-    var $errorMessageUpload;
-    var $successMessageUpload;
-    if (actionSelector === 'upload-default-transcript') {
-        errorMessageElementParentSelector = 'available-default-transcripts-section';
-        successMessageElementParentSelector = 'enabled-default-transcripts-section';
-    } else if (actionSelector === 'remove-default-transcript') {
-        errorMessageElementParentSelector = 'enabled-default-transcripts-section';
-        successMessageElementParentSelector = 'available-default-transcripts-section';
-    }
-    isNotDisplayedErrorMessageElement = $('.api-request.' + actionSelector + '.' + langCode + '.status-error')
-            .length === 0;
-    isNotDisplayedSuccessMessageElement = $('.api-request.' + actionSelector + '.' + langCode + '.status-success')
-            .length === 0;
-    if (isNotDisplayedErrorMessageElement && isNotDisplayedSuccessMessageElement) {
-        $errorMessageUpload = $('<div>',
-            {class: 'api-request ' + actionSelector + ' ' + langCode + ' status-error'});
-        $errorMessageUpload.appendTo($('.' + errorMessageElementParentSelector + ':visible').last());
-        $successMessageUpload = $('<div>',
-            {class: 'api-request ' + actionSelector + ' ' + langCode + ' status-success'});
-        $successMessageUpload.appendTo($('.' + successMessageElementParentSelector + ':visible').last());
-    }
-}
 
-/**
- * Display message with results on a performed action.
- */
-function showStatus(message, type, successSelector, errorSelector) {
-    'use strict';
-    var selectorToEmpty = '';
-    var selectorToShow = '';
-    // Only one success message is to be displayed at once
-    $('.api-request').empty();
-    if (type === 'success') {
-        selectorToEmpty = errorSelector;
-        selectorToShow = successSelector;
-    } else if (type === 'error') {
-        selectorToEmpty = successSelector;
-        selectorToShow = errorSelector;
+    var parentSelector = '';
+    var messageSelector = '.api-response.' + actionSelector + '.' + langCode + '.status';
+    var $messageUpload;
+    if (actionSelector === 'upload-default-transcript') {
+        parentSelector = 'available-default-transcripts-section';
+    } else if (actionSelector === 'remove-default-transcript') {
+        parentSelector = 'enabled-default-transcripts-section';
     }
-    $(selectorToEmpty).empty();
-    $(selectorToShow).text(message).show();
-    setTimeout(function() {
-        $(errorSelector).hide();
-    }, 5000);
+
+    if ($(messageSelector).length === 0) {
+        $messageUpload = $('<div>',
+            {class: messageSelector});
+        $messageUpload.appendTo($('.' + parentSelector + ':visible').last());
+    }
 }
 
 /**
@@ -222,13 +189,13 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     // Remove enabled transcript of choice
     var $enabledTranscriptBlock = $('div[value=' + langCode + ']').closest('div.enabled-default-transcripts-section');
     var $enabledLabel = $('div.custom-field-section-label.enabled-transcripts');
-    var successMessageRemoval = langLabel + ' transcripts are successfully removed from the list of enabled ones.';
-    var errorMessage = langLabel + ' transcripts are removed, but can not be uploaded from the video platform.';
-    var failureMessage = langLabel + ' transcripts are not neither removed nor added to the list of available ones.';
     var allEnabledTranscripts;
     var isSuccessfulRemoval;
     var isStoredVideoPlatform;
     var isNotPresentEnabledTranscripts;
+    var message, status;
+    var SUCCESS = 'success';
+    var ERROR = 'error';
     $enabledTranscriptBlock.remove();
     isNotPresentEnabledTranscripts = !$('div.enabled-default-transcripts-section:visible').length;
     // Hide label of enabled transcripts if no such items left
@@ -241,26 +208,22 @@ function removeEnabledTranscriptBlock(enabledTranscript, initialDefaultTranscrip
     allEnabledTranscripts = getDefaultTranscriptsArray('enabled');
     isSuccessfulRemoval = $.inArray(langCode, allEnabledTranscripts) === -1; // Is not in array
     isStoredVideoPlatform = $.inArray(langCode, initialDefaultTranscriptsLangCodes) !== -1;  // Is in array
-    // Display message with results on removal
+    // Display message with results of removal
     if (isSuccessfulRemoval && isStoredVideoPlatform) {
-        showStatus(
-            successMessageRemoval,
-            'success',
-            '.api-request.remove-default-transcript.' + langCode + '.status-success',
-            '.api-request.remove-default-transcript.' + langCode + '.status-error');
+        message = gettext('{langLabel} transcripts are successfully removed from the list of enabled ones.');
+        status = SUCCESS;
     } else if (isSuccessfulRemoval && !isStoredVideoPlatform) {
-        showStatus(
-            errorMessage,
-            'error',
-            '.api-request.remove-default-transcript.' + langCode + '.status-success',
-            '.api-request.remove-default-transcript.' + langCode + '.status-error');
+        message = gettext('{langLabel} transcripts are removed, but can not be uploaded from the video platform.');
+        status = ERROR;
     } else {
-        showStatus(
-            failureMessage,
-            'error',
-            '.api-request.remove-default-transcript.' + langCode + '.status-success',
-            '.api-request.remove-default-transcript.' + langCode + '.status-error');
+        message = gettext('{langLabel} transcripts are not neither removed nor added to the list of available ones.');
+        status = ERROR;
     }
+    showStatus(
+        $('.api-response.remove-default-transcript.' + langCode + '.status'),
+        status,
+        message.replace('{langLabel}', langLabel)
+    );
 }
 
 /**

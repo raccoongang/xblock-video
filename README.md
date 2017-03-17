@@ -1,9 +1,30 @@
-[![Build Status](https://travis-ci.org/raccoongang/xblock-video.svg?branch=dev)](https://travis-ci.org/raccoongang/xblock-video)
-[![Coverage Status](https://coveralls.io/repos/github/raccoongang/xblock-video/badge.svg?branch=dev)](https://coveralls.io/github/raccoongang/xblock-video?branch=dev)
-
 # xblock-video
 
+[![Build Status](https://img.shields.io/travis/raccoongang/xblock-video/dev.svg)](https://travis-ci.org/raccoongang/xblock-video)
+[![Coverage Status](https://img.shields.io/codecov/c/github/raccoongang/xblock-video/dev.svg)](https://codecov.io/gh/raccoongang/xblock-video)
+[![GitHub release](https://img.shields.io/github/release/raccoongang/xblock-video.svg)](https://github.com/raccoongang/xblock-video/releases)
+
 XBlock to embed videos hosted on different video platform into your courses.
+
+The idea of crowd-funded universal video-xblock was brought to the
+audience by Nate (Appsembler) on Open edX Con 2016 in Stanford.
+It was well-received and first funds were gathered.
+
+The development was initiated  by Raccoon Gang team, basing on
+previously developed wistia-xblock. Raccoon Gang guys created universal
+pluggable interface and implemented several video-backends:
+
+- Brightcove
+- Html5
+- Vimeo
+- Wistia
+- Youtube
+
+Appsembler and Raccoon Gang are presenting the talk on the story of
+video-xblock on Open edX Con 2017 in Madrid.
+
+We welcome open-source community to add more video-backends as well as
+fix issues.
 
 ## Installation
 

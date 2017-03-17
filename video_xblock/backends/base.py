@@ -19,7 +19,7 @@ from xblock.plugin import Plugin
 from django.conf import settings
 
 from video_xblock.exceptions import VideoXBlockException
-from video_xblock.utils import render_resource, resource_string, ugettext as _
+from video_xblock.utils import render_resource, render_template, resource_string, ugettext as _
 
 
 class BaseApiClient(object):
@@ -106,22 +106,13 @@ class BaseVideoPlayer(Plugin):
         return []
 
     @property
-    def editable_fields(self):
-        """
-        Tuple of all editable VideoXBlock fields to display in studio edit window.
-
-        Defaults to contatenation of `basic_fields` and `advanced_fields`.
-        """
-        return tuple(itertools.chain(self.basic_fields, self.advanced_fields))
-
-    @property
     def basic_fields(self):
         """
         Tuple of VideoXBlock fields to display in Basic tab of edit modal window.
 
         Subclasses can extend or redefine list if needed. Defaults to a tuple defined by VideoXBlock.
         """
-        return self.xblock.basic_fields
+        return ('display_name', 'href')
 
     @property
     def advanced_fields(self):
@@ -130,7 +121,11 @@ class BaseVideoPlayer(Plugin):
 
         Subclasses can extend or redefine list if needed. Defaults to a tuple defined by VideoXBlock.
         """
-        return self.xblock.advanced_fields
+        return (
+            'start_time', 'end_time', 'handout', 'transcripts',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'default_transcripts', 'download_video_allowed', 'download_video_url'
+        )
 
     @property
     def fields_help(self):
@@ -238,7 +233,7 @@ class BaseVideoPlayer(Plugin):
         """
         frag = self.get_frag(**context)
         return Response(
-            self.render_resource('static/html/base.html', frag=frag),
+            self.render_template('base.html', frag=frag),
             content_type='text/html'
         )
 
@@ -256,6 +251,15 @@ class BaseVideoPlayer(Plugin):
             django.utils.safestring.SafeText
         """
         return render_resource(path, **context)
+
+    def render_template(self, name, **context):
+        """
+        Render static template using provided context.
+
+        Returns:
+            django.utils.safestring.SafeText
+        """
+        return render_template(name, **context)
 
     @classmethod
     def match(cls, href):
@@ -277,7 +281,6 @@ class BaseVideoPlayer(Plugin):
         """
         return '<script>' + self.render_resource(path, **context) + '</script>'
 
-    @abc.abstractmethod
     def get_default_transcripts(self, **kwargs):  # pylint: disable=unused-argument
         """
         Fetch transcripts list from a video platform.
@@ -300,8 +303,7 @@ class BaseVideoPlayer(Plugin):
         """
         return [], ''
 
-    @abc.abstractmethod
-    def authenticate_api(self, **kwargs):
+    def authenticate_api(self, **kwargs):  # pylint: disable=unused-argument
         """
         Authenticate to a video platform's API in order to perform authorized requests.
 
@@ -313,7 +315,6 @@ class BaseVideoPlayer(Plugin):
         """
         return {}, ''
 
-    @abc.abstractmethod
     def download_default_transcript(self, url, language_code):  # pylint: disable=unused-argument
         """
         Download default transcript from a video platform API and format it accordingly to the WebVTT standard.

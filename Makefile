@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 .PHONY=all,quality,test
 
 all: quality test
@@ -11,10 +12,7 @@ test-py:
 	nosetests video_xblock --with-coverage --cover-package=video_xblock
 
 test-js:
-	export DISPLAY=:99.0
-	sh -e /etc/init.d/xvfb start
 	karma start video_xblock/static/video_xblock_karma.conf.js
-	sh -e /etc/init.d/xvfb stop
 
 quality: quality-py quality-js
 
@@ -26,22 +24,19 @@ quality-py:
 quality-js:
 	eslint video_xblock/static/js/
 
-deps:
-	pip install --process-dependency-links -r requirements.txt
+dev-install:
+	# Install package using pip to leverage pip's cache and shorten CI build time
+	pip install --process-dependency-links -e .
 
 deps-test:
 	pip install -r test_requirements.txt
 	bower install
 
 tools:
-	npm install bower "eslint@^2.12.0" "eslint-config-edx-es5@2.0.0" "eslint-plugin-dollar-sign@0.0.5" "eslint-plugin-import@^1.9.2"
+	npm install
 
-coveralls:
-	coveralls-lcov -v -n video_xblock/static/coverage/PhantomJS\ 2.1.1\ \(Linux\ 0.0.0\)/lcov.info > coverage.json
-	coveralls --merge=coverage.json
-
-prepare-for-js:
-	npm install jasmine-core karma karma-jasmine karma-phantomjs-launcher karma-coverage karma-coveralls karma-chrome-launcher
+coverage:
+	bash <(curl -s https://codecov.io/bash)
 
 package:
 	echo "Here be static dependencies packaging"

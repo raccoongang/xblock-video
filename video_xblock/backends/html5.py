@@ -21,7 +21,12 @@ class Html5Player(BaseVideoPlayer):
 
         Hide `download_video_url` field for Html5Player.
         """
-        return [field for field in super(Html5Player, self).advanced_fields if field != 'download_video_url']
+        return tuple(
+            field for field in super(Html5Player, self).advanced_fields
+            if field not in self.exclude_advanced_fields
+        )
+
+    exclude_advanced_fields = ('default_transcripts', 'download_video_url')
 
     # Html API for requesting transcripts.
     captions_api = {}
@@ -74,21 +79,3 @@ class Html5Player(BaseVideoPlayer):
             "playbackRates": [0.5, 1, 1.5, 2],
         })
         return result
-
-    def authenticate_api(self, **kwargs):  # pylint: disable=unused-argument
-        """
-        Current Vimeo captions API doesn't require authentication, but this may change.
-        """
-        return {}, ''
-
-    def get_default_transcripts(self, **kwargs):  # pylint: disable=unused-argument
-        """
-        Fetch transcripts list from a video platform.
-        """
-        return [], ''
-
-    def download_default_transcript(self, url, language_code):  # pylint: disable=unused-argument
-        """
-        Download default transcript in WebVVT format.
-        """
-        return u''
