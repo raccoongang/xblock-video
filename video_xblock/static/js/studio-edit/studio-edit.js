@@ -170,6 +170,7 @@ function StudioEditableXBlock(runtime, element) {
     function extractErrorMessage(responseText) {
         var message;
         try {
+            console.log('*************5');
             message = JSON.parse(responseText).error;
             if (typeof message === 'object' && message.messages) {
                 // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
@@ -299,6 +300,7 @@ function StudioEditableXBlock(runtime, element) {
                     if (val === '') {
                         val = null;
                     } else {
+                        console.log('*************6');
                         val = JSON.parse(val); // TODO: handle parse errors
                     }
                     return val;
@@ -373,8 +375,10 @@ function StudioEditableXBlock(runtime, element) {
         $checkboxes.bind('change input', fieldChanged($wrapper, $resetButton));
 
         $resetButton.click(function() {
+            console.log('*************7');
             var defaults = JSON.parse($wrapper.attr('data-default'));
             $checkboxes.each(function() {
+                console.log('*************8');
                 var val = JSON.parse($(this).val());
                 $(this).prop('checked', defaults.indexOf(val) > -1);
             });
@@ -430,6 +434,7 @@ function StudioEditableXBlock(runtime, element) {
     // End of Raccoongang changes
 
     if (gotTranscriptsValue) {
+        console.log('*************9');
         transcriptsValue = JSON.parse(gotTranscriptsValue);
     }
 

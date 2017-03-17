@@ -389,7 +389,7 @@ class PlaybackStateMixin(XBlock):
             state (dict): Video player state key-value pairs.
         """
         for field_name in self.player_state_fields:
-            setattr(self, field_name, state.get(underscore_to_camelcase(field_name), getattr(self, field_name)))
+            setattr(self, field_name, state.get(field_name, getattr(self, field_name)))
 
 
 class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixin, ContentStoreMixin, XBlock):
