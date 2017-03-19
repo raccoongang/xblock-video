@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Code stabilization:
   - Python unit tests.
   - JS unit tests foundation.
-    
+
 ### Changed
 
 - UI improvements in Studio:
