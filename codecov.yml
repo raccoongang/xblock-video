@@ -1,0 +1,11 @@
+flags:
+  # filter the folder(s) you wish to measure by that flag
+  python:
+    paths:
+      - *.py
+  studio:
+    paths:
+      - studio-edit*.js
+  js:
+    paths:
+      - *.js
