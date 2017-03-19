@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Code stabilization:
   - Python unit tests.
   - JS unit tests foundation.
-
+    
 ### Changed
 
 - UI improvements in Studio:
@@ -61,3 +61,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Various bugfixes and improvements.
+
+[0.1.0-alpha]: https://github.com/raccoongang/xblock-video/tree/v0.1.0-alpha
+[0.2.0-alpha]: https://github.com/raccoongang/xblock-video/compare/v0.1.0-alpha...v0.2.0-aplha
+[0.3.0-alpha]: https://github.com/raccoongang/xblock-video/compare/v0.2.0-alpha...v0.3.0-aplha
+[0.4.0]: https://github.com/raccoongang/xblock-video/compare/v0.3.0-alpha...v0.4.0
+[0.5.0]: https://github.com/raccoongang/xblock-video/compare/v0.4.0...v0.5.0
+[Unreleased]: https://github.com/raccoongang/xblock-video/compare/v0.5.0...HEAD
