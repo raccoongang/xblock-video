@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Swith from Coveralls to Codecov for better code coverage.
 
+### Fixed
+
+- Various bugs.
+
 ## [0.5.0] - 2017-03-14
 
 ### Added
@@ -29,6 +33,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- Interactive transcripts now automatically scrolls to follow video.
 - UI improvements in Studio:
   - Split Video XBlock settings into Basic & Advanced tabs.
   - Display only fields relevant to selected video.
@@ -94,4 +99,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.4.0]: https://github.com/raccoongang/xblock-video/compare/v0.3.0-alpha...v0.4.0
 [0.5.0]: https://github.com/raccoongang/xblock-video/compare/v0.4.0...v0.5.0
 [0.6.0]: https://github.com/raccoongang/xblock-video/compare/v0.5.0...v0.6.0
-[Unreleased]: https://github.com/raccoongang/xblock-video/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/raccoongang/xblock-video/compare/v0.6.0...HEAD
