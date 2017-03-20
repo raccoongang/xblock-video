@@ -93,4 +93,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.3.0-alpha]: https://github.com/raccoongang/xblock-video/compare/v0.2.0-alpha...v0.3.0-aplha
 [0.4.0]: https://github.com/raccoongang/xblock-video/compare/v0.3.0-alpha...v0.4.0
 [0.5.0]: https://github.com/raccoongang/xblock-video/compare/v0.4.0...v0.5.0
+[0.6.0]: https://github.com/raccoongang/xblock-video/compare/v0.5.0...v0.6.0
 [Unreleased]: https://github.com/raccoongang/xblock-video/compare/v0.5.0...HEAD
