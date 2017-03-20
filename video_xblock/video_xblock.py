@@ -374,10 +374,10 @@ class PlaybackStateMixin(XBlock):
         result['transcriptsObject'] = transcripts_object
         result['transcripts'] = transcripts
         for field_name in self.player_state_fields:
-            mixedcase_field_name = underscore_to_mixedcase(field_name)
-            if mixedcase_field_name not in result:
-                result[mixedcase_field_name] = getattr(self, field_name)
-
+            if field_name not in result:
+                mixedcase_field_name = underscore_to_mixedcase(field_name)
+                if mixedcase_field_name not in result:
+                    result[mixedcase_field_name] = getattr(self, field_name)
         return result
 
     @player_state.setter
@@ -919,8 +919,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
             made_fields (list): XBlock fields prepared to be rendered in a studio edit modal.
         """
         made_fields = [
-            self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
-            for key in fields
+            self._make_field_info(key, self.fields[key]) for key in fields  # pylint: disable=unsubscriptable-object
         ]
         return made_fields
 
