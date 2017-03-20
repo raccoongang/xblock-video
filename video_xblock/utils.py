@@ -64,4 +64,5 @@ def underscore_to_camelcase(value):
         while True:
             yield str.capitalize
 
-    return "".join(camelcase().next()(x) if x else '_' for x in value.split("_"))
+    camel = camelcase()
+    return "".join(camel.next()(x) if x else '_' for x in value.split("_"))

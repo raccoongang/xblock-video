@@ -371,8 +371,8 @@ class PlaybackStateMixin(XBlock):
         }
         result = dict()
         result['captionsLanguage'] = self.captions_language or course.language
-        result['transcripts'] = transcripts
         result['transcriptsObject'] = transcripts_object
+        result['transcripts'] = transcripts
         for field_name in self.player_state_fields:
             camelcase_field_name = underscore_to_camelcase(field_name)
             if camelcase_field_name not in result:
