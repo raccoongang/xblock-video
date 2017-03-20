@@ -54,15 +54,15 @@ def ugettext(text):
     return text
 
 
-def underscore_to_camelcase(value):
+def underscore_to_mixedcase(value):
     """
-    Convert variables with underscore to camelcase style.
+    Convert variables with under_score to mixedCase style.
     """
-    def camelcase():
-        """Camelcase generator."""
+    def mixedcase():
+        """Mixedcase generator."""
         yield str.lower
         while True:
             yield str.capitalize
 
-    camel = camelcase()
-    return "".join(camel.next()(x) if x else '_' for x in value.split("_"))
+    mix = mixedcase()
+    return "".join(mix.next()(x) if x else '_' for x in value.split("_"))

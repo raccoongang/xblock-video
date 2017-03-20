@@ -28,7 +28,7 @@ from .constants import PlayerName
 from .exceptions import ApiClientError
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
-from .utils import render_template, render_resource, resource_string, underscore_to_camelcase, ugettext as _
+from .utils import render_template, render_resource, resource_string, underscore_to_mixedcase, ugettext as _
 
 log = logging.getLogger(__name__)
 
@@ -374,9 +374,9 @@ class PlaybackStateMixin(XBlock):
         result['transcriptsObject'] = transcripts_object
         result['transcripts'] = transcripts
         for field_name in self.player_state_fields:
-            camelcase_field_name = underscore_to_camelcase(field_name)
-            if camelcase_field_name not in result:
-                result[camelcase_field_name] = getattr(self, field_name)
+            mixedcase_field_name = underscore_to_mixedcase(field_name)
+            if mixedcase_field_name not in result:
+                result[mixedcase_field_name] = getattr(self, field_name)
 
         return result
 
@@ -791,7 +791,7 @@ class VideoXBlock(TranscriptsMixin, PlaybackStateMixin, StudioEditableXBlockMixi
 
         for field_name in self.player_state_fields:
             if field_name not in player_state:
-                player_state[field_name] = request[underscore_to_camelcase(field_name)]
+                player_state[field_name] = request[underscore_to_mixedcase(field_name)]
 
         self.player_state = player_state
         return {'success': True}
