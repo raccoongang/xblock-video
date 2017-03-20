@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- Interactive transcripts now automatically scrolls to follow video.
+- Interactive transcripts now automatically scroll to follow video.
 - UI improvements in Studio:
   - Split Video XBlock settings into Basic & Advanced tabs.
   - Display only fields relevant to selected video.
