@@ -66,7 +66,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.2.0-alpha] - 2017-01-04
 
+### Added
+
+- Interactive transcripts
+- Closed captions
+- Open edX Analytic events
+- Brightcove playerID support
+- Handouts upload/download
+- Context menu
+- Offset start/end time
+- A11y: keyboard-only access, screen readers support
+
 ## [0.1.0-alpha] - 2016-11-30
+
+### Added
+
+- Youtube support
+- Wistia support
+- Basic Brightcove support
+- Different playback rates support
+- Video player state load/save
+- All video players share skin similar to Open edX's video module
 
 [0.1.0-alpha]: https://github.com/raccoongang/xblock-video/tree/v0.1.0-alpha
 [0.2.0-alpha]: https://github.com/raccoongang/xblock-video/compare/v0.1.0-alpha...v0.2.0-aplha
