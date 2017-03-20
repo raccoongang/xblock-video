@@ -47,6 +47,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- Vimeo backend support
 - Brightcove content protection and auto-quality
   - On API authentication uploads two custom Ingest Profiles:
     - Creates new API credentials with required permissions
@@ -63,11 +64,30 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   - Brightcove & Wistia require API authentication before default transcripts
   upload can work.
 
+- Dev process improvements
+  - Code Climate integration to track code quality
+  - Coveralls.io integration to track test coverage
+
+### Changed
+
+- Now TravisCI runs eslint and python unit tests on every commit
+
 ### Fixed
 
 - Various bugfixes and improvements.
 
 ## [0.3.0-alpha] - 2017-01-16
+
+### Added
+
+- SRT subtitles support
+- Transcripts downloading for students
+- TravisCI integration: pylint to begin with
+
+## Fixed
+
+- Code cleanup
+- Various bugs
 
 ## [0.2.0-alpha] - 2017-01-04
 
