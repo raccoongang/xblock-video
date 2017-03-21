@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 - Swith from Coveralls to Codecov for better code coverage.
+- Interactive transcripts now align current line to the middle of video frame.
 
 ### Fixed
 
