@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
-- Various bugs.
+- Interactive transcripts automscrolling for Brightcove videos.
 
 ## [0.5.0] - 2017-03-14
 
@@ -55,22 +55,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
     - HLSe for auto qualify & encryption
 
 - Add new UI controls after a user has authenticated against Brightcove API:
-  - View video tech info
-  - Send video re-transcode request on a Brightcove side
+  - View video tech info.
+  - Send video re-transcode request on a Brightcove side.
 
-- Default transcripts upload
+- Default transcripts upload:
   - Allows to fetch transcripts from the platform and store them into XBlock.
   - Supports: Brightcove, Youtube & Wistia.
   - Brightcove & Wistia require API authentication before default transcripts
   upload can work.
 
-- Dev process improvements
-  - Code Climate integration to track code quality
-  - Coveralls.io integration to track test coverage
+- Dev process improvements:
+  - Code Climate integration to track code quality.
+  - Coveralls.io integration to track test coverage.
 
 ### Changed
 
-- Now TravisCI runs eslint and python unit tests on every commit
+- Now TravisCI runs eslint and python unit tests on every commit.
 
 ### Fixed
 
@@ -80,38 +80,38 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- SRT subtitles support
-- Transcripts downloading for students
-- TravisCI integration: pylint to begin with
+- SRT subtitles support.
+- Transcripts downloading for students.
+- TravisCI integration: pylint to begin with.
 
 ## Fixed
 
-- Code cleanup
-- Various bugs
+- Code cleanup.
+- Various bugs.
 
 ## [0.2.0-alpha] - 2017-01-04
 
 ### Added
 
-- Interactive transcripts
-- Closed captions
-- Open edX Analytic events
-- Brightcove playerID support
-- Handouts upload/download
-- Context menu
-- Offset start/end time
-- A11y: keyboard-only access, screen readers support
+- Interactive transcripts.
+- Closed captions.
+- Open edX Analytic events.
+- Brightcove playerID support.
+- Handouts upload/download.
+- Context menu.
+- Offset start/end time.
+- A11y: keyboard-only access, screen readers support.
 
 ## [0.1.0-alpha] - 2016-11-30
 
 ### Added
 
-- Youtube support
-- Wistia support
-- Basic Brightcove support
-- Different playback rates support
-- Video player state load/save
-- All video players share skin similar to Open edX's video module
+- Youtube support.
+- Wistia support.
+- Basic Brightcove support.
+- Different playback rates support.
+- Video player state load/save.
+- All video players share skin similar to Open edX's video module.
 
 [0.1.0-alpha]: https://github.com/raccoongang/xblock-video/tree/v0.1.0-alpha
 [0.2.0-alpha]: https://github.com/raccoongang/xblock-video/compare/v0.1.0-alpha...v0.2.0-aplha
