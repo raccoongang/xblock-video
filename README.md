@@ -57,10 +57,12 @@ TODO
 
 ## Development
 
-Install dependencies and development tools:
+Prereqs: [NodeJS >= 4.0](https://docs.npmjs.com/getting-started/installing-node#updating-npm)
+
+Install development tools and dependencies:
 
 ```shell
-> make deps deps-test tools
+> make tools deps-test
 ```
 
 Run quality checks:
