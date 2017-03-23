@@ -362,7 +362,8 @@ function StudioEditableXBlock(runtime, element) {
      * Get transcripts from 3playmedia's API and show result message.
      */
     function getTranscripts3playmediaApi(data) {
-        var message, status, includeLang;
+        var message, includeLang;
+        var $status_block = $('.threeplaymedia.status');
         var options = {
             type: 'POST',
             url: getTranscripts3playmediaApiHandlerUrl,
@@ -388,25 +389,21 @@ function StudioEditableXBlock(runtime, element) {
                         }
                     });
                 }
-                message = success_message;
-                status = SUCCESS;
+                return showStatus($status_block, SUCCESS, success_message);
             } else {
-                message = error_message;
-                status = ERROR;
+                return showStatus($status_block, ERROR, error_message);
             }
         })
         .fail(function(jqXHR) {
-            message = gettext('This may be happening because of an error with our server or your ' +
-                'internet connection. Try refreshing the page or making sure you are online.');
-            status = ERROR;
             if (jqXHR.responseText) { // Try to get more specific error message we can show to user.
                 message = extractErrorMessage(jqXHR.responseText);
+            } else {
+                message = gettext('This may be happening because of an error with our server or your ' +
+                'internet connection. Try refreshing the page or making sure you are online.');
             }
             runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
+            return showStatus($status_block, ERROR, message);
         })
-        .always(function() {
-            showStatus($('.threeplaymedia.status'), status, message);
-        });
     }
 
     /**
