@@ -20,6 +20,7 @@ module.exports = function (config) {
             'js/spec/test_context.js',
             'js/base.js',
             'js/studio-edit/utils.js',
+            'js/studio-edit/transcripts-manual-upload.js',
             'js/spec/*_spec.js',
             'js/spec/studio-edit/*_spec.js'
         ],
