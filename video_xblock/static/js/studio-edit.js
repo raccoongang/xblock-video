@@ -374,20 +374,21 @@ function StudioEditableXBlock(runtime, element) {
         .done(function(response) {
             var success_message = response['success_message'];
             var error_message = response['error_message'];
-            if (success_message) {
-                if (response.transcripts) {
-                    response.transcripts.forEach(function (item) {
-                        includeLang = transcriptsValue.find(function (element) {
-                            return element.lang == item.lang;
-                        });
-                        // Add a transcript from the 3playmedia only for non exists language
-                        if (!includeLang) {
-                            createTranscriptBlock(item.lang, item.label, transcriptsValue, item.url);
-                            pushTranscript(item.lang, item.label, item.url, '', transcriptsValue);
-                            pushTranscriptsValue(transcriptsValue);
-                        }
+            if (success_message && response.transcripts) {
+                response.transcripts.forEach(function (item) {
+                    includeLang = transcriptsValue.find(function (element) {
+                        return element.lang == item.lang;
                     });
-                }
+                    // Add a transcript from the 3playmedia only for non exists language
+                    if (!includeLang) {
+                        createTranscriptBlock(item.lang, item.label, transcriptsValue, item.url);
+                        pushTranscript(item.lang, item.label, item.url, '', transcriptsValue);
+                        pushTranscriptsValue(transcriptsValue);
+                    }
+                });
+            }
+
+            if (success_message){
                 message = success_message;
                 status = SUCCESS;
             } else {
@@ -433,7 +434,7 @@ function StudioEditableXBlock(runtime, element) {
             else if (error_message) {
                 message = error_message;
                 status = ERROR;
-            };
+            }
         })
         .fail(function(jqXHR) {
             message = gettext('This may be happening because of an error with our server or your ' +
