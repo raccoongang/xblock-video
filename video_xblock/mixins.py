@@ -46,7 +46,6 @@ class SettingsMixin(XBlock):
             from django.conf import settings
             return settings.XBLOCK_SETTINGS[self.block_settings_key]
 
-
     def populate_default_values(self, fields_dict):
         """
         Populate unset default values from settings file
