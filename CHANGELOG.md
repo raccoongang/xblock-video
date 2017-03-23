@@ -12,7 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - 3PlayMedia support. Now you can fetch transcripts for your video from 3PM.
-- Open edX settings support. Now administrators can set default values for VideoXBlock on a system-wide level.
+- Open edX settings support. Now administrators can set default values
+  for VideoXBlock on a system-wide level.
 
 ### Changed
 
