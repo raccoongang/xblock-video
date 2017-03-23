@@ -15,17 +15,20 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
+            'https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js',
             'bower_components/video-js/dist/video.js',
             'js/spec/test_context.js',
             'js/base.js',
-            'js/spec/*_spec.js'
+            'js/studio-edit/utils.js',
+            'js/spec/*_spec.js',
+            'js/spec/studio-edit/*_spec.js'
         ],
         plugins: [
             'karma-chrome-launcher',
             'karma-phantomjs-launcher',
             'karma-jasmine',
             'karma-coverage',
-            'karma-coveralls',
+            // 'karma-coveralls',
             'jasmine-core'
         ],
 
