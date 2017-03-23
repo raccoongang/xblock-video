@@ -388,7 +388,7 @@ function StudioEditableXBlock(runtime, element) {
                 });
             }
 
-            if (success_message){
+            if (success_message) {
                 message = success_message;
                 status = SUCCESS;
             } else {
