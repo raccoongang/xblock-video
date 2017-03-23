@@ -11,7 +11,7 @@ class SettingsMixin(XBlock):
 
     Provides convenient access to XBlock's settings set in edx-platform config files.
 
-    Sample default settings in /edx/app/edxapp/cms.env.json & /edx/app/edxapp/lms.env.json files:
+    Sample default settings in /edx/app/edxapp/cms.env.json:
     "XBLOCK_SETTINGS": {
       "video_xblock": {
         "3playmedia_api_key": "987654321",
@@ -45,7 +45,7 @@ class SettingsMixin(XBlock):
             return s_service.get_settings_bucket(self)
         else:
             from django.conf import settings
-            return settings.XBLOCK_SETTINGS[self.block_settings_key]
+            return settings.XBLOCK_SETTINGS.get(self.block_settings_key, {})
 
     def populate_default_values(self, fields_dict):
         """
