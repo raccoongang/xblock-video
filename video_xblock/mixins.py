@@ -7,7 +7,7 @@ from xblock.core import XBlock
 @XBlock.wants('settings')
 class SettingsMixin(XBlock):
     """
-    This XBlock Mixin provides access to XBlock settings service.
+    SettingsMixin provides access to XBlock settings service.
 
     Provides convenient access to XBlock's settings set in edx-platform config files.
 
@@ -19,12 +19,13 @@ class SettingsMixin(XBlock):
       }
     }
     """
+
     block_settings_key = 'video_xblock'
 
     @property
     def settings(self):
         """
-        Settings property.
+        Return xblock settings set in .json config.
 
         Returned value depends on the context:
         - `studio_view()` is being executed in CMS context and gets data from `lms.env.json`.
@@ -48,7 +49,7 @@ class SettingsMixin(XBlock):
 
     def populate_default_values(self, fields_dict):
         """
-        Populate unset default values from settings file
+        Populate unset default values from settings file.
         """
         for key, value in self.settings.items():
             fields_dict.setdefault(key, value)
