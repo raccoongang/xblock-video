@@ -9,7 +9,7 @@ clean:
 test: test-py test-js
 
 test-py:
-	nosetests video_xblock --with-coverage --cover-package=video_xblock --cover-inclusive
+	nosetests video_xblock --with-coverage --cover-package=video_xblock
 
 test-js:
 	karma start video_xblock/static/video_xblock_karma.conf.js
