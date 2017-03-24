@@ -7,11 +7,10 @@ vendor_dir := video_xblock/static/vendor
 vendor_js := video.js/dist/video.min.js\
 			 videojs-contextmenu-ui/dist/videojs-contextmenu-ui.min.js\
 			 videojs-contextmenu/dist/videojs-contextmenu.min.js\
-			 videojs-offset/dist/videojs-offset.js\
 			 videojs-offset/dist/videojs-offset.min.js\
-			 videojs-transcript/dist/videojs-transcript.js\
+			 videojs-transcript/dist/videojs-transcript.min.js\
 			 videojs-vimeo/src/Vimeo.js\
-			 videojs-wistia/src/wistia.js\
+			 videojs-wistia/src/vjs.wistia.js\
 			 videojs-youtube/dist/Youtube.min.js
 
 vendor_css := video.js/dist/video-js.min.css

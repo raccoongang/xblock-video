@@ -180,7 +180,7 @@ class BaseVideoPlayer(Plugin):
 
         if json.loads(context['player_state'])['transcripts']:
             js_files += [
-                'static/vendor/js/videojs-transcript.js',
+                'static/vendor/js/videojs-transcript.min.js',
                 'static/js/transcript-download.js',
                 'static/js/videojs-transcript.js'
             ]

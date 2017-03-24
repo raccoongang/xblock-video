@@ -83,7 +83,7 @@ class WistiaPlayer(BaseVideoPlayer):
         )
 
         js_files = [
-            'static/vendor/js/wistia.js',
+            'static/vendor/js/vjs.wistia.js',
             'static/vendor/js/videojs-offset.min.js',
             'static/js/player-context-menu.js'
         ]
