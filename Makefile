@@ -1,5 +1,20 @@
+PATH  := node_modules/.bin:$(PATH)
 SHELL := /bin/bash
 .PHONY=all,quality,test
+
+bower_dir := bower_components
+vendor_dir := video_xblock/static/vendor
+vendor_js := video.js/dist/video.min.js\
+			 videojs-contextmenu-ui/dist/videojs-contextmenu-ui.min.js\
+			 videojs-contextmenu/dist/videojs-contextmenu.min.js\
+			 videojs-offset/dist/videojs-offset.js\
+			 videojs-offset/dist/videojs-offset.min.js\
+			 videojs-transcript/dist/videojs-transcript.js\
+			 videojs-vimeo/src/Vimeo.js\
+			 videojs-wistia/src/wistia.js\
+			 videojs-youtube/dist/Youtube.min.js
+
+vendor_css := video.js/dist/video-js.min.css
 
 all: quality test
 
@@ -30,6 +45,8 @@ dev-install:
 
 deps-test:
 	pip install -r test_requirements.txt
+
+bower: tools
 	bower install
 
 tools:
@@ -38,5 +55,11 @@ tools:
 coverage:
 	bash <(curl -s https://codecov.io/bash)
 
-package:
-	echo "Here be static dependencies packaging"
+$(vendor_js): bower
+	cp $(bower_dir)/$@ $(vendor_dir)/js/$(@F)
+
+$(vendor_css): bower
+	cp $(bower_dir)/$@ $(vendor_dir)/css/$(@F)
+
+package: $(vendor_js) $(vendor_css)
+	@echo "Packaging vendor files..."
