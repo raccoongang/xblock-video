@@ -10,7 +10,7 @@ vendor_js := video.js/dist/video.min.js\
 			 videojs-offset/dist/videojs-offset.min.js\
 			 videojs-transcript/dist/videojs-transcript.min.js\
 			 videojs-vimeo/src/Vimeo.js\
-			 videojs-wistia/src/vjs.wistia.js\
+			 videojs-wistia/vjs.wistia.js\
 			 videojs-youtube/dist/Youtube.min.js
 
 vendor_css := video.js/dist/video-js.min.css
@@ -54,10 +54,10 @@ tools:
 coverage:
 	bash <(curl -s https://codecov.io/bash)
 
-$(vendor_js): bower
+$(vendor_js): deps-js
 	cp $(bower_dir)/$@ $(vendor_dir)/js/$(@F)
 
-$(vendor_css): bower
+$(vendor_css): deps-js
 	cp $(bower_dir)/$@ $(vendor_dir)/css/$(@F)
 
 package: $(vendor_js) $(vendor_css)
