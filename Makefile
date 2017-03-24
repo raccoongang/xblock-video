@@ -61,7 +61,7 @@ clear-vendored:
 $(vendor_js): clear-vendored deps-js
 	cp $(bower_dir)/$@ $(vendor_dir)/js/$(@F)
 
-$(vendor_css): deps-js
+$(vendor_css): clear-vendored deps-js
 	cp $(bower_dir)/$@ $(vendor_dir)/css/$(@F)
 
 package: $(vendor_js) $(vendor_css)
