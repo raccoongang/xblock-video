@@ -54,7 +54,11 @@ tools:
 coverage:
 	bash <(curl -s https://codecov.io/bash)
 
-$(vendor_js): deps-js
+clear-vendored:
+	rm $(vendor_dir)/js/*
+	rm $(vendor_dir)/css/*
+
+$(vendor_js): clear-vendored deps-js
 	cp $(bower_dir)/$@ $(vendor_dir)/js/$(@F)
 
 $(vendor_css): deps-js
