@@ -45,7 +45,7 @@ dev-install:
 deps-test:
 	pip install -r test_requirements.txt
 
-bower: tools
+deps-js: tools
 	bower install
 
 tools:
