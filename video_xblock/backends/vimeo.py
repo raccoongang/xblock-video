@@ -9,7 +9,7 @@ from video_xblock import BaseVideoPlayer
 
 class VimeoPlayer(BaseVideoPlayer):
     """
-    VimeoPlayer is used for videos hosted on the Vimeo.com.
+    VimeoPlayer is used for videos hosted on vimeo.com.
     """
 
     # Regex is taken from http://regexr.com/3a2p0
@@ -40,8 +40,8 @@ class VimeoPlayer(BaseVideoPlayer):
             self.render_resource('static/html/vimeo.html', **context)
         )
         js_files = [
-            'static/bower_components/videojs-vimeo/src/Vimeo.js',
-            'static/bower_components/videojs-offset/dist/videojs-offset.min.js'
+            'static/vendor/js/Vimeo.js',
+            'static/vendor/js/videojs-offset.min.js'
         ]
 
         for js_file in js_files:

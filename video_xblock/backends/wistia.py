@@ -27,11 +27,6 @@ class WistiaPlayer(BaseVideoPlayer):
         r'https?:\/\/(.+)?(wistia.com|wi.st)\/(medias|embed)\/(?P<media_id>.*)'
     )
 
-    # advanced_fields = (
-    #     'start_time', 'end_time', 'handout', 'transcripts',
-    #     'download_transcript_allowed', 'token', 'default_transcripts'
-    # )
-
     # Token field is stored in metadata only if authentication was successful
     metadata_fields = ['token', ]
 
@@ -88,8 +83,8 @@ class WistiaPlayer(BaseVideoPlayer):
         )
 
         js_files = [
-            'static/bower_components/videojs-wistia/src/wistia.js',
-            'static/bower_components/videojs-offset/dist/videojs-offset.min.js',
+            'static/vendor/js/vjs.wistia.js',
+            'static/vendor/js/videojs-offset.min.js',
             'static/js/player-context-menu.js'
         ]
 
