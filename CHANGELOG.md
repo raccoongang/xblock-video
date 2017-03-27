@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Update `videojs-wistia` external JS dependency.
+
 ## [0.6.1] - 2017-03-27
 
 ### Changed
