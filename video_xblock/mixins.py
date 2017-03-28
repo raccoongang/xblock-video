@@ -358,10 +358,9 @@ class PlaybackStateMixin(XBlock):
         result['transcriptsObject'] = transcripts_object
         result['transcripts'] = transcripts
         for field_name in self.player_state_fields:
-            if field_name not in result:
-                mixedcase_field_name = underscore_to_mixedcase(field_name)
-                if mixedcase_field_name not in result:
-                    result[mixedcase_field_name] = getattr(self, field_name)
+            mixedcase_field_name = underscore_to_mixedcase(field_name)
+            if mixedcase_field_name not in result:
+                result[mixedcase_field_name] = getattr(self, field_name)
         return result
 
     @player_state.setter
