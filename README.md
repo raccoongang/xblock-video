@@ -37,7 +37,7 @@ pip install --process-dependency-links -e "git+https://github.com/raccoongang/xb
 
 ## Enabling in Studio
 
-You can enable the Wistia xblock in studio through the advanced
+You can enable the Video xblock in studio through the advanced
 settings:
 
 1. From the main page of a specific course, click on *Settings*,
@@ -59,7 +59,7 @@ Sample default settings in `/edx/app/edxapp/cms.env.json`:
 ```json
     "XBLOCK_SETTINGS": {
       "video_xblock": {
-        "3playmedia_api_key": "987654321",
+        "threeplaymedia_apikey": "987654321",
         "account_id": "1234567890"
       }
     }
@@ -70,7 +70,7 @@ Sample default settings in `/edx/app/edxapp/cms.env.json`:
 Install dependencies and development tools:
 
 ```shell
-> make deps deps-test tools
+> make tools deps-test
 ```
 
 Run quality checks:

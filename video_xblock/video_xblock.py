@@ -25,8 +25,7 @@ from .exceptions import ApiClientError
 from .mixins import ContentStoreMixin, PlaybackStateMixin, SettingsMixin, TranscriptsMixin
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
-from .utils import render_template, render_resource, resource_string, ugettext as _
-
+from .utils import render_template, render_resource, resource_string, underscore_to_mixedcase, ugettext as _
 
 log = logging.getLogger(__name__)
 
@@ -321,7 +320,7 @@ class VideoXBlock(
                 transcript_download_link=full_transcript_download_link
             )
         )
-        frag.add_javascript(resource_string("static/js/video_xblock.js"))
+        frag.add_javascript(resource_string("static/js/student-view/video-xblock.js"))
         frag.add_css(resource_string("static/css/student-view.css"))
         frag.initialize_js('VideoXBlockStudentViewInit')
         return frag
@@ -387,10 +386,10 @@ class VideoXBlock(
         fragment.add_css(resource_string("static/css/student-view.css"))
         fragment.add_css(resource_string("static/css/transcripts-upload.css"))
         fragment.add_css(resource_string("static/css/studio-edit.css"))
-        fragment.add_javascript(resource_string("static/js/studio-edit-utils.js"))
-        fragment.add_javascript(resource_string("static/js/studio-edit.js"))
-        fragment.add_javascript(resource_string("static/js/studio-edit-transcripts-autoload.js"))
-        fragment.add_javascript(resource_string("static/js/studio-edit-transcripts-manual-upload.js"))
+        fragment.add_javascript(resource_string("static/js/studio-edit/utils.js"))
+        fragment.add_javascript(resource_string("static/js/studio-edit/studio-edit.js"))
+        fragment.add_javascript(resource_string("static/js/studio-edit/transcripts-autoload.js"))
+        fragment.add_javascript(resource_string("static/js/studio-edit/transcripts-manual-upload.js"))
         fragment.initialize_js('StudioEditableXBlock')
         return fragment
 
@@ -435,15 +434,13 @@ class VideoXBlock(
             Data on success (dict).
         """
         player_state = {
-            'current_time': request['currentTime'],
-            'playback_rate': request['playbackRate'],
-            'volume': request['volume'],
-            'muted': request['muted'],
-            'transcripts': self.transcripts,
-            'transcripts_enabled': request['transcriptsEnabled'],
-            'captions_enabled': request['captionsEnabled'],
-            'captions_language': request['captionsLanguage']
+            'transcripts': self.transcripts
         }
+
+        for field_name in self.player_state_fields:
+            if field_name not in player_state:
+                player_state[field_name] = request[underscore_to_mixedcase(field_name)]
+
         self.player_state = player_state
         return {'success': True}
 
@@ -573,8 +570,7 @@ class VideoXBlock(
             made_fields (list): XBlock fields prepared to be rendered in a studio edit modal.
         """
         made_fields = [
-            self._make_field_info(key, self.fields[key])  # pylint: disable=unsubscriptable-object
-            for key in fields
+            self._make_field_info(key, self.fields[key]) for key in fields  # pylint: disable=unsubscriptable-object
         ]
         return made_fields
 
@@ -737,9 +733,9 @@ class VideoXBlock(
         # If the last authentication effort was not successful, metadata should be updated as well.
         # Since video xblock metadata may store various information, this is to update the auth data only.
         if not auth_data:
-            self.metadata['token'] = ''          # Wistia API
-            self.metadata['access_token'] = ''   # Brightcove API
-            self.metadata['client_id'] = ''      # Brightcove API
+            self.metadata['token'] = ''  # Wistia API
+            self.metadata['access_token'] = ''  # Brightcove API
+            self.metadata['client_id'] = ''  # Brightcove API
             self.metadata['client_secret'] = ''  # Brightcove API
 
     @XBlock.json_handler
