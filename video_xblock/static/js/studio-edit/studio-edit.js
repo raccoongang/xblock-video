@@ -454,10 +454,10 @@ function StudioEditableXBlock(runtime, element) {
         .done(function(response) {
             var errorMessage = response.error_message;
             var successMessage = response.success_message;
-            if (success_message && response.transcripts) {
-                response.transcripts.forEach(function (item) {
-                    includeLang = transcriptsValue.find(function (element) {
-                        return element.lang == item.lang;
+            if (successMessage && response.transcripts) {
+                response.transcripts.forEach(function(item) {
+                    includeLang = transcriptsValue.find(function(element) { // eslint-disable-line no-shadow
+                        return element.lang === item.lang;
                     });
                     // Add a transcript from the 3playmedia only for non exists language
                     if (!includeLang) {
@@ -468,11 +468,11 @@ function StudioEditableXBlock(runtime, element) {
                 });
             }
 
-            if (success_message) {
-                message = success_message;
+            if (successMessage) {
+                message = successMessage;
                 status = SUCCESS;
             } else {
-                message = error_message;
+                message = errorMessage;
                 status = ERROR;
             }
         })
