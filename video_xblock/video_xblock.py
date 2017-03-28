@@ -25,7 +25,7 @@ from .exceptions import ApiClientError
 from .mixins import ContentStoreMixin, PlaybackStateMixin, SettingsMixin, TranscriptsMixin
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
-from .utils import render_template, render_resource, resource_string, underscore_to_mixedcase, ugettext as _
+from .utils import render_template, render_resource, resource_string, ugettext as _
 
 log = logging.getLogger(__name__)
 
@@ -421,28 +421,6 @@ class VideoXBlock(
             brightcove_js_url=VideoXBlock.get_brightcove_js_url(self.account_id, self.player_id),
             transcripts=transcripts,
         )
-
-    @XBlock.json_handler
-    def save_player_state(self, request, _suffix=''):
-        """
-        Xblock handler to save playback player state. Called by JavaScript of `student_view`.
-
-        Arguments:
-            request (dict): Request data to handle.
-            suffix (str): Slug used for routing.
-        Returns:
-            Data on success (dict).
-        """
-        player_state = {
-            'transcripts': self.transcripts
-        }
-
-        for field_name in self.player_state_fields:
-            if field_name not in player_state:
-                player_state[field_name] = request[underscore_to_mixedcase(field_name)]
-
-        self.player_state = player_state
-        return {'success': True}
 
     @XBlock.json_handler
     def publish_event(self, data, _suffix=''):

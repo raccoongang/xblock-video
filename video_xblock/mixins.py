@@ -14,7 +14,7 @@ from xblock.core import XBlock
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
 
-from .utils import ugettext as _
+from .utils import ugettext as _, underscore_to_mixedcase
 
 
 @XBlock.wants('contentstore')
@@ -337,6 +337,11 @@ class PlaybackStateMixin(XBlock):
         help="Captions are enabled or not"
     )
 
+    player_state_fields = (
+        'current_time', 'muted', 'playback_rate', 'volume', 'transcripts_enabled',
+        'captions_enabled', 'captions_language', 'transcripts'
+    )
+
     @property
     def player_state(self):
         """
@@ -348,17 +353,16 @@ class PlaybackStateMixin(XBlock):
             trans['lang']: {'url': trans['url'], 'label': trans['label']}
             for trans in transcripts
         }
-        return {
-            'current_time': self.current_time,
-            'muted': self.muted,
-            'playback_rate': self.playback_rate,
-            'volume': self.volume,
-            'transcripts': transcripts,
-            'transcripts_enabled': self.transcripts_enabled,
-            'captions_enabled': self.captions_enabled,
-            'captions_language': self.captions_language or course.language,
-            'transcripts_object': transcripts_object
-        }
+        result = dict()
+        result['captionsLanguage'] = self.captions_language or course.language
+        result['transcriptsObject'] = transcripts_object
+        result['transcripts'] = transcripts
+        for field_name in self.player_state_fields:
+            if field_name not in result:
+                mixedcase_field_name = underscore_to_mixedcase(field_name)
+                if mixedcase_field_name not in result:
+                    result[mixedcase_field_name] = getattr(self, field_name)
+        return result
 
     @player_state.setter
     def player_state(self, state):
@@ -368,14 +372,30 @@ class PlaybackStateMixin(XBlock):
         Arguments:
             state (dict): Video player state key-value pairs.
         """
-        self.current_time = state.get('current_time', self.current_time)
-        self.muted = state.get('muted', self.muted)
-        self.playback_rate = state.get('playback_rate', self.playback_rate)
-        self.volume = state.get('volume', self.volume)
-        self.transcripts = state.get('transcripts', self.transcripts)
-        self.transcripts_enabled = state.get('transcripts_enabled', self.transcripts_enabled)
-        self.captions_enabled = state.get('captions_enabled', self.captions_enabled)
-        self.captions_language = state.get('captions_language', self.captions_language)
+        for field_name in self.player_state_fields:
+            setattr(self, field_name, state.get(field_name, getattr(self, field_name)))
+
+    @XBlock.json_handler
+    def save_player_state(self, request, _suffix=''):
+        """
+        Xblock handler to save playback player state. Called by JavaScript of `student_view`.
+
+        Arguments:
+            request (dict): Request data to handle.
+            suffix (str): Slug used for routing.
+        Returns:
+            Data on success (dict).
+        """
+        player_state = {
+            'transcripts': self.transcripts
+        }
+
+        for field_name in self.player_state_fields:
+            if field_name not in player_state:
+                player_state[field_name] = request[underscore_to_mixedcase(field_name)]
+
+        self.player_state = player_state
+        return {'success': True}
 
 
 @XBlock.wants('settings')
