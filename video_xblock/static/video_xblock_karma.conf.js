@@ -15,9 +15,9 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
-            'bower_components/video-js/dist/video.js',
-            'js/spec/test_context.js',
             'js/base.js',
+            'vendor/js/video.min.js',
+            'js/spec/test_context.js',
             'js/spec/*_spec.js'
         ],
         plugins: [
