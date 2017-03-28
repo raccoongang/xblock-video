@@ -27,7 +27,7 @@ test: test-py test-js ## Run tests
 test-py: ## Run Python tests
 	nosetests video_xblock --with-coverage --cover-package=video_xblock
 
-test-js: tools
+test-js:
 	karma start video_xblock/static/video_xblock_karma.conf.js
 
 quality: quality-py quality-js ## Run code quality checks
