@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.6.3] - 2017-03-29
+
 ### Changed
 
 - Extend Brightcove url regex to include additional set of video urls.
@@ -144,4 +146,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.6.0]: https://github.com/raccoongang/xblock-video/compare/v0.5.0...v0.6.0
 [0.6.1]: https://github.com/raccoongang/xblock-video/compare/v0.6.0...v0.6.1
 [0.6.2]: https://github.com/raccoongang/xblock-video/compare/v0.6.1...v0.6.2
-[Unreleased]: https://github.com/raccoongang/xblock-video/compare/v0.6.2...HEAD
+[0.6.3]: https://github.com/raccoongang/xblock-video/compare/v0.6.2...v0.6.3
+[Unreleased]: https://github.com/raccoongang/xblock-video/compare/v0.6.3...HEAD
