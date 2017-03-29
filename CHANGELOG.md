@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Extend Brightcove url regex to include additional set of video urls.
+  Now it supports both:
+  - `https://studio.brightcove.com/products/videos/<media-id>`
+  - `https://studio.brightcove.com/products/videocloud/media/videos/<media-id>`
+
 ## [0.6.2] - 2017-03-27
 
 ### Changed
