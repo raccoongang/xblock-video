@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [0.6.3] - 2017-03-29
+## [0.6.3] - 2017-03-30
 
 ### Changed
 
@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   Now it supports both:
   - `https://studio.brightcove.com/products/videos/<media-id>`
   - `https://studio.brightcove.com/products/videocloud/media/videos/<media-id>`
+- Restructure JavaScript codebase.
 
 ## [0.6.2] - 2017-03-27
 
