@@ -1,3 +1,8 @@
+/* global createAvailableTranscriptBlock disableOption removeStandardTranscriptBlock getInitialDefaultTranscriptsData
+removeEnabledTranscriptBlock bindUploadListenerAvailableTranscript pushTranscript pushTranscriptsValue
+createEnabledTranscriptBlock createTranscriptBlock parseRelativeTime removeAllEnabledTranscripts tinyMCE baseUrl
+validateTranscripts fillValues validateTranscriptFile removeTranscriptBlock clickUploader
+languageChecker $3playmediaTranscriptsApi getTranscripts3playmediaApiHandlerUrl*/
 /**
     Set up the Video xblock studio editor. This part is responsible for validation and sending of the data to a backend.
     Reference:
@@ -11,14 +16,29 @@ function StudioEditableXBlock(runtime, element) {
     var $defaultTranscriptsSwitcher = $('input.default-transcripts-switch-input');
     var $enabledLabel = $('div.custom-field-section-label.enabled-transcripts');
     var $availableLabel = $('div.custom-field-section-label.available-transcripts');
-    var noEnabledTranscript;
-    var noAvailableTranscript;
     var $modalHeaderTabs = $('.editor-modes.action-list.action-modes');
     var currentTabName;
     var isNotDummy = $('#xb-field-edit-href').val() !== '';
     var SUCCESS = 'success';
     var ERROR = 'error';
 
+    var transcriptsValue = [];
+    var disabledLanguages = [];
+    var $fileUploader = $('.input-file-uploader', element);
+    var $defaultTranscriptUploader = $('.upload-default-transcript');
+    var $defaultTranscriptRemover = $('.remove-default-transcript');
+    var $standardTranscriptUploader = $('.add-transcript');
+    var $standardTranscriptRemover = $('.remove-action');
+    var $langChoiceItem = $('.language-transcript-selector', element);
+    var $videoApiAuthenticator = $('#video-api-authenticate', element);
+    var $3playmediaTranscriptsApi = $('#threeplaymedia-api-transcripts', element);
+    var gotTranscriptsValue = $('input[data-field-name="transcripts"]').val();
+    var downloadTranscriptHandlerUrl = runtime.handlerUrl(element, 'download_transcript');
+    var authenticateVideoApiHandlerUrl = runtime.handlerUrl(element, 'authenticate_video_api_handler');
+    var uploadDefaultTranscriptHandlerUrl = runtime.handlerUrl(element, 'upload_default_transcript_handler');
+    var currentLanguageCode;
+    var initialDefaultTranscriptsData = getInitialDefaultTranscriptsData();
+    var initialDefaultTranscripts = initialDefaultTranscriptsData[0];
 
     /** Toggle studio editor's current tab.
      */
@@ -141,6 +161,118 @@ function StudioEditableXBlock(runtime, element) {
     $('#settings-tab').ready(function() {
         showBackendSettings();
     });
+    /**
+     * Is there a more specific error message we can show?
+     * @param  {String} responseText JSON received from ajax call
+     * @return {String}              Error message extracted from input JSON or a portion of input text
+     */
+    function extractErrorMessage(responseText) {
+        var message;
+        try {
+            message = JSON.parse(responseText).error;
+            if (typeof message === 'object' && message.messages) {
+                // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
+                message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
+            }
+            return message;
+        } catch (error) { // SyntaxError thrown by JSON.parse
+            return responseText.substr(0, 300);
+        }
+    }
+    /**
+     * Bind removal listener to a newly created enabled transcript.
+     */
+    function bindRemovalListenerEnabledTranscript(langCode, langLabel, downloadUrlServer) {
+        var $removeElement = $(
+            '.default-transcripts-action-link.remove-default-transcript[data-lang-code=' + langCode + ']');
+        $removeElement.click(function(event) {
+            var defaultTranscript = {
+                lang: langCode,
+                label: langLabel,
+                url: downloadUrlServer
+            };
+            // Affect default transcripts
+            removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
+            createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
+            bindUploadListenerAvailableTranscript(langCode, langLabel); // eslint-disable-line no-use-before-define
+            // Affect standard transcripts
+            removeStandardTranscriptBlock(langCode, transcriptsValue, disabledLanguages);
+            disableOption($langChoiceItem, disabledLanguages);
+            event.preventDefault();
+        });
+    }
+    /**
+     * Upload a transcript available on a video platform to video xblock and update displayed default transcripts.
+     */
+    function uploadDefaultTranscriptsToServer(data) {
+        var message, status;
+
+        $.ajax({
+            type: 'POST',
+            url: uploadDefaultTranscriptHandlerUrl,
+            data: JSON.stringify(data),
+            dataType: 'json'
+        })
+        .done(function(response) {
+            var newLang = response.lang;
+            var newLabel = response.label;
+            var newUrl = response.url;
+            // Add a default transcript to the list of enabled ones
+            var downloadUrl = downloadTranscriptHandlerUrl + '?' + newUrl;
+            var defaultTranscript = {
+                lang: newLang,
+                label: newLabel,
+                url: downloadUrl
+            };
+            // Create a standard transcript
+            pushTranscript(newLang, newLabel, newUrl, '', transcriptsValue);
+            pushTranscriptsValue(transcriptsValue);
+            createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
+            bindRemovalListenerEnabledTranscript(newLang, newLabel, newUrl);
+            message = response.success_message;
+            status = SUCCESS;
+        })
+        .fail(function(jqXHR) {
+            message = gettext('This may be happening because of an error with our server or your ' +
+                'internet connection. Try refreshing the page or making sure you are online.');
+            if (jqXHR.responseText) { // Is there a more specific error message we can show?
+                message += extractErrorMessage(jqXHR.responseText);
+            }
+            status = ERROR;
+        })
+        .always(function() {
+            showStatus(
+                $('.api-response.upload-default-transcript.' + currentLanguageCode + '.status'),
+                status,
+                message
+            );
+        });
+    }
+    /**
+     * Bind upload listener to a newly created available transcript.
+     */
+    function bindUploadListenerAvailableTranscript(langCode, langLabel) {
+        var $uploadElement = $(
+            '.default-transcripts-action-link.upload-default-transcript[data-lang-code=' + langCode + ']');
+        $uploadElement.click(function() {
+            // Get url for a transcript fetching from the API
+            var downloadUrlApi = getTranscriptUrl(initialDefaultTranscripts, langCode);
+            var defaultTranscript = {
+                lang: langCode,
+                label: langLabel,
+                url: downloadUrlApi
+            };
+            uploadDefaultTranscriptsToServer(defaultTranscript);
+            // Affect standard transcripts
+            createTranscriptBlock(langCode, langLabel, transcriptsValue, downloadTranscriptHandlerUrl);
+        });
+    }
+    /** Field Changed event */
+    function fieldChanged($wrapper, $resetButton) {
+        // Field value has been modified:
+        $wrapper.addClass('is-set');
+        $resetButton.removeClass('inactive').addClass('active');
+    }
 
     $(element).find('.field-data-control').each(function() {
         var $field = $(this);
@@ -154,16 +286,13 @@ function StudioEditableXBlock(runtime, element) {
             val: function() {
                 var val = $field.val();
                 // Cast values to the appropriate type so that we send nice clean JSON over the wire:
-                if (type == 'boolean') {  // eslint-disable-line
-                    return (val == 'true' || val == '1');  // eslint-disable-line
-                }
-                if (type == 'integer') {  // eslint-disable-line
+                if (type === 'boolean') {  // eslint-disable-line
+                    return (val === 'true' || val === '1');  // eslint-disable-line
+                } else if (type === 'integer') {  // eslint-disable-line
                     return parseInt(val, 10);
-                }
-                if (type == 'float') {  // eslint-disable-line
+                } else if (type === 'float') {  // eslint-disable-line
                     return parseFloat(val);
-                }
-                if (type == 'generic' || type == 'list' || type == 'set') {  // eslint-disable-line
+                } else if (['generic', 'list', 'set'].indexOf(type) !== -1) {
                     val = val.trim();
                     if (val === '') {
                         val = null;
@@ -171,32 +300,26 @@ function StudioEditableXBlock(runtime, element) {
                         val = JSON.parse(val); // TODO: handle parse errors
                     }
                     return val;
-                }
-                /* eslint-disable */
-                if (type == 'string' && (
-                    contextId == 'xb-field-edit-start_time'
-                    || contextId == 'xb-field-edit-end_time')) {
+                } else if (type === 'string' && (
+                    contextId === 'xb-field-edit-start_time'
+                    || contextId === 'xb-field-edit-end_time')) {
                     return parseRelativeTime(val);
+                } else {
+                    return val;
                 }
-                /* eslint-disable */
-                return val;
-            },
+            }
         });
-        var fieldChanged = function() {
-            // Field value has been modified:
-            $wrapper.addClass('is-set');
-            $resetButton.removeClass('inactive').addClass('active');
-        };
-        $field.bind('change input paste', fieldChanged);
+        $field.bind('change input paste', fieldChanged($wrapper, $resetButton));
         $resetButton.click(function() {
-            $field.val($wrapper.attr('data-default')); // Use attr instead of data to force treating the default value as a string
+            // Use attr instead of data to force treating the default value as a string
+            $field.val($wrapper.attr('data-default'));
             $wrapper.removeClass('is-set');
             $resetButton.removeClass('active').addClass('inactive');
             // Remove all enabled default transcripts
             removeAllEnabledTranscripts(initialDefaultTranscriptsData, bindUploadListenerAvailableTranscript);
         });
 
-        if (type == 'datepicker' && datepickerAvailable) {
+        if (type === 'datepicker' && datepickerAvailable) {
             $field.datepicker('destroy');
             $field.datepicker({dateFormat: 'm/d/yy'});
         }
@@ -204,15 +327,9 @@ function StudioEditableXBlock(runtime, element) {
 
     $(element).find('.wrapper-list-settings .list-set').each(function() {
         var $optionList = $(this);
-        var $checkboxes = $(this).find('input');
+        var $checkboxes = $optionList.find('input');
         var $wrapper = $optionList.closest('li');
         var $resetButton = $wrapper.find('button.setting-clear');
-        var fieldChanged = function() {
-            // Field value has been modified:
-            $wrapper.addClass('is-set');
-            $resetButton.removeClass('inactive').addClass('active');
-        };
-
         fields.push({
             name: $wrapper.data('field-name'),
             isSet: function() { return $wrapper.hasClass('is-set'); },
@@ -221,13 +338,13 @@ function StudioEditableXBlock(runtime, element) {
                 var val = [];
                 $checkboxes.each(function() {
                     if ($(this).is(':checked')) {
-                        val.push(JSON.parse($(this).val()));
+                        val.push(JSON.parse($optionList.val()));
                     }
                 });
                 return val;
             }
         });
-        $checkboxes.bind('change input', fieldChanged);
+        $checkboxes.bind('change input', fieldChanged($wrapper, $resetButton));
 
         $resetButton.click(function() {
             var defaults = JSON.parse($wrapper.attr('data-default'));
@@ -242,37 +359,23 @@ function StudioEditableXBlock(runtime, element) {
         });
     });
 
-    /**
-     * Is there a more specific error message we can show?
-     * @param  {String} responseText JSON received from ajax call
-     * @return {String}              Error message extracted from input JSON or a portion of input text
-     */
-    function extractErrorMessage(responseText) {
-        try {
-            message = JSON.parse(responseText).error;
-            if (typeof message === 'object' && message.messages) {
-                // e.g. {"error": {"messages": [{"text": "Unknown user 'bob'!", "type": "error"}, ...]}} etc.
-                message = $.map(message.messages, function(msg) { return msg.text; }).join(', ');
-            }
-            return message;
-        } catch (error) { // SyntaxError thrown by JSON.parse
-            return responseText.substr(0, 300);
-        }
-    }
     /** Submit studio editor settings.
      */
-    function studio_submit(data) {
+    function studioSubmit(data) {
         var handlerUrl = runtime.handlerUrl(element, 'submit_studio_edits');
+        var message;
         runtime.notify('save', {state: 'start', message: gettext('Saving')});
         $.ajax({
             type: 'POST',
             url: handlerUrl,
             data: JSON.stringify(data),
             dataType: 'json',
-            global: false,  // Disable Studio's error handling that conflicts with studio's notify('save') and notify('cancel') :-/
-            success: function(response) { runtime.notify('save', {state: 'end'}); }
+            // Disable Studio's error handling that conflicts with studio's notify('save') and notify('cancel') :-/
+            global: false,
+            success: function() { runtime.notify('save', {state: 'end'}); }
         }).fail(function(jqXHR) {
-            var message = gettext('This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.');
+            message = gettext('This may be happening because of an error with our server or your internet' +
+                ' connection. Try refreshing the page or making sure you are online.');
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
                 message = extractErrorMessage(jqXHR.responseText);
             }
@@ -282,10 +385,8 @@ function StudioEditableXBlock(runtime, element) {
 
     // Raccoongang changes
     $('.save-button', element).bind('click', function(event) {
-        var isValidated = validateTranscripts(event, $langChoiceItem);
-        if (isValidated) {
-            var values = fillValues(fields);
-            studio_submit(values);
+        if (validateTranscripts(event, $langChoiceItem)) {
+            studioSubmit(fillValues(fields));
         }
     });
 
@@ -295,33 +396,12 @@ function StudioEditableXBlock(runtime, element) {
     });
     // End of Raccoongang changes
 
-    // Raccoongang addons
-    var transcriptsValue = [];
-    var disabledLanguages = [];
-    var $fileUploader = $('.input-file-uploader', element);
-    var $defaultTranscriptUploader = $('.upload-default-transcript');
-    var $defaultTranscriptRemover = $('.remove-default-transcript');
-    var $standardTranscriptUploader = $('.add-transcript');
-    var $standardTranscriptRemover = $('.remove-action');
-    var $langChoiceItem = $('.language-transcript-selector', element);
-    var $videoApiAuthenticator = $('#video-api-authenticate', element);
-    var $3playmediaTranscriptsApi = $('#threeplaymedia-api-transcripts', element);
-    var gotTranscriptsValue = $('input[data-field-name="transcripts"]').val();
-    var downloadTranscriptHandlerUrl = runtime.handlerUrl(element, 'download_transcript');
-    var authenticateVideoApiHandlerUrl = runtime.handlerUrl(element, 'authenticate_video_api_handler');
-    var uploadDefaultTranscriptHandlerUrl = runtime.handlerUrl(element, 'upload_default_transcript_handler');
-    var getTranscripts3playmediaApiHandlerUrl = runtime.handlerUrl(element, 'get_transcripts_3playmedia_api_handler');
-    var currentLanguageCode;
-    var currentLanguageLabel;
-    var initialDefaultTranscriptsData = getInitialDefaultTranscriptsData();
-    var initialDefaultTranscripts = initialDefaultTranscriptsData[0];
-
     if (gotTranscriptsValue) {
         transcriptsValue = JSON.parse(gotTranscriptsValue);
     }
 
     transcriptsValue.forEach(function(transcriptValue) {
-        disabledLanguages.push(transcriptValue.lang)
+        disabledLanguages.push(transcriptValue.lang);
     });
 
     /**
@@ -333,17 +413,17 @@ function StudioEditableXBlock(runtime, element) {
             type: 'POST',
             url: getTranscripts3playmediaApiHandlerUrl,
             dataType: 'json',
-            data: JSON.stringify(data),
+            data: JSON.stringify(data)
         };
 
         $.ajax(options)
         .done(function(response) {
-            var success_message = response['success_message'];
-            var error_message = response['error_message'];
-            if (success_message && response.transcripts) {
-                response.transcripts.forEach(function (item) {
-                    includeLang = transcriptsValue.find(function (element) {
-                        return element.lang == item.lang;
+            var errorMessage = response.error_message;
+            var successMessage = response.success_message;
+            if (successMessage && response.transcripts) {
+                response.transcripts.forEach(function(item) {
+                    includeLang = transcriptsValue.find(function(element) { // eslint-disable-line no-shadow
+                        return element.lang === item.lang;
                     });
                     // Add a transcript from the 3playmedia only for non exists language
                     if (!includeLang) {
@@ -354,11 +434,11 @@ function StudioEditableXBlock(runtime, element) {
                 });
             }
 
-            if (success_message) {
-                message = success_message;
+            if (successMessage) {
+                message = successMessage;
                 status = SUCCESS;
             } else {
-                message = error_message;
+                message = errorMessage;
                 status = ERROR;
             }
         })
@@ -390,15 +470,14 @@ function StudioEditableXBlock(runtime, element) {
             dataType: 'json'
         })
         .done(function(response) {
-            var error_message = response['error_message'];
-            var success_message = response['success_message'];
-            if (success_message) {
-                message = success_message;
+            var errorMessage = response.error_message;
+            var successMessage = response.success_message;
+            if (successMessage) {
+                message = successMessage;
                 status = SUCCESS;
                 showBackendSettings();
-            }
-            else if (error_message) {
-                message = error_message;
+            } else if (errorMessage) {
+                message = errorMessage;
                 status = ERROR;
             }
         })
@@ -422,52 +501,6 @@ function StudioEditableXBlock(runtime, element) {
     }
 
     /**
-     * Upload a transcript available on a video platform to video xblock and update displayed default transcripts.
-     */
-    function uploadDefaultTranscriptsToServer(data) {
-        var message, status;
-
-        $.ajax({
-            type: 'POST',
-            url: uploadDefaultTranscriptHandlerUrl,
-            data: JSON.stringify(data),
-            dataType: 'json'
-        })
-        .done(function(response) {
-            var newLang = response['lang'];
-            var newLabel = response['label'];
-            var newUrl = response['url'];
-            // Create a standard transcript
-            pushTranscript(newLang, newLabel, newUrl, '', transcriptsValue);
-            pushTranscriptsValue(transcriptsValue);
-            // Add a default transcript to the list of enabled ones
-            var downloadUrl = downloadTranscriptHandlerUrl + '?' + newUrl;
-            var defaultTranscript= {'lang': newLang, 'label': newLabel, 'url': downloadUrl};
-            createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
-            bindRemovalListenerEnabledTranscript(newLang, newLabel, newUrl);
-            // Display status messages
-            // var error_message = response['error_message'];
-            message = response['success_message'];
-            status = SUCCESS;
-        })
-        .fail(function(jqXHR) {
-            message = gettext('This may be happening because of an error with our server or your ' +
-                'internet connection. Try refreshing the page or making sure you are online.');
-            if (jqXHR.responseText) { // Is there a more specific error message we can show?
-                message += extractErrorMessage(jqXHR.responseText);
-            }
-            status = ERROR;
-        })
-        .always(function() {
-            showStatus(
-                $('.api-response.upload-default-transcript.' + currentLanguageCode + '.status'),
-                status,
-                message
-            );
-        });
-    }
-
-    /**
      * Create a new transcript, containing valid data, after successful form submit.
      *
      * Arguments:
@@ -481,22 +514,22 @@ function StudioEditableXBlock(runtime, element) {
      *  currentLiTag (Object): DOM element containing information on an uploaded subtitle.
      */
     function successHandler(event, response, statusText, xhr, fieldName, lang, label, currentLiTag) {
-        var url = '/' + response['asset']['id'];
+        var url = '/' + response.asset.id;
         // User can upload a file without extension
         var filename = $fileUploader[0].files[0].name;
         var downloadUrl = downloadTranscriptHandlerUrl + '?' + url;
-        var successMessage = 'File "' + filename + '" uploaded successfully';
+        var successMessage = gettext('File "{filename}" uploaded successfully').replace('{filename}', filename);
         var $parentDiv;
         var downloadUrlServer;
         var defaultTranscript;
         var isValidated = validateTranscriptFile(event, fieldName, filename, $fileUploader);
-        if (fieldName == 'handout' && isValidated) {
+        if (fieldName === 'handout' && isValidated) {
             $parentDiv = $('.file-uploader');
             $('.download-setting', $parentDiv).attr('href', downloadUrl).removeClass('is-hidden');
             $('a[data-change-field-name=' + fieldName + ']').text('Replace');
-            displayStatusCaptions(SUCCESS, successMessage, $parentDiv);
+            showStatus($('.status', $parentDiv), SUCCESS, successMessage);
             $('input[data-field-name=' + fieldName + ']').val(url).change();
-        } else if (fieldName == 'transcripts' && isValidated) {
+        } else if (fieldName === 'transcripts' && isValidated) {
             pushTranscript(lang, label, url, '', transcriptsValue);
             $('.add-transcript').removeClass('is-disabled');
             $('input[data-field-name=' + fieldName + ']').val(JSON.stringify(transcriptsValue)).change();
@@ -504,13 +537,21 @@ function StudioEditableXBlock(runtime, element) {
             $(currentLiTag).find('.download-transcript')
                 .removeClass('is-hidden')
                 .attr('href', downloadUrl);
-            displayStatusTranscripts(SUCCESS, successMessage, currentLiTag);
+            showStatus(
+                $('.status', $(currentLiTag)),
+                SUCCESS,
+                successMessage
+            );
             // Affect default transcripts: update a respective enabled transcript with an external url
             // of a newly created standard transcript
             downloadUrlServer =
                 $('.list-settings-buttons .upload-setting.upload-transcript[data-lang-code=' + lang + ']')
                 .siblings('a.download-transcript.download-setting').attr('href');
-            defaultTranscript = {'lang': lang, 'label': label, 'url': downloadUrlServer};
+            defaultTranscript = {
+                lang: lang,
+                label: label,
+                url: downloadUrlServer
+            };
             createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
             bindRemovalListenerEnabledTranscript(lang, label, downloadUrl);
         }
@@ -523,70 +564,42 @@ function StudioEditableXBlock(runtime, element) {
     }
 
     /**
-     * Bind upload listener to a newly created available transcript.
-     */
-    function bindUploadListenerAvailableTranscript(langCode, langLabel) {
-        var $uploadElement = $('.default-transcripts-action-link.upload-default-transcript[data-lang-code=' + langCode + ']');
-        $uploadElement.click(function () {
-            // Get url for a transcript fetching from the API
-            var downloadUrlApi = getTranscriptUrl(initialDefaultTranscripts, langCode);
-            var defaultTranscript = {'lang': langCode, 'label': langLabel, 'url': downloadUrlApi};
-            uploadDefaultTranscriptsToServer(defaultTranscript);
-            // Affect standard transcripts
-            createTranscriptBlock(langCode, langLabel, transcriptsValue, downloadTranscriptHandlerUrl);
-        });
-    }
-
-    /**
-     * Bind removal listener to a newly created enabled transcript.
-     */
-    function bindRemovalListenerEnabledTranscript(langCode, langLabel, downloadUrlServer) {
-        var $removeElement = $('.default-transcripts-action-link.remove-default-transcript[data-lang-code=' + langCode + ']');
-        $removeElement.click(function(event) {
-            var defaultTranscript = {'lang' : langCode, 'label' : langLabel, 'url': downloadUrlServer};
-            // Affect default transcripts
-            removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
-            createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
-            bindUploadListenerAvailableTranscript(langCode, langLabel);
-            // Affect standard transcripts
-            removeStandardTranscriptBlock(langCode, transcriptsValue, disabledLanguages);
-            disableOption($langChoiceItem, disabledLanguages);
-            event.preventDefault();
-        });
-    }
-
-    /**
      * Wrap standard transcript removal sequence for it to be re-used.
      */
     function standardTranscriptRemovalWrapper(event) {
-        // Affect standard transcripts
-        removeTranscriptBlock(event, transcriptsValue, disabledLanguages);
-        disableOption($langChoiceItem, disabledLanguages);
         // Affect default transcripts
         var $currentBlock = $(event.currentTarget).closest('li');
         var lang = $currentBlock.find('option:selected').val();
         var label = $currentBlock.find('option:selected').attr('data-lang-label');
-        var defaultTranscript = {'lang' : lang, 'label' : label, 'url': ''};
+        var defaultTranscript = {
+            lang: lang,
+            label: label,
+            url: ''
+        };
+        // Affect standard transcripts
+        removeTranscriptBlock(event, transcriptsValue, disabledLanguages);
+        disableOption($langChoiceItem, disabledLanguages);
         removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
         createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
         bindUploadListenerAvailableTranscript(lang, label);
     }
 
     $fileUploader.on('change', function(event) {
+        var $currentTarget = $(event.currentTarget);
+        var fieldName = $currentTarget.attr('data-change-field-name');
+        var lang = $currentTarget.attr('data-lang-code');
+        var label = $currentTarget.attr('data-lang-label');
+        var currentLiTag = $('.language-transcript-selector')
+            .children()[parseInt($currentTarget.attr('data-li-index'), 10)];
         if (!$fileUploader.val()) {
             return;
         }
-        var fieldName = $(event.currentTarget).attr('data-change-field-name');
-        var lang = $(event.currentTarget).attr('data-lang-code');
-        var label = $(event.currentTarget).attr('data-lang-label');
-        var currentLiIndex = $(event.currentTarget).attr('data-li-index');
-        var currentLiTag = $('.language-transcript-selector').children()[parseInt(currentLiIndex)];
         $('.upload-setting', element).addClass('is-disabled');
         $('.file-uploader-form', element).ajaxSubmit({
             success: function(response, statusText, xhr) {
-                successHandler(event, response, statusText, xhr, fieldName, lang, label, currentLiTag)
+                successHandler(event, response, statusText, xhr, fieldName, lang, label, currentLiTag);
             },
-            error: function(jqXHR, textStatus, errorThrown) {
+            error: function(jqXHR, textStatus) {
                 runtime.notify('error', {title: gettext('Unable to update settings'), message: textStatus});
             }
         });
@@ -594,18 +607,18 @@ function StudioEditableXBlock(runtime, element) {
     });
 
     $videoApiAuthenticator.on('click', function(event) {
+        var $data = $('.token', element).val();
         event.preventDefault();
         event.stopPropagation();
-        var $data = $('.token', element).val();
         authenticateVideoApi($data);
     });
 
     $3playmediaTranscriptsApi.on('click', function(event) {
+        var $apiKey = $('.threeplaymedia-api-key', element).val();
+        var $fileId = $('#xb-field-edit-threeplaymedia_file_id', element).val();
         event.preventDefault();
         event.stopPropagation();
-        var $api_key = $('.threeplaymedia-api-key', element).val();
-        var $file_id = $('#xb-field-edit-threeplaymedia_file_id', element).val();
-        getTranscripts3playmediaApi({api_key: $api_key, file_id: $file_id});
+        getTranscripts3playmediaApi({api_key: $apiKey, file_id: $fileId});
     });
 
     $('.lang-select').on('change', function(event) {
@@ -618,7 +631,7 @@ function StudioEditableXBlock(runtime, element) {
         clickUploader(event, $fileUploader);
     });
 
-    $('.setting-clear').on('click', function (event) {
+    $('.setting-clear').on('click', function(event) {
         var $currentBlock = $(event.currentTarget).closest('li');
         if ($('.file-uploader', $currentBlock).length > 0) {
             $('.upload-setting', $currentBlock).text('Upload');
@@ -632,44 +645,53 @@ function StudioEditableXBlock(runtime, element) {
         event.preventDefault();
         $(event.currentTarget).addClass('is-disabled');
         $templateItem.removeClass('is-hidden').appendTo($langChoiceItem);
-        $('.upload-transcript', $templateItem).on('click', function(event) {
+        $('.upload-transcript', $templateItem).on('click', function(event) { // eslint-disable-line no-shadow
             clickUploader(event, $fileUploader);
         });
-        $('.lang-select', $templateItem).on('change', function(event) {
+        $('.lang-select', $templateItem).on('change', function(event) { // eslint-disable-line no-shadow
             languageChecker(event, transcriptsValue, disabledLanguages);
             disableOption($langChoiceItem, disabledLanguages);
             pushTranscriptsValue(transcriptsValue);
         });
         // Bind a listener
-        $('.remove-action').on('click', function(event) {
+        $('.remove-action').on('click', function(event) { // eslint-disable-line no-shadow
             standardTranscriptRemovalWrapper(event);
         });
-   });
+    });
 
     $standardTranscriptRemover.click(function(event) {
         standardTranscriptRemovalWrapper(event);
     });
 
     $defaultTranscriptUploader.click(function(event) {
+        var $currentTarget = $(event.currentTarget);
+        var langCode = $currentTarget.attr('data-lang-code');
+        var label = $currentTarget.attr('data-lang-label');
+        var url = $currentTarget.attr('data-download-url');
+        var defaultTranscript = {
+            lang: langCode,
+            label: label,
+            url: url
+        };
         event.preventDefault();
         event.stopPropagation();
-        var langCode = $(event.currentTarget).attr('data-lang-code');
-        var label = $(event.currentTarget).attr('data-lang-label');
-        var url = $(event.currentTarget).attr('data-download-url');
         currentLanguageCode = langCode;
-        currentLanguageLabel = label;
-        var defaultTranscript = {'lang': langCode, 'label' : label, 'url' : url};
         // Affect default transcripts
         uploadDefaultTranscriptsToServer(defaultTranscript);
         // Affect standard transcripts
-        createTranscriptBlock(langCode, label, transcriptsValue, downloadTranscriptHandlerUrl)
+        createTranscriptBlock(langCode, label, transcriptsValue, downloadTranscriptHandlerUrl);
     });
 
     $defaultTranscriptRemover.click(function(event) {
-        var langCode = $(event.currentTarget).attr('data-lang-code');
-        var langLabel = $(event.currentTarget).attr('data-lang-label');
-        var downloadUrl = $(event.currentTarget).attr('data-download-url');
-        var defaultTranscript = {'lang' : langCode, 'label' : langLabel, 'url': downloadUrl};
+        var $currentTarget = $(event.currentTarget);
+        var langCode = $currentTarget.attr('data-lang-code');
+        var langLabel = $currentTarget.attr('data-lang-label');
+        var downloadUrl = $currentTarget.attr('data-download-url');
+        var defaultTranscript = {
+            lang: langCode,
+            label: langLabel,
+            url: downloadUrl
+        };
         // Affect default transcripts
         removeEnabledTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
         createAvailableTranscriptBlock(defaultTranscript, initialDefaultTranscriptsData);
@@ -680,13 +702,9 @@ function StudioEditableXBlock(runtime, element) {
         event.preventDefault();
     });
 
-    $defaultTranscriptsSwitcher.change(function(){
-        noEnabledTranscript = !$('.enabled-default-transcripts-section:visible').length;
-        noAvailableTranscript = !$('.available-default-transcripts-section:visible').length;
-        // Hide label of enabled default transcripts block if no transcript is enabled on video xblock, and vice versa
-        setDisplayDefaultTranscriptsLabel(noEnabledTranscript, $enabledLabel);
-        // Hide label of available default transcripts block if no transcript is available on a platform, and vice versa
-        setDisplayDefaultTranscriptsLabel(noAvailableTranscript, $availableLabel);
+    $defaultTranscriptsSwitcher.change(function() {
+        $enabledLabel.toggleClass('is-hidden', $('.enabled-default-transcripts-section:visible').length);
+        $availableLabel.toggleClass('is-hidden', $('.available-default-transcripts-section:visible').length);
     });
     // End of Raccoongang addons
 }

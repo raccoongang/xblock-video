@@ -306,7 +306,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
     BrightcovePlayer is used for videos hosted on the Brightcove Video Cloud.
     """
 
-    url_re = re.compile(r'https:\/\/studio.brightcove.com\/products\/videocloud\/media\/videos\/(?P<media_id>\d+)')
+    url_re = re.compile(r'https:\/\/studio.brightcove.com\/products(?:\/videocloud\/media)?\/videos\/(?P<media_id>\d+)')
     metadata_fields = ['access_token', 'client_id', 'client_secret', ]
 
     # Current api for requesting transcripts.
@@ -387,12 +387,12 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         )
         js_files = [
             'static/js/base.js',
-            'static/js/toggle-button.js'
+            'static/js/videojs/toggle-button.js'
         ]
         js_files += [
-            'static/js/videojs-tabindex.js',
-            'static/js/videojs_event_plugin.js',
-            'static/js/brightcove-videojs-init.js'
+            'static/js/videojs/videojs-tabindex.js',
+            'static/js/videojs/videojs-event-plugin.js',
+            'static/js/videojs/brightcove-videojs-init.js'
         ]
 
         for js_file in js_files:
@@ -411,14 +411,14 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             self.resource_string(
                 'static/vendor/js/videojs-offset.min.js'
             ),
-            self.resource_string('static/js/videojs-speed-handler.js')
+            self.resource_string('static/js/videojs/videojs-speed-handler.js')
         ]
         if context.get('transcripts'):
             vjs_plugins += [
                 self.resource_string(
                     'static/vendor/js/videojs-transcript.min.js'
                 ),
-                self.resource_string('static/js/videojs-transcript.js')
+                self.resource_string('static/js/videojs/videojs-transcript.js')
             ]
         context['vjs_plugins'] = vjs_plugins
         return super(BrightcovePlayer, self).get_player_html(**context)
