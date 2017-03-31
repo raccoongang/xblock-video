@@ -7,11 +7,36 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [0.6.0] - 2017-03-21
+## [0.6.3] - 2017-03-30
+
+### Changed
+
+- Extend Brightcove url regex to include additional set of video urls.
+  Now it supports both:
+  - `https://studio.brightcove.com/products/videos/<media-id>`
+  - `https://studio.brightcove.com/products/videocloud/media/videos/<media-id>`
+- Restructure JavaScript codebase.
+
+## [0.6.2] - 2017-03-27
+
+### Changed
+
+- Update `videojs-wistia` external JS dependency.
+
+## [0.6.1] - 2017-03-27
+
+### Changed
+
+- Simplify VideoXBlock installation by bundling JS/CSS dependencies into
+  `static/vendor` subdirectory.
+
+## [0.6.0] - 2017-03-23
 
 ### Added
 
 - 3PlayMedia support. Now you can fetch transcripts for your video from 3PM.
+- Open edX settings support. Now administrators can set default values
+  for VideoXBlock on a system-wide level.
 
 ### Changed
 
@@ -120,4 +145,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.4.0]: https://github.com/raccoongang/xblock-video/compare/v0.3.0-alpha...v0.4.0
 [0.5.0]: https://github.com/raccoongang/xblock-video/compare/v0.4.0...v0.5.0
 [0.6.0]: https://github.com/raccoongang/xblock-video/compare/v0.5.0...v0.6.0
-[Unreleased]: https://github.com/raccoongang/xblock-video/compare/v0.6.0...HEAD
+[0.6.1]: https://github.com/raccoongang/xblock-video/compare/v0.6.0...v0.6.1
+[0.6.2]: https://github.com/raccoongang/xblock-video/compare/v0.6.1...v0.6.2
+[0.6.3]: https://github.com/raccoongang/xblock-video/compare/v0.6.2...v0.6.3
+[Unreleased]: https://github.com/raccoongang/xblock-video/compare/v0.6.3...HEAD

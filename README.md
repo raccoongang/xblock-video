@@ -31,16 +31,13 @@ fix issues.
 ```shell
 sudo -sHu edxapp
 source ~/edxapp_env
-# Clone and install xblock
-git clone https://github.com/raccoongang/xblock-video.git
-cd xblock-video
-# Install Python and JavaScript dependencies
-make deps
+# Install VideoXBlock using pip
+pip install --process-dependency-links -e "git+https://github.com/raccoongang/xblock-video.git@dev#egg=video_xblock"
 ```
 
 ## Enabling in Studio
 
-You can enable the Wistia xblock in studio through the advanced
+You can enable the Video xblock in studio through the advanced
 settings:
 
 1. From the main page of a specific course, click on *Settings*,
@@ -55,12 +52,25 @@ settings:
 
 TODO
 
+### Set default values in config files
+
+Sample default settings in `/edx/app/edxapp/cms.env.json`:
+
+```json
+    "XBLOCK_SETTINGS": {
+      "video_xblock": {
+        "threeplaymedia_apikey": "987654321",
+        "account_id": "1234567890"
+      }
+    }
+```
+
 ## Development
 
 Install dependencies and development tools:
 
 ```shell
-> make deps deps-test tools
+> make tools deps-test
 ```
 
 Run quality checks:
