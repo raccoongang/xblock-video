@@ -16,7 +16,7 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         files: [
             'https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js',
-            'bower_components/video-js/dist/video.js',
+            'vendor/js/video.min.js',
             'js/spec/test_context.js',
             'js/base.js',
             'js/studio-edit/utils.js',

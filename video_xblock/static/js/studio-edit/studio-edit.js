@@ -454,38 +454,35 @@ function StudioEditableXBlock(runtime, element) {
         .done(function(response) {
             var errorMessage = response.error_message;
             var successMessage = response.success_message;
-            if (successMessage) {
-                if (response.transcripts) {
-                    response.transcripts.forEach(function transcript(item) {
-                        includeLang = transcriptsValue.find(
-                            function existLanguage(element) { // eslint-disable-line no-shadow
-                                return element.lang === item.lang;
-                            }
-                        );
-                        if (!includeLang) {
-                            createTranscriptBlock(
-                                item.lang, item.label, transcriptsValue, item.url
-                            );
-                            pushTranscript(
-                                item.lang, item.label, item.url, '', transcriptsValue
-                            );
-                            pushTranscriptsValue(transcriptsValue);
-                        }
+            if (successMessage && response.transcripts) {
+                response.transcripts.forEach(function(item) {
+                    includeLang = transcriptsValue.find(function(element) { // eslint-disable-line no-shadow
+                        return element.lang === item.lang;
                     });
-                }
+                    // Add a transcript from the 3playmedia only for non exists language
+                    if (!includeLang) {
+                        createTranscriptBlock(item.lang, item.label, transcriptsValue, item.url);
+                        pushTranscript(item.lang, item.label, item.url, '', transcriptsValue);
+                        pushTranscriptsValue(transcriptsValue);
+                    }
+                });
+            }
+
+            if (successMessage) {
                 message = successMessage;
                 status = SUCCESS;
-            } else if (errorMessage) {
+            } else {
                 message = errorMessage;
                 status = ERROR;
             }
         })
         .fail(function(jqXHR) {
-            message = gettext('This may be happening because of an error with our server or your ' +
-                'internet connection. Try refreshing the page or making sure you are online.');
             status = ERROR;
-            if (jqXHR.responseText) { // Is there a more specific error message we can show?
+            if (jqXHR.responseText) { // Try to get more specific error message we can show to user.
                 message = extractErrorMessage(jqXHR.responseText);
+            } else {
+                message = gettext('This may be happening because of an error with our server or your ' +
+                'internet connection. Try refreshing the page or making sure you are online.');
             }
             runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
         })
