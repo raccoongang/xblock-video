@@ -29,7 +29,7 @@ module.exports = function (config) {
             'karma-phantomjs-launcher',
             'karma-jasmine',
             'karma-coverage',
-            // 'karma-coveralls',
+            'karma-coveralls',
             'jasmine-core'
         ],
 
