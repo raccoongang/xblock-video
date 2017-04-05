@@ -307,7 +307,6 @@ function StudioEditableXBlock(runtime, element) {
                 } else {
                     return val;
                 }
-                }
             }
         });
         $field.bind('change input paste', fieldChanged($wrapper, $resetButton));
