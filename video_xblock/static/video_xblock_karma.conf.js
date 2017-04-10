@@ -50,7 +50,7 @@ module.exports = function (config) {
         reporters: ['progress', 'coverage'],
 
         coverageReporter: {
-            type: 'html',
+            type: 'cobertura',
             dir: 'coverage/',
             repoToken: 'St0myP2WKubt2SrFuyQDZI7Y1gsxDIiiX'
         },
