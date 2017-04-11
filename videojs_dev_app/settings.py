@@ -29,8 +29,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
-    'django.contrib.staticfiles',
-    'video_xblock'
+    'video_xblock',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -63,8 +62,6 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = 'videojs_dev_app.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
