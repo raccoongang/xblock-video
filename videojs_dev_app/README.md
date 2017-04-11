@@ -5,7 +5,7 @@ Simply Django Application for improving VideoJS player. Edx doesn't needed.
 ## Setup and run
 
  ```shell
- pip install --process-dependency-links -e ./ 
+ pip install --process-dependency-links -e ./
  pip install -r test_requirements.txt
  cd videojs_dev_app/
  python manage.py runserver 0.0.0.0:8000
