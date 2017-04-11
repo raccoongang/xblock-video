@@ -39,7 +39,13 @@ def player_data(player_name):
 
 
 class obj(object):
+    """
+    Convert dict to object.
+    """
     def __init__(self, d):
+        """
+        Process of conversion.
+        """
         for a, b in d.items():
             if isinstance(b, (list, tuple)):
                 setattr(self, a, [obj(x) if isinstance(x, dict) else x for x in b])

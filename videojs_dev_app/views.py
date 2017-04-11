@@ -29,11 +29,11 @@ def player(request, player_name):
             '<h1>404 Error. Unsupported player name. Choose one from list: %s</h1' % PLAYER_LIST
         )
 
-    player = player_cls(obj(data))
+    player = player_cls(obj(data)) if player_name == 'brightcove' else player_cls(data)
     response = player.get_player_html(
         url=data['href'],
         autoplay=False,
-        account_id=data['account_id'],
+        account_id=data.get('account_id',''),
         player_id='default',
         video_id=player.media_id(data['href']),
         video_player_id='video_player_{}'.format('test_block'),  # pylint: disable=no-member
@@ -45,7 +45,7 @@ def player(request, player_name):
         start_time=0,  # pylint: disable=no-member
         end_time=0,  # pylint: disable=no-member
         brightcove_js_url="https://players.brightcove.net/{account_id}/{player_id}_default/index.min.js".format(
-                account_id=data['account_id'],
+                account_id=data.get('account_id',''),
                 player_id='default'
             ),
         transcripts={},
