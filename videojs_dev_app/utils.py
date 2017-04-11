@@ -42,6 +42,7 @@ class obj(object):
     """
     Convert dict to object.
     """
+
     def __init__(self, d):
         """
         Process of conversion.
