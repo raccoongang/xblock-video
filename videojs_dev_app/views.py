@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseNotFound
 from django.conf import settings
 from django.shortcuts import render
 
-from utils import get_player, player_data
+from utils import get_player, player_data, obj
 
 PLAYER_LIST = settings.PLAYER_DATA.keys()
 
@@ -18,9 +18,9 @@ def player_list(request):
     return render(request, 'list.html', context)
 
 
-def detail(request, player_name):
+def player(request, player_name):
     """
-    View to render player.
+    View to render player for iFrame.
     """
     data = player_data(player_name)
     player_cls = get_player(player_name)
@@ -28,14 +28,15 @@ def detail(request, player_name):
         return HttpResponseNotFound(
             '<h1>404 Error. Unsupported player name. Choose one from list: %s</h1' % PLAYER_LIST
         )
-    player = player_cls(data)
+
+    player = player_cls(obj(data))
     response = player.get_player_html(
         url=data['href'],
         autoplay=False,
-        account_id='123',
-        player_id='321',
+        account_id=data['account_id'],
+        player_id='default',
         video_id=player.media_id(data['href']),
-        video_player_id='video_player_{}'.format('block_id'),  # pylint: disable=no-member
+        video_player_id='video_player_{}'.format('test_block'),  # pylint: disable=no-member
         save_state_url='',
         player_state={
             'currentTime': 0,
@@ -43,7 +44,27 @@ def detail(request, player_name):
         },
         start_time=0,  # pylint: disable=no-member
         end_time=0,  # pylint: disable=no-member
-        brightcove_js_url=0,
+        brightcove_js_url="https://players.brightcove.net/{account_id}/{player_id}_default/index.min.js".format(
+                account_id=data['account_id'],
+                player_id='default'
+            ),
         transcripts={},
     )
     return HttpResponse(response.body)
+
+
+def detail(request, player_name):
+    """
+    View to render student view imitation.
+    """
+    data = player_data(player_name)
+    player_cls = get_player(player_name)
+
+    if not player_cls or not data:
+        return HttpResponseNotFound(
+            '<h1>404 Error. Unsupported player name. Choose one from list: %s</h1' % PLAYER_LIST
+        )
+    context = {
+        'player_name': player_name,
+    }
+    return render(request, 'detail.html', context)

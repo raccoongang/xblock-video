@@ -108,7 +108,11 @@ PLAYER_DATA = {
         'display_name': 'Youtube player',
         'href': 'https://www.youtube.com/watch?v=QObk7YFF2FM'
     },
-
+    'brightcove': {
+        'display_name': 'Brightcove player',
+        'href': 'https://studio.brightcove.com/products/videocloud/media/videos/5186070740001',
+        'account_id': 5184446939001,
+    }
 }
 
 try:
