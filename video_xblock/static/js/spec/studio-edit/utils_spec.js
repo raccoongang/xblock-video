@@ -9,13 +9,10 @@ describe('Studio edit utils', function() {
             name: 'display_name',
             isSet: function() { return true; },
             val: function() { return 'test value'; },
-            hasEditor: function() { return false; }
         },
         {
             name: 'href',
             isSet: function() { return false; },
-            hasEditor: function() {},
-            removeEditor: function() { return false; }
         }
     ];
     it("return field's fillValues", function() {
