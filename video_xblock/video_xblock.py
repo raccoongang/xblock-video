@@ -749,6 +749,7 @@ class VideoXBlock(
         fragment.add_css(resource_string("static/css/student-view.css"))
         fragment.add_css(resource_string("static/css/transcripts-upload.css"))
         fragment.add_css(resource_string("static/css/studio-edit.css"))
+        fragment.add_javascript(resource_string("static/js/runtime-handlers.js"))
         fragment.add_javascript(resource_string("static/js/studio-edit/utils.js"))
         fragment.add_javascript(resource_string("static/js/studio-edit/studio-edit.js"))
         fragment.add_javascript(resource_string("static/js/studio-edit/transcripts-autoload.js"))
