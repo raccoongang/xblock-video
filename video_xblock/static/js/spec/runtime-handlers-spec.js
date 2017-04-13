@@ -14,14 +14,6 @@ describe('Runtime handlers', function() {
         saveState: 'save_player_state',
         publishEvent: 'publish_event'
     };
-    var invalidHandlers = {
-        downloadTranscript: 'downloadTranscript',
-        authenticateVideoApi: 'authenticateVideoApi',
-        uploadDefaultTranscript: 'uploadDefaultTranscript',
-        getTranscripts3playmediaApi: 'getTranscripts3playmediaApi',
-        saveState: 'saveState',
-        publishEvent: 'publishEvent'
-    };
     var runtimeMock = {
         handlerUrl: function(el, handlerName) {
             return handlerName;
@@ -31,10 +23,5 @@ describe('Runtime handlers', function() {
     it('returns expected handlers', function() {
         expect(getHandlers(runtimeMock, 'element'))
             .toEqual(handlersMap);
-    });
-
-    it("doesn't return invalid handlers", function() {
-        expect(getHandlers(runtimeMock, 'element'))
-            .not.toEqual(invalidHandlers);
     });
 });
