@@ -545,3 +545,7 @@ body .video-js .vjs-menu-button-popup .vjs-menu .vjs-menu-item:hover {
     color: #0ea6ec;
     border-left: 2px solid #0ea6ec;
 }
+
+.vjs-text-track-display div div {
+    width: 100% !important;
+} 
