@@ -18,7 +18,7 @@ describe('Studio edit utils', function() {
             removeEditor: function() { return false; }
         }
     ];
-    it('return fiell\'s fillValues', function() {
+    it("return field's fillValues", function() {
         expect(fillValues(fields)).toEqual({values: {display_name: 'test value'}, defaults: ['href']});
     });
     it('return showStatus', function() {
