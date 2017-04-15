@@ -1,17 +1,14 @@
-import os
-from os import listdir
-from os.path import basename
+"""
+Workbench mixin adds XBlock SDK workbench runtime support
+"""
 
-from xblockutils.resources import ResourceLoader
-
-loader = ResourceLoader(__name__)
+from video_xblock.utils import loader
 
 
 class WorkbenchMixin(object):
 
     @staticmethod
-    # @XBlock.register_temp_plugin(youtube.YoutubePlayer, 'youtube')
     def workbench_scenarios():
-        """A canned scenario for display in the workbench."""
+        """A canned scenarios for display in the workbench."""
 
-        return loader.load_scenarios_from_path('scenarios')
+        return loader.load_scenarios_from_path('workbench/scenarios')

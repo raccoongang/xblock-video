@@ -42,9 +42,14 @@ class ContentStoreMixin(XBlock):
     """
 
     @staticmethod
-    def import_xmodule_contentstore():
-        from xmodule.contentstore.django import contentstore
-        from xmodule.contentstore.content import StaticContent
+    def import_contentstore():
+        from xmodule.contentstore.django import contentstore  # pylint: disable=import-error
+        return contentstore
+
+    @staticmethod
+    def import_static_content():
+        from xmodule.contentstore.content import StaticContent  # pylint: disable=import-error
+        return StaticContent
 
     @property
     def contentstore(self):
@@ -55,8 +60,7 @@ class ContentStoreMixin(XBlock):
         if contentstore_service:
             return contentstore_service.contentstore
 
-        self.import_xmodule_contentstore()
-        return contentstore
+        return self.import_contentstore()
 
     @property
     def static_content(self):
@@ -67,8 +71,7 @@ class ContentStoreMixin(XBlock):
         if contentstore_service:
             return contentstore_service.StaticContent
 
-        self.import_xmodule_contentstore()
-        return StaticContent
+        return self.import_static_content()
 
 
 class TranscriptsMixin(XBlock):

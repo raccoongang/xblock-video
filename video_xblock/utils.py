@@ -7,9 +7,11 @@ import os.path
 import pkg_resources
 
 from django.template import Engine, Context, Template
+from xblockutils.resources import ResourceLoader
 
 
 html_parser = HTMLParser()  # pylint: disable=invalid-name
+loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
 
 
 def resource_string(path):

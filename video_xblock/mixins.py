@@ -3,8 +3,6 @@ VideoXBlock mixins moudle.
 """
 from xblock.core import XBlock
 
-from .backends import youtube
-
 
 @XBlock.wants('settings')
 class SettingsMixin(XBlock):
