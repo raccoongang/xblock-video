@@ -5,6 +5,7 @@ All you need to provide is video url, this XBlock does the rest for you.
 """
 
 import datetime
+from importlib import import_module
 import json
 import httplib
 import logging
@@ -42,14 +43,11 @@ class ContentStoreMixin(XBlock):
     """
 
     @staticmethod
-    def import_contentstore():
-        from xmodule.contentstore.django import contentstore  # pylint: disable=import-error
-        return contentstore
-
-    @staticmethod
-    def import_static_content():
-        from xmodule.contentstore.content import StaticContent  # pylint: disable=import-error
-        return StaticContent
+    def import_from(module, klass):
+        """
+        Dynamic equivalent for 'from module import klass'.
+        """
+        return getattribute(import_module(module), klass)
 
     @property
     def contentstore(self):
@@ -60,7 +58,7 @@ class ContentStoreMixin(XBlock):
         if contentstore_service:
             return contentstore_service.contentstore
 
-        return self.import_contentstore()
+        return self.import_from('xmodule.contentstore.django', 'contentstore')
 
     @property
     def static_content(self):
@@ -71,7 +69,7 @@ class ContentStoreMixin(XBlock):
         if contentstore_service:
             return contentstore_service.StaticContent
 
-        return self.import_static_content()
+        return self.import_from('xmodule.contentstore.content', 'StaticContent')
 
 
 class TranscriptsMixin(XBlock):
