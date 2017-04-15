@@ -3,6 +3,8 @@ VideoXBlock mixins moudle.
 """
 from xblock.core import XBlock
 
+from .backends import youtube
+
 
 @XBlock.wants('settings')
 class SettingsMixin(XBlock):
@@ -54,3 +56,24 @@ class SettingsMixin(XBlock):
         for key, value in self.settings.items():
             fields_dict.setdefault(key, value)
         return fields_dict
+
+
+class LocationMixin(XBlock):
+
+    @property
+    def block_id(self):
+        if hasattr(self, 'location'):
+            return self.location.block_id
+        return 'block_id'
+
+    @property
+    def course_key(self):
+        if hasattr(self, 'location'):
+            return self.location.course_key
+        return 'course_key'
+
+    @property
+    def deprecated_string(self):
+        if hasattr(self, 'location'):
+            return self.location.to_deprecated_string()
+        return 'deprecated_string'
