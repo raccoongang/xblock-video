@@ -47,7 +47,7 @@ class ContentStoreMixin(XBlock):
         """
         Dynamic equivalent for 'from module import klass'.
         """
-        return getattribute(import_module(module), klass)
+        return getattr(import_module(module), klass)
 
     @property
     def contentstore(self):
