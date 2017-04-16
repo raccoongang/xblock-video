@@ -11,8 +11,8 @@ from django.conf import settings
 
 from video_xblock import VideoXBlock
 from video_xblock.utils import ugettext as _
-from video_xblock.tests.base import VideoXBlockTestBase
-from video_xblock.tests.mocks.base import MockCourse
+from video_xblock.tests.unit.base import VideoXBlockTestBase
+from video_xblock.tests.unit.mocks.base import MockCourse
 
 from video_xblock.constants import PlayerName
 

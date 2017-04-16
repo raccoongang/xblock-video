@@ -10,7 +10,7 @@ from xblock.core import XBlock
 from video_xblock.settings import ALL_LANGUAGES
 from video_xblock.utils import ugettext as _
 from video_xblock.exceptions import VideoXBlockException
-from video_xblock.tests.base import VideoXBlockTestBase
+from video_xblock.tests.unit.base import VideoXBlockTestBase
 from video_xblock.backends import (
     brightcove,
     html5,
@@ -18,7 +18,7 @@ from video_xblock.backends import (
     youtube,
     vimeo
 )
-from video_xblock.tests.mocks import (
+from video_xblock.tests.unit.mocks import (
     brightcove as brightcove_mock,
     vimeo as vimeo_mock,
     wistia as wistia_mock,
