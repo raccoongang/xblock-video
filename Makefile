@@ -50,7 +50,7 @@ dev-install:
 
 deps-test: ## Install dependencies required to run tests
 	pip install -r test_requirements.txt
-	pip install -r $VIRTUAL_ENV/src/xblock-sdk/requirements/test.txt
+	pip install -r $(VIRTUAL_ENV)/src/xblock-sdk/requirements/test.txt
 
 deps-js: tools
 	bower install
