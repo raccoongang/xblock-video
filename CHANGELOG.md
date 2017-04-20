@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Bundle VideoJS fonts into Video XBlock.
 
+### Changed
+
+- Update bundled VideoJS to 5.13.1.
+
 ## [0.6.4] - 2017-04-14
 
 ### Changed

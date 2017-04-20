@@ -4,7 +4,7 @@ SHELL := /bin/bash
 
 bower_dir := bower_components
 vendor_dir := video_xblock/static/vendor
-vendor_js := video.js/dist/video.min.js\
+vendor_js := video-js/dist/video.min.js\
 			 videojs-contextmenu-ui/dist/videojs-contextmenu-ui.min.js\
 			 videojs-contextmenu/dist/videojs-contextmenu.min.js\
 			 videojs-offset/dist/videojs-offset.min.js\
@@ -13,7 +13,7 @@ vendor_js := video.js/dist/video.min.js\
 			 videojs-wistia/vjs.wistia.js\
 			 videojs-youtube/dist/Youtube.min.js
 
-vendor_css := video.js/dist/video-js.min.css
+vendor_css := video-js/dist/video-js.min.css
 vendor_fonts := video-js/dist/font/VideoJS.eot\
 				video-js/dist/font/VideoJS.svg\
 				video-js/dist/font/VideoJS.ttf\
