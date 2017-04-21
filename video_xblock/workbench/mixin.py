@@ -6,9 +6,14 @@ from video_xblock.utils import loader
 
 
 class WorkbenchMixin(object):
+    """
+    WorkbenchMixin adds XBlock-SDK workbench support to an XBlock.
+    """
 
     @staticmethod
     def workbench_scenarios():
-        """A canned scenarios for display in the workbench."""
+        """
+        Loads scenarios for display in the workbench from xml files.
+        """
 
         return loader.load_scenarios_from_path('workbench/scenarios')

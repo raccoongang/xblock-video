@@ -57,6 +57,11 @@ class SettingsMixin(XBlock):
 
 
 class LocationMixin(XBlock):
+    """
+    Provides utility methods to access XBlock's `location`.
+
+    Some runtimes, e.g. workbench, don't provide location, hence stubs.
+    """
 
     @property
     def block_id(self):

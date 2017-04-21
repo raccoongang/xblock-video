@@ -370,6 +370,11 @@ class PlaybackStateMixin(XBlock):
 
     @property
     def course_default_language(self):
+        """
+        Utility method returns course's language.
+
+        Falls back to 'en' if runtime doen't provide `modulestore` service.
+        """
         if self.runtime.service(self, 'modulestore'):
             course = self.runtime.modulestore.get_course(self.course_id)
             return course.language
