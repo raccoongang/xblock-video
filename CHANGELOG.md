@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - XBlock SDK Workbench scenarios to simplify development.
 
+## [0.6.5] - 2017-04-21
+
+### Added
+
+- Bundle VideoJS fonts into Video XBlock.
+
 ## [0.6.4] - 2017-04-14
 
 ### Changed
@@ -164,4 +170,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.6.2]: https://github.com/raccoongang/xblock-video/compare/v0.6.1...v0.6.2
 [0.6.3]: https://github.com/raccoongang/xblock-video/compare/v0.6.2...v0.6.3
 [0.6.4]: https://github.com/raccoongang/xblock-video/compare/v0.6.3...v0.6.4
-[Unreleased]: https://github.com/raccoongang/xblock-video/compare/v0.6.4...HEAD
+[0.6.5]: https://github.com/raccoongang/xblock-video/compare/v0.6.4...v0.6.5
+[Unreleased]: https://github.com/raccoongang/xblock-video/compare/v0.6.5...HEAD
