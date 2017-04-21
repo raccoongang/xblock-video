@@ -77,6 +77,16 @@ class TranscriptsMixin(XBlock):
     TranscriptsMixin class to encapsulate transcripts-related logic.
     """
 
+    transcripts = String(
+        default='',
+        scope=Scope.content,
+        display_name=_('Upload transcript'),
+        help=_(
+            'Add transcripts in different languages. Click below to specify a language and upload an .srt transcript'
+            ' file for that language.'
+        )
+    )
+
     @staticmethod
     def convert_caps_to_vtt(caps):
         """
@@ -341,16 +351,6 @@ class PlaybackStateMixin(XBlock):
         help="ISO code for the current language for captions and transcripts"
     )
 
-    transcripts = String(
-        default='',
-        scope=Scope.content,
-        display_name=_('Upload transcript'),
-        help=_(
-            'Add transcripts in different languages. Click below to specify a language and upload an .srt transcript'
-            ' file for that language.'
-        )
-    )
-
     transcripts_enabled = Boolean(
         default=False,
         scope=Scope.preferences,
@@ -379,23 +379,25 @@ class PlaybackStateMixin(XBlock):
     @property
     def player_state(self):
         """
-        Return video player state as a dictionary.
+        Return video player state as a dict.
+
+        Dict keys are in mixedCase to be friendly with JS code, which consumes the state.
         """
         transcripts = json.loads(self.transcripts) if self.transcripts else []
         transcripts_object = {
             trans['lang']: {'url': trans['url'], 'label': trans['label']}
             for trans in transcripts
         }
-        result = dict()
-        result['captionsLanguage'] = self.captions_language or self.course_default_language
-        result['transcriptsObject'] = transcripts_object
-        result['transcripts'] = transcripts
+        state = {
+            'captionsLanguage': self.captions_language or self.course_default_language,
+            'transcriptsObject': transcripts_object,
+            'transcripts': transcripts,
+        }
         for field_name in self.player_state_fields:
-            if field_name not in result:
-                mixedcase_field_name = underscore_to_mixedcase(field_name)
-                if mixedcase_field_name not in result:
-                    result[mixedcase_field_name] = getattr(self, field_name)
-        return result
+            mixedcase_field_name = underscore_to_mixedcase(field_name)
+            if field_name not in state and mixedcase_field_name not in state:
+                state[mixedcase_field_name] = getattr(self, field_name)
+        return state
 
     @player_state.setter
     def player_state(self, state):
@@ -407,6 +409,28 @@ class PlaybackStateMixin(XBlock):
         """
         for field_name in self.player_state_fields:
             setattr(self, field_name, state.get(field_name, getattr(self, field_name)))
+
+    @XBlock.json_handler
+    def save_player_state(self, request, suffix=''):  # pylint: disable=unused-argument
+        """
+        Xblock handler to save playback player state. Called by JavaScript of `student_view`.
+
+        Arguments:
+            request (dict): Request data to handle.
+            suffix (str): Slug used for routing.
+        Returns:
+            Data on success (dict).
+        """
+        player_state = {
+            'transcripts': self.transcripts
+        }
+
+        for field_name in self.player_state_fields:
+            if field_name not in player_state:
+                player_state[field_name] = request[underscore_to_mixedcase(field_name)]
+
+        self.player_state = player_state
+        return {'success': True}
 
 
 class VideoXBlock(
@@ -800,28 +824,6 @@ class VideoXBlock(
             brightcove_js_url=VideoXBlock.get_brightcove_js_url(self.account_id, self.player_id),
             transcripts=transcripts,
         )
-
-    @XBlock.json_handler
-    def save_player_state(self, request, suffix=''):  # pylint: disable=unused-argument
-        """
-        Xblock handler to save playback player state. Called by JavaScript of `student_view`.
-
-        Arguments:
-            request (dict): Request data to handle.
-            suffix (str): Slug used for routing.
-        Returns:
-            Data on success (dict).
-        """
-        player_state = {
-            'transcripts': self.transcripts
-        }
-
-        for field_name in self.player_state_fields:
-            if field_name not in player_state:
-                player_state[field_name] = request[underscore_to_mixedcase(field_name)]
-
-        self.player_state = player_state
-        return {'success': True}
 
     @XBlock.json_handler
     def publish_event(self, data, suffix=''):  # pylint: disable=unused-argument
