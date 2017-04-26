@@ -40,3 +40,5 @@ function showStatus($el, type, message) {
         $el.addClass('is-hidden');
     }, msgShowTime);
 }
+
+var gettext = gettext || function(str) {return str;}
