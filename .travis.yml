@@ -9,6 +9,13 @@ addons:
     packages:
     # Install binary package for lxml to speed up build
     - python-lxml
+  sonarqube:
+    organization: z4y4ts-github
+    token:
+      secure: L4Us1c2s1L9ep8sBpPL97CsrqNja4bksAXEJWmpWVLXG9dvP9P9+kVTFe3sQcyS9m/FWOGyK4PtEmk94vxDnDw1EefvY2owyCPDGcX2CWft9CzQMR64Gij03qfCx3t+h5qkzIs26HgXMgGDvzS+pspP9sY79ihFbcvQRmFXVE5nCR2QQbpeh81bgEArYELVwwiUUeUM6QcTbIMFMjFvTYRu57Sej884JnYfKOb9WGHXo2As1ky2708mNs/KnHwbQWeDo2hqTuvbj/R1+ekPlJGUBNnTqHlh0iyxqysdWxpBKjzCuqbKQsMgURWttHIjnxW12TAnFiNijFeTlCxew0ERNaZqSMOCzfA5WMDNwZ8trJRPs6sWNPBrTIjo0ReEKwXG2leqs3b4ERJVjttakfKArkGz2qFESia9css/n578KT7UISjDkKTpuVMGSET2thObzGOLtxvnx/AJl7NPls/UrJvG0C9rUxAyJix0DE434hTG+HEsMshTmunZPj0upF0hymX0fFbo7TspHhfZa07yteuZ+/L97Ck/MAz0221QVClzkZu75eTgi0eRAbCsRlgQrWaYKFvT1lYm7RCihFTscQVDrbJyAzo6AYxFBDUikCBb6HqMqAY/0LATIE+VrT1EPgsLphD/3721k9+UxUOcis34iovCbDfTBAKnFOqs=
+
+jdk:
+- oraclejdk8
 
 cache:
   pip: true
@@ -31,10 +38,7 @@ script:
 - make quality-py
 - make quality-js
 - make test
+- sonar-scanner
 
 after_success:
 - make coverage
-
-notifications:
-  slack:
-    secure: BmwAxUvohFcruAoIjqcw35q7xbWWl7BV+ABaWO4Fxc+hC20tPNzQUjMLgzYboMtaiBLncMpiFhriv2KCQs6khKtnertZPKfhG01FP/vQ2FPYF3p5K2ZvCsfkTeSKKtohmH0rMCuuRu/Wt3ACbcX/9KMc7Lrn0knaUyqTApJm24HVCkCsnL5MDkZT3AxnuCURdYaq+BTiPWJnmyZMrRNxGH/WcperVy0T4LxYnhpg6xGnyfyip0IDXOGp77pn5LcDiqhE3ISthH170arGxWyBvwLdeTSqTN8hViGqOVe9oBy5GrdNvNsqVRN6MLONSQNOnNT8P+F1m7h7sRohvFG0ZcJK6spKA7QhUGk8Wj6Kp5hdOK/cAd786HfusdJkRLUgyW1TAj/LsUE/z5VQgxoN8GtjSLtEjiHLTW1ueGxJ48LODFjzT7MptUyvSf98EK9emVbgYoGE2d0HkXDv9hqF63n8yGc7rGMNvS0I0e9nQ+9QdPjkT4KTNpJgiRDtrFK/8/P4hmgmEYXvC1//t5H+BrVMymH2v/+jvwn56zb+RbvK8yt7wHLgtENxEECQWy6QgYXUry3AfMOsaBOpVCW/ATCotM1+lkyjb0YLTmRNuTfJx2hvUc1gxJPr1WUZur4Cz87fVWUM9k4aFD9gKeR1JOTMc71leQNAmdYVDI0ypMc=
