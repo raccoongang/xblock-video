@@ -8,16 +8,16 @@
    git clone git@github.com:edx/xblock-sdk.git -b v0.1.3 ../xblock-sdk
    ```
 
-2. Make sure VideoXBlock is installed into your environment:
+1. Make sure VideoXBlock is installed into your environment:
 
    ```bash
    make dev-install
    ```
 
-3. Run Workbench:
+1. Run Workbench:
 
    ```bash
    ../xblock-sdk/manage.py runserver
    ```
 
-4. Go to <http://localhost:8000/> in your browser.
+1. Go to <http://localhost:8000/> in your browser.
