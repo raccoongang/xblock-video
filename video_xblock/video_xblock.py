@@ -337,8 +337,9 @@ class PlaybackStateMixin(XBlock):
         scope=Scope.content,
         display_name=_('Upload transcript'),
         help=_(
-            'Add transcripts in different languages. Click below to specify a language and upload an .srt transcript'
-            ' file for that language.'
+            "Add transcripts in different languages. "
+            "Click below to specify a language and upload an .srt or .vtt "
+            "transcript file for that language."
         )
     )
 
