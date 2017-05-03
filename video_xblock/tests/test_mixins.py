@@ -99,9 +99,11 @@ class PlaybackStateMixinTests(VideoXBlockTestBase):
     def test_course_default_language(self):
         with patch.object(self.xblock, 'runtime') as runtime_mock:
             service_mock = runtime_mock.service
-            lang_mock = type(runtime_mock.modulestore.get_course.return_value).language = PropertyMock(return_value='test_lang')
+            lang_mock = \
+                type(runtime_mock.modulestore.get_course.return_value).language = \
+                PropertyMock(return_value='test_lang')
             lang_mock.return_value = 'test_lang'
-            self.xblock.course_id = course_id_mock = PropertyMock()
+            self.xblock.course_id = PropertyMock()
 
             self.assertEqual(self.xblock.course_default_language, 'test_lang')
             service_mock.assert_called_once_with(self.xblock, 'modulestore')
