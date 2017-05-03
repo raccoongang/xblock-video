@@ -20,4 +20,4 @@
    ../xblock-sdk/manage.py runserver
    ```
 
-4. Go to `http://localhost:8000/` in your browser.
+4. Go to <http://localhost:8000/> in your browser.
