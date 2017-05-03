@@ -759,12 +759,12 @@ class VideoXBlock(
         return fragment
 
     @XBlock.handler
-    def render_player(self, request, _suffix=''):
+    def render_player(self, _request, _suffix=''):
         """
         View `student_view` loads this handler as an iframe to display actual video player.
 
         Arguments:
-            request (webob.Request): Request to handle.
+            _request (webob.Request): Request to handle. Imposed by `XBlock.handler`.
             _suffix (string): Slug used for routing. Imposed by `XBlock.handler`.
         Returns:
             Rendered html string as a Response (webob.Response).
