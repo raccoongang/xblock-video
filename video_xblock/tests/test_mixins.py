@@ -10,15 +10,15 @@ class LocationMixinTests(VideoXBlockTestBase):
     """Test LocationMixin"""
 
     def test_no_location_block_id(self):
-        self.assertFalse(hasattr(self.xblock,'location'))
+        self.assertFalse(hasattr(self.xblock, 'location'))
         self.assertEqual(self.xblock.block_id, 'block_id')
 
     def test_no_location_course_key(self):
-        self.assertFalse(hasattr(self.xblock,'location'))
+        self.assertFalse(hasattr(self.xblock, 'location'))
         self.assertEqual(self.xblock.course_key, 'course_key')
 
     def test_no_location_deprecated_string(self):
-        self.assertFalse(hasattr(self.xblock,'location'))
+        self.assertFalse(hasattr(self.xblock, 'location'))
         self.assertEqual(self.xblock.deprecated_string, 'deprecated_string')
 
     def test_block_id(self):
