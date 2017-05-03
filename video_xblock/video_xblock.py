@@ -237,13 +237,13 @@ class TranscriptsMixin(XBlock):
         return 'success', translations
 
     @XBlock.json_handler
-    def get_transcripts_3playmedia_api_handler(self, data, suffix=''):  # pylint: disable=unused-argument
+    def get_transcripts_3playmedia_api_handler(self, data, _suffix=''):
         """
         Xblock handler to authenticate to a video platform's API. Called by JavaScript of `studio_view`.
 
         Arguments:
             data (dict): Data from frontend, necessary for authentication (tokens, account id, etc).
-            suffix (str): Slug used for routing.
+            _suffix (str): Slug used for routing. Imposed by `XBlock.json_handler`.
         Returns:
             response (dict): Status messages key-value pairs.
         """
@@ -274,13 +274,13 @@ class TranscriptsMixin(XBlock):
         }
 
     @XBlock.handler
-    def download_transcript(self, request, suffix=''):  # pylint: disable=unused-argument
+    def download_transcript(self, request, _suffix=''):
         """
         Download a transcript.
 
         Arguments:
             request (webob.Request): Request to handle.
-            suffix (string): Slug used for routing.
+            _suffix (string): Slug used for routing. Imposed by `XBlock.handler`.
         Returns:
             File with the correct name.
         """
@@ -296,7 +296,7 @@ class TranscriptsMixin(XBlock):
         return response
 
     @XBlock.handler
-    def srt_to_vtt(self, request, suffix=''):  # pylint: disable=unused-argument
+    def srt_to_vtt(self, request, _suffix=''):
         """
         Fetch raw transcripts, convert them into WebVTT format and return back.
 
@@ -304,7 +304,8 @@ class TranscriptsMixin(XBlock):
 
         Arguments:
             request (webob.Request): The request to handle
-            suffix (string): The remainder of the url, after the handler url prefix, if available.
+            _suffix (string): The remainder of the url, after the handler url prefix, if available.
+                              Imposed by `XBlock.json_handler`.
         Returns:
             webob.Response: WebVTT transcripts wrapped in Response object.
         """
@@ -422,7 +423,8 @@ class PlaybackStateMixin(XBlock):
             Data on success (dict).
         """
         player_state = {
-            'transcripts': self.transcripts
+            ' =
+          ': self.transcripts
         }
 
         for field_name in self.player_state_fields:
@@ -689,7 +691,7 @@ class VideoXBlock(
 
         self.validate_href_data(validation, data)
 
-    def student_view(self, context=None):  # pylint: disable=unused-argument
+    def student_view(self, _context=None):
         """
         The primary view of the `VideoXBlock`, shown to students when viewing courses.
         """
@@ -797,13 +799,13 @@ class VideoXBlock(
         return fragment
 
     @XBlock.handler
-    def render_player(self, request, suffix=''):  # pylint: disable=unused-argument
+    def render_player(self, _request, _suffix=''):
         """
         View `student_view` loads this handler as an iframe to display actual video player.
 
         Arguments:
-            request (webob.Request): Request to handle.
-            suffix (string): Slug used for routing.
+            _request (webob.Request): Request to handle. Imposed by `XBlock.handler`.
+            _suffix (string): Slug used for routing. Imposed by `XBlock.handler`.
         Returns:
             Rendered html string as a Response (webob.Response).
         """
@@ -826,22 +828,44 @@ class VideoXBlock(
         )
 
     @XBlock.json_handler
-    def publish_event(self, data, suffix=''):  # pylint: disable=unused-argument
+    def save_player_state(self, request, _suffix=''):
+        """
+        Xblock handler to save playback player state. Called by JavaScript of `student_view`.
+
+        Arguments:
+            request (dict): Request data to handle.
+            _suffix (str): Slug used for routing. Imposed by `XBlock.json_handler`.
+        Returns:
+            Data on success (dict).
+        """
+        player_state = {
+            'transcripts': self.transcripts
+        }
+
+        for field_name in self.player_state_fields:
+            if field_name not in player_state:
+                player_state[field_name] = request[underscore_to_mixedcase(field_name)]
+
+        self.player_state = player_state
+        return {'success': True}
+
+    @XBlock.json_handler
+    def publish_event(self, data, _suffix=''):
         """
         Handler to publish XBlock event from frontend. Called by JavaScript of `student_view`.
 
         Arguments:
             data (dict): Data from frontend on the event.
-            suffix (string): Slug used for routing.
+            _suffix (string): Slug used for routing. Imposed by `XBlock.json_handler`.
         Returns:
             Data on result (dict).
         """
         try:
-            eventType = data.pop('eventType')  # pylint: disable=invalid-name
+            event_type = data.pop('eventType')
         except KeyError:
             return {'result': 'error', 'message': 'Missing eventType in JSON data'}
 
-        self.runtime.publish(self, eventType, data)
+        self.runtime.publish(self, event_type, data)
         return {'result': 'success'}
 
     def clean_studio_edits(self, data):
@@ -992,7 +1016,7 @@ class VideoXBlock(
 
         Arguments:
             request (xblock.django.request.DjangoWebobRequest): Incoming request data.
-            suffix (str): Slug used for routing.
+            suffix (str): Slug used for routing. Imposed by `XBlock.json_handler`.
         Returns:
              Depending on player's `dispatch()` entry point, either info on video / Brightcove account or None value
              (when performing some action via Brightcove API) may be returned.
@@ -1074,13 +1098,13 @@ class VideoXBlock(
         return auth_data, error_message
 
     @XBlock.json_handler
-    def authenticate_video_api_handler(self, data, suffix=''):  # pylint: disable=unused-argument
+    def authenticate_video_api_handler(self, data, _suffix=''):
         """
         Xblock handler to authenticate to a video platform's API. Called by JavaScript of `studio_view`.
 
         Arguments:
             data (dict): Data from frontend, necessary for authentication (tokens, account id, etc).
-            suffix (str): Slug used for routing.
+            _suffix (str): Slug used for routing. Imposed by `XBlock.json_handler`.
         Returns:
             response (dict): Status messages key-value pairs.
         """
@@ -1120,13 +1144,13 @@ class VideoXBlock(
             self.metadata['client_secret'] = ''  # Brightcove API
 
     @XBlock.json_handler
-    def upload_default_transcript_handler(self, data, suffix=''):  # pylint: disable=unused-argument
+    def upload_default_transcript_handler(self, data, _suffix=''):
         """
         Upload a transcript, fetched from a video platform's API, to video xblock.
 
         Arguments:
             data (dict): Data from frontend on a default transcript to be fetched from a video platform.
-            suffix (str): Slug used for routing.
+            _suffix (str): Slug used for routing. Imposed by `XBlock.json_handler`.
         Returns:
             response (dict): Data on a default transcript, fetched from a video platform.
 
