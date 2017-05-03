@@ -88,7 +88,7 @@ Run tests:
 ```
 
 VideoXBlock is bundled with a set of XBlock-SDK Workbench scenarios.
-See [workbench docs](/workbench/README.md) for details.
+See [workbench docs](/video_xblock/workbench/README.md) for details.
 
 ## License
 
