@@ -87,6 +87,16 @@ class LocationMixinTests(VideoXBlockTestBase):
         str_mock.assert_called_once()
 
 
+class PlaybackStateMixinTests(VideoXBlockTestBase):
+    """Test PlaybackStateMixin"""
+
+    def test_fallback_course_default_language(self):
+        with patch.object(self.xblock, 'runtime') as runtime_mock:
+            runtime_mock.service = service_mock = Mock(return_value=None)
+            self.assertEqual(self.xblock.course_default_language, 'en')
+            service_mock.assert_called_once()
+
+
 class WorkbenchMixinTest(VideoXBlockTestBase):
     """Test WorkbenchMixin"""
 
