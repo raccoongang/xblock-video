@@ -33,6 +33,14 @@ class ContentStoreMixinTest(VideoXBlockTestBase):
             self.assertEqual(self.xblock.contentstore, 'contentstore_test')
             service_mock.assert_called_once_with(self.xblock, 'contentstore')
 
+    def test_static_content(self):
+        with patch.object(self.xblock, 'runtime') as runtime_mock:
+            service_mock = runtime_mock.service
+            type(service_mock.return_value).StaticContent = PropertyMock(return_value='StaticContent_test')
+
+            self.assertEqual(self.xblock.static_content, 'StaticContent_test')
+            service_mock.assert_called_once_with(self.xblock, 'contentstore')
+
 
 class LocationMixinTests(VideoXBlockTestBase):
     """Test LocationMixin"""
