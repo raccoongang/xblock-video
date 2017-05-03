@@ -3,7 +3,6 @@ VideoXBlock mixins test cases.
 """
 
 from mock import patch, Mock, PropertyMock
-from mock import patch
 
 from video_xblock.tests.base import VideoXBlockTestBase
 from video_xblock.utils import loader
@@ -25,6 +24,14 @@ class ContentStoreMixinTest(VideoXBlockTestBase):
 
             self.assertEqual(self.xblock.static_content, 'StaticContent_test')
             import_mock.assert_called_once_with('xmodule.contentstore.content', 'StaticContent')
+
+    def test_contentstore(self):
+        with patch.object(self.xblock, 'runtime') as runtime_mock:
+            service_mock = runtime_mock.service
+            type(service_mock.return_value).contentstore = PropertyMock(return_value='contentstore_test')
+
+            self.assertEqual(self.xblock.contentstore, 'contentstore_test')
+            service_mock.assert_called_once_with(self.xblock, 'contentstore')
 
 
 class LocationMixinTests(VideoXBlockTestBase):
