@@ -753,7 +753,7 @@ class VideoXBlock(
         # For a Brightcove player only
         is_not_default_account_id = \
             self.account_id is not self.fields['account_id'].default  # pylint: disable=unsubscriptable-object
-        if is_not_default_account_id:  # pylint: disable=unsubscriptable-object
+        if is_not_default_account_id:
             kwargs['account_id'] = self.account_id
         # Fetch captions list (available/default transcripts list) from video platform API
         try:
