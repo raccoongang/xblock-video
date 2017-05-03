@@ -44,6 +44,7 @@ class LocationMixinTests(VideoXBlockTestBase):
         self.assertEqual(self.xblock.deprecated_string, 'test_str')
         str_mock.assert_called_once()
 
+
 class WorkbenchMixinTest(VideoXBlockTestBase):
     """Test WorkbenchMixin"""
 
