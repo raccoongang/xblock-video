@@ -2,7 +2,7 @@
 
 ## To run VideoXBlock workbench scenarios
 
-1. Install xblock-sdk in parent directory:
+1. Clone [XBlock SDK](https://github.com/edx/xblock-sdk) in parent directory:
 
    ```bash
    git clone git@github.com:edx/xblock-sdk.git -b v0.1.3 ../xblock-sdk
