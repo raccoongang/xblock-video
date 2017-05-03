@@ -1,9 +1,11 @@
-import unittest
+"""
+VideoXBlock mixins test cases.
+"""
+
 from mock import patch, Mock, PropertyMock
 
-from video_xblock import VideoXBlock
-from video_xblock.mixins import LocationMixin
 from video_xblock.tests.base import VideoXBlockTestBase
+from video_xblock.utils import loader
 
 
 class LocationMixinTests(VideoXBlockTestBase):
@@ -41,3 +43,13 @@ class LocationMixinTests(VideoXBlockTestBase):
 
         self.assertEqual(self.xblock.deprecated_string, 'test_str')
         str_mock.assert_called_once()
+
+class WorkbenchMixinTest(VideoXBlockTestBase):
+    """Test WorkbenchMixin"""
+
+    @patch.object(loader, 'load_scenarios_from_path')
+    def test_workbench_scenarios(self, loader_mock):
+        loader_mock.return_value = [('Scenario', '<xml/>')]
+
+        self.assertEqual(self.xblock.workbench_scenarios(), [('Scenario', '<xml/>')])
+        loader_mock.assert_called_once_with('workbench/scenarios')
