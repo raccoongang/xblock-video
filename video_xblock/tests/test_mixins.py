@@ -70,12 +70,8 @@ class LocationMixinTests(VideoXBlockTestBase):
     def test_fallback_deprecated_string(self):
         self.assertEqual(self.xblock.deprecated_string, 'deprecated_string')
 
-    def setup_location_mock(self):
-        """Utility method to mock self.xblock.location"""
-        self.xblock.location = Mock()
-
     def test_block_id(self):
-        self.setup_location_mock()
+        self.xblock.location = Mock()
         type(self.xblock.location).block_id = block_mock = \
             PropertyMock(return_value='test_block_id')
 
@@ -83,7 +79,7 @@ class LocationMixinTests(VideoXBlockTestBase):
         block_mock.assert_called_once()
 
     def test_course_key(self):
-        self.setup_location_mock()
+        self.xblock.location = Mock()
         course_key_mock = \
             type(self.xblock.location).course_key = \
             PropertyMock(return_value='test_course_key')
