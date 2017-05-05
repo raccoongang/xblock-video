@@ -8,7 +8,7 @@ from xblock.exceptions import NoSuchServiceError
 
 from video_xblock.constants import DEFAULT_LANG
 from video_xblock.tests.base import VideoXBlockTestBase
-from video_xblock.utils import import_from, loader
+from video_xblock.utils import loader
 
 
 class ContentStoreMixinTest(VideoXBlockTestBase):
