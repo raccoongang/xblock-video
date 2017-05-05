@@ -6,6 +6,7 @@ from mock import patch, Mock, PropertyMock
 
 from xblock.exceptions import NoSuchServiceError
 
+from video_xblock.constants import DEFAULT_LANG
 from video_xblock.tests.base import VideoXBlockTestBase
 from video_xblock.utils import import_from, loader
 
@@ -100,7 +101,7 @@ class PlaybackStateMixinTests(VideoXBlockTestBase):
     def test_fallback_course_default_language(self):
         with patch.object(self.xblock, 'runtime') as runtime_mock:
             runtime_mock.service = service_mock = Mock(side_effect=NoSuchServiceError)
-            self.assertEqual(self.xblock.course_default_language, 'en')
+            self.assertEqual(self.xblock.course_default_language, DEFAULT_LANG)
             service_mock.assert_called_once()
 
     def test_course_default_language(self):

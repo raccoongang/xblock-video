@@ -5,7 +5,6 @@ All you need to provide is video url, this XBlock does the rest for you.
 """
 
 import datetime
-from importlib import import_module
 import json
 import httplib
 import logging
@@ -23,7 +22,7 @@ from pycaption import detect_format, WebVTTWriter
 from webob import Response
 
 from .backends.base import BaseVideoPlayer
-from .constants import PlayerName
+from .constants import DEFAULT_LANG, PlayerName
 from .exceptions import ApiClientError
 from .mixins import LocationMixin, SettingsMixin
 from .workbench.mixin import WorkbenchMixin
@@ -378,7 +377,7 @@ class PlaybackStateMixin(XBlock):
             course = self.runtime.service(self, 'modulestore').get_course(self.course_id)
             return course.language
         except NoSuchServiceError:
-            return 'en'
+            return DEFAULT_LANG
 
     @property
     def player_state(self):
