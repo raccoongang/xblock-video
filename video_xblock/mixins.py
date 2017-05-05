@@ -436,9 +436,9 @@ class SettingsMixin(XBlock):
             # At the moment SettingsService is not available in the context
             # of Studio Edit modal. See https://github.com/edx/edx-platform/pull/14648
             return s_service.get_settings_bucket(self)
-        else:
-            from django.conf import settings
-            return settings.XBLOCK_SETTINGS.get(self.block_settings_key, {})
+
+        from django.conf import settings
+        return settings.XBLOCK_SETTINGS.get(self.block_settings_key, {})
 
     def populate_default_values(self, fields_dict):
         """
@@ -447,3 +447,44 @@ class SettingsMixin(XBlock):
         for key, value in self.settings.items():
             fields_dict.setdefault(key, value)
         return fields_dict
+
+
+class LocationMixin(XBlock):
+    """
+    Provides utility methods to access XBlock's `location`.
+
+    Some runtimes, e.g. workbench, don't provide location, hence stubs.
+    """
+
+    @property
+    def block_id(self):
+        """
+        Facade property for `XBlock.location.block_id`.
+
+        Returns stub value if `location` property is unavailabe. E.g. in workbench runtime.
+        """
+        if hasattr(self, 'location'):
+            return self.location.block_id
+        return 'block_id'
+
+    @property
+    def course_key(self):
+        """
+        Facade property for `XBlock.location.course_key`.
+
+        Returns stub value if `location` property is unavailabe. E.g. in workbench runtime.
+        """
+        if hasattr(self, 'location'):
+            return self.location.course_key
+        return 'course_key'
+
+    @property
+    def deprecated_string(self):
+        """
+        Facade property for `XBlock.location.course_key`.
+
+        Returns stub value if `location` property is unavailabe. E.g. in workbench runtime.
+        """
+        if hasattr(self, 'location'):
+            return self.location.to_deprecated_string()
+        return 'deprecated_string'

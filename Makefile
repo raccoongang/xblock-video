@@ -14,6 +14,10 @@ vendor_js := video.js/dist/video.min.js\
 			 videojs-youtube/dist/Youtube.min.js
 
 vendor_css := video.js/dist/video-js.min.css
+vendor_fonts := video-js/dist/font/VideoJS.eot\
+				video-js/dist/font/VideoJS.svg\
+				video-js/dist/font/VideoJS.ttf\
+				video-js/dist/font/VideoJS.woff
 
 all: quality test
 
@@ -27,7 +31,7 @@ test: test-py test-js ## Run tests
 test-py: ## Run Python tests
 	nosetests video_xblock --with-coverage --cover-package=video_xblock
 
-test-js:
+test-js: ## Run JavaScript tests
 	karma start video_xblock/static/video_xblock_karma.conf.js
 
 quality: quality-py quality-js ## Run code quality checks
@@ -45,7 +49,7 @@ dev-install:
 	pip install --process-dependency-links -e .
 
 deps-test: ## Install dependencies required to run tests
-	pip install -r test_requirements.txt
+	pip install -Ur test_requirements.txt
 
 deps-js: tools
 	bower install
@@ -57,8 +61,9 @@ coverage: ## Send coverage reports to coverage sevice
 	bash <(curl -s https://codecov.io/bash)
 
 clear-vendored:
-	rm $(vendor_dir)/js/*
-	rm $(vendor_dir)/css/*
+	rm -rf $(vendor_dir)/js/*
+	rm -rf $(vendor_dir)/css/*
+	mkdir $(vendor_dir)/css/fonts
 
 $(vendor_js): clear-vendored deps-js
 	cp $(bower_dir)/$@ $(vendor_dir)/js/$(@F)
@@ -66,7 +71,10 @@ $(vendor_js): clear-vendored deps-js
 $(vendor_css): clear-vendored deps-js
 	cp $(bower_dir)/$@ $(vendor_dir)/css/$(@F)
 
-vendored: $(vendor_js) $(vendor_css) ## Update vendored JS/CSS assets
+$(vendor_fonts): clear-vendored deps-js
+	cp $(bower_dir)/$@ $(vendor_dir)/css/fonts/$(@F)
+
+vendored: $(vendor_js) $(vendor_css) $(vendor_fonts)  ## Update vendored JS/CSS assets
 	@echo "Packaging vendor files..."
 
 help:
