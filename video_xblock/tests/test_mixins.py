@@ -122,8 +122,14 @@ class PlaybackStateMixinTests(VideoXBlockTestBase):
 class TranscriptsMixinTests(VideoXBlockTestBase):
     """Test TranscriptsMixin"""
 
+    def test_get_transcript_download_link(self):
+        type(self.xblock).captions_language = PropertyMock(return_value='en')
+        type(self.xblock).transcripts = trans_mock = PropertyMock()
+        trans_mock.return_value = '[{"lang": "en", "url": "test_transcript.vtt"}]'
+
+        self.assertEqual(self.xblock.get_transcript_download_link(), 'test_transcript.vtt')
+
     def test_get_transcript_download_link_fallback(self):
-        # with patch.object(self.xblock, 'transcripts') as transcripts_mock:
         type(self.xblock).transcripts = PropertyMock(return_value='')
 
         self.assertEqual(self.xblock.get_transcript_download_link(), '')
