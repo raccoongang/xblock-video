@@ -70,8 +70,7 @@ class TranscriptsMixin(XBlock):
         reader = detect_format(caps)
         if reader:
             return WebVTTWriter().write(reader().read(caps))
-        else:
-            return u''
+        return u''
 
     def route_transcripts(self, transcripts):
         """
@@ -369,15 +368,16 @@ class PlaybackStateMixin(XBlock):
             trans['lang']: {'url': trans['url'], 'label': trans['label']}
             for trans in transcripts
         }
-        result = dict()
-        result['captionsLanguage'] = self.captions_language or self.course_default_language
-        result['transcriptsObject'] = transcripts_object
-        result['transcripts'] = transcripts
+        state = {
+            'captionsLanguage': self.captions_language or self.course_default_language,
+            'transcriptsObject': transcripts_object,
+            'transcripts': transcripts
+        }
         for field_name in self.player_state_fields:
             mixedcase_field_name = underscore_to_mixedcase(field_name)
-            if mixedcase_field_name not in result:
-                result[mixedcase_field_name] = getattr(self, field_name)
-        return result
+            if mixedcase_field_name not in state:
+                state[mixedcase_field_name] = getattr(self, field_name)
+        return state
 
     @player_state.setter
     def player_state(self, state):
