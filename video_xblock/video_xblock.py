@@ -12,8 +12,7 @@ import os.path
 import requests
 
 from xblock.core import XBlock
-from xblock.exceptions import NoSuchServiceError
-from xblock.fields import Scope, Boolean, Float, String, Dict
+from xblock.fields import Scope, Boolean, String, Dict
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
@@ -21,16 +20,13 @@ from xblockutils.studio_editable import StudioEditableXBlockMixin
 from webob import Response
 
 from .backends.base import BaseVideoPlayer
-from .constants import DEFAULT_LANG, PlayerName
+from .constants import PlayerName
 from .exceptions import ApiClientError
 from .mixins import ContentStoreMixin, LocationMixin, PlaybackStateMixin, SettingsMixin, TranscriptsMixin
 from .workbench.mixin import WorkbenchMixin
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
-from .utils import (
-    import_from, render_template, render_resource, resource_string,
-    underscore_to_mixedcase, ugettext as _
-)
+from .utils import render_template, render_resource, resource_string, ugettext as _
 
 log = logging.getLogger(__name__)
 
