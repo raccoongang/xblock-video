@@ -13,6 +13,7 @@ import os.path
 import requests
 
 from xblock.core import XBlock
+from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Scope, Boolean, Float, String, Dict
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
@@ -304,7 +305,7 @@ class TranscriptsMixin(XBlock):
         return Response(self.convert_caps_to_vtt(caps))
 
 
-@XBlock.wants('modulestore')
+@XBlock.needs('modulestore')
 class PlaybackStateMixin(XBlock):
     """
     PlaybackStateMixin encapsulates video-playback related data.
@@ -377,11 +378,11 @@ class PlaybackStateMixin(XBlock):
 
         Falls back to 'en' if runtime doen't provide `modulestore` service.
         """
-        if self.runtime.service(self, 'modulestore'):
-            course = self.runtime.modulestore.get_course(self.course_id)
+        try:
+            course = self.runtime.service(self, 'modulestore').get_course(self.course_id)
             return course.language
-
-        return 'en'
+        except NoSuchServiceError:
+            return 'en'
 
     @property
     def player_state(self):
