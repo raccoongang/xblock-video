@@ -12,24 +12,26 @@ import os.path
 import requests
 
 from xblock.core import XBlock
+from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Scope, Boolean, Float, String, Dict
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
-from xmodule.contentstore.django import contentstore
-from xmodule.contentstore.content import StaticContent
-
 from pycaption import detect_format, WebVTTWriter
 from webob import Response
 
 from .backends.base import BaseVideoPlayer
-from .constants import PlayerName
+from .constants import DEFAULT_LANG, PlayerName
 from .exceptions import ApiClientError
-from .mixins import SettingsMixin
+from .mixins import LocationMixin, SettingsMixin
+from .workbench.mixin import WorkbenchMixin
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
-from .utils import render_template, render_resource, resource_string, underscore_to_mixedcase, ugettext as _
+from .utils import (
+    import_from, render_template, render_resource, resource_string,
+    underscore_to_mixedcase, ugettext as _
+)
 
 log = logging.getLogger(__name__)
 
@@ -51,7 +53,8 @@ class ContentStoreMixin(XBlock):
         contentstore_service = self.runtime.service(self, 'contentstore')
         if contentstore_service:
             return contentstore_service.contentstore
-        return contentstore
+
+        return import_from('xmodule.contentstore.django', 'contentstore')
 
     @property
     def static_content(self):
@@ -61,7 +64,8 @@ class ContentStoreMixin(XBlock):
         contentstore_service = self.runtime.service(self, 'contentstore')
         if contentstore_service:
             return contentstore_service.StaticContent
-        return StaticContent
+
+        return import_from('xmodule.contentstore.content', 'StaticContent')
 
 
 class TranscriptsMixin(XBlock):
@@ -84,8 +88,8 @@ class TranscriptsMixin(XBlock):
         reader = detect_format(caps)
         if reader:
             return WebVTTWriter().write(reader().read(caps))
-        else:
-            return u''
+
+        return u''
 
     def route_transcripts(self, transcripts):
         """
@@ -125,7 +129,7 @@ class TranscriptsMixin(XBlock):
         """
         # Define location of default transcript as a future asset and prepare content to store in assets
         file_name = reference_name.replace(" ", "_") + ext
-        course_key = self.location.course_key  # pylint: disable=no-member
+        course_key = self.course_key
         content_loc = self.static_content.compute_location(course_key, file_name)  # AssetLocator object
         content = self.static_content(
             content_loc,
@@ -219,13 +223,13 @@ class TranscriptsMixin(XBlock):
         return 'success', translations
 
     @XBlock.json_handler
-    def get_transcripts_3playmedia_api_handler(self, data, suffix=''):  # pylint: disable=unused-argument
+    def get_transcripts_3playmedia_api_handler(self, data, _suffix=''):
         """
         Xblock handler to authenticate to a video platform's API. Called by JavaScript of `studio_view`.
 
         Arguments:
             data (dict): Data from frontend, necessary for authentication (tokens, account id, etc).
-            suffix (str): Slug used for routing.
+            _suffix (str): Slug used for routing. Imposed by `XBlock.json_handler`.
         Returns:
             response (dict): Status messages key-value pairs.
         """
@@ -256,13 +260,13 @@ class TranscriptsMixin(XBlock):
         }
 
     @XBlock.handler
-    def download_transcript(self, request, suffix=''):  # pylint: disable=unused-argument
+    def download_transcript(self, request, _suffix=''):
         """
         Download a transcript.
 
         Arguments:
             request (webob.Request): Request to handle.
-            suffix (string): Slug used for routing.
+            _suffix (string): Slug used for routing. Imposed by `XBlock.handler`.
         Returns:
             File with the correct name.
         """
@@ -278,7 +282,7 @@ class TranscriptsMixin(XBlock):
         return response
 
     @XBlock.handler
-    def srt_to_vtt(self, request, suffix=''):  # pylint: disable=unused-argument
+    def srt_to_vtt(self, request, _suffix=''):
         """
         Fetch raw transcripts, convert them into WebVTT format and return back.
 
@@ -286,7 +290,8 @@ class TranscriptsMixin(XBlock):
 
         Arguments:
             request (webob.Request): The request to handle
-            suffix (string): The remainder of the url, after the handler url prefix, if available.
+            _suffix (string): The remainder of the url, after the handler url prefix, if available.
+                              Imposed by `XBlock.json_handler`.
         Returns:
             webob.Response: WebVTT transcripts wrapped in Response object.
         """
@@ -295,6 +300,7 @@ class TranscriptsMixin(XBlock):
         return Response(self.convert_caps_to_vtt(caps))
 
 
+@XBlock.needs('modulestore')
 class PlaybackStateMixin(XBlock):
     """
     PlaybackStateMixin encapsulates video-playback related data.
@@ -337,8 +343,9 @@ class PlaybackStateMixin(XBlock):
         scope=Scope.content,
         display_name=_('Upload transcript'),
         help=_(
-            'Add transcripts in different languages. Click below to specify a language and upload an .srt transcript'
-            ' file for that language.'
+            "Add transcripts in different languages. "
+            "Click below to specify a language and upload an .srt or .vtt "
+            "transcript file for that language."
         )
     )
 
@@ -360,18 +367,30 @@ class PlaybackStateMixin(XBlock):
     )
 
     @property
+    def course_default_language(self):
+        """
+        Utility method returns course's language.
+
+        Falls back to 'en' if runtime doen't provide `modulestore` service.
+        """
+        try:
+            course = self.runtime.service(self, 'modulestore').get_course(self.course_id)
+            return course.language
+        except NoSuchServiceError:
+            return DEFAULT_LANG
+
+    @property
     def player_state(self):
         """
         Return video player state as a dictionary.
         """
-        course = self.runtime.modulestore.get_course(self.course_id)
         transcripts = json.loads(self.transcripts) if self.transcripts else []
         transcripts_object = {
             trans['lang']: {'url': trans['url'], 'label': trans['label']}
             for trans in transcripts
         }
         result = dict()
-        result['captionsLanguage'] = self.captions_language or course.language
+        result['captionsLanguage'] = self.captions_language or self.course_default_language
         result['transcriptsObject'] = transcripts_object
         result['transcripts'] = transcripts
         for field_name in self.player_state_fields:
@@ -394,8 +413,8 @@ class PlaybackStateMixin(XBlock):
 
 
 class VideoXBlock(
-        SettingsMixin, TranscriptsMixin, PlaybackStateMixin,
-        StudioEditableXBlockMixin, ContentStoreMixin, XBlock
+        SettingsMixin, TranscriptsMixin, PlaybackStateMixin, LocationMixin,
+        StudioEditableXBlockMixin, ContentStoreMixin, WorkbenchMixin, XBlock
 ):
     """
     Main VideoXBlock class, responsible for saving video settings and rendering it for students.
@@ -649,7 +668,7 @@ class VideoXBlock(
 
         self.validate_href_data(validation, data)
 
-    def student_view(self, context=None):  # pylint: disable=unused-argument
+    def student_view(self, _context=None):
         """
         The primary view of the `VideoXBlock`, shown to students when viewing courses.
         """
@@ -674,7 +693,7 @@ class VideoXBlock(
                 'static/html/student_view.html',
                 player_url=player_url,
                 display_name=self.display_name,
-                usage_id=self.location.to_deprecated_string(),  # pylint: disable=no-member
+                usage_id=self.deprecated_string,
                 handout=self.handout,
                 transcripts=self.route_transcripts(self.transcripts),
                 download_transcript_allowed=self.download_transcript_allowed,
@@ -733,7 +752,7 @@ class VideoXBlock(
         basic_fields = self.prepare_studio_editor_fields(player.basic_fields)
         advanced_fields = self.prepare_studio_editor_fields(player.advanced_fields)
         context = {
-            'courseKey': self.location.course_key,  # pylint: disable=no-member
+            'courseKey': self.course_key,
             'languages': languages,
             'transcripts': transcripts,
             'download_transcript_handler_url': download_transcript_handler_url,
@@ -757,13 +776,13 @@ class VideoXBlock(
         return fragment
 
     @XBlock.handler
-    def render_player(self, request, suffix=''):  # pylint: disable=unused-argument
+    def render_player(self, _request, _suffix=''):
         """
         View `student_view` loads this handler as an iframe to display actual video player.
 
         Arguments:
-            request (webob.Request): Request to handle.
-            suffix (string): Slug used for routing.
+            _request (webob.Request): Request to handle. Imposed by `XBlock.handler`.
+            _suffix (string): Slug used for routing. Imposed by `XBlock.handler`.
         Returns:
             Rendered html string as a Response (webob.Response).
         """
@@ -776,7 +795,7 @@ class VideoXBlock(
         return player.get_player_html(
             url=self.href, autoplay=False, account_id=self.account_id, player_id=self.player_id,
             video_id=player.media_id(self.href),
-            video_player_id='video_player_{}'.format(self.location.block_id),  # pylint: disable=no-member
+            video_player_id='video_player_{}'.format(self.block_id),
             save_state_url=save_state_url,
             player_state=self.player_state,
             start_time=int(self.start_time.total_seconds()),  # pylint: disable=no-member
@@ -786,13 +805,13 @@ class VideoXBlock(
         )
 
     @XBlock.json_handler
-    def save_player_state(self, request, suffix=''):  # pylint: disable=unused-argument
+    def save_player_state(self, request, _suffix=''):
         """
         Xblock handler to save playback player state. Called by JavaScript of `student_view`.
 
         Arguments:
             request (dict): Request data to handle.
-            suffix (str): Slug used for routing.
+            _suffix (str): Slug used for routing. Imposed by `XBlock.json_handler`.
         Returns:
             Data on success (dict).
         """
@@ -808,22 +827,22 @@ class VideoXBlock(
         return {'success': True}
 
     @XBlock.json_handler
-    def publish_event(self, data, suffix=''):  # pylint: disable=unused-argument
+    def publish_event(self, data, _suffix=''):
         """
         Handler to publish XBlock event from frontend. Called by JavaScript of `student_view`.
 
         Arguments:
             data (dict): Data from frontend on the event.
-            suffix (string): Slug used for routing.
+            _suffix (string): Slug used for routing. Imposed by `XBlock.json_handler`.
         Returns:
             Data on result (dict).
         """
         try:
-            eventType = data.pop('eventType')  # pylint: disable=invalid-name
+            event_type = data.pop('eventType')
         except KeyError:
             return {'result': 'error', 'message': 'Missing eventType in JSON data'}
 
-        self.runtime.publish(self, eventType, data)
+        self.runtime.publish(self, event_type, data)
         return {'result': 'success'}
 
     def clean_studio_edits(self, data):
@@ -974,7 +993,7 @@ class VideoXBlock(
 
         Arguments:
             request (xblock.django.request.DjangoWebobRequest): Incoming request data.
-            suffix (str): Slug used for routing.
+            suffix (str): Slug used for routing. Imposed by `XBlock.json_handler`.
         Returns:
              Depending on player's `dispatch()` entry point, either info on video / Brightcove account or None value
              (when performing some action via Brightcove API) may be returned.
@@ -1056,13 +1075,13 @@ class VideoXBlock(
         return auth_data, error_message
 
     @XBlock.json_handler
-    def authenticate_video_api_handler(self, data, suffix=''):  # pylint: disable=unused-argument
+    def authenticate_video_api_handler(self, data, _suffix=''):
         """
         Xblock handler to authenticate to a video platform's API. Called by JavaScript of `studio_view`.
 
         Arguments:
             data (dict): Data from frontend, necessary for authentication (tokens, account id, etc).
-            suffix (str): Slug used for routing.
+            _suffix (str): Slug used for routing. Imposed by `XBlock.json_handler`.
         Returns:
             response (dict): Status messages key-value pairs.
         """
@@ -1102,13 +1121,13 @@ class VideoXBlock(
             self.metadata['client_secret'] = ''  # Brightcove API
 
     @XBlock.json_handler
-    def upload_default_transcript_handler(self, data, suffix=''):  # pylint: disable=unused-argument
+    def upload_default_transcript_handler(self, data, _suffix=''):
         """
         Upload a transcript, fetched from a video platform's API, to video xblock.
 
         Arguments:
             data (dict): Data from frontend on a default transcript to be fetched from a video platform.
-            suffix (str): Slug used for routing.
+            _suffix (str): Slug used for routing. Imposed by `XBlock.json_handler`.
         Returns:
             response (dict): Data on a default transcript, fetched from a video platform.
 
