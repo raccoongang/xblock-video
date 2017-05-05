@@ -119,6 +119,16 @@ class PlaybackStateMixinTests(VideoXBlockTestBase):
             course_id_mock.assert_not_called()
 
 
+class TranscriptsMixinTests(VideoXBlockTestBase):
+    """Test TranscriptsMixin"""
+
+    def test_get_transcript_download_link_fallback(self):
+        # with patch.object(self.xblock, 'transcripts') as transcripts_mock:
+        type(self.xblock).transcripts = PropertyMock(return_value='')
+
+        self.assertEqual(self.xblock.get_transcript_download_link(), '')
+
+
 class WorkbenchMixinTest(VideoXBlockTestBase):
     """Test WorkbenchMixin"""
 
