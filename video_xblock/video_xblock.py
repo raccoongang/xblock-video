@@ -58,7 +58,7 @@ class VideoXBlock(
     )
 
     href = String(
-        default=',
+        default='',
         display_name=_('Video URL'),
         help=_('URL of the video page. E.g. https://example.wistia.com/medias/12345abcde'),
         scope=Scope.content

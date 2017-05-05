@@ -8,13 +8,12 @@ import requests
 from pycaption import detect_format, WebVTTWriter
 from webob import Response
 
+from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Scope, Boolean, Float, String
 from xblock.core import XBlock
 
-from xmodule.contentstore.django import contentstore
-from xmodule.contentstore.content import StaticContent
-
-from .utils import ugettext as _, underscore_to_mixedcase
+from .constants import DEFAULT_LANG
+from .utils import import_from, ugettext as _, underscore_to_mixedcase
 
 
 @XBlock.wants('contentstore')
@@ -23,7 +22,9 @@ class ContentStoreMixin(XBlock):
     Proxy to future `contentstore` service.
 
     If `contentstore` service is not provided by `runtime` it returns classes
-    from `xmodule.contentstore`
+    from `xmodule.contentstore`.
+
+    At the time of writing `contentstore` service does not exist yet.
     """
 
     @property
@@ -34,7 +35,8 @@ class ContentStoreMixin(XBlock):
         contentstore_service = self.runtime.service(self, 'contentstore')
         if contentstore_service:
             return contentstore_service.contentstore
-        return contentstore
+
+        return import_from('xmodule.contentstore.django', 'contentstore')
 
     @property
     def static_content(self):
@@ -44,7 +46,8 @@ class ContentStoreMixin(XBlock):
         contentstore_service = self.runtime.service(self, 'contentstore')
         if contentstore_service:
             return contentstore_service.StaticContent
-        return StaticContent
+
+        return import_from('xmodule.contentstore.content', 'StaticContent')
 
 
 class TranscriptsMixin(XBlock):
@@ -108,7 +111,7 @@ class TranscriptsMixin(XBlock):
         """
         # Define location of default transcript as a future asset and prepare content to store in assets
         file_name = reference_name.replace(" ", "_") + ext
-        course_key = self.location.course_key  # pylint: disable=no-member
+        course_key = self.course_key
         content_loc = self.static_content.compute_location(course_key, file_name)  # AssetLocator object
         content = self.static_content(
             content_loc,
@@ -278,6 +281,7 @@ class TranscriptsMixin(XBlock):
         return Response(self.convert_caps_to_vtt(caps))
 
 
+@XBlock.needs('modulestore')
 class PlaybackStateMixin(XBlock):
     """
     PlaybackStateMixin encapsulates video-playback related data.
@@ -343,18 +347,30 @@ class PlaybackStateMixin(XBlock):
     )
 
     @property
+    def course_default_language(self):
+        """
+        Utility method returns course's language.
+
+        Falls back to 'en' if runtime doen't provide `modulestore` service.
+        """
+        try:
+            course = self.runtime.service(self, 'modulestore').get_course(self.course_id)
+            return course.language
+        except NoSuchServiceError:
+            return DEFAULT_LANG
+
+    @property
     def player_state(self):
         """
         Return video player state as a dictionary.
         """
-        course = self.runtime.modulestore.get_course(self.course_id)
         transcripts = json.loads(self.transcripts) if self.transcripts else []
         transcripts_object = {
             trans['lang']: {'url': trans['url'], 'label': trans['label']}
             for trans in transcripts
         }
         result = dict()
-        result['captionsLanguage'] = self.captions_language or course.language
+        result['captionsLanguage'] = self.captions_language or self.course_default_language
         result['transcriptsObject'] = transcripts_object
         result['transcripts'] = transcripts
         for field_name in self.player_state_fields:
