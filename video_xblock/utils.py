@@ -3,6 +3,7 @@ Video xblock helpers.
 """
 
 from HTMLParser import HTMLParser
+from importlib import import_module
 import os.path
 import pkg_resources
 
@@ -12,6 +13,13 @@ from xblockutils.resources import ResourceLoader
 
 html_parser = HTMLParser()  # pylint: disable=invalid-name
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
+
+
+def import_from(module, klass):
+    """
+    Dynamic equivalent for 'from module import klass'.
+    """
+    return getattr(import_module(module), klass)
 
 
 def resource_string(path):

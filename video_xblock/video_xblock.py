@@ -29,7 +29,10 @@ from .mixins import LocationMixin, SettingsMixin
 from .workbench.mixin import WorkbenchMixin
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
-from .utils import render_template, render_resource, resource_string, underscore_to_mixedcase, ugettext as _
+from .utils import (
+    import_from, render_template, render_resource, resource_string,
+    underscore_to_mixedcase, ugettext as _
+)
 
 log = logging.getLogger(__name__)
 
@@ -43,13 +46,6 @@ class ContentStoreMixin(XBlock):
     from `xmodule.contentstore`
     """
 
-    @staticmethod
-    def import_from(module, klass):
-        """
-        Dynamic equivalent for 'from module import klass'.
-        """
-        return getattr(import_module(module), klass)
-
     @property
     def contentstore(self):
         """
@@ -59,7 +55,7 @@ class ContentStoreMixin(XBlock):
         if contentstore_service:
             return contentstore_service.contentstore
 
-        return self.import_from('xmodule.contentstore.django', 'contentstore')
+        return import_from('xmodule.contentstore.django', 'contentstore')
 
     @property
     def static_content(self):
@@ -70,7 +66,7 @@ class ContentStoreMixin(XBlock):
         if contentstore_service:
             return contentstore_service.StaticContent
 
-        return self.import_from('xmodule.contentstore.content', 'StaticContent')
+        return import_from('xmodule.contentstore.content', 'StaticContent')
 
 
 class TranscriptsMixin(XBlock):

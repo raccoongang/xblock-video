@@ -7,32 +7,21 @@ from mock import patch, Mock, PropertyMock
 from xblock.exceptions import NoSuchServiceError
 
 from video_xblock.tests.base import VideoXBlockTestBase
-from video_xblock.utils import loader
+from video_xblock.utils import import_from, loader
 
 
 class ContentStoreMixinTest(VideoXBlockTestBase):
     """Test ContentStoreMixin"""
 
-    @patch('video_xblock.video_xblock.import_module')
-    def test_import_from(self, import_module_mock):
-        import_module_mock.return_value = module_mock = Mock()
-        type(module_mock).test_class = class_mock = PropertyMock(
-            return_value='a_class'
-        )
-
-        self.assertEqual(self.xblock.import_from('test_module', 'test_class'), 'a_class')
-        import_module_mock.assert_called_once_with('test_module')
-        class_mock.assert_called_once_with()
-
     def test_contentstore_no_service(self):
-        with patch.object(self.xblock, 'import_from') as import_mock:
+        with patch('video_xblock.video_xblock.import_from') as import_mock:
             import_mock.return_value = 'contentstore_test'
 
             self.assertEqual(self.xblock.contentstore, 'contentstore_test')
             import_mock.assert_called_once_with('xmodule.contentstore.django', 'contentstore')
 
     def test_static_content_no_service(self):
-        with patch.object(self.xblock, 'import_from') as import_mock:
+        with patch('video_xblock.video_xblock.import_from') as import_mock:
             import_mock.return_value = 'StaticContent_test'
 
             self.assertEqual(self.xblock.static_content, 'StaticContent_test')
