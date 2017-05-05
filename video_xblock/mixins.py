@@ -375,8 +375,7 @@ class PlaybackStateMixin(XBlock):
         }
         for field_name in self.player_state_fields:
             mixedcase_field_name = underscore_to_mixedcase(field_name)
-            if mixedcase_field_name not in state:
-                state[mixedcase_field_name] = getattr(self, field_name)
+            state.setdefault(mixedcase_field_name, getattr(self, field_name))
         return state
 
     @player_state.setter
