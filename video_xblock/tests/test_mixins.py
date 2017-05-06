@@ -124,6 +124,15 @@ class PlaybackStateMixinTests(VideoXBlockTestBase):
 class TranscriptsMixinTests(VideoXBlockTestBase):
     """Test TranscriptsMixin"""
 
+    @patch('video_xblock.mixins.WebVTTWriter.write')
+    @patch('video_xblock.mixins.detect_format')
+    def test_convert_caps_to_vtt_fallback(self, detect_format_mock, vtt_writer_mock):
+        detect_format_mock.return_value = None
+
+        self.assertEqual(self.xblock.convert_caps_to_vtt('test caps'), u'')
+        vtt_writer_mock.assert_not_called()
+        detect_format_mock.assert_called_once_with('test caps')
+
     @patch.object(VideoXBlock, 'captions_language', new_callable=PropertyMock)
     @patch.object(VideoXBlock, 'transcripts', new_callable=PropertyMock)
     def test_get_transcript_download_link(self, trans_mock, lang_mock):
