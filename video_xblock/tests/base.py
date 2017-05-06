@@ -54,3 +54,6 @@ class VideoXBlockTestBase(unittest.TestCase):
         """
         self.restore_mocked()
         super(VideoXBlockTestBase, self).tearDown()
+
+    def unfinishedTest(self):
+        self.fail('The test is imcomplete!')

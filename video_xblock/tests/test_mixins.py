@@ -9,6 +9,7 @@ from xblock.exceptions import NoSuchServiceError
 from video_xblock.constants import DEFAULT_LANG
 from video_xblock.tests.base import VideoXBlockTestBase
 from video_xblock.utils import loader
+from video_xblock.video_xblock import VideoXBlock
 
 
 class ContentStoreMixinTest(VideoXBlockTestBase):
@@ -122,15 +123,17 @@ class PlaybackStateMixinTests(VideoXBlockTestBase):
 class TranscriptsMixinTests(VideoXBlockTestBase):
     """Test TranscriptsMixin"""
 
-    def test_get_transcript_download_link(self):
-        type(self.xblock).captions_language = PropertyMock(return_value='en')
-        type(self.xblock).transcripts = trans_mock = PropertyMock()
+    @patch.object(VideoXBlock, 'captions_language', new_callable=PropertyMock)
+    @patch.object(VideoXBlock, 'transcripts', new_callable=PropertyMock)
+    def test_get_transcript_download_link(self,trans_mock, lang_mock):
+        lang_mock.return_value = 'en'
         trans_mock.return_value = '[{"lang": "en", "url": "test_transcript.vtt"}]'
 
         self.assertEqual(self.xblock.get_transcript_download_link(), 'test_transcript.vtt')
 
-    def test_get_transcript_download_link_fallback(self):
-        type(self.xblock).transcripts = PropertyMock(return_value='')
+    @patch.object(VideoXBlock, 'transcripts', new_callable=PropertyMock)
+    def test_get_transcript_download_link_fallback(self, trans_mock):
+        trans_mock.return_value = ''
 
         self.assertEqual(self.xblock.get_transcript_download_link(), '')
 
