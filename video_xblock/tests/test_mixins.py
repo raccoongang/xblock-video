@@ -125,7 +125,7 @@ class TranscriptsMixinTests(VideoXBlockTestBase):
 
     @patch.object(VideoXBlock, 'captions_language', new_callable=PropertyMock)
     @patch.object(VideoXBlock, 'transcripts', new_callable=PropertyMock)
-    def test_get_transcript_download_link(self,trans_mock, lang_mock):
+    def test_get_transcript_download_link(self, trans_mock, lang_mock):
         lang_mock.return_value = 'en'
         trans_mock.return_value = '[{"lang": "en", "url": "test_transcript.vtt"}]'
 
