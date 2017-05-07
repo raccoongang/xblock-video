@@ -421,13 +421,13 @@ class PlaybackStateMixin(XBlock):
             setattr(self, field_name, state.get(field_name, getattr(self, field_name)))
 
     @XBlock.json_handler
-    def save_player_state(self, request, suffix=''):  # pylint: disable=unused-argument
+    def save_player_state(self, request, _suffix=''):
         """
         Xblock handler to save playback player state. Called by JavaScript of `student_view`.
 
         Arguments:
             request (dict): Request data to handle.
-            suffix (str): Slug used for routing.
+            _suffix (str): Slug used for routing. Imposed by `XBlock.json_handler`.
         Returns:
             Data on success (dict).
         """
@@ -835,27 +835,7 @@ class VideoXBlock(
             transcripts=transcripts,
         )
 
-    @XBlock.json_handler
-    def save_player_state(self, request, _suffix=''):
-        """
-        Xblock handler to save playback player state. Called by JavaScript of `student_view`.
 
-        Arguments:
-            request (dict): Request data to handle.
-            _suffix (str): Slug used for routing. Imposed by `XBlock.json_handler`.
-        Returns:
-            Data on success (dict).
-        """
-        player_state = {
-            'transcripts': self.transcripts
-        }
-
-        for field_name in self.player_state_fields:
-            if field_name not in player_state:
-                player_state[field_name] = request[underscore_to_mixedcase(field_name)]
-
-        self.player_state = player_state
-        return {'success': True}
 
     @XBlock.json_handler
     def publish_event(self, data, _suffix=''):
