@@ -13,6 +13,7 @@ import os.path
 import requests
 
 from xblock.core import XBlock
+from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Scope, Boolean, Float, String, Dict
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
@@ -22,13 +23,16 @@ from pycaption import detect_format, WebVTTWriter
 from webob import Response
 
 from .backends.base import BaseVideoPlayer
-from .constants import PlayerName
+from .constants import DEFAULT_LANG, PlayerName
 from .exceptions import ApiClientError
 from .mixins import LocationMixin, SettingsMixin
 from .workbench.mixin import WorkbenchMixin
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
-from .utils import render_template, render_resource, resource_string, underscore_to_mixedcase, ugettext as _
+from .utils import (
+    import_from, render_template, render_resource, resource_string,
+    underscore_to_mixedcase, ugettext as _
+)
 
 log = logging.getLogger(__name__)
 
@@ -58,7 +62,7 @@ class ContentStoreMixin(XBlock):
         if contentstore_service:
             return contentstore_service.contentstore
 
-        return self.import_from('xmodule.contentstore.django', 'contentstore')
+        return import_from('xmodule.contentstore.django', 'contentstore')
 
     @property
     def static_content(self):
@@ -69,7 +73,7 @@ class ContentStoreMixin(XBlock):
         if contentstore_service:
             return contentstore_service.StaticContent
 
-        return self.import_from('xmodule.contentstore.content', 'StaticContent')
+        return import_from('xmodule.contentstore.content', 'StaticContent')
 
 
 class TranscriptsMixin(XBlock):
@@ -102,8 +106,8 @@ class TranscriptsMixin(XBlock):
         reader = detect_format(caps)
         if reader:
             return WebVTTWriter().write(reader().read(caps))
-        else:
-            return u''
+
+        return u''
 
     def route_transcripts(self, transcripts):
         """
@@ -314,7 +318,7 @@ class TranscriptsMixin(XBlock):
         return Response(self.convert_caps_to_vtt(caps))
 
 
-@XBlock.wants('modulestore')
+@XBlock.needs('modulestore')
 class PlaybackStateMixin(XBlock):
     """
     PlaybackStateMixin encapsulates video-playback related data.
@@ -371,11 +375,16 @@ class PlaybackStateMixin(XBlock):
 
     @property
     def course_default_language(self):
-        if self.runtime.service(self, 'modulestore'):
-            course = self.runtime.modulestore.get_course(self.course_id)
-            return course.language
+        """
+        Utility method returns course's language.
 
-        return 'en'
+        Falls back to 'en' if runtime doen't provide `modulestore` service.
+        """
+        try:
+            course = self.runtime.service(self, 'modulestore').get_course(self.course_id)
+            return course.language
+        except NoSuchServiceError:
+            return DEFAULT_LANG
 
     @property
     def player_state(self):
