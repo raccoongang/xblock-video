@@ -432,8 +432,7 @@ class PlaybackStateMixin(XBlock):
             Data on success (dict).
         """
         player_state = {
-            ' =
-          ': self.transcripts
+            'transcripts': self.transcripts
         }
 
         for field_name in self.player_state_fields:
