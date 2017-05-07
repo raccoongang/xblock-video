@@ -126,6 +126,16 @@ class TranscriptsMixinTests(VideoXBlockTestBase):
 
     @patch('video_xblock.mixins.WebVTTWriter.write')
     @patch('video_xblock.mixins.detect_format')
+    def test_convert_caps_to_vtt(self, detect_format_mock, vtt_writer_mock):
+        detect_format_mock.return_value.return_value.read = read_mock = Mock()
+        read_mock.return_value = 'non vtt transcript'
+        vtt_writer_mock.return_value = 'vtt transcript'
+
+        self.assertEqual(self.xblock.convert_caps_to_vtt('test caps'), 'vtt transcript')
+        vtt_writer_mock.assert_called_once_with('non vtt transcript')
+
+    @patch('video_xblock.mixins.WebVTTWriter.write')
+    @patch('video_xblock.mixins.detect_format')
     def test_convert_caps_to_vtt_fallback(self, detect_format_mock, vtt_writer_mock):
         detect_format_mock.return_value = None
 
