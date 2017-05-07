@@ -2,8 +2,9 @@
 VideoXBlock mixins test cases.
 """
 
-from mock import patch, Mock, PropertyMock
+from mock import patch, Mock, MagicMock, PropertyMock
 
+from webob import Response
 from xblock.exceptions import NoSuchServiceError
 
 from video_xblock.constants import DEFAULT_LANG
@@ -156,6 +157,20 @@ class TranscriptsMixinTests(VideoXBlockTestBase):
         trans_mock.return_value = ''
 
         self.assertEqual(self.xblock.get_transcript_download_link(), '')
+
+    @patch('video_xblock.mixins.requests', new_callable=MagicMock)
+    @patch.object(VideoXBlock, 'convert_caps_to_vtt')
+    def test_srt_to_vtt(self, convert_caps_to_vtt_mock, requests_mock):
+        convert_caps_to_vtt_mock.return_value = 'vtt transcripts'
+        requests_mock.get.return_value.text = text_mock = PropertyMock(
+            return_value='vtt transcripts'
+        )
+
+        vtt_response = self.xblock.srt_to_vtt(requests_mock, 'unused suffix')
+
+        self.assertIsInstance(vtt_response, Response)
+        self.assertEqual(vtt_response.text, 'vtt transcripts')
+        convert_caps_to_vtt_mock.assert_called_once_with(text_mock)
 
 
 class WorkbenchMixinTest(VideoXBlockTestBase):
