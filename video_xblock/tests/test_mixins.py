@@ -30,26 +30,26 @@ class ContentStoreMixinTest(VideoXBlockTestBase):
         import_mock.assert_called_once_with('xmodule.contentstore.content', 'StaticContent')
 
     def test_contentstore(self):
-        self.xblock.runtime = runtime_mock = Mock()
-        service_mock = runtime_mock.service
-        type(service_mock.return_value).contentstore = cs_mock = PropertyMock(
-            return_value='contentstore_test'
-        )
+        with patch.object(self.xblock, 'runtime') as runtime_mock:
+            service_mock = runtime_mock.service
+            type(service_mock.return_value).contentstore = cs_mock = PropertyMock(
+                return_value='contentstore_test'
+            )
 
-        self.assertEqual(self.xblock.contentstore, 'contentstore_test')
-        service_mock.assert_called_once_with(self.xblock, 'contentstore')
-        cs_mock.assert_called_once()
+            self.assertEqual(self.xblock.contentstore, 'contentstore_test')
+            service_mock.assert_called_once_with(self.xblock, 'contentstore')
+            cs_mock.assert_called_once()
 
     def test_static_content(self):
-        self.xblock.runtime = runtime_mock = Mock()
-        service_mock = runtime_mock.service
-        type(service_mock.return_value).StaticContent = sc_mock = PropertyMock(
-            return_value='StaticContent_test'
-        )
+        with patch.object(self.xblock, 'runtime') as runtime_mock:
+            service_mock = runtime_mock.service
+            type(service_mock.return_value).StaticContent = sc_mock = PropertyMock(
+                return_value='StaticContent_test'
+            )
 
-        self.assertEqual(self.xblock.static_content, 'StaticContent_test')
-        service_mock.assert_called_once_with(self.xblock, 'contentstore')
-        sc_mock.assert_called_once()
+            self.assertEqual(self.xblock.static_content, 'StaticContent_test')
+            service_mock.assert_called_once_with(self.xblock, 'contentstore')
+            sc_mock.assert_called_once()
 
 
 class LocationMixinTests(VideoXBlockTestBase):
