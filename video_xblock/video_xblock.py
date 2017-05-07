@@ -835,8 +835,6 @@ class VideoXBlock(
             transcripts=transcripts,
         )
 
-
-
     @XBlock.json_handler
     def publish_event(self, data, _suffix=''):
         """
