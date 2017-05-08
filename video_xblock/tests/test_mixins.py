@@ -2,7 +2,7 @@
 VideoXBlock mixins test cases.
 """
 
-from mock import call, patch, Mock, MagicMock, PropertyMock
+from mock import patch, Mock, MagicMock, PropertyMock
 
 from webob import Response
 from xblock.exceptions import NoSuchServiceError
@@ -146,11 +146,10 @@ class TranscriptsMixinTests(VideoXBlockTestBase):
 
     @patch.object(VideoXBlock, 'get_file_name_from_path')
     @patch('video_xblock.mixins.requests.get')
-    def test_download_transcript_handler_response_object(self, get_mock,
-            get_filename_mock):
+    def test_download_transcript_handler_response_object(self, get_mock, get_filename_mock):
         # Arrange
         get_filename_mock.return_value = 'transcript.vtt'
-        get_mock.return_value.text = 'vtt transcripts' # text_mock = PropertyMock()
+        get_mock.return_value.text = 'vtt transcripts'
         request_mock = MagicMock()
         request_mock.host_url = 'test.host'
         request_mock.query_string = '/test-query-string'
@@ -184,13 +183,16 @@ class TranscriptsMixinTests(VideoXBlockTestBase):
     @patch('video_xblock.mixins.requests', new_callable=MagicMock)
     @patch.object(VideoXBlock, 'convert_caps_to_vtt')
     def test_srt_to_vtt(self, convert_caps_to_vtt_mock, requests_mock):
+        # Arrange
         request_mock = MagicMock()
         convert_caps_to_vtt_mock.return_value = 'vtt transcripts'
         requests_mock.get.return_value.text = text_mock = PropertyMock()
-        text_mock.return_value='vtt transcripts'
+        text_mock.return_value = 'vtt transcripts'
 
+        # Act
         vtt_response = self.xblock.srt_to_vtt(request_mock, 'unused suffix')
 
+        # Assert
         self.assertIsInstance(vtt_response, Response)
         self.assertEqual(vtt_response.text, 'vtt transcripts')
         convert_caps_to_vtt_mock.assert_called_once_with(text_mock)
