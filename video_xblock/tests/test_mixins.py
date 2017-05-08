@@ -148,7 +148,7 @@ class TranscriptsMixinTests(VideoXBlockTestBase):
 
     @patch.object(VideoXBlock, 'static_content')
     @patch.object(VideoXBlock, 'contentstore')
-    @patch.object(VideoXBlock, 'course_key')
+    @patch.object(VideoXBlock, 'course_key', new_callable=PropertyMock)
     def test_create_transcript_file(self, course_key, contentstore_mock, static_content_mock):
         # Arrange
         trans_srt_stub = 'test srt transcript'
@@ -163,9 +163,10 @@ class TranscriptsMixinTests(VideoXBlockTestBase):
 
         # Assert
         static_content_mock.assert_called_with(
-            'test-location', 'test_transcripts.vtt', 'application/json', u'test srt transcript'
+            'test-location.vtt', 'test_transcripts.vtt', 'application/json', u'test srt transcript'
         )
         save_mock.assert_called_once_with(static_content_mock.return_value)
+        course_key.assert_called_once_with()
 
         self.assertEqual(file_name, 'test_transcripts.vtt')
         self.assertEqual(external_url, '/test-location.vtt')
