@@ -162,6 +162,7 @@ class SettingsMixinTests(VideoXBlockTestBase):
                 self.xblock.block_settings_key, {}
             )
 
+
 class TranscriptsMixinTests(VideoXBlockTestBase):
     """Test TranscriptsMixin"""
 
