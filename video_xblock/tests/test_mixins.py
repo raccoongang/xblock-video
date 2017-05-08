@@ -163,13 +163,12 @@ class TranscriptsMixinTests(VideoXBlockTestBase):
 
         # Assert
         static_content_mock.assert_called_with(
-            'test-location', 'test_transcripts.vtt','application/json', u'test srt transcript'
+            'test-location', 'test_transcripts.vtt', 'application/json', u'test srt transcript'
         )
         save_mock.assert_called_once_with(static_content_mock.return_value)
 
         self.assertEqual(file_name, 'test_transcripts.vtt')
         self.assertEqual(external_url, '/test-location.vtt')
-
 
     @patch.object(VideoXBlock, 'get_file_name_from_path')
     @patch('video_xblock.mixins.requests.get')
