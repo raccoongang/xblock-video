@@ -1,9 +1,5 @@
 """
-<<<<<<< HEAD
-Workbench mixin adds XBlock SDK workbench runtime support
-=======
 Workbench mixin adds XBlock SDK workbench runtime support.
->>>>>>> dev
 """
 
 from video_xblock.utils import loader
