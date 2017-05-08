@@ -2,6 +2,8 @@
 VideoXBlock mixins test cases.
 """
 
+from collections import Iterable
+
 from mock import patch, Mock, MagicMock, PropertyMock
 
 from webob import Response
@@ -179,6 +181,23 @@ class TranscriptsMixinTests(VideoXBlockTestBase):
         trans_mock.return_value = ''
 
         self.assertEqual(self.xblock.get_transcript_download_link(), '')
+
+    def test_route_transcripts(self):
+        # Arrange
+        transcripts = '[{"url": "test-trans.srt"}]'
+        with patch.object(self.xblock, 'runtime') as runtime_mock:
+            handler_url_mock = runtime_mock.handler_url
+            handler_url_mock.return_value = 'test-trans.vtt'
+
+            # Act
+            transcripts_routes = self.xblock.route_transcripts(transcripts)
+
+            # Assert
+            self.assertIsInstance(transcripts_routes, Iterable)
+            self.assertEqual(next(transcripts_routes), {'url': 'test-trans.vtt'})
+            handler_url_mock.assert_called_once_with(
+                self.xblock, 'srt_to_vtt', query='test-trans.srt'
+            )
 
     @patch('video_xblock.mixins.requests', new_callable=MagicMock)
     @patch.object(VideoXBlock, 'convert_caps_to_vtt')
