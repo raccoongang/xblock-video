@@ -2,7 +2,7 @@
 VideoXBlock mixins test cases.
 """
 
-from mock import patch, Mock, MagicMock, PropertyMock
+from mock import call, patch, Mock, MagicMock, PropertyMock
 
 from webob import Response
 from xblock.exceptions import NoSuchServiceError
@@ -144,6 +144,29 @@ class TranscriptsMixinTests(VideoXBlockTestBase):
         vtt_writer_mock.assert_not_called()
         detect_format_mock.assert_called_once_with('test caps')
 
+    @patch.object(VideoXBlock, 'get_file_name_from_path')
+    @patch('video_xblock.mixins.requests.get')
+    def test_download_transcript_handler_response_object(self, get_mock,
+            get_filename_mock):
+        # Arrange
+        get_filename_mock.return_value = 'transcript.vtt'
+        get_mock.return_value.text = 'vtt transcripts' # text_mock = PropertyMock()
+        request_mock = MagicMock()
+        request_mock.host_url = 'test.host'
+        request_mock.query_string = '/test-query-string'
+
+        # Act
+        vtt_response = self.xblock.download_transcript(request_mock, 'unused suffix')
+
+        # Assert
+        self.assertIsInstance(vtt_response, Response)
+        self.assertEqual(vtt_response.text, 'vtt transcripts')
+        self.assertEqual(vtt_response.headerlist, [
+            ('Content-Type', 'text/plain'),
+            ('Content-Disposition', 'attachment; filename={}'.format('transcript.vtt'))
+        ])
+        get_mock.assert_called_once_with('test.host/test-query-string')
+
     @patch.object(VideoXBlock, 'captions_language', new_callable=PropertyMock)
     @patch.object(VideoXBlock, 'transcripts', new_callable=PropertyMock)
     def test_get_transcript_download_link(self, trans_mock, lang_mock):
@@ -161,12 +184,12 @@ class TranscriptsMixinTests(VideoXBlockTestBase):
     @patch('video_xblock.mixins.requests', new_callable=MagicMock)
     @patch.object(VideoXBlock, 'convert_caps_to_vtt')
     def test_srt_to_vtt(self, convert_caps_to_vtt_mock, requests_mock):
+        request_mock = MagicMock()
         convert_caps_to_vtt_mock.return_value = 'vtt transcripts'
-        requests_mock.get.return_value.text = text_mock = PropertyMock(
-            return_value='vtt transcripts'
-        )
+        requests_mock.get.return_value.text = text_mock = PropertyMock()
+        text_mock.return_value='vtt transcripts'
 
-        vtt_response = self.xblock.srt_to_vtt(requests_mock, 'unused suffix')
+        vtt_response = self.xblock.srt_to_vtt(request_mock, 'unused suffix')
 
         self.assertIsInstance(vtt_response, Response)
         self.assertEqual(vtt_response.text, 'vtt transcripts')

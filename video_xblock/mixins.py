@@ -252,9 +252,9 @@ class TranscriptsMixin(XBlock):
             File with the correct name.
         """
         trans_path = self.get_path_for(request.query_string)
-        result = requests.get(request.host_url + request.query_string).text
         filename = self.get_file_name_from_path(trans_path)
-        response = Response(result)
+        transcript = requests.get(request.host_url + request.query_string).text
+        response = Response(transcript)
         headerlist = [
             ('Content-Type', 'text/plain'),
             ('Content-Disposition', 'attachment; filename={}'.format(filename))
