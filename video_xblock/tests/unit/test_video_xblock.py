@@ -4,10 +4,11 @@ Test cases for video_xblock.
 
 import datetime
 import json
-import mock
+from mock import patch, Mock, MagicMock, PropertyMock
 
 from django.test import RequestFactory
 from django.conf import settings
+from xblock.fragment import Fragment
 
 from video_xblock import VideoXBlock
 from video_xblock.utils import ugettext as _
@@ -55,7 +56,7 @@ class VideoXBlockTests(VideoXBlockTestBase):
         Test player state property.
         """
         self.xblock.course_id = 'test:course:id'
-        self.xblock.runtime.modulestore = mock.Mock(get_course=MockCourse)
+        self.xblock.runtime.modulestore = Mock(get_course=MockCourse)
         self.assertDictEqual(
             self.xblock.player_state,
             {
@@ -88,7 +89,7 @@ class VideoXBlockTests(VideoXBlockTestBase):
         Test player state saving.
         """
         self.xblock.course_id = 'test:course:id'
-        self.xblock.runtime.modulestore = mock.Mock(get_course=MockCourse)
+        self.xblock.runtime.modulestore = Mock(get_course=MockCourse)
         data = {
             'currentTime': 5,
             'muted': True,
@@ -117,3 +118,35 @@ class VideoXBlockTests(VideoXBlockTestBase):
             'captionsLanguage': data['captionsLanguage'],
             'transcriptsObject': {}
         })
+
+    @patch('video_xblock.video_xblock.render_resource')
+    @patch('video_xblock.video_xblock.resource_string')
+    @patch.object(VideoXBlock, 'route_transcripts')
+    def test_studio_view(self, route_transcripts, resource_string_mock, render_resource_mock):
+        # Arrange
+        unused_context_stub = object()
+        render_resource_mock.return_value = u'<iframe/>'
+        handler_url = self.xblock.runtime.handler_url = Mock()
+        handler_url.side_effect = ['/player/url', '/transcript/download/url']
+        route_transcripts.return_value = 'transcripts.vtt'
+
+        # Act
+        studio_view = self.xblock.student_view(unused_context_stub)
+
+        # Assert
+        self.assertIsInstance(studio_view, Fragment)
+        render_resource_mock.assert_called_once_with(
+            'static/html/student_view.html',
+            display_name='Video',
+            download_transcript_allowed=False,
+            download_video_url=False,
+            handout='',
+            handout_file_name='',
+            player_url='/player/url',
+            transcript_download_link='',
+            transcripts='transcripts.vtt',
+            usage_id='deprecated_string'
+        )
+        resource_string_mock.assert_called_with('static/css/student-view.css')
+        handler_url.assert_called_with(self.xblock, 'download_transcript')
+        route_transcripts.assert_called_once_with(self.xblock.transcripts)

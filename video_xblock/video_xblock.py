@@ -287,6 +287,16 @@ class VideoXBlock(
 
         self.validate_href_data(validation, data)
 
+    def get_download_video_url(self):
+        # Use field `href` for Html5 player.
+        # Use field `download_video_url` for other players. Don't show button if this field is empty.
+        if not self.download_video_allowed:
+            return False
+        elif self.player_name == PlayerName.HTML5:
+            return self.href
+        elif self.download_video_url:
+            return self.download_video_url
+
     def student_view(self, _context=None):
         """
         The primary view of the `VideoXBlock`, shown to students when viewing courses.
@@ -296,14 +306,7 @@ class VideoXBlock(
         transcript_download_link = self.get_transcript_download_link()
         full_transcript_download_link = ''
 
-        # Use field `href` for Html5 player.
-        # Use field `download_video_url` for other players. Don't show button if this field is empty.
-        download_video_url = False
-        if self.download_video_allowed:
-            if self.player_name == PlayerName.HTML5:
-                download_video_url = self.href
-            elif self.download_video_url:
-                download_video_url = self.download_video_url
+        download_video_url = self.get_download_video_url()
 
         if transcript_download_link:
             full_transcript_download_link = download_transcript_handler_url + transcript_download_link
