@@ -137,11 +137,13 @@ class SettingsMixinTests(VideoXBlockTestBase):
             # Arrange
             service_mock = runtime_mock.service
             settings_bucket_mock = service_mock.return_value.get_settings_bucket
+            settings_bucket_mock.return_value = {'foo': 'bar'}
 
             # Act
             settings = self.xblock.settings
 
             # Assert
+            self.assertEqual(settings, {'foo': 'bar'})
             service_mock.assert_called_once_with(self.xblock, 'settings')
             settings_bucket_mock.assert_called_once_with(self.xblock)
             import_from_mock.assert_not_called()
@@ -152,13 +154,16 @@ class SettingsMixinTests(VideoXBlockTestBase):
             # Arrange
             service_mock = runtime_mock.service
             service_mock.return_value = None
+            get_settings_mock = import_from_mock.return_value.XBLOCK_SETTINGS.get
+            get_settings_mock.return_value = {'foo': 'bar'}
 
             # Act
             settings = self.xblock.settings
 
             # Assert
+            self.assertEqual(settings, {'foo': 'bar'})
             import_from_mock.assert_called_once_with('django.conf', 'settings')
-            import_from_mock.return_value.XBLOCK_SETTINGS.get.assert_called_once_with(
+            get_settings_mock.assert_called_once_with(
                 self.xblock.block_settings_key, {}
             )
 
