@@ -146,6 +146,31 @@ class TranscriptsMixinTests(VideoXBlockTestBase):
         vtt_writer_mock.assert_not_called()
         detect_format_mock.assert_called_once_with('test caps')
 
+    @patch.object(VideoXBlock, 'static_content')
+    @patch.object(VideoXBlock, 'contentstore')
+    @patch.object(VideoXBlock, 'course_key')
+    def test_create_transcript_file(self, course_key, contentstore_mock, static_content_mock):
+        # Arrange
+        trans_srt_stub = 'test srt transcript'
+        reference_name_stub = 'test transcripts'
+        static_content_mock.compute_location = Mock(return_value='test-location.vtt')
+        save_mock = contentstore_mock.return_value.save
+
+        # Act
+        file_name, external_url = self.xblock.create_transcript_file(
+            trans_str=trans_srt_stub, reference_name=reference_name_stub
+        )
+
+        # Assert
+        static_content_mock.assert_called_with(
+            'test-location', 'test_transcripts.vtt','application/json', u'test srt transcript'
+        )
+        save_mock.assert_called_once_with(static_content_mock.return_value)
+
+        self.assertEqual(file_name, 'test_transcripts.vtt')
+        self.assertEqual(external_url, '/test-location.vtt')
+
+
     @patch.object(VideoXBlock, 'get_file_name_from_path')
     @patch('video_xblock.mixins.requests.get')
     def test_download_transcript_handler_response_object(self, get_mock, get_filename_mock):
