@@ -4,7 +4,7 @@ Test cases for video_xblock.
 
 import datetime
 import json
-from mock import patch, Mock, MagicMock, PropertyMock
+from mock import patch, Mock
 
 from django.test import RequestFactory
 from django.conf import settings
@@ -129,6 +129,7 @@ class VideoXBlockTests(VideoXBlockTestBase):
         handler_url = self.xblock.runtime.handler_url = Mock()
         handler_url.side_effect = ['/player/url', '/transcript/download/url']
         route_transcripts.return_value = 'transcripts.vtt'
+        self.xblock.get_transcript_download_link = Mock(return_value='/transcript/link.vtt')
 
         # Act
         studio_view = self.xblock.student_view(unused_context_stub)
@@ -143,7 +144,7 @@ class VideoXBlockTests(VideoXBlockTestBase):
             handout='',
             handout_file_name='',
             player_url='/player/url',
-            transcript_download_link='',
+            transcript_download_link='/transcript/download/url'+'/transcript/link.vtt',
             transcripts='transcripts.vtt',
             usage_id='deprecated_string'
         )
