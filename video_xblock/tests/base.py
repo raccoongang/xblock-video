@@ -64,5 +64,8 @@ class VideoXBlockTestBase(unittest.TestCase):
         self.fail('The test is incomplete!')
 
     def test_mark_untinished_raises_assertion_error(self):
+        """
+        Self-check to be sure self.mark_unfinished() is actually fails.
+        """
         with self.assertRaises(AssertionError):
             self.mark_unfinished()
