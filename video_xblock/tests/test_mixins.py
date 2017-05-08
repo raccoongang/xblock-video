@@ -103,11 +103,11 @@ class PlaybackStateMixinTests(VideoXBlockTestBase):
     """Test PlaybackStateMixin"""
 
     def test_fallback_course_default_language(self):
-        self.xblock.runtime = runtime_mock = Mock()
-        runtime_mock.service = service_mock = Mock(side_effect=NoSuchServiceError)
+        with patch.object(self.xblock, 'runtime') as runtime_mock:
+            runtime_mock.service = service_mock = Mock(side_effect=NoSuchServiceError)
 
-        self.assertEqual(self.xblock.course_default_language, DEFAULT_LANG)
-        service_mock.assert_called_once()
+            self.assertEqual(self.xblock.course_default_language, DEFAULT_LANG)
+            service_mock.assert_called_once()
 
     def test_course_default_language(self):
         self.xblock.runtime = runtime_mock = Mock()
