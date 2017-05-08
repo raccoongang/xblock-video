@@ -167,6 +167,18 @@ class SettingsMixinTests(VideoXBlockTestBase):
                 self.xblock.block_settings_key, {}
             )
 
+    @patch.object(VideoXBlock, 'settings', new_callable=PropertyMock)
+    def test_populate_default_values(self, settings_mock):
+        # Arrange
+        settings_mock.return_value = {'foo': 'another bar', 'spam': 'eggs'}
+        xblock_fields_dict = {'foo': 'bar'}
+
+        # Act
+        populated_xblock_fields = self.xblock.populate_default_values(xblock_fields_dict)
+
+        # Assert
+        self.assertEqual(populated_xblock_fields, {'foo': 'bar', 'spam': 'eggs'})
+
 
 class TranscriptsMixinTests(VideoXBlockTestBase):
     """Test TranscriptsMixin"""
