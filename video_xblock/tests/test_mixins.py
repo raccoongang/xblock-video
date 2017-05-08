@@ -110,18 +110,18 @@ class PlaybackStateMixinTests(VideoXBlockTestBase):
             service_mock.assert_called_once()
 
     def test_course_default_language(self):
-        self.xblock.runtime = runtime_mock = Mock()
-        service_mock = runtime_mock.service
-        lang_mock = type(service_mock.return_value.get_course.return_value).language = PropertyMock(
-            return_value='test_lang'
-        )
-        lang_mock.return_value = 'test_lang'
-        self.xblock.course_id = course_id_mock = PropertyMock()
+        with patch.object(self.xblock, 'runtime') as runtime_mock:
+            service_mock = runtime_mock.service
+            lang_mock = type(service_mock.return_value.get_course.return_value).language = PropertyMock(
+                return_value='test_lang'
+            )
+            lang_mock.return_value = 'test_lang'
+            self.xblock.course_id = course_id_mock = PropertyMock()
 
-        self.assertEqual(self.xblock.course_default_language, 'test_lang')
-        service_mock.assert_called_once_with(self.xblock, 'modulestore')
-        lang_mock.assert_called_once()
-        course_id_mock.assert_not_called()
+            self.assertEqual(self.xblock.course_default_language, 'test_lang')
+            service_mock.assert_called_once_with(self.xblock, 'modulestore')
+            lang_mock.assert_called_once()
+            course_id_mock.assert_not_called()
 
 
 class TranscriptsMixinTests(VideoXBlockTestBase):
