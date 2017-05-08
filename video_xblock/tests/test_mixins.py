@@ -10,7 +10,7 @@ from webob import Response
 from xblock.exceptions import NoSuchServiceError
 
 from video_xblock.constants import DEFAULT_LANG
-from video_xblock.tests.base import VideoXBlockTestBase
+from video_xblock.tests.unit.base import VideoXBlockTestBase
 from video_xblock.utils import loader
 from video_xblock.video_xblock import VideoXBlock
 
