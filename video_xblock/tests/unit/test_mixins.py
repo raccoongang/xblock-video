@@ -124,6 +124,44 @@ class PlaybackStateMixinTests(VideoXBlockTestBase):
             course_id_mock.assert_not_called()
 
 
+class SettingsMixinTests(VideoXBlockTestBase):
+    """
+    Test SettingsMixin
+    """
+    def test_block_settings_key_is_correct(self):
+        self.assertEqual(self.xblock.block_settings_key, 'video_xblock')
+
+    @patch('video_xblock.mixins.import_from')
+    def test_settings_property_with_runtime_service(self, import_from_mock):
+        with patch.object(self.xblock, 'runtime') as runtime_mock:
+            # Arrange
+            service_mock = runtime_mock.service
+            settings_bucket_mock = service_mock.return_value.get_settings_bucket
+
+            # Act
+            settings = self.xblock.settings
+
+            # Assert
+            service_mock.assert_called_once_with(self.xblock, 'settings')
+            settings_bucket_mock.assert_called_once_with(self.xblock)
+            import_from_mock.assert_not_called()
+
+    @patch('video_xblock.mixins.import_from')
+    def test_settings_property_without_runtime_service(self, import_from_mock):
+        with patch.object(self.xblock, 'runtime') as runtime_mock:
+            # Arrange
+            service_mock = runtime_mock.service
+            service_mock.return_value = None
+
+            # Act
+            settings = self.xblock.settings
+
+            # Assert
+            import_from_mock.assert_called_once_with('django.conf', 'settings')
+            import_from_mock.return_value.XBLOCK_SETTINGS.get.assert_called_once_with(
+                self.xblock.block_settings_key, {}
+            )
+
 class TranscriptsMixinTests(VideoXBlockTestBase):
     """Test TranscriptsMixin"""
 
