@@ -6,14 +6,12 @@ import datetime
 import json
 from mock import patch, Mock
 
-from django.test import RequestFactory
 from django.conf import settings
 from xblock.fragment import Fragment
 
 from video_xblock import VideoXBlock
 from video_xblock.utils import ugettext as _
 from video_xblock.tests.unit.base import VideoXBlockTestBase
-from video_xblock.tests.unit.mocks.base import MockCourse
 
 from video_xblock.constants import PlayerName
 
@@ -51,27 +49,6 @@ class VideoXBlockTests(VideoXBlockTestBase):
         self.assertEqual(self.xblock.download_video_allowed, False)
         self.assertEqual(self.xblock.download_video_url, '')
 
-    def test_player_state(self):
-        """
-        Test player state property.
-        """
-        self.xblock.course_id = 'test:course:id'
-        self.xblock.runtime.modulestore = Mock(get_course=MockCourse)
-        self.assertDictEqual(
-            self.xblock.player_state,
-            {
-                'currentTime': self.xblock.current_time,
-                'muted': self.xblock.muted,
-                'playbackRate': self.xblock.playback_rate,
-                'volume': self.xblock.volume,
-                'transcripts': [],
-                'transcriptsEnabled': self.xblock.transcripts_enabled,
-                'captionsEnabled': self.xblock.captions_enabled,
-                'captionsLanguage': 'en',
-                'transcriptsObject': {}
-            }
-        )
-
     def test_get_brightcove_js_url(self):
         """
         Test brightcove.js url generation.
@@ -83,41 +60,6 @@ class VideoXBlockTests(VideoXBlockTestBase):
                 player_id=self.xblock.player_id
             )
         )
-
-    def test_save_player_state(self):
-        """
-        Test player state saving.
-        """
-        self.xblock.course_id = 'test:course:id'
-        self.xblock.runtime.modulestore = Mock(get_course=MockCourse)
-        data = {
-            'currentTime': 5,
-            'muted': True,
-            'playbackRate': 2,
-            'volume': 0.5,
-            'transcripts': [],
-            'transcriptsEnabled': True,
-            'captionsEnabled': True,
-            'captionsLanguage': 'ru',
-            'transcriptsObject': {}
-        }
-        factory = RequestFactory()
-        request = factory.post('', json.dumps(data), content_type='application/json')
-
-        response = self.xblock.save_player_state(request)
-
-        self.assertEqual('{"success": true}', response.body)  # pylint: disable=no-member
-        self.assertDictEqual(self.xblock.player_state, {
-            'currentTime': data['currentTime'],
-            'muted': data['muted'],
-            'playbackRate': data['playbackRate'],
-            'volume': data['volume'],
-            'transcripts': data['transcripts'],
-            'transcriptsEnabled': data['transcriptsEnabled'],
-            'captionsEnabled': data['captionsEnabled'],
-            'captionsLanguage': data['captionsLanguage'],
-            'transcriptsObject': {}
-        })
 
     @patch('video_xblock.video_xblock.render_resource')
     @patch('video_xblock.video_xblock.resource_string')

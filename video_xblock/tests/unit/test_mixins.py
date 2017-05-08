@@ -3,9 +3,11 @@ VideoXBlock mixins test cases.
 """
 
 from collections import Iterable
+import json
 
 from mock import patch, Mock, MagicMock, PropertyMock
 
+from django.test import RequestFactory
 from webob import Response
 from xblock.exceptions import NoSuchServiceError
 
@@ -122,6 +124,63 @@ class PlaybackStateMixinTests(VideoXBlockTestBase):
             service_mock.assert_called_once_with(self.xblock, 'modulestore')
             lang_mock.assert_called_once()
             course_id_mock.assert_not_called()
+
+
+    def test_player_state(self):
+        """
+        Test player state property.
+        """
+        self.xblock.course_id = 'test:course:id'
+        self.xblock.runtime.modulestore = Mock(get_course=Mock)
+        self.assertDictEqual(
+            self.xblock.player_state,
+            {
+                'currentTime': self.xblock.current_time,
+                'muted': self.xblock.muted,
+                'playbackRate': self.xblock.playback_rate,
+                'volume': self.xblock.volume,
+                'transcripts': [],
+                'transcriptsEnabled': self.xblock.transcripts_enabled,
+                'captionsEnabled': self.xblock.captions_enabled,
+                'captionsLanguage': 'en',
+                'transcriptsObject': {}
+            }
+        )
+
+    def test_save_player_state(self):
+        """
+        Test player state saving.
+        """
+        self.xblock.course_id = 'test:course:id'
+        self.xblock.runtime.modulestore = Mock(get_course=Mock)
+        data = {
+            'currentTime': 5,
+            'muted': True,
+            'playbackRate': 2,
+            'volume': 0.5,
+            'transcripts': [],
+            'transcriptsEnabled': True,
+            'captionsEnabled': True,
+            'captionsLanguage': 'ru',
+            'transcriptsObject': {}
+        }
+        factory = RequestFactory()
+        request = factory.post('', json.dumps(data), content_type='application/json')
+
+        response = self.xblock.save_player_state(request)
+
+        self.assertEqual('{"success": true}', response.body)  # pylint: disable=no-member
+        self.assertDictEqual(self.xblock.player_state, {
+            'currentTime': data['currentTime'],
+            'muted': data['muted'],
+            'playbackRate': data['playbackRate'],
+            'volume': data['volume'],
+            'transcripts': data['transcripts'],
+            'transcriptsEnabled': data['transcriptsEnabled'],
+            'captionsEnabled': data['captionsEnabled'],
+            'captionsLanguage': data['captionsLanguage'],
+            'transcriptsObject': {}
+        })
 
 
 class SettingsMixinTests(VideoXBlockTestBase):
