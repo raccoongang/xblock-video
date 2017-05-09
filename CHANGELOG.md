@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- XBlock SDK Workbench scenarios to simplify development.
+
+## [0.6.6] - 2017-05-03
+
+### Changed
+
+- Make transcripts help hint more helpful.
+
+## [0.6.5] - 2017-04-21
+
+### Added
+
+- Bundle VideoJS fonts into Video XBlock.
+
+## [0.6.4] - 2017-04-14
+
+### Changed
+
+- Improve video player controls look&feel.
+- Make subtitles responsive.
+
+### Fixed
+
+- Fetching subtitles from 3PlayMedia.
+
+## [0.6.3] - 2017-03-30
+
+### Changed
+
+- Extend Brightcove url regex to include additional set of video urls.
+  Now it supports both:
+  - `https://studio.brightcove.com/products/videos/<media-id>`
+  - `https://studio.brightcove.com/products/videocloud/media/videos/<media-id>`
+- Restructure JavaScript codebase.
+
+## [0.6.2] - 2017-03-27
+
+### Changed
+
+- Update `videojs-wistia` external JS dependency.
+
+## [0.6.1] - 2017-03-27
+
 ### Changed
 
 - Simplify VideoXBlock installation by bundling JS/CSS dependencies into
@@ -127,4 +172,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.4.0]: https://github.com/raccoongang/xblock-video/compare/v0.3.0-alpha...v0.4.0
 [0.5.0]: https://github.com/raccoongang/xblock-video/compare/v0.4.0...v0.5.0
 [0.6.0]: https://github.com/raccoongang/xblock-video/compare/v0.5.0...v0.6.0
-[Unreleased]: https://github.com/raccoongang/xblock-video/compare/v0.6.0...HEAD
+[0.6.1]: https://github.com/raccoongang/xblock-video/compare/v0.6.0...v0.6.1
+[0.6.2]: https://github.com/raccoongang/xblock-video/compare/v0.6.1...v0.6.2
+[0.6.3]: https://github.com/raccoongang/xblock-video/compare/v0.6.2...v0.6.3
+[0.6.4]: https://github.com/raccoongang/xblock-video/compare/v0.6.3...v0.6.4
+[0.6.5]: https://github.com/raccoongang/xblock-video/compare/v0.6.4...v0.6.5
+[0.6.6]: https://github.com/raccoongang/xblock-video/compare/v0.6.5...v0.6.6
+[Unreleased]: https://github.com/raccoongang/xblock-video/compare/v0.6.6...HEAD

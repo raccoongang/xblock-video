@@ -15,11 +15,14 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
-            'js/base.js',
+            'https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js',
             'vendor/js/video.min.js',
             'js/spec/test_context.js',
-            'js/player_state.js',
-            'js/spec/*_spec.js'
+            'js/base.js',
+            'js/studio-edit/utils.js',
+            'js/studio-edit/transcripts-manual-upload.js',
+            'js/spec/*_spec.js',
+            'js/spec/studio-edit/*_spec.js'
         ],
         plugins: [
             'karma-chrome-launcher',
@@ -37,7 +40,7 @@ module.exports = function (config) {
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            'js/*.js': ['coverage']
+            'js/**/*.js': ['coverage']
         },
 
 
@@ -49,7 +52,6 @@ module.exports = function (config) {
         coverageReporter: {
             type: 'cobertura',
             dir: 'coverage/',
-            repoToken: 'St0myP2WKubt2SrFuyQDZI7Y1gsxDIiiX'
         },
 
         // web server port
