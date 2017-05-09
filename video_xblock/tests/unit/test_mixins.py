@@ -125,7 +125,6 @@ class PlaybackStateMixinTests(VideoXBlockTestBase):
             lang_mock.assert_called_once()
             course_id_mock.assert_not_called()
 
-
     def test_player_state(self):
         """
         Test player state property.
