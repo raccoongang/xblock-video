@@ -60,7 +60,7 @@ class ContentStoreMixinTest(VideoXBlockTestBase):
 class LocationMixinTests(VideoXBlockTestBase):
     """Test LocationMixin"""
 
-    def test_xblod_doesnt_have_location_by_default(self):
+    def test_xblock_doesnt_have_location_by_default(self):
         self.assertFalse(hasattr(self.xblock, 'location'))
 
     def test_fallback_block_id(self):
