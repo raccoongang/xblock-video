@@ -3,7 +3,6 @@ Test cases for video_xblock.
 """
 
 import datetime
-import json
 from mock import patch, Mock
 
 from django.conf import settings
