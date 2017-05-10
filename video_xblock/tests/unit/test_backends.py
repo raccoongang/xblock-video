@@ -321,12 +321,13 @@ class TestCustomBackends(VideoXBlockTestBase):
         'download_video_url',
         'href',
     ]
+
     @data(*zip(backends, download_video_url_delegates))
     @unpack
     def test_download_video_url_delegates_to_proper_xblock_attribute(self, backend, patch_target):
         # Arrange
         delegate_mock = PropertyMock()
-        setattr(self.xblock, download_video_url_delegates, delegate_mock)
+        setattr(self.xblock, patch_target, delegate_mock)
         player = self.player[backend](self.xblock)
 
         # Act
