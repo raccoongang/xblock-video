@@ -32,9 +32,6 @@ test-py: ## Run Python tests
 test-js: ## Run JavaScript tests
 	karma start video_xblock/static/video_xblock_karma.conf.js
 
-test-acceptance:
-	python run_tests.py video_xblock/tests/acceptance
-
 quality: quality-py quality-js ## Run code quality checks
 
 quality-py:
