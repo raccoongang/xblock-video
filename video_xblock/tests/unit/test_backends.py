@@ -5,7 +5,7 @@ Test cases for video_xblock backends.
 import babelfish
 from ddt import ddt, data, unpack
 from lxml import etree
-from mock import patch, PropertyMock
+from mock import PropertyMock
 from django.test.utils import override_settings
 from xblock.core import XBlock
 from video_xblock.settings import ALL_LANGUAGES
