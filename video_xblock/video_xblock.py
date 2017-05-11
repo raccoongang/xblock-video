@@ -411,7 +411,7 @@ class VideoXBlock(
             transcripts=self.route_transcripts(self.transcripts)
         ).strip()
         return player.get_player_html(
-            url=self.href, autoplay=False, account_id=self.account_id, player_id=self.player_id,
+            url=self.href, account_id=self.account_id, player_id=self.player_id,
             video_id=player.media_id(self.href),
             video_player_id='video_player_{}'.format(self.block_id),
             save_state_url=save_state_url,
