@@ -288,14 +288,12 @@ class VideoXBlock(
         self.validate_href_data(validation, data)
 
     def get_download_video_url(self):
-        # Use field `href` for Html5 player.
-        # Use field `download_video_url` for other players. Don't show button if this field is empty.
-        if not self.download_video_allowed:
-            return False
-        elif self.player_name == PlayerName.HTML5:
-            return self.href
-        elif self.download_video_url:
-            return self.download_video_url
+        """
+        Return direct video url for download if download is allowed.
+
+        Else return `False` which will hide "download video" button.
+        """
+        return self.download_video_allowed and self.get_player().download_video_url
 
     def student_view(self, _context=None):
         """
@@ -305,8 +303,6 @@ class VideoXBlock(
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
         transcript_download_link = self.get_transcript_download_link()
         full_transcript_download_link = ''
-
-        download_video_url = self.get_download_video_url()
 
         if transcript_download_link:
             full_transcript_download_link = download_transcript_handler_url + transcript_download_link
@@ -319,7 +315,7 @@ class VideoXBlock(
                 handout=self.handout,
                 transcripts=self.route_transcripts(self.transcripts),
                 download_transcript_allowed=self.download_transcript_allowed,
-                download_video_url=download_video_url,
+                download_video_url=self.get_download_video_url(),
                 handout_file_name=self.get_file_name_from_path(self.handout),
                 transcript_download_link=full_transcript_download_link
             )
@@ -415,7 +411,7 @@ class VideoXBlock(
             transcripts=self.route_transcripts(self.transcripts)
         ).strip()
         return player.get_player_html(
-            url=self.href, autoplay=False, account_id=self.account_id, player_id=self.player_id,
+            url=self.href, account_id=self.account_id, player_id=self.player_id,
             video_id=player.media_id(self.href),
             video_player_id='video_player_{}'.format(self.block_id),
             save_state_url=save_state_url,

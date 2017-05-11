@@ -1,3 +1,3 @@
 """
-Testing of video_xblock modules.
+Unit tests for video_xblock modules.
 """

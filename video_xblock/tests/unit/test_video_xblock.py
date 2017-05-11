@@ -3,8 +3,7 @@ Test cases for video_xblock.
 """
 
 import datetime
-import json
-from mock import patch, Mock
+from mock import patch, Mock, PropertyMock
 
 from django.conf import settings
 from xblock.fragment import Fragment
@@ -62,9 +61,56 @@ class VideoXBlockTests(VideoXBlockTestBase):
         )
 
     @patch('video_xblock.video_xblock.render_resource')
+    @patch.object(VideoXBlock, 'route_transcripts')
+    @patch.object(VideoXBlock, 'get_player')
+    @patch.object(VideoXBlock, 'player_state', new_callable=PropertyMock)
+    @patch.object(VideoXBlock, 'get_brightcove_js_url')
+    def test_render_player(
+            self, brightcove_js_url_mock, player_state_mock, player_mock,
+            route_transcripts_mock, render_resource_mock
+    ):
+        # Arrange
+        request_mock, suffix_mock = Mock(), Mock()
+        render_resource_mock.return_value = u'vtt transcripts'
+        handler_url = self.xblock.runtime.handler_url = Mock()
+        get_player_html_mock = player_mock.return_value.get_player_html
+        media_id_mock = player_mock.return_value.media_id
+
+        # Act
+        rendered_player = self.xblock.render_player(request_mock, suffix_mock)
+
+        # Assert
+        self.assertEqual(rendered_player, get_player_html_mock.return_value)
+        get_player_html_mock.assert_called_once_with(
+            account_id=self.xblock.account_id,
+            brightcove_js_url=brightcove_js_url_mock.return_value,
+            end_time=self.xblock.end_time.total_seconds(),  # pylint: disable=no-member
+            player_id=self.xblock.player_id,
+            player_state=player_state_mock.return_value,
+            save_state_url=handler_url.return_value,
+            start_time=self.xblock.start_time.total_seconds(),  # pylint: disable=no-member
+            transcripts=u'vtt transcripts',
+            url=self.xblock.href,
+            video_id=media_id_mock.return_value,
+            video_player_id='video_player_block_id'
+        )
+        brightcove_js_url_mock.assert_called_once_with(
+            self.xblock.account_id, self.xblock.player_id
+        )
+        player_state_mock.assert_called_once_with()
+        render_resource_mock.assert_called_once_with(
+            'static/html/transcripts.html',
+            transcripts=route_transcripts_mock()
+        )
+        player_mock.assert_called_once_with()
+        handler_url.assert_called_once_with(self.xblock, 'save_player_state')
+        request_mock.assert_not_called()
+        suffix_mock.assert_not_called()
+
+    @patch('video_xblock.video_xblock.render_resource')
     @patch('video_xblock.video_xblock.resource_string')
     @patch.object(VideoXBlock, 'route_transcripts')
-    def test_studio_view(self, route_transcripts, resource_string_mock, render_resource_mock):
+    def test_student_view(self, route_transcripts, resource_string_mock, render_resource_mock):
         # Arrange
         unused_context_stub = object()
         render_resource_mock.return_value = u'<iframe/>'
