@@ -76,7 +76,6 @@ class VideoXBlockTests(VideoXBlockTestBase):
         get_player_html_mock = player_mock.return_value.get_player_html
         media_id_mock = player_mock.return_value.media_id
 
-
         # Act
         rendered_player = self.xblock.render_player(request_mock, suffix_mock)
 
