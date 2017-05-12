@@ -1,6 +1,6 @@
 PATH  := node_modules/.bin:$(PATH)
 SHELL := /bin/bash
-SELENIUM_BROWSER := chrome
+SELENIUM_BROWSER ?= firefox
 
 .PHONY=all,quality,test
 
