@@ -1,9 +1,12 @@
+"""
+TODO.
+"""
+
 from time import sleep
 
 from ddt import data, ddt
 
 from xblockutils.base_test import SeleniumXBlockTest
-from xblockutils.studio_editable_test import StudioEditableBaseTest
 
 from video_xblock.utils import loader
 
@@ -22,7 +25,6 @@ class TestStudentView(SeleniumXBlockTest):
         """
         params = params or {}
         scenario = loader.load_unicode("workbench/scenarios/{}".format(xml_file))
-        print(scenario)
         self.set_scenario_xml(scenario)
         if load_immediately:
             view = self.go_to_view("student_view")
@@ -41,7 +43,7 @@ class TestStudentView(SeleniumXBlockTest):
         # Act
         self.assertIsNotNone(wrapper)
         self.assertFalse(vjs_player.is_playing())
-        vjs_player.play_button.click()
+        vjs_player.play_button.click()  # pylint: disable=no-member
         sleep(1)  # TODO: Change to promise
 
         # Assert
