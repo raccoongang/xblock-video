@@ -1,5 +1,4 @@
-PATH := node_modules/.bin:$(PATH):/usr/lib/chromium-browser/
-LD_LIBRARY_PATH := $(LD_LIBRARY_PATH):/usr/lib/chromium-browser/libs
+PATH := node_modules/.bin:$(PATH)
 SHELL := /bin/bash
 SELENIUM_BROWSER ?= chrome
 
@@ -46,7 +45,6 @@ xvfb:
 
 test-acceptance:
 	echo "$(LD_LIBRARY_PATH)"
-	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH)
 	chromedriver --version
 	SELENIUM_BROWSER=$(SELENIUM_BROWSER) \
 	python run_tests.py video_xblock/tests/acceptance \

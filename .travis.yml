@@ -35,6 +35,8 @@ before_script:
 # Install bower, eslint, eslint-config-edx-es5 and their dependencies
 - make tools
 - make deps-test
+- export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/chromium-browser/libs
+- export PATH=$PATH:/usr/lib/chromium-browser
 
 script:
 - make quality-py
