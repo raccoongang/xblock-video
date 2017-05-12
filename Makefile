@@ -28,7 +28,7 @@ clean: # Clean working directory
 	-find . -name *.pyc -delete
 
 ifeq ($(TESTS),acceptance)
-test: test-acceptance ## Run tests
+test: xvfb test-acceptance ## Run tests
 else
 test: test-py test-js ## Run tests
 endif
@@ -39,10 +39,13 @@ test-py: ## Run Python tests
 test-js: ## Run JavaScript tests
 	karma start video_xblock/static/video_xblock_karma.conf.js
 
-test-acceptance:
+xvfb:
 	export DISPLAY=:99.0
 	sh -e /etc/init.d/xvfb start
 	sleep 3 # give xvfb some time to start
+
+test-acceptance:
+	ls /usr/lib/chromium-browser/libs
 	chromedriver --version
 	SELENIUM_BROWSER=$(SELENIUM_BROWSER) \
 	python run_tests.py video_xblock/tests/acceptance \
