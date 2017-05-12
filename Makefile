@@ -42,6 +42,7 @@ test-acceptance:
 	export DISPLAY=:99.0
 	sh -e /etc/init.d/xvfb start
 	sleep 3 # give xvfb some time to start
+	chromedriver --version
 	SELENIUM_BROWSER=$(SELENIUM_BROWSER) \
 	python run_tests.py video_xblock/tests/acceptance \
 	--with-coverage --cover-package=video_xblock
