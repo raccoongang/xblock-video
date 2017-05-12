@@ -2,10 +2,8 @@
 TODO.
 """
 
-from time import sleep
-
+from bok_choy.promise import EmptyPromise
 from ddt import data, ddt
-
 from xblockutils.base_test import SeleniumXBlockTest
 
 from video_xblock.utils import loader
@@ -44,7 +42,8 @@ class TestStudentView(SeleniumXBlockTest):
         self.assertIsNotNone(wrapper)
         self.assertFalse(vjs_player.is_playing())
         vjs_player.play_button.click()  # pylint: disable=no-member
-        sleep(1)  # TODO: Change to promise
 
         # Assert
-        self.assertTrue(vjs_player.is_playing())
+        EmptyPromise(
+            lambda: vjs_player.is_playing(), "Video is being played"
+        ).fulfill()
