@@ -6,7 +6,10 @@ python:
 
 addons:
   apt:
+    sources:
+    - google-chrome
     packages:
+    - google-chrome-stable
     # Install binary package for lxml to speed up build
     - python-lxml
 

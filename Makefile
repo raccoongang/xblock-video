@@ -1,6 +1,6 @@
 PATH  := node_modules/.bin:$(PATH)
 SHELL := /bin/bash
-SELENIUM_BROWSER ?= firefox
+SELENIUM_BROWSER ?= chrome
 
 .PHONY=all,quality,test
 
@@ -39,6 +39,9 @@ test-js: ## Run JavaScript tests
 	karma start video_xblock/static/video_xblock_karma.conf.js
 
 test-acceptance:
+	export DISPLAY=:99.0
+	sh -e /etc/init.d/xvfb start
+	sleep 3 # give xvfb some time to start
 	SELENIUM_BROWSER=$(SELENIUM_BROWSER) \
 	python run_tests.py video_xblock/tests/acceptance \
 	--with-coverage --cover-package=video_xblock
