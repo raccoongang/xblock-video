@@ -31,9 +31,6 @@ class TestStudentView(SeleniumXBlockTest):
 
     @data('brightcove.xml', 'youtube.xml', 'vimeo.xml', 'wistia.xml')
     def test_video_player_can_play_video(self, scenario):
-        """
-        The xblock should display the text value of field2.
-        """
         # Arrange
         wrapper = self.load_scenario(scenario)
         vjs_player = VideojsPlayerPage(self.driver)
@@ -44,6 +41,4 @@ class TestStudentView(SeleniumXBlockTest):
         vjs_player.play_button.click()  # pylint: disable=no-member
 
         # Assert
-        EmptyPromise(
-            lambda: vjs_player.is_playing(), "Video is being played"
-        ).fulfill()
+        EmptyPromise(vjs_player.is_playing, "Video is being played").fulfill()
