@@ -45,6 +45,7 @@ xvfb:
 
 test-acceptance:
 	echo "$(LD_LIBRARY_PATH)"
+	ldd /usr/lib/chromium-browser/chromedriver
 	chromedriver --version
 	SELENIUM_BROWSER=$(SELENIUM_BROWSER) \
 	python run_tests.py video_xblock/tests/acceptance \
