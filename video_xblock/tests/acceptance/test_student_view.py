@@ -1,9 +1,16 @@
+from time import sleep
+
+from ddt import data, ddt
+
 from xblockutils.base_test import SeleniumXBlockTest
 from xblockutils.studio_editable_test import StudioEditableBaseTest
 
 from video_xblock.utils import loader
 
+from .pages import VideojsPlayerPage
 
+
+@ddt
 class TestStudentView(SeleniumXBlockTest):
     """
     Test the Student View of MyCoolXBlock
@@ -14,16 +21,28 @@ class TestStudentView(SeleniumXBlockTest):
         Given the name of an XML file in the xml_templates folder, load it into the workbench.
         """
         params = params or {}
-        scenario = loader.render_django_template("workbench/scenarios/{}".format(xml_file), params)
+        scenario = loader.load_unicode("workbench/scenarios/{}".format(xml_file))
+        print(scenario)
         self.set_scenario_xml(scenario)
         if load_immediately:
-            return self.go_to_view("student_view")
+            view = self.go_to_view("student_view")
+            self.driver.switch_to.frame('xblock-video-player')
+            return view
 
-    def test_hello_world(self):
+    @data('brightcove.xml', 'youtube.xml', 'vimeo.xml', 'wistia.xml')
+    def test_video_player_can_play_video(self, scenario):
         """
         The xblock should display the text value of field2.
         """
-        wrapper = self.load_scenario('youtube.xml')
-        self.driver.switch_to_frame('xblock-video-player')
-        player_container = self.driver.find_element_by_id('video_player_block_id')
-        self.assertIsNotNone(player_container)
+        # Arrange
+        wrapper = self.load_scenario(scenario)
+        vjs_player = VideojsPlayerPage(self.driver)
+
+        # Act
+        self.assertIsNotNone(wrapper)
+        self.assertFalse(vjs_player.is_playing())
+        vjs_player.play_button.click()
+        sleep(1)  # TODO: Change to promise
+
+        # Assert
+        self.assertTrue(vjs_player.is_playing())
