@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Run tests for the Problem Builder XBlock
+Run tests for the VideoXBlock.
 
 This script is required to run our selenium tests inside the xblock-sdk workbench
 because the workbench SDK's settings file is not inside any python module.
