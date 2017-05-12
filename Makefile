@@ -44,7 +44,6 @@ xvfb:
 	sleep 3 # give xvfb some time to start
 
 test-acceptance:
-	chromedriver --version
 	SELENIUM_BROWSER=$(SELENIUM_BROWSER) \
 	python run_tests.py video_xblock/tests/acceptance \
 	--with-coverage --cover-package=video_xblock
