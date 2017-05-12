@@ -46,7 +46,9 @@ xvfb:
 
 test-acceptance:
 	echo "$(LD_LIBRARY_PATH)"
+	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) \
 	chromedriver --version
+	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) \
 	SELENIUM_BROWSER=$(SELENIUM_BROWSER) \
 	python run_tests.py video_xblock/tests/acceptance \
 	--with-coverage --cover-package=video_xblock
