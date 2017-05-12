@@ -12,6 +12,7 @@ addons:
     packages:
     - google-chrome-stable
     - chromium-chromedriver
+    - libbase
     # Install binary package for lxml to speed up build
     - python-lxml
 
