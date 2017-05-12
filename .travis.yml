@@ -11,6 +11,7 @@ addons:
     - google-chrome
     packages:
     - google-chrome-stable
+    - chromium-chromedriver
     # Install binary package for lxml to speed up build
     - python-lxml
 
