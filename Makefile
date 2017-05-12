@@ -1,5 +1,7 @@
 PATH  := node_modules/.bin:$(PATH)
 SHELL := /bin/bash
+SELENIUM_BROWSER := chrome
+
 .PHONY=all,quality,test
 
 bower_dir := bower_components
@@ -24,7 +26,11 @@ clean: # Clean working directory
 	-rm -rf dist/
 	-find . -name *.pyc -delete
 
+ifeq ($(TESTS),acceptance)
+test: test-acceptance ## Run tests
+else
 test: test-py test-js ## Run tests
+endif
 
 test-py: ## Run Python tests
 	nosetests video_xblock.tests.unit --with-coverage --cover-package=video_xblock
@@ -33,7 +39,9 @@ test-js: ## Run JavaScript tests
 	karma start video_xblock/static/video_xblock_karma.conf.js
 
 test-acceptance:
-	python run_tests.py video_xblock/tests/acceptance
+	SELENIUM_BROWSER=$(SELENIUM_BROWSER) \
+	python run_tests.py video_xblock/tests/acceptance \
+	--with-coverage --cover-package=video_xblock
 
 quality: quality-py quality-js ## Run code quality checks
 
@@ -59,8 +67,17 @@ deps-js: tools
 tools: ## Install development tools
 	npm install
 
-coverage: ## Send coverage reports to coverage sevice
-	bash <(curl -s https://codecov.io/bash)
+coverage-unit: ## Send unit tests coverage reports to coverage sevice
+	bash <(curl -s https://codecov.io/bash) -cF unit
+
+coverage-acceptance: ## Send acceptance tests coverage reports to coverage sevice
+	bash <(curl -s https://codecov.io/bash) -cF acceptance
+
+ifeq ($(TESTS),acceptance)
+coverage: coverage-acceptance ## Send coverage reports to coverage sevice
+else
+coverage: coverage-unit ## Send coverage reports to coverage sevice
+endif
 
 clear-vendored:
 	rm -rf $(vendor_dir)/js/*
