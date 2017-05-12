@@ -1,4 +1,5 @@
-PATH  := node_modules/.bin:$(PATH):/usr/lib/chromium-browser/
+PATH := node_modules/.bin:$(PATH):/usr/lib/chromium-browser/
+LD_LIBRARY_PATH := $(LD_LIBRARY_PATH):/usr/lib/chromium-browser/libs
 SHELL := /bin/bash
 SELENIUM_BROWSER ?= chrome
 
