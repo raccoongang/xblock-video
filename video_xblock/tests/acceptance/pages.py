@@ -30,6 +30,7 @@ class VideojsPlayerPage(object):
     play_button = VideoJsPlayButton()
 
     def __init__(self, driver):
+        """Constructor."""
         self.driver = driver
 
     def is_playing(self):
