@@ -23,20 +23,17 @@ class VideoJsPlayButton(ClassPageElement):
 
 class VideojsPlayerPage(object):
     """
-    Page
+    VideoJs player page-object.
     """
 
     player_element = VideoJsPlayerElement()
     play_button = VideoJsPlayButton()
 
     def __init__(self, driver):
-        """
-        TODO.
-        """
         self.driver = driver
 
     def is_playing(self):
         """
-        TODO.
+        Check if video is being played.
         """
         return 'vjs-playing' in self.player_element.get_attribute('class')  # pylint: disable=no-member
