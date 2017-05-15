@@ -1,5 +1,5 @@
 """
-TODO.
+Acceptance test for video playback.
 """
 
 from bok_choy.promise import EmptyPromise
@@ -14,7 +14,7 @@ from .pages import VideojsPlayerPage
 @ddt
 class TestStudentView(SeleniumXBlockTest):
     """
-    Test the Student View of MyCoolXBlock
+    Test the Student View of VideoXBlock.
     """
 
     def load_scenario(self, xml_file, params=None, load_immediately=True):
