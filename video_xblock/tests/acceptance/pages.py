@@ -1,5 +1,5 @@
 """
-TODO.
+Page objects to use in tests.
 """
 
 from .element import IdPageElement, ClassPageElement
@@ -7,7 +7,7 @@ from .element import IdPageElement, ClassPageElement
 
 class VideoJsPlayerElement(IdPageElement):
     """
-    TODO.
+    Root VideoJs player element.
     """
 
     locator = 'video_player_block_id'
@@ -15,7 +15,7 @@ class VideoJsPlayerElement(IdPageElement):
 
 class VideoJsPlayButton(ClassPageElement):
     """
-    TODO.
+    VideoJs play button located on the control bar.
     """
 
     locator = 'vjs-play-control'
@@ -23,7 +23,7 @@ class VideoJsPlayButton(ClassPageElement):
 
 class VideojsPlayerPage(object):
     """
-    TODO.
+    Page
     """
 
     player_element = VideoJsPlayerElement()

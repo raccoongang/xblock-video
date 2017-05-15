@@ -1,3 +1,3 @@
 """
-TODO.
+Acceptance test for VideoXBlock.
 """

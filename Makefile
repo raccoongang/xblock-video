@@ -43,8 +43,8 @@ quality: quality-py quality-js ## Run code quality checks
 
 quality-py:
 	pep8 . --format=pylint --max-line-length=120
-	pylint -f colorized video_xblock
 	pydocstyle -e
+	pylint -f colorized video_xblock
 
 quality-js:
 	eslint video_xblock/static/js/

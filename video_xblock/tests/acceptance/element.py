@@ -1,5 +1,5 @@
 """
-TODO.
+Page elements to use with page objects.
 """
 
 from selenium.webdriver.support.ui import WebDriverWait
@@ -7,14 +7,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 class IdPageElement(object):
     """
-    TODO.
-
-    Base page class that is initialized on every page object class.
+    Page element wich finds itself by id attribute.
     """
 
     def __get__(self, obj, owner):
         """
-        Get the text of the specified object.
+        Get the element of the specified object.
         """
         driver = obj.driver
         WebDriverWait(driver, 100).until(
@@ -25,12 +23,12 @@ class IdPageElement(object):
 
 class ClassPageElement(object):
     """
-    TODO.
+    Page element wich finds itself by class attribute.
     """
 
     def __get__(self, obj, owner):
         """
-        Get the text of the specified object.
+        Get the element of the specified object.
         """
         driver = obj.driver
         WebDriverWait(driver, 100).until(
@@ -41,7 +39,9 @@ class ClassPageElement(object):
 
 class InputPageElement(object):
     """
-    TODO.
+    Input page element.
+
+    Locates element by its name, can get and set element's text value.
     """
 
     def __set__(self, obj, value):
@@ -50,15 +50,15 @@ class InputPageElement(object):
         """
         driver = obj.driver
         WebDriverWait(driver, 100).until(
-            lambda driver: driver.find_element_by_id(self.locator))  # pylint: disable=no-member
-        driver.find_element_by_id(self.locator).send_keys(value)  # pylint: disable=no-member
+            lambda driver: driver.find_element_by_name(self.locator))  # pylint: disable=no-member
+        driver.find_element_by_name(self.locator).send_keys(value)  # pylint: disable=no-member
 
     def __get__(self, obj, owner):
         """
-        Get the text of the specified object.
+        Get the text value of the specified object.
         """
         driver = obj.driver
         WebDriverWait(driver, 100).until(
-            lambda driver: driver.find_element_by_id(self.locator))  # pylint: disable=no-member
-        element = driver.find_element_by_id(self.locator)  # pylint: disable=no-member
+            lambda driver: driver.find_element_by_name(self.locator))  # pylint: disable=no-member
+        element = driver.find_element_by_name(self.locator)  # pylint: disable=no-member
         return element.get_attribute('value')
