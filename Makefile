@@ -26,22 +26,13 @@ clean: # Clean working directory
 	-rm -rf dist/
 	-find . -name *.pyc -delete
 
-ifeq ($(TESTS),acceptance)
-test: xvfb test-acceptance ## Run tests
-else
-test: test-py test-js ## Run tests
-endif
+test: test-py test-js test-acceptance ## Run unit and acceptance tests
 
 test-py: ## Run Python tests
 	nosetests video_xblock.tests.unit --with-coverage --cover-package=video_xblock
 
 test-js: ## Run JavaScript tests
 	karma start video_xblock/static/video_xblock_karma.conf.js
-
-xvfb:
-	export DISPLAY=:99.0
-	sh -e /etc/init.d/xvfb start
-	sleep 3 # give xvfb some time to start
 
 test-acceptance:
 	SELENIUM_BROWSER=$(SELENIUM_BROWSER) \
@@ -77,12 +68,6 @@ coverage-unit: ## Send unit tests coverage reports to coverage sevice
 
 coverage-acceptance: ## Send acceptance tests coverage reports to coverage sevice
 	bash <(curl -s https://codecov.io/bash) -cF acceptance
-
-ifeq ($(TESTS),acceptance)
-coverage: coverage-acceptance ## Send coverage reports to coverage sevice
-else
-coverage: coverage-unit ## Send coverage reports to coverage sevice
-endif
 
 clear-vendored:
 	rm -rf $(vendor_dir)/js/*
