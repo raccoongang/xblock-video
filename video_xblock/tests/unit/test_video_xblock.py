@@ -3,7 +3,7 @@ Test cases for video_xblock.
 """
 
 import datetime
-from mock import patch, Mock, PropertyMock
+from mock import patch, Mock, MagicMock, PropertyMock
 
 from django.conf import settings
 from web_fragments.fragment import FragmentResource
@@ -139,6 +139,55 @@ class VideoXBlockTests(VideoXBlockTestBase):
         resource_string_mock.assert_called_with('static/css/student-view.css')
         handler_url.assert_called_with(self.xblock, 'download_transcript')
         route_transcripts.assert_called_once_with(self.xblock.transcripts)
+
+    @patch('video_xblock.video_xblock.ALL_LANGUAGES', new_callable=MagicMock)
+    @patch('video_xblock.video_xblock.render_template')
+    @patch.object(VideoXBlock, 'route_transcripts')
+    @patch.object(VideoXBlock, 'prepare_studio_editor_fields')
+    @patch('video_xblock.video_xblock.resource_string')
+    def test_studio_view_uses_correct_context(
+            self, resource_string_mock, prepare_fields_mock, _route_transcripts,
+            render_template_mock, all_languages_mock
+    ):
+        # Arrange
+        unused_context_stub = object()
+        all_languages_mock.__iter__.return_value = [['en', 'English']]
+        self.xblock.runtime.handler_url = handler_url_mock = Mock()
+        prepare_fields_mock.side_effect = basic_fields_stub, advanced_fields_stub = [
+            [{'name': 'display_name'}],
+            [{'name': 'href'}]
+        ]
+        resource_string_mock.side_effect = expected_resources = [
+            'static/css/student-view.css',
+            'static/css/transcripts-upload.css',
+            'static/css/studio-edit.css',
+            'static/js/runtime-handlers.js',
+            'static/js/studio-edit/utils.js',
+            'static/js/studio-edit/studio-edit.js',
+            'static/js/studio-edit/transcripts-autoload.js',
+            'static/js/studio-edit/transcripts-manual-upload.js',
+        ]
+
+        expected_context = {
+            'advanced_fields': advanced_fields_stub,
+            'auth_error_message': "In order to authenticate to a video platform's API, please provide a Video API Token.",
+            'basic_fields': basic_fields_stub,
+            'courseKey': 'course_key',
+            'default_transcripts': [],
+            'download_transcript_handler_url': handler_url_mock.return_value,
+            'initial_default_transcripts': [],
+            'languages': [{'code': 'en', 'label': 'English'}],
+            'transcripts': [],
+            'transcripts_autoupload_message': '',
+        }
+
+        # Act
+        studio_view = self.xblock.studio_view(unused_context_stub)
+
+        # Assert
+        render_template_mock.assert_called_once_with('studio-edit.html', **expected_context)
+        handler_url_mock.assert_called_with(self.xblock, 'download_transcript')
+        self.mark_unfinished()
 
     @staticmethod
     def _make_fragment_resource(file_name):
