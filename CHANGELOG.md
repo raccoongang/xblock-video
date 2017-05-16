@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - XBlock SDK Workbench scenarios to simplify development.
 
+### Changed
+
+- Update bundled VideoJS to 5.13.1.
+
 ## [0.6.6] - 2017-05-03
 
 ### Changed
