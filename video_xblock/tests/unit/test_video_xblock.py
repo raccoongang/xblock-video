@@ -142,20 +142,23 @@ class VideoXBlockTests(VideoXBlockTestBase):
 
     @staticmethod
     def _make_fragment_resource(file_name):
+        """
+        Helper factory method to create `FragmentResource` used in tests.
+        """
         if file_name.endswith('.js'):
             return FragmentResource('text', file_name, 'application/javascript', 'foot')
         elif file_name.endswith('.css'):
             return FragmentResource('text', file_name, 'text/css', 'head')
 
     @patch('video_xblock.video_xblock.render_template')
-    @patch('video_xblock.video_xblock.resource_string')
     @patch.object(VideoXBlock, 'route_transcripts')
+    @patch('video_xblock.video_xblock.resource_string')
     def test_studio_view_uses_correct_resources(
-            self, route_transcripts, resource_string_mock, render_template_mock
+            self, resource_string_mock, _route_transcripts, _render_template_mock
     ):
         # Arrange
         unused_context_stub = object()
-        handler_url = self.xblock.runtime.handler_url = Mock()
+        self.xblock.runtime.handler_url = Mock()
         resource_string_mock.side_effect = expected_resources = [
             'static/css/student-view.css',
             'static/css/transcripts-upload.css',
