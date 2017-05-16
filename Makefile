@@ -32,7 +32,7 @@ test-py: ## Run Python tests
 	nosetests video_xblock.tests.unit --with-coverage --cover-package=video_xblock
 
 test-js: ## Run JavaScript tests
-	karma start video_xblock/static/video_xblock_karma.conf.js
+	karma start video_xblock/static/video-xblock-karma.conf.js
 
 test-acceptance:
 	SELENIUM_BROWSER=$(SELENIUM_BROWSER) \
