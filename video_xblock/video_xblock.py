@@ -340,7 +340,7 @@ class VideoXBlock(
         # Note that there is no need to authenticate to Youtube API,
         # whilst for Wistia, a sample authorised request is to be made to ensure authentication succeeded,
         # since it is needed for the auth status message generation and the player's state update with auth status.
-        auth_data, auth_error_message = self.authenticate_video_api()  # pylint: disable=unused-variable
+        _auth_data, auth_error_message = self.authenticate_video_api()
 
         # Prepare parameters necessary to make requests to API.
         video_id = player.media_id(self.href)

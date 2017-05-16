@@ -143,16 +143,18 @@ class VideoXBlockTests(VideoXBlockTestBase):
     @patch('video_xblock.video_xblock.ALL_LANGUAGES', new_callable=MagicMock)
     @patch('video_xblock.video_xblock.render_template')
     @patch.object(VideoXBlock, 'route_transcripts')
+    @patch.object(VideoXBlock, 'authenticate_video_api')
     @patch.object(VideoXBlock, 'prepare_studio_editor_fields')
     @patch('video_xblock.video_xblock.resource_string')
     def test_studio_view_uses_correct_context(
-            self, resource_string_mock, prepare_fields_mock, _route_transcripts,
-            render_template_mock, all_languages_mock
+            self, resource_string_mock, prepare_fields_mock, authenticate_video_api_mock,
+            _route_transcripts, render_template_mock, all_languages_mock
     ):
         # Arrange
         unused_context_stub = object()
         all_languages_mock.__iter__.return_value = [['en', 'English']]
         self.xblock.runtime.handler_url = handler_url_mock = Mock()
+        authenticate_video_api_mock.return_value = (object(), 'Stub auth error message')
         prepare_fields_mock.side_effect = basic_fields_stub, advanced_fields_stub = [
             [{'name': 'display_name'}],
             [{'name': 'href'}]
@@ -170,7 +172,7 @@ class VideoXBlockTests(VideoXBlockTestBase):
 
         expected_context = {
             'advanced_fields': advanced_fields_stub,
-            'auth_error_message': "In order to authenticate to a video platform's API, please provide a Video API Token.",
+            'auth_error_message': 'Stub auth error message',
             'basic_fields': basic_fields_stub,
             'courseKey': 'course_key',
             'default_transcripts': [],
@@ -187,7 +189,7 @@ class VideoXBlockTests(VideoXBlockTestBase):
         # Assert
         render_template_mock.assert_called_once_with('studio-edit.html', **expected_context)
         handler_url_mock.assert_called_with(self.xblock, 'download_transcript')
-        self.mark_unfinished()
+        # self.mark_unfinished()
 
     @staticmethod
     def _make_fragment_resource(file_name):
