@@ -6,13 +6,13 @@ import datetime
 from mock import patch, Mock, PropertyMock
 
 from django.conf import settings
+from web_fragments.fragment import FragmentResource
 from xblock.fragment import Fragment
 
 from video_xblock import VideoXBlock
+from video_xblock.constants import PlayerName
 from video_xblock.utils import ugettext as _
 from video_xblock.tests.unit.base import VideoXBlockTestBase
-
-from video_xblock.constants import PlayerName
 
 
 settings.configure()
@@ -120,10 +120,10 @@ class VideoXBlockTests(VideoXBlockTestBase):
         self.xblock.get_transcript_download_link = Mock(return_value='/transcript/link.vtt')
 
         # Act
-        studio_view = self.xblock.student_view(unused_context_stub)
+        student_view = self.xblock.student_view(unused_context_stub)
 
         # Assert
-        self.assertIsInstance(studio_view, Fragment)
+        self.assertIsInstance(student_view, Fragment)
         render_resource_mock.assert_called_once_with(
             'static/html/student_view.html',
             display_name='Video',
@@ -139,3 +139,41 @@ class VideoXBlockTests(VideoXBlockTestBase):
         resource_string_mock.assert_called_with('static/css/student-view.css')
         handler_url.assert_called_with(self.xblock, 'download_transcript')
         route_transcripts.assert_called_once_with(self.xblock.transcripts)
+
+    @staticmethod
+    def _make_fragment_resource(file_name):
+        if file_name.endswith('.js'):
+            return FragmentResource('text', file_name, 'application/javascript', 'foot')
+        elif file_name.endswith('.css'):
+            return FragmentResource('text', file_name, 'text/css', 'head')
+
+    @patch('video_xblock.video_xblock.render_template')
+    @patch('video_xblock.video_xblock.resource_string')
+    @patch.object(VideoXBlock, 'route_transcripts')
+    def test_studio_view_uses_correct_resources(
+            self, route_transcripts, resource_string_mock, render_template_mock
+    ):
+        # Arrange
+        unused_context_stub = object()
+        handler_url = self.xblock.runtime.handler_url = Mock()
+        resource_string_mock.side_effect = expected_resources = [
+            'static/css/student-view.css',
+            'static/css/transcripts-upload.css',
+            'static/css/studio-edit.css',
+            'static/js/runtime-handlers.js',
+            'static/js/studio-edit/utils.js',
+            'static/js/studio-edit/studio-edit.js',
+            'static/js/studio-edit/transcripts-autoload.js',
+            'static/js/studio-edit/transcripts-manual-upload.js',
+        ]
+
+        expected_fragment_resources = map(
+            self._make_fragment_resource, expected_resources
+        )
+
+        # Act
+        studio_view = self.xblock.studio_view(unused_context_stub)
+
+        # Assert
+        self.assertIsInstance(studio_view, Fragment)
+        self.assertEqual(studio_view.resources, expected_fragment_resources)
