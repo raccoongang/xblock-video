@@ -159,7 +159,7 @@ class VideoXBlockTests(VideoXBlockTestBase):
             [{'name': 'display_name'}],
             [{'name': 'href'}]
         ]
-        resource_string_mock.side_effect = expected_resources = [
+        resource_string_mock.side_effect = [
             'static/css/student-view.css',
             'static/css/transcripts-upload.css',
             'static/css/studio-edit.css',
@@ -184,7 +184,7 @@ class VideoXBlockTests(VideoXBlockTestBase):
         }
 
         # Act
-        studio_view = self.xblock.studio_view(unused_context_stub)
+        self.xblock.studio_view(unused_context_stub)
 
         # Assert
         render_template_mock.assert_called_once_with('studio-edit.html', **expected_context)
