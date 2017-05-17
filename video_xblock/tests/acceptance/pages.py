@@ -27,6 +27,7 @@ class VideojsPlayerPage(object):
     """
 
     player_element = VideoJsPlayerElement()
+    # player_element = VideoJsPlayerElement(usage_id=usage_id)
     play_button = VideoJsPlayButton()
 
     def __init__(self, driver):
