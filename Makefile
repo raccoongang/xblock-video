@@ -25,6 +25,7 @@ clean: # Clean working directory
 	-rm -rf bower_components/
 	-rm -rf dist/
 	-find . -name *.pyc -delete
+	-rm *acceptance*.png *acceptance*.log
 
 test: test-py test-js test-acceptance ## Run unit and acceptance tests
 

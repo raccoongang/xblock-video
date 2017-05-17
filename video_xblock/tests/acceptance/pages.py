@@ -2,7 +2,7 @@
 Page objects to use in tests.
 """
 
-from .element import IdPageElement, ClassPageElement
+from video_xblock.tests.acceptance.element import IdPageElement, ClassPageElement
 
 
 class VideoJsPlayerElement(IdPageElement):

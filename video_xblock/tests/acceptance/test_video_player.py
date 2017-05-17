@@ -7,8 +7,7 @@ from ddt import data, ddt
 from xblockutils.base_test import SeleniumXBlockTest
 
 from video_xblock.utils import loader
-
-from .pages import VideojsPlayerPage
+from video_xblock.tests.acceptance.pages import VideojsPlayerPage
 
 
 @ddt
