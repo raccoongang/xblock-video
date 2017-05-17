@@ -25,7 +25,7 @@ class TestStudentView(SeleniumXBlockTest):
         self.set_scenario_xml(scenario)
         if load_immediately:
             view = self.go_to_view("student_view")
-            self.driver.switch_to.frame('xblock-video-player-deprecated_string')
+            self.driver.switch_to.frame('xblock-video-player-usage_id')
             return view
 
     @data('brightcove.xml', 'youtube.xml', 'vimeo.xml', 'wistia.xml')
