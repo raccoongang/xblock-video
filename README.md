@@ -68,7 +68,7 @@ To successfully use videos hosted on Brightcove Videocloud service one must prov
 
 1. Grab your [BC_TOKEN] from Brightcove Videocloud.
 1. Open Video XBlock settings, Advanced tab. Scroll down to `Video API Token` section.
-1. Put BC_TOKENT taken from Brightcvove into `Client Token` field.
+1. Put `BC_TOKENT` taken from Brightcvove into `Client Token` field.
 1. Click on `Connect to video platform` button.
 
 [BC_TOKEN]: https://docs.brightcove.com/en/video-cloud/media-management/guides/authentication.html
