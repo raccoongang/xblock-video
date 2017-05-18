@@ -4,6 +4,7 @@ import os
 import re
 from setuptools import setup
 
+
 def get_version(*file_paths):
     """
     Extract the version string from the file at the given relative path fragments.
@@ -16,10 +17,6 @@ def get_version(*file_paths):
     if version_match:
         return version_match.group(1)
     raise RuntimeError('Unable to find version string.')
-
-
-VERSION = get_version('video_xblock', '__init__.py')
-DESCRIPTION = 'Video XBlock to embed videos hosted on different video platforms into your courseware'
 
 
 def package_data(pkg, roots):
@@ -36,6 +33,10 @@ def package_data(pkg, roots):
                 data.append(os.path.relpath(os.path.join(dirname, fname), pkg))
 
     return {pkg: data}
+
+
+VERSION = get_version('video_xblock', '__init__.py')
+DESCRIPTION = 'Video XBlock to embed videos hosted on different video platforms into your courseware'
 
 
 setup(
