@@ -1,10 +1,27 @@
 """Setup for video XBlock."""
 
 import os
+import re
 from setuptools import setup
 
+def get_version(*file_paths):
+    """
+    Extract the version string from the file at the given relative path fragments.
+    """
+    str_literal_re = r"['\"]([^'\"]*)['\"]"
+    filename = os.path.join(os.path.dirname(__file__), *file_paths)
+    version_file = open(filename).read()
+    version_match = re.search(r"^__version__ = "+str_literal_re,
+                              version_file, re.M)
 
-VERSION = '0.6.5'
+    commit_match = re.search(r"^__commit__ = "+str_literal_re,
+                              version_file, re.M)
+    if version_match and commit_match:
+        return commit_match.group(1), version_match.group(1)
+    raise RuntimeError('Unable to find version string.')
+
+
+COMMIT, VERSION = get_version('video_xblock', '__init__.py')
 DESCRIPTION = 'Video XBlock to embed videos hosted on different video platforms into your courseware'
 
 

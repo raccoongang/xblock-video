@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Pass some debugging information to the front end.
+
 ## [0.7.0] - 2017-05-17
 
 ### Added
