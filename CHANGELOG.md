@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.7.1] - 2017-05-18
+
 ### Added
 
 - Pass some debugging information to the front end.
