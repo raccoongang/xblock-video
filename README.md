@@ -38,8 +38,8 @@ backends as well as report and fix issues.
 Thanks to [InterSystems] and [Open University] for sponsoring the initial
 version of the Video XBlock!
 
-[InterSystems]: http://www.intersystems.com
-[Open University]: http://www.open.ac.uk
+[InterSystems]: https://www.intersystems.com
+[Open University]: https://www.open.ac.uk
 
 ## Installation
 
