@@ -4,11 +4,20 @@
 [![Coverage Status](https://img.shields.io/codecov/c/github/raccoongang/xblock-video/dev.svg)](https://codecov.io/gh/raccoongang/xblock-video)
 [![GitHub release](https://img.shields.io/github/release/raccoongang/xblock-video.svg)](https://github.com/raccoongang/xblock-video/releases)
 
-The Video XBlock is for embedding videos hosted on different video platforms into your Open edX courses.
+The Video XBlock is for embedding videos hosted on different video platforms
+into your Open edX courses.
 
-The idea of crowd-funded universal video-xblock was proposed by @natea (Appsembler) at the Open edX Conference 2016 at Stanford. It was well-received and several companies offered to sponsor the initial development.
+The idea of crowd-funded universal video-xblock was proposed by @natea
+(Appsembler) at the Open edX Conference 2016 at Stanford. It was well-received
+and several companies offered to sponsor the initial development.
 
-Appsembler initially contracted with Raccoon Gang to build the [wistia-xblock](https://appsembler.com/blog/why-open-edx-needs-an-alternative-video-xblock/) as a prototype ([see the Github repo](https://github.com/appsembler/xblock-wistia)), and later created a new Video XBlock featuring universal pluggable interface with several video hosting providers support:
+Appsembler initially contracted with Raccoon Gang to build the [wistia-xblock]
+as a prototype ([see the Github repo]), and later created a new Video XBlock
+featuring universal pluggable interface with several video hosting providers
+support:
+
+[wistia-xblock]: https://appsembler.com/blog/why-open-edx-needs-an-alternative-video-xblock/
+[see the Github repo]: https://github.com/appsembler/xblock-wistia
 
 - Brightcove
 - Html5
@@ -16,9 +25,13 @@ Appsembler initially contracted with Raccoon Gang to build the [wistia-xblock](h
 - Wistia
 - Youtube
 
-Appsembler and Raccoon Gang will be co-presenting [a talk about the video-xblock](https://openedx2017.sched.com/event/9zf6/lightning-talks) at the Open edX Con 2017 in Madrid.
+Appsembler and Raccoon Gang will be co-presenting [a talk about the
+video-xblock] at the Open edX Con 2017 in Madrid.
 
-We welcome folks from the Open edX community to contribute additional video backends as well as report and fix issues.
+[a talk about the video-xblock]: https://openedx2017.sched.com/event/9zf6/lightning-talks
+
+We welcome folks from the Open edX community to contribute additional video
+backends as well as report and fix issues.
 
 Thanks to [InterSystems](http://www.intersystems.com) and [Open University](http://www.open.ac.uk) for sponsoring the initial version of the Video XBlock!
 
