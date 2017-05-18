@@ -7,6 +7,14 @@
 The Video XBlock is for embedding videos hosted on different video platforms
 into your Open edX courses.
 
+Supported video platforms:
+
+- Brightcove
+- Html5
+- Vimeo
+- Wistia
+- Youtube
+
 The idea of crowd-funded universal video-xblock was proposed by @natea
 (Appsembler) at the Open edX Conference 2016 at Stanford. It was well-received
 and several companies offered to sponsor the initial development.
@@ -18,12 +26,6 @@ support:
 
 [wistia-xblock]: https://appsembler.com/blog/why-open-edx-needs-an-alternative-video-xblock/
 [see the Github repo]: https://github.com/appsembler/xblock-wistia
-
-- Brightcove
-- Html5
-- Vimeo
-- Wistia
-- Youtube
 
 Appsembler and Raccoon Gang will be co-presenting [a talk about the
 video-xblock] at the Open edX Con 2017 in Madrid.
