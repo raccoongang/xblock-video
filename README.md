@@ -33,7 +33,11 @@ video-xblock] at the Open edX Con 2017 in Madrid.
 We welcome folks from the Open edX community to contribute additional video
 backends as well as report and fix issues.
 
-Thanks to [InterSystems](http://www.intersystems.com) and [Open University](http://www.open.ac.uk) for sponsoring the initial version of the Video XBlock!
+Thanks to [InterSystems] and [Open University] for sponsoring the initial
+version of the Video XBlock!
+
+[InterSystems]: http://www.intersystems.com
+[Open University]: http://www.open.ac.uk
 
 ## Installation
 
