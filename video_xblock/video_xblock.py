@@ -27,7 +27,7 @@ from .workbench.mixin import WorkbenchMixin
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
 from .utils import render_template, render_resource, resource_string, ugettext as _
-from . import __commit__, __version__
+from . import __version__
 
 log = logging.getLogger(__name__)
 
@@ -320,7 +320,6 @@ class VideoXBlock(
                 handout_file_name=self.get_file_name_from_path(self.handout),
                 transcript_download_link=full_transcript_download_link,
                 version=__version__,
-                commit=__commit__,
             )
         )
         frag.add_javascript(resource_string("static/js/student-view/video-xblock.js"))
