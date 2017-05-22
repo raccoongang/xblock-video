@@ -32,7 +32,7 @@ class AuthenticateApiHandlerTests(VideoXBlockTestBase):
 
         # Act
         result_response = self.xblock.authenticate_video_api_handler(request_mock)
-        result = result_response.body
+        result = result_response.body  # pylint: disable=no-member
 
         # Assert
         self.assertEqual(
