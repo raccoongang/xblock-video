@@ -707,13 +707,10 @@ class VideoXBlock(
                                  "please provide a Video API Token."
                 }
 
-        auth_data, error_message = self.authenticate_video_api(token)  # pylint: disable=unused-variable
+        _auth_data, error_message = self.authenticate_video_api(token)
         if error_message:
-            response = {'error_message': error_message}
-        else:
-            success_message = 'Successfully authenticated to the video platform.'
-            response = {'success_message': success_message}
-        return response
+            return {'error_message': error_message}
+        return {'success_message': 'Successfully authenticated to the video platform.'}
 
     def update_metadata_authentication(self, auth_data, player):
         """
