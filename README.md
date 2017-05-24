@@ -89,6 +89,7 @@ your `account_id` go to [Videocloud studio] -> _Admin_ -> _Account Information_.
    1. Login to [Videocloud Studio] as you normally do.
    1. With any page in Studio open, open the developer tools for the browser,
       go to the Console, and paste in the following code:
+
        ```js
        var cookiesArray = document.cookie.split(";"), cookiesObj = {}, i, tmpArray = [];
        for (i = 0; i < cookiesArray.length; i++) {
@@ -99,6 +100,7 @@ your `account_id` go to [Videocloud studio] -> _Admin_ -> _Account Information_.
        }
        window.prompt("BC_TOKEN:", cookiesObj.BC_TOKEN);
        ```
+
       and press `<return>`.
    1. You should see a prompt appear that contains your BC_TOKEN.
     ![BC_TOKEN sample](https://learning-services-media.brightcove.com/doc-assets/video-cloud-apis/ingest-profiles-api/guides/prompt-with-token-safari.png "Sample BC_TOKEN")
