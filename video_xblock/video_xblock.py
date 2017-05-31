@@ -27,6 +27,7 @@ from .workbench.mixin import WorkbenchMixin
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
 from .utils import render_template, render_resource, resource_string, ugettext as _
+from . import __version__
 
 log = logging.getLogger(__name__)
 
@@ -169,7 +170,7 @@ class VideoXBlock(
     )
 
     token = String(
-        default='default',
+        default='',
         display_name=_('Video API Token'),
         help=_('You can generate a client token following official documentation of your video platform\'s API.'),
         scope=Scope.content,
@@ -317,7 +318,8 @@ class VideoXBlock(
                 download_transcript_allowed=self.download_transcript_allowed,
                 download_video_url=self.get_download_video_url(),
                 handout_file_name=self.get_file_name_from_path(self.handout),
-                transcript_download_link=full_transcript_download_link
+                transcript_download_link=full_transcript_download_link,
+                version=__version__,
             )
         )
         frag.add_javascript(resource_string("static/js/student-view/video-xblock.js"))
@@ -367,12 +369,14 @@ class VideoXBlock(
         languages.sort(key=lambda l: l['label'])
         transcripts = json.loads(self.transcripts) if self.transcripts else []
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
+        auth_error_message = ''
 
         # Authenticate to API of the player video platform and update metadata with auth information.
         # Note that there is no need to authenticate to Youtube API,
         # whilst for Wistia, a sample authorised request is to be made to ensure authentication succeeded,
         # since it is needed for the auth status message generation and the player's state update with auth status.
-        _auth_data, auth_error_message = self.authenticate_video_api()
+        if self.token:
+            _auth_data, auth_error_message = self.authenticate_video_api(self.token)
 
         initial_default_transcripts, transcripts_autoupload_message = self._update_default_transcripts(
             player, transcripts
@@ -638,7 +642,7 @@ class VideoXBlock(
         response = Response(json.dumps(resp), content_type='application/json')
         return response
 
-    def authenticate_video_api(self, token=''):
+    def authenticate_video_api(self, token):
         """
         Authenticate to a video platform's API.
 
@@ -650,15 +654,7 @@ class VideoXBlock(
         """
         # TODO move auth fields validation and kwargs population to specific backends
         # Handles a case where no token was provided by a user
-        is_default_token = self.token == self.fields['token'].default  # pylint: disable=unsubscriptable-object
-        is_youtube_player = str(self.player_name) != PlayerName.YOUTUBE  # pylint: disable=unsubscriptable-object
-        if is_default_token and is_youtube_player:
-            error_message = 'In order to authenticate to a video platform\'s API, please provide a Video API Token.'
-            return {}, error_message
-        if token:
-            kwargs = {'token': token}
-        else:
-            kwargs = {'token': self.token}
+        kwargs = {'token': token}
 
         # Handles a case where no account_id was provided by a user
         if str(self.player_name) == PlayerName.BRIGHTCOVE:
@@ -668,9 +664,7 @@ class VideoXBlock(
             kwargs['account_id'] = self.account_id
 
         player = self.get_player()
-        if str(self.player_name) == PlayerName.BRIGHTCOVE and not self.metadata.get('client_id'):
-            auth_data, error_message = player.authenticate_api(**kwargs)
-        elif str(self.player_name) == PlayerName.BRIGHTCOVE and self.metadata.get('client_id'):
+        if str(self.player_name) == PlayerName.BRIGHTCOVE and self.metadata.get('client_id'):
             auth_data = {
                 'client_secret': self.metadata.get('client_secret'),
                 'client_id': self.metadata.get('client_id'),
@@ -695,17 +689,20 @@ class VideoXBlock(
             response (dict): Status messages key-value pairs.
         """
         # Fetch a token provided by a user before the save button was clicked.
-        if str(data) != self.token:
-            token = str(data)
-        else:
-            token = ''
-        auth_data, error_message = self.authenticate_video_api(token)  # pylint: disable=unused-variable
+        token = str(data)
+
+        is_default_token = token == self.fields['token'].default  # pylint: disable=unsubscriptable-object
+        is_youtube_player = str(self.player_name) != PlayerName.YOUTUBE  # pylint: disable=unsubscriptable-object
+        if not token or (is_default_token and is_youtube_player):
+            return {
+                'error_message': "In order to authenticate to a video platform's API, "
+                                 "please provide a Video API Token."
+                }
+
+        _auth_data, error_message = self.authenticate_video_api(token)
         if error_message:
-            response = {'error_message': error_message}
-        else:
-            success_message = 'Successfully authenticated to the video platform.'
-            response = {'success_message': success_message}
-        return response
+            return {'error_message': error_message}
+        return {'success_message': 'Successfully authenticated to the video platform.'}
 
     def update_metadata_authentication(self, auth_data, player):
         """
