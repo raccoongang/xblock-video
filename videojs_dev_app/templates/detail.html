@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{player_name|title}} Player</title>
+</head>
+<body>
+<iframe
+    src="{% url 'player' player_name %}"
+    frameborder="0"
+    scrolling="no"
+    allowfullscreen
+    mozallowfullscreen
+    webkitallowfullscreen
+    width="100%"
+    height="600px"
+>
+</iframe>
+</body>
+</html>
