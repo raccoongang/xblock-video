@@ -18,19 +18,25 @@ class PlayerName(object):
     YOUTUBE = 'youtube-player'
 
 
-class ThreePlayMediaTranscriptFormatID(object):
+class TPMApiTranscriptFormatID(object):
     """
-    3PlayMedia service's transcripts API format_name - format_ID mapping
-    Full list can be got by GET to "http://static.3playmedia.com/output_formats?apikey=foo"
+    3PlayMedia service's transcripts API format_name - format_ID mapping.
+
+    Full list can be got by GET to "http://static.3playmedia.com/output_formats?apikey=foo".
     """
+
+    SRT = 7
+    PDF = 46
     WEBVTT = 51
 
 
 class TPMApiLanguage(object):
     """
-    3PlayMedia service's transcripts API language_ID - language info (e.g.: code, name...) mapping
+    3PlayMedia service's transcripts API language_ID - language info (e.g.: code, name...) mapping.
+
     Full list can be got by GET to "http://api.3playmedia.com/caption_imports/available_languages?apikey=:api_key"
     """
+
     TPM_LANGUAGES = {
         1: {
             "ietf_code": "en",
@@ -294,6 +300,11 @@ class TPMApiLanguage(object):
     }
 
     def __init__(self, language_id):
+        """
+        Initiate 3PlayMedia language information based on given language ID.
+
+        :param language_id : int (from API response list of available transcript translations).
+        """
         if language_id not in self.TPM_LANGUAGES.keys():
             raise ValueError("Language ID: {} does not exist!".format(language_id))
         language_info = self.TPM_LANGUAGES[language_id]

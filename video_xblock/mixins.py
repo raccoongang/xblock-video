@@ -13,7 +13,7 @@ from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Scope, Boolean, Float, String
 from xblock.core import XBlock
 
-from .constants import DEFAULT_LANG, ThreePlayMediaTranscriptFormatID, TPMApiLanguage
+from .constants import DEFAULT_LANG, TPMApiTranscriptFormatID, TPMApiLanguage
 from .utils import import_from, ugettext as _, underscore_to_mixedcase
 
 log = logging.getLogger(__name__)
@@ -196,7 +196,7 @@ class TranscriptsMixin(XBlock):
             formatted_content = requests.get(
                 '{domain}files/{file_id}/transcripts/{tid}?apikey={api_key}&format_id={format_id}'.format(
                     domain=domain, file_id=file_id, api_key=apikey, tid=tid,
-                    format_id=ThreePlayMediaTranscriptFormatID.WEBVTT
+                    format_id=TPMApiTranscriptFormatID.WEBVTT
                 )
             ).text
             lang_data = TPMApiLanguage(lang_id)
