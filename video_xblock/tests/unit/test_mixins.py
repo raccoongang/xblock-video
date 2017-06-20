@@ -362,8 +362,9 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
     @patch('video_xblock.constants.TPMApiLanguage')
     @patch('video_xblock.constants.TPMApiTranscriptFormatID')
     @patch('video_xblock.mixins.requests.get')
-    def test_get_translations_from_3playmedia(self, request_get_mock, format_id_mock, lang_data_mock, player_mock,
-                                              create_transcript_file_mock):
+    def test_get_translations_from_3playmedia(
+            self, request_get_mock, format_id_mock, lang_data_mock, player_mock, create_transcript_file_mock
+    ):
         # Arrange
         vtt_file_mock = Mock(return_value='vtt_file_text')
         domain = "https://static.3playmedia.com/"
