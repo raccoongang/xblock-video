@@ -26,6 +26,7 @@ class TPMApiTranscriptFormatID(object):
     """
 
     SRT = 7
+    JSON = 29
     PDF = 46
     WEBVTT = 51
 
