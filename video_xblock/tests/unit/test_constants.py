@@ -16,8 +16,8 @@ class ConstantsTest(unittest.TestCase):
 
     def test_three_play_media_language_data_constant_creation(self):
         """Test 3PlayMedia available transcript language_info object creation"""
-        self.assertRaises(ValueError, TPMApiLanguage('a'))
-        self.assertRaises(ValueError, TPMApiLanguage(999))
+        self.assertRaises(ValueError, TPMApiLanguage, 'a')
+        self.assertRaises(ValueError, TPMApiLanguage, 999)
 
     @data({
         1: {
