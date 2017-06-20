@@ -382,14 +382,14 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
         request_get_mock.side_effect = [transcripts_response_stub, vtt_file_response_stub]
 
         format_id_mock.WEBVTT.return_value = 51
-        lang_data_mock.configure_mock(**{
-            "language_id": 1,
-            "ietf_code": "en",
-            "iso_639_1_code": "en",
-            "name": "English",
-            "full_name": "English",
-            "description": "All English variants"
-        })
+        lang_data_mock.configure_mock(
+            language_id=1,
+            ietf_code="en",
+            iso_639_1_code="en",
+            name="English",
+            full_name="English",
+            description="All English variants"
+        )
         media_id_mock = player_mock.return_value.media_id
         media_id_mock.return_value = 'test_video_id'
         create_transcript_file_mock.return_value = ('test_file_name', 'test_ext_url')
