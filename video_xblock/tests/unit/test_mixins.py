@@ -368,12 +368,12 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
         # Arrange
         vtt_file_mock = Mock(return_value='vtt_file_text')
         domain = "https://static.3playmedia.com/"
-        all_transcripts_url = domain + 'files/758521/transcripts?apikey=test_api_key'
-        vtt_translation_url = domain + 'files/758521/transcripts/1653424?apikey=test_api_key&format_id=51'
+        all_transcripts_url = domain + 'files/123456/transcripts?apikey=test_api_key'
+        vtt_translation_url = domain + 'files/123456/transcripts/9876543?apikey=test_api_key&format_id=51'
 
         transcripts_response_stub = ResponseStub(body=[{
-            "id": 1653424,
-            "media_file_id": 758521,
+            "id": 9876543,
+            "media_file_id": 123456,
             "language_id": 1,
             "language_name": "English",
             "type": "TranscribedTranscript"
@@ -393,7 +393,7 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
         media_id_mock = player_mock.return_value.media_id
         media_id_mock.return_value = 'test_video_id'
         create_transcript_file_mock.return_value = ('test_file_name', 'test_ext_url')
-        file_id_mock, apikey_mock = 758521, 'test_api_key'
+        file_id_mock, apikey_mock = 123456, 'test_api_key'
 
         # Act
         status, transcripts = self.xblock.get_translations_from_3playmedia(file_id_mock, apikey_mock)
