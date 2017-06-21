@@ -25,14 +25,12 @@ class ConstantsTest(unittest.TestCase):
             "iso_639_1_code": "en",
             "name": "English",
             "full_name": "English",
-            "description": "All English variants"
         },
         48: {
             "ietf_code": "",
             "iso_639_1_code": "uk",
             "name": "Ukrainian",
             "full_name": "Ukrainian",
-            "description": ""
         }
     })
     def test_three_play_media_language_data_constant_structure(self, test_data):
@@ -42,4 +40,3 @@ class ConstantsTest(unittest.TestCase):
             self.assertEqual(TPMApiLanguage(lang_id).iso_639_1_code, lang_info["iso_639_1_code"])
             self.assertEqual(TPMApiLanguage(lang_id).name, lang_info["name"])
             self.assertEqual(TPMApiLanguage(lang_id).full_name, lang_info["full_name"])
-            self.assertEqual(TPMApiLanguage(lang_id).description, lang_info["description"])
