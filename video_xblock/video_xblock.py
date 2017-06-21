@@ -229,7 +229,7 @@ class VideoXBlock(
             data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
         """
         is_provided_account_id = \
-            data.account_id != self.fields['account_id'].default
+            data.account_id != self.fields['account_id'].default  # pylint: disable=unsubscriptable-object
         # Validate provided account id
         if is_provided_account_id:
             try:
@@ -258,7 +258,7 @@ class VideoXBlock(
             data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
         """
         is_not_provided_href = \
-            data.href == self.fields['href'].default
+            data.href == self.fields['href'].default  # pylint: disable=unsubscriptable-object
         is_matched_href = False
         for _player_name, player_class in BaseVideoPlayer.load_classes():
             if player_class.match(data.href):
@@ -338,7 +338,7 @@ class VideoXBlock(
             kwargs[k] = self.metadata[k]
         # For a Brightcove player only
         is_not_default_account_id = \
-            self.account_id is not self.fields['account_id'].default
+            self.account_id is not self.fields['account_id'].default  # pylint: disable=unsubscriptable-object
         if is_not_default_account_id:
             kwargs['account_id'] = self.account_id
 
@@ -468,7 +468,7 @@ class VideoXBlock(
         Arguments:
             data (dict): POST data.
         """
-        data['player_name'] = self.fields['player_name'].default
+        data['player_name'] = self.fields['player_name'].default  # pylint: disable=unsubscriptable-object
         for player_name, player_class in BaseVideoPlayer.load_classes():
             if player_name == PlayerName.DUMMY:
                 continue
@@ -565,7 +565,7 @@ class VideoXBlock(
             made_fields (list): XBlock fields prepared to be rendered in a studio edit modal.
         """
         made_fields = [
-            self._make_field_info(key, self.fields[key]) for key in fields
+            self._make_field_info(key, self.fields[key]) for key in fields  # pylint: disable=unsubscriptable-object
         ]
         return made_fields
 
@@ -658,7 +658,7 @@ class VideoXBlock(
 
         # Handles a case where no account_id was provided by a user
         if str(self.player_name) == PlayerName.BRIGHTCOVE:
-            if self.account_id == self.fields['account_id'].default:
+            if self.account_id == self.fields['account_id'].default:  # pylint: disable=unsubscriptable-object
                 error_message = 'In order to authenticate to a video platform\'s API, please provide an Account Id.'
                 return {}, error_message
             kwargs['account_id'] = self.account_id
@@ -691,8 +691,8 @@ class VideoXBlock(
         # Fetch a token provided by a user before the save button was clicked.
         token = str(data)
 
-        is_default_token = token == self.fields['token'].default
-        is_youtube_player = str(self.player_name) != PlayerName.YOUTUBE
+        is_default_token = token == self.fields['token'].default  # pylint: disable=unsubscriptable-object
+        is_youtube_player = str(self.player_name) != PlayerName.YOUTUBE  # pylint: disable=unsubscriptable-object
         if not token or (is_default_token and is_youtube_player):
             return {
                 'error_message': "In order to authenticate to a video platform's API, "
