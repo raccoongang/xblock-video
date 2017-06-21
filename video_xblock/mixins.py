@@ -3,15 +3,15 @@ Video XBlock mixins geared toward specific subsets of functionality.
 """
 
 import json
-import requests
 import logging
 
+import requests
 from pycaption import detect_format, WebVTTWriter
 from webob import Response
 
+from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Scope, Boolean, Float, String
-from xblock.core import XBlock
 
 from .constants import DEFAULT_LANG, TPMApiTranscriptFormatID, TPMApiLanguage
 from .utils import import_from, ugettext as _, underscore_to_mixedcase
