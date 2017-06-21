@@ -114,7 +114,7 @@ class TestCustomBackends(VideoXBlockTestBase):
             'default_transcripts', 'download_video_allowed', 'download_video_url'
         ],
         [  # Vimeo
-            'start_time', 'end_time', 'handout', 'transcripts',
+            'start_time', 'end_time', 'handout', 'transcripts', 'token',
             'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
             'default_transcripts', 'download_video_allowed', 'download_video_url'
         ],
