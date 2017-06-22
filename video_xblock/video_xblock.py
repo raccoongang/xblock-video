@@ -282,7 +282,7 @@ class VideoXBlock(
             validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
             data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
         """
-        is_brightcove = str(self.player_name) == 'brightcove-player'
+        is_brightcove = str(self.player_name) == PlayerName.BRIGHTCOVE
 
         if is_brightcove:
             self.validate_account_id_data(validation, data)
