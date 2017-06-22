@@ -212,12 +212,13 @@ class VimeoPlayer(BaseVideoPlayer):
 
         video_id = kwargs.get('video_id')
         url = self.captions_api['url'].format(media_id=video_id)
-        message = _('No timed transcript may be fetched from a video platform.')
+        message = _('Default transcripts successfully fetched from a video platform.')
         default_transcripts = []
         # Fetch available transcripts' languages and urls.
         try:
             json_data = self.api_client.get(url)
         except VimeoApiClientError:
+            message = _('No timed transcript may be fetched from a video platform.')
             return default_transcripts, message
 
         if json_data:

@@ -1,30 +1,50 @@
 """
 Test cases for video_xblock backends.
 """
-# copy should be imported before requests
+import unittest
+
 import babelfish
 from ddt import ddt, data, unpack
-from lxml import etree
-from mock import PropertyMock
 from django.test.utils import override_settings
+from lxml import etree
+from mock import PropertyMock, Mock, patch
 from xblock.core import XBlock
-from video_xblock.settings import ALL_LANGUAGES
-from video_xblock.utils import ugettext as _
-from video_xblock.exceptions import VideoXBlockException
-from video_xblock.tests.unit.base import VideoXBlockTestBase
+
 from video_xblock.backends import (
+    base,
     brightcove,
     html5,
     wistia,
     youtube,
-    vimeo
+    vimeo,
 )
+from video_xblock.exceptions import VideoXBlockException
+from video_xblock.settings import ALL_LANGUAGES
+from video_xblock.tests.unit.base import VideoXBlockTestBase
 from video_xblock.tests.unit.mocks import (
     brightcove as brightcove_mock,
     vimeo as vimeo_mock,
     wistia as wistia_mock,
-    youtube as youtube_mock
+    youtube as youtube_mock,
 )
+from video_xblock.tests.unit.mocks.base import ResponseStub
+from video_xblock.utils import ugettext as _
+
+
+class TestBaseBackendFunctionality(unittest.TestCase):
+    """
+    Unit tests for base video xblock backend.
+    """
+    def setUp(self):
+        base.BaseVideoPlayer.__abstractmethods__ = set()  # the way we can instantiate abstract class during testing
+        self.base_player = base.BaseVideoPlayer(xblock=Mock())  # pylint: disable=abstract-class-instantiated
+
+    def test_base_player(self):
+        """
+        Cover BaseVideoPlayer initial functionality.
+        """
+        self.assertFalse(self.base_player.default_transcripts_in_vtt)
+        self.assertEqual(self.base_player.media_id(href=Mock()), "")
 
 
 @ddt
@@ -335,3 +355,95 @@ class TestCustomBackends(VideoXBlockTestBase):
 
         # Assert
         self.assertEqual(download_video_url, delegate_mock)
+
+
+@ddt
+class VimeoApiClientTest(VideoXBlockTestBase):
+    """
+    Test Vimeo backend API client.
+    """
+
+    def setUp(self):
+        super(VimeoApiClientTest, self).setUp()
+        self.vimeo_api_client = vimeo.VimeoApiClient(token='test_token')
+        self.vimeo_player = vimeo.VimeoPlayer(self.xblock)
+
+    @patch('video_xblock.backends.vimeo.requests.get')
+    def test_api_client_get(self, requests_get_mock):
+        """
+        Test Vimeo's API client GET method.
+        """
+        # Arrange
+        test_body = {'test': 'body'}
+        requests_get_mock.side_effect = [
+            ResponseStub(status_code=200, body=test_body),
+            ResponseStub(status_code=400)
+        ]
+
+        # Act
+        response = self.vimeo_api_client.get(url='test_url')
+
+        # Assert
+        requests_get_mock.assert_called_with('test_url', headers={'Authorization': 'Bearer test_token'})
+        self.assertEqual(response, test_body)
+        self.assertRaises(vimeo.VimeoApiClientError, self.vimeo_api_client.get, url='test_url')
+
+    def test_api_client_post(self):
+        """
+        Test Vimeo's API client POST method.
+        """
+        self.assertRaises(vimeo.VimeoApiClientError, self.vimeo_api_client.post, "test_url", "test_payload")
+
+    @data([{
+        u'hls_link_expires_time': 1498128010,
+        u'name': u'English_captions_video.vtt',
+        u'language': u'en',
+        u'uri': u'/texttracks/1234567',
+        u'link_expires_time': 1498128010,
+        u'hls_link': u'test_hls_captions_url',
+        u'link': u'test_captions_url',
+        u'active': True,
+        u'type': u'subtitles'
+    }])
+    @patch('video_xblock.backends.vimeo.VimeoPlayer.get_transcript_language_parameters')
+    def test_parse_vimeo_texttracks(self, transcripts_data, get_lang_params_mock):
+        """
+        Test Vimeo's texttracks API parsing utility.
+        """
+        # Arrange
+        get_lang_params_mock.return_value = (u'en', u'English')
+
+        # Act
+        parsed = self.vimeo_player.parse_vimeo_texttracks(transcripts_data)
+
+        # Assert
+        self.assertEqual(parsed, [{
+            'lang': transcripts_data[0][u'language'],
+            'label': u'English',
+            'url': transcripts_data[0][u'link']
+        }])
+        self.assertRaises(vimeo.VimeoApiClientError, self.vimeo_player.parse_vimeo_texttracks, [{}])
+
+    @data({"data": [{"test_key": "test_value"}]})
+    def test_get_default_transcripts(self, test_json_data):
+        """
+        Test Vimeo's default transcripts fetching.
+        """
+
+        with patch.object(self.vimeo_player, 'api_client') as api_client_mock:
+            # Arrange
+            api_client_mock.get.return_value = test_json_data
+            type(api_client_mock).access_token = PropertyMock(return_value="test_token")
+
+            # Act
+            transcripts, _message = self.vimeo_player.get_default_transcripts(video_id="test_video_id")
+
+            # Assert
+            self.assertIsInstance(transcripts, list)
+            api_client_mock.get.assert_called_with('https://api.vimeo.com/videos/test_video_id/texttracks')
+
+            type(api_client_mock).access_token = PropertyMock(return_value=None)  # token-not-provided case
+            self.assertRaises(vimeo.VimeoApiClientError, self.vimeo_player.get_default_transcripts)
+
+            api_client_mock.get.side_effect = vimeo.VimeoApiClientError()
+            self.assertRaises(vimeo.VimeoApiClientError, self.vimeo_player.get_default_transcripts)
