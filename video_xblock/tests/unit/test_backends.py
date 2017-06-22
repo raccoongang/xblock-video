@@ -447,3 +447,22 @@ class VimeoApiClientTest(VideoXBlockTestBase):
 
             api_client_mock.get.side_effect = vimeo.VimeoApiClientError()
             self.assertRaises(vimeo.VimeoApiClientError, self.vimeo_player.get_default_transcripts)
+
+    @patch('video_xblock.backends.vimeo.unescape')
+    @patch('video_xblock.backends.vimeo.requests.get')
+    def test_download_default_transcript(self, requests_get_mock, unescape_mock):
+        """
+        Test Vimeo's default transcripts downloading.
+        """
+
+        # Arrange
+        test_file_data = u"test_file_data"
+        requests_get_mock.return_value = Mock(content=test_file_data)
+
+        # Act
+        self.vimeo_player.download_default_transcript(url='test_url')
+
+        # Assert
+        self.assertRaises(VideoXBlockException, self.vimeo_player.download_default_transcript)
+        requests_get_mock.assert_called_once_with('test_url')
+        self.assertTrue(unescape_mock.called)
