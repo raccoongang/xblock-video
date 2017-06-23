@@ -358,7 +358,6 @@ class TestCustomBackends(VideoXBlockTestBase):
         self.assertEqual(download_video_url, delegate_mock)
 
 
-@ddt
 class VimeoApiClientTest(VideoXBlockTestBase):
     """
     Test Vimeo backend API client.
@@ -457,9 +456,9 @@ class VimeoApiClientTest(VideoXBlockTestBase):
 
         with patch.object(self.vimeo_player, 'api_client') as api_client_mock, \
                 patch.object(self.vimeo_player, 'parse_vimeo_texttracks') as parse_texttracks_mock:
+            type(api_client_mock).access_token = PropertyMock(return_value="test_token")
             api_client_mock.get.return_value = test_json_data
             parse_texttracks_mock.return_value = test_json_data["data"]
-            type(api_client_mock).access_token = PropertyMock(return_value="test_token")
 
             # Act
             transcripts, message = self.vimeo_player.get_default_transcripts(video_id="test_video_id")
@@ -482,12 +481,12 @@ class VimeoApiClientTest(VideoXBlockTestBase):
         with patch.object(self.vimeo_player, 'api_client') as api_client_mock:
             type(api_client_mock).access_token = PropertyMock(return_value=None)
 
-        # Act
+            # Act
             with self.assertRaises(vimeo.VimeoApiClientError) as raised:
                 self.vimeo_player.get_default_transcripts()
 
-        # Assert
-            self.assertEqual(str(raised.exception), failure_message)
+                # Assert
+                self.assertEqual(str(raised.exception), failure_message)
 
     def test_get_default_transcripts_get_failed(self):
         """
@@ -501,10 +500,10 @@ class VimeoApiClientTest(VideoXBlockTestBase):
             type(api_client_mock).access_token = PropertyMock(return_value="test_token")
             api_client_mock.get.side_effect = vimeo.VimeoApiClientError()
 
-        # Act
+            # Act
             default_transcripts, message = self.vimeo_player.get_default_transcripts(video_id="test_video_id")
 
-        # Assert
+            # Assert
             self.assertEqual(default_transcripts, [])
             self.assertEqual(message, failure_message)
 
