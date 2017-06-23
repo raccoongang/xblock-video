@@ -6,15 +6,13 @@ Vimeo Video player plugin.
 import httplib
 import json
 import logging
-from xml.sax.saxutils import unescape
-
 import re
+
 import requests
 
 from video_xblock import BaseVideoPlayer, ApiClientError
 from video_xblock.backends.base import BaseApiClient
-from video_xblock.exceptions import VideoXBlockException
-from video_xblock.utils import ugettext as _
+from ..utils import ugettext as _, remove_escaping
 
 log = logging.getLogger(__name__)
 
@@ -39,10 +37,7 @@ class VimeoApiClient(BaseApiClient):
         """
         Initialize Vimeo API client.
         """
-        if token:
-            self.access_token = token
-        else:
-            self.access_token = ''
+        self.access_token = token or ''
 
     def get(self, url, headers=None, can_retry=False):
         """
@@ -55,7 +50,8 @@ class VimeoApiClient(BaseApiClient):
         Returns:
             Response in python native data format.
         """
-        headers_ = {'Authorization': 'Bearer ' + str(self.access_token)}
+        headers_ = {'Authorization': 'Bearer ' + str(self.access_token),
+                    'Accept': 'application/json'}
         if headers is not None:
             headers_.update(headers)
         resp = requests.get(url, headers=headers_)
@@ -134,11 +130,13 @@ class VimeoPlayer(BaseVideoPlayer):
         return fields_list
 
     fields_help = {
-        'href': 'URL of the video page. E.g. https://vimeo.com/987654321',
-        'token': 'You can generate a Vimeo access token via <b>Application console\'s Authentication section</b> by '
-                 '<a href="https://developer.vimeo.com/apps/new" '
-                 'target="_blank">creating new app</a>. Please ensure appropriate operations '
-                 'scope ("private") has been set for access token.'
+        'href': _('URL of the video page. E.g. https://vimeo.com/987654321'),
+        'token': _(
+            'You can generate a Vimeo access token via <b>Application console\'s Authentication section</b> by '
+            '<a href="https://developer.vimeo.com/apps/new" '
+            'target="_blank">creating new app</a>. Please ensure appropriate operations '
+            'scope ("private") has been set for access token.'
+        )
     }
 
     def media_id(self, href):
@@ -221,19 +219,22 @@ class VimeoPlayer(BaseVideoPlayer):
             message = _('No timed transcript may be fetched from a video platform.')
             return default_transcripts, message
 
-        if json_data:
-            transcripts_data = json_data.get('data')
-            # Handle empty response (video w/o transcripts)
-            if not transcripts_data:
-                message = _("For now, video platform doesn't have any timed transcript for this video.")
-                return default_transcripts, message
-            # Populate default_transcripts
-            try:
-                default_transcripts = self.parse_vimeo_texttracks(transcripts_data)
-            except VimeoApiClientError as client_exc:
-                message = client_exc.message
+        if not json_data:
+            message = _('There are no default transcripts for the video on the video platform.')
+            return default_transcripts, message
 
-        return default_transcripts, message
+        transcripts_data = json_data.get('data')
+        # Handle empty response (video w/o transcripts)
+        if not transcripts_data:
+            message = _("For now, video platform doesn't have any timed transcript for this video.")
+            return default_transcripts, message
+        # Populate default_transcripts
+        try:
+            default_transcripts = self.parse_vimeo_texttracks(transcripts_data)
+        except VimeoApiClientError as client_exc:
+            message = client_exc.message
+        finally:
+            return default_transcripts, message
 
     def parse_vimeo_texttracks(self, transcripts_data):
         """
@@ -259,7 +260,7 @@ class VimeoPlayer(BaseVideoPlayer):
         log.debug("Parsed Vimeo transcripts: " + str(default_transcripts))
         return default_transcripts
 
-    def download_default_transcript(self, url=None, language_code=None):  # pylint: disable=unused-argument
+    def download_default_transcript(self, url, language_code=None):  # pylint: disable=unused-argument
         """
         Download default transcript from Vimeo video platform API in WebVVT format.
 
@@ -268,19 +269,7 @@ class VimeoPlayer(BaseVideoPlayer):
         Returns:
             sub (unicode): Transcripts formatted per WebVTT format https://w3c.github.io/webvtt/
         """
-        if url is None:
-            raise VideoXBlockException(_('`url` parameter is required.'))
         data = requests.get(url)
         text = data.content.decode('utf8')
-        # To clean subs text from special symbols here, we need `unescape()` from xml.sax.saxutils
-        # Reference: https://wiki.python.org/moin/EscapingHtml
-        html_unescape_table = {
-            "&amp;": "&",
-            "&quot;": '"',
-            "&amp;#39;": "'",
-            "&apos;": "'",
-            "&gt;": ">",
-            "&lt;": "<"
-        }
-        cleaned_captions_text = unescape(text, html_unescape_table)
+        cleaned_captions_text = remove_escaping(text)
         return unicode(cleaned_captions_text)

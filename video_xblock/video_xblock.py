@@ -148,8 +148,8 @@ class VideoXBlock(
         display_name=_('Default Timed Transcript'),
         help=_(
             'Default transcripts are uploaded automatically from a video platform '
-            'to the list of available transcripts.'
-            '<br/><b>Note: "Video API Token" should be given in order to make auto fetching possible.</b>'
+            'to the list of available transcripts.<br/>'
+            '<b>Note: "Video API Token" should be given in order to make auto fetching possible.</b>'
         ),
         resettable_editor=False
     )
@@ -386,7 +386,7 @@ class VideoXBlock(
         # Prepare basic_fields and advanced_fields for them to be rendered
         basic_fields = self.prepare_studio_editor_fields(player.basic_fields)
         advanced_fields = self.prepare_studio_editor_fields(player.advanced_fields)
-        log.debug("Fetched default transcripts: " + str(self.default_transcripts))
+        log.debug("Fetched default transcripts: {}".format(self.default_transcripts))
         context = {
             'courseKey': self.course_key,
             'languages': languages,

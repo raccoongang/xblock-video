@@ -8,14 +8,13 @@ from datetime import datetime
 import json
 import httplib
 import re
-from xml.sax.saxutils import unescape
 
 import requests
 from xblock.fragment import Fragment
 
 from video_xblock.backends.base import BaseVideoPlayer, BaseApiClient
 from video_xblock.exceptions import ApiClientError, VideoXBlockException
-from video_xblock.utils import ugettext as _
+from ..utils import ugettext as _, remove_escaping
 
 
 class BrightcoveApiClientError(ApiClientError):
@@ -581,16 +580,5 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             raise VideoXBlockException(_('`url` parameter is required.'))
         data = requests.get(url)
         text = data.content.decode('utf8')
-        # To clean subs text from special symbols here, we need `unescape()` from xml.sax.saxutils
-        # Reference: https://wiki.python.org/moin/EscapingHtml
-        html_unescape_table = {
-            "&amp;": "&",
-            "&quot;": '"',
-            "&amp;#39;": "'",
-            "&apos;": "'",
-            "&gt;": ">",
-            "&lt;": "<"
-        }
-        unescaped_text = unescape(text, html_unescape_table)
-        sub = unicode(unescaped_text)
-        return sub
+        cleaned_captions_text = remove_escaping(text)
+        return unicode(cleaned_captions_text)
