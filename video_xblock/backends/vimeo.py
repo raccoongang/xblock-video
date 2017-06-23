@@ -12,7 +12,7 @@ import requests
 
 from video_xblock import BaseVideoPlayer, ApiClientError
 from video_xblock.backends.base import BaseApiClient
-from ..utils import ugettext as _, remove_escaping
+from video_xblock.utils import ugettext as _, remove_escaping
 
 log = logging.getLogger(__name__)
 
@@ -206,7 +206,7 @@ class VimeoPlayer(BaseVideoPlayer):
             message (str): Message for a user with details on default transcripts fetching outcomes.
         """
         if not self.api_client.access_token:
-            raise VimeoApiClientError(_('No API credentials provided'))
+            raise VimeoApiClientError(_('No API credentials provided.'))
 
         video_id = kwargs.get('video_id')
         url = self.captions_api['url'].format(media_id=video_id)
@@ -223,12 +223,8 @@ class VimeoPlayer(BaseVideoPlayer):
             message = _('There are no default transcripts for the video on the video platform.')
             return default_transcripts, message
 
-        transcripts_data = json_data.get('data')
-        # Handle empty response (video w/o transcripts)
-        if not transcripts_data:
-            message = _("For now, video platform doesn't have any timed transcript for this video.")
-            return default_transcripts, message
         # Populate default_transcripts
+        transcripts_data = json_data.get('data')
         try:
             default_transcripts = self.parse_vimeo_texttracks(transcripts_data)
             return default_transcripts, message

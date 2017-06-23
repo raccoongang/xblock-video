@@ -370,16 +370,13 @@ class VimeoApiClientTest(VideoXBlockTestBase):
         self.vimeo_player = vimeo.VimeoPlayer(self.xblock)
 
     @patch('video_xblock.backends.vimeo.requests.get')
-    def test_api_client_get(self, requests_get_mock):
+    def test_api_client_get_200(self, requests_get_mock):
         """
-        Test Vimeo's API client GET method.
+        Test Vimeo's API client GET method if status Ok returned.
         """
         # Arrange
         test_body = {'test': 'body'}
-        requests_get_mock.side_effect = [
-            ResponseStub(status_code=200, body=test_body),
-            ResponseStub(status_code=400)
-        ]
+        requests_get_mock.return_value = ResponseStub(status_code=200, body=test_body)
 
         # Act
         response = self.vimeo_api_client.get(url='test_url')
@@ -390,7 +387,16 @@ class VimeoApiClientTest(VideoXBlockTestBase):
             'Authorization': 'Bearer test_token'
         })
         self.assertEqual(response, test_body)
-        # assert catches "status_code=400" case during "requests_get_mock" second call:
+
+    @patch('video_xblock.backends.vimeo.requests.get')
+    def test_api_client_get_400(self, requests_get_mock):
+        """
+        Test Vimeo's API client GET method if status 400 returned.
+        """
+        # Arrange
+        requests_get_mock.return_value = ResponseStub(status_code=400)
+
+        # Act & Assert
         self.assertRaises(vimeo.VimeoApiClientError, self.vimeo_api_client.get, url='test_url')
 
     def test_api_client_post(self):
@@ -402,7 +408,7 @@ class VimeoApiClientTest(VideoXBlockTestBase):
     @patch('video_xblock.backends.vimeo.VimeoPlayer.get_transcript_language_parameters')
     def test_parse_vimeo_texttracks(self, get_lang_params_mock):
         """
-        Test Vimeo's texttracks API parsing utility.
+        Test Vimeo's texttracks API parsing utility with correct data.
         """
         # Arrange
         transcripts_data = [{
@@ -427,11 +433,22 @@ class VimeoApiClientTest(VideoXBlockTestBase):
             'label': u'English',
             'url': transcripts_data[0][u'link']
         }])
-        self.assertRaises(vimeo.VimeoApiClientError, self.vimeo_player.parse_vimeo_texttracks, [{}])
+
+    @patch('video_xblock.backends.vimeo.VimeoPlayer.get_transcript_language_parameters')
+    def test_parse_vimeo_texttracks_empty_data(self, get_lang_params_mock):
+        """
+        Test Vimeo's texttracks API parsing utility with empty data.
+        """
+        # Arrange
+        transcripts_data = [{}]
+        get_lang_params_mock.return_value = (u'en', u'English')
+
+        # Act & Assert
+        self.assertRaises(vimeo.VimeoApiClientError, self.vimeo_player.parse_vimeo_texttracks, transcripts_data)
 
     def test_get_default_transcripts(self):
         """
-        Test Vimeo's default transcripts fetching.
+        Test Vimeo's default transcripts fetching (positive scenario).
         """
 
         # Arrange
@@ -454,11 +471,84 @@ class VimeoApiClientTest(VideoXBlockTestBase):
             self.assertIsInstance(transcripts, list)
             self.assertEqual(message, success_message)
 
-            type(api_client_mock).access_token = PropertyMock(return_value=None)  # token-not-provided case
-            self.assertRaises(vimeo.VimeoApiClientError, self.vimeo_player.get_default_transcripts)
+    def test_get_default_transcripts_no_token(self):
+        """
+        Test Vimeo's default transcripts fetching without provided API token.
+        """
 
+        # Arrange
+        failure_message = _('No API credentials provided.')
+
+        with patch.object(self.vimeo_player, 'api_client') as api_client_mock:
+            type(api_client_mock).access_token = PropertyMock(return_value=None)
+
+        # Act
+            with self.assertRaises(vimeo.VimeoApiClientError) as raised:
+                self.vimeo_player.get_default_transcripts()
+
+        # Assert
+            self.assertEqual(str(raised.exception), failure_message)
+
+    def test_get_default_transcripts_get_failed(self):
+        """
+        Test Vimeo's default transcripts fetching with GET request failure.
+        """
+
+        # Arrange
+        failure_message = _('No timed transcript may be fetched from a video platform.')
+
+        with patch.object(self.vimeo_player, 'api_client') as api_client_mock:
+            type(api_client_mock).access_token = PropertyMock(return_value="test_token")
             api_client_mock.get.side_effect = vimeo.VimeoApiClientError()
-            self.assertRaises(vimeo.VimeoApiClientError, self.vimeo_player.get_default_transcripts)
+
+        # Act
+            default_transcripts, message = self.vimeo_player.get_default_transcripts(video_id="test_video_id")
+
+        # Assert
+            self.assertEqual(default_transcripts, [])
+            self.assertEqual(message, failure_message)
+
+    def test_get_default_transcripts_no_data(self):
+        """
+        Test Vimeo's default transcripts fetching with no data returned.
+        """
+
+        # Arrange
+        test_json_data = []
+        success_message = _('There are no default transcripts for the video on the video platform.')
+
+        with patch.object(self.vimeo_player, 'api_client') as api_client_mock:
+            type(api_client_mock).access_token = PropertyMock(return_value="test_token")
+            api_client_mock.get.return_value = test_json_data
+
+            # Act
+            transcripts, message = self.vimeo_player.get_default_transcripts(video_id="test_video_id")
+
+            # Assert
+            self.assertEqual(transcripts, [])
+            self.assertEqual(message, success_message)
+
+    def test_get_default_transcripts_parsing_failure(self):
+        """
+        Test Vimeo's default transcripts fetching with data parsing failure.
+        """
+
+        # Arrange
+        test_json_data = {"data": [{"test_key": "test_value"}]}
+        failure_message = "test_message"
+
+        with patch.object(self.vimeo_player, 'api_client') as api_client_mock, \
+                patch.object(self.vimeo_player, 'parse_vimeo_texttracks') as parse_texttracks_mock:
+            type(api_client_mock).access_token = PropertyMock(return_value="test_token")
+            api_client_mock.get.return_value = test_json_data
+            parse_texttracks_mock.side_effect = vimeo.VimeoApiClientError(failure_message)
+
+            # Act
+            transcripts, message = self.vimeo_player.get_default_transcripts(video_id="test_video_id")
+
+            # Assert
+            self.assertEqual(transcripts, [])
+            self.assertEqual(message, failure_message)
 
     @patch('video_xblock.backends.vimeo.remove_escaping')
     @patch('video_xblock.backends.vimeo.requests.get')

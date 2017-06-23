@@ -14,7 +14,7 @@ from xblock.fragment import Fragment
 
 from video_xblock.backends.base import BaseVideoPlayer, BaseApiClient
 from video_xblock.exceptions import ApiClientError, VideoXBlockException
-from ..utils import ugettext as _, remove_escaping
+from video_xblock.utils import ugettext as _, remove_escaping
 
 
 class BrightcoveApiClientError(ApiClientError):
