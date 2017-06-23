@@ -231,9 +231,9 @@ class VimeoPlayer(BaseVideoPlayer):
         # Populate default_transcripts
         try:
             default_transcripts = self.parse_vimeo_texttracks(transcripts_data)
+            return default_transcripts, message
         except VimeoApiClientError as client_exc:
             message = client_exc.message
-        finally:
             return default_transcripts, message
 
     def parse_vimeo_texttracks(self, transcripts_data):
