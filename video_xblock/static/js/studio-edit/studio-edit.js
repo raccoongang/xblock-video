@@ -222,7 +222,7 @@ function StudioEditableXBlock(runtime, element) {
                 lang: newLang,
                 label: newLabel,
                 url: downloadUrl,
-                source: source,
+                source: source
             };
             // Create a standard transcript
             pushTranscript(newLang, newLabel, newUrl, '', transcriptsValue);
@@ -407,7 +407,7 @@ function StudioEditableXBlock(runtime, element) {
      * Get transcripts from 3playmedia's API and show result message.
      */
     function getTranscripts3playmediaApi(data) {
-        var message, status, includeLang;
+        var message, status;
         var options = {
             type: 'POST',
             url: runtimeHandlers.getTranscripts3playmediaApi,
@@ -421,15 +421,9 @@ function StudioEditableXBlock(runtime, element) {
             var successMessage = response.success_message;
             if (successMessage && response.transcripts) {
                 response.transcripts.forEach(function(item) {
-                    includeLang = transcriptsValue.find(function(element) { // eslint-disable-line no-shadow
-                        return element.lang === item.lang;
-                    });
-                    // Add a transcript from the 3playmedia only for non exists language
-                    if (!includeLang) {
-                        createTranscriptBlock(item.lang, item.label, transcriptsValue, item.url);
-                        pushTranscript(item.lang, item.label, item.url, '', transcriptsValue);
-                        pushTranscriptsValue(transcriptsValue);
-                    }
+                    createTranscriptBlock(item.lang, item.label, transcriptsValue, item.url);
+                    pushTranscript(item.lang, item.label, item.url, '', transcriptsValue);
+                    pushTranscriptsValue(transcriptsValue);
                 });
             }
 
@@ -672,7 +666,7 @@ function StudioEditableXBlock(runtime, element) {
             lang: langCode,
             label: label,
             url: url,
-            source: source,
+            source: source
         };
         event.preventDefault();
         event.stopPropagation();
