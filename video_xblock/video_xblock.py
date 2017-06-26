@@ -331,6 +331,7 @@ class VideoXBlock(
         """
         Private method to fetch/update default transcripts.
         """
+        log.debug("Default transcripts updating...")
         # Prepare parameters necessary to make requests to API.
         video_id = player.media_id(self.href)
         kwargs = {'video_id': video_id}
@@ -738,6 +739,7 @@ class VideoXBlock(
             response (dict): Data on a default transcript, fetched from a video platform.
 
         """
+        log.debug("Uploading default transcript with data: {}".format(data))
         player = self.get_player()
         video_id = player.media_id(self.href)
         lang_code = str(data.get(u'lang'))
@@ -764,4 +766,5 @@ class VideoXBlock(
             'url': external_url,
             'label': lang_label
         }
+        log.debug("Uploaded default transcript: {}".format(response))
         return response

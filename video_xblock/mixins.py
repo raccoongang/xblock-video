@@ -178,13 +178,14 @@ class TranscriptsMixin(XBlock):
             translations (list) : List of translations (dict) .
             error_message (dict): Description of error.
         """
+        log.debug("Getting 3PlayMedia transcripts...")
         domain = 'https://static.3playmedia.com/'
         transcripts_3playmedia = requests.get(
             '{domain}files/{file_id}/transcripts?apikey={api_key}'.format(
                 domain=domain, file_id=file_id, api_key=apikey
             )
         ).json()
-        log.debug(transcripts_3playmedia)
+
         errors = isinstance(transcripts_3playmedia, dict) and transcripts_3playmedia.get('errors')
         if errors:
             return 'error', {'error_message': u'\n'.join(errors.values())}
@@ -215,6 +216,7 @@ class TranscriptsMixin(XBlock):
                 "label": lang_label,
                 "url": external_url,
             })
+        log.debug("Got 3PlayMedia transcripts: {}".format(translations))
         return 'success', translations
 
     @XBlock.json_handler

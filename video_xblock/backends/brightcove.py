@@ -7,6 +7,7 @@ import base64
 from datetime import datetime
 import json
 import httplib
+import logging
 import re
 from xml.sax.saxutils import unescape
 
@@ -14,8 +15,11 @@ import requests
 from xblock.fragment import Fragment
 
 from video_xblock.backends.base import BaseVideoPlayer, BaseApiClient
+from video_xblock.constants import TranscriptSource
 from video_xblock.exceptions import ApiClientError, VideoXBlockException
 from video_xblock.utils import ugettext as _
+
+log = logging.getLogger(__name__)
 
 
 class BrightcoveApiClientError(ApiClientError):
@@ -526,6 +530,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
                 ]
             message (str): Message for a user with details on default transcripts fetching outcomes.
         """
+        log.debug("BC: getting default transcripts...")
         if not self.api_key and not self.api_secret:
             raise BrightcoveApiClientError(_('No API credentials provided'))
 
@@ -562,6 +567,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
                 'label': lang_label,
                 'url': transcript_url,
             })
+        log.debug("BC: default transcripts: {}".format(default_transcripts))
         return default_transcripts, message
 
     def download_default_transcript(self, url=None, language_code=None):  # pylint: disable=unused-argument
@@ -573,6 +579,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         Returns:
             sub (unicode): Transcripts formatted per WebVTT format https://w3c.github.io/webvtt/
         """
+        log.debug("BC: downloading default transcript from url:{}".format(url))
         if url is None:
             raise VideoXBlockException(_('`url` parameter is required.'))
         data = requests.get(url)
