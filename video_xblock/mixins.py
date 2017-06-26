@@ -13,8 +13,8 @@ from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Scope, Boolean, Float, String
 
-from .constants import DEFAULT_LANG, TPMApiTranscriptFormatID, TPMApiLanguage
-from .utils import import_from, ugettext as _, underscore_to_mixedcase
+from .constants import DEFAULT_LANG, TPMApiTranscriptFormatID, TPMApiLanguage, TranscriptSource
+from .utils import import_from, ugettext as _, underscore_to_mixedcase, create_reference
 
 log = logging.getLogger(__name__)
 
@@ -203,9 +203,9 @@ class TranscriptsMixin(XBlock):
             lang_data = TPMApiLanguage(lang_id)
             lang_label = lang_data.name
             video_id = self.get_player().media_id(self.href)
-            reference_name = "{lang_label}_captions_video_{video_id}".format(
-                lang_label=lang_label, video_id=video_id
-            ).encode('utf8')
+            source = TranscriptSource.THREE_PLAY_MEDIA
+
+            reference_name = create_reference(lang_label, video_id, source)
 
             _file_name, external_url = self.create_transcript_file(
                 trans_str=formatted_content,
@@ -215,6 +215,7 @@ class TranscriptsMixin(XBlock):
                 "lang": lang_data.iso_639_1_code,
                 "label": lang_label,
                 "url": external_url,
+                "source": source,
             })
         log.debug("Got 3PlayMedia transcripts: {}".format(translations))
         return 'success', translations

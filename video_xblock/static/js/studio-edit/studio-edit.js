@@ -215,12 +215,14 @@ function StudioEditableXBlock(runtime, element) {
             var newLang = response.lang;
             var newLabel = response.label;
             var newUrl = response.url;
+            var source = response.source;
             // Add a default transcript to the list of enabled ones
             var downloadUrl = runtimeHandlers.downloadTranscript + '?' + newUrl;
             var defaultTranscript = {
                 lang: newLang,
                 label: newLabel,
-                url: downloadUrl
+                url: downloadUrl,
+                source: source,
             };
             // Create a standard transcript
             pushTranscript(newLang, newLabel, newUrl, '', transcriptsValue);
@@ -665,10 +667,12 @@ function StudioEditableXBlock(runtime, element) {
         var langCode = $currentTarget.attr('data-lang-code');
         var label = $currentTarget.attr('data-lang-label');
         var url = $currentTarget.attr('data-download-url');
+        var source = $currentTarget.attr('data-source');
         var defaultTranscript = {
             lang: langCode,
             label: label,
-            url: url
+            url: url,
+            source: source,
         };
         event.preventDefault();
         event.stopPropagation();

@@ -566,6 +566,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
                 'lang': lang_code,
                 'label': lang_label,
                 'url': transcript_url,
+                'source': TranscriptSource.DEFAULT,
             })
         log.debug("BC: default transcripts: {}".format(default_transcripts))
         return default_transcripts, message

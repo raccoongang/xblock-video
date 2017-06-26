@@ -26,7 +26,7 @@ from .mixins import ContentStoreMixin, LocationMixin, PlaybackStateMixin, Settin
 from .workbench.mixin import WorkbenchMixin
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
-from .utils import render_template, render_resource, resource_string, ugettext as _
+from .utils import render_template, render_resource, resource_string, ugettext as _, create_reference
 from . import __version__
 
 log = logging.getLogger(__name__)
@@ -744,9 +744,10 @@ class VideoXBlock(
         video_id = player.media_id(self.href)
         lang_code = str(data.get(u'lang'))
         lang_label = str(data.get(u'label'))
+        source = str(data.get(u'source', ''))
         sub_url = str(data.get(u'url'))
-        # File name format is <language label>_captions_video_<video_id>, e.g. "English_captions_video_456g68"
-        reference_name = "{}_captions_video_{}".format(lang_label, video_id).encode('utf8')
+
+        reference_name = create_reference(lang_label, video_id, source)
 
         # Fetch default transcript
         sub_unicode = player.download_default_transcript(
@@ -764,7 +765,8 @@ class VideoXBlock(
             'success_message': success_message,
             'lang': lang_code,
             'url': external_url,
-            'label': lang_label
+            'label': lang_label,
+            'source': source,
         }
         log.debug("Uploaded default transcript: {}".format(response))
         return response

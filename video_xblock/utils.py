@@ -76,3 +76,17 @@ def underscore_to_mixedcase(value):
 
     mix = mixedcase()
     return "".join(mix.next()(x) if x else '_' for x in value.split("_"))
+
+
+def create_reference(lang_label, video_id, source="default"):
+    """
+    Build transcript file reference based on input information.
+
+    Format is <language label>_<source>_captions_video_<video_id>, e.g. "English_default_captions_video_456g68"
+    """
+    reference = "{lang_label}_{source}_captions_video_{video_id}".format(
+        lang_label=lang_label,
+        video_id=video_id,
+        source=source,
+    ).encode('utf8')
+    return reference

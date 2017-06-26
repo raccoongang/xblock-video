@@ -18,6 +18,15 @@ class PlayerName(object):
     YOUTUBE = 'youtube-player'
 
 
+class TranscriptSource(object):
+    """
+    Define transcript source, e.g. where transcript was fetched from.
+    """
+
+    DEFAULT = 'default'
+    THREE_PLAY_MEDIA = '3play-media'
+
+
 class TPMApiTranscriptFormatID(object):
     """
     3PlayMedia service's transcripts API format_name - format_ID mapping.
