@@ -148,7 +148,8 @@ class VideoXBlock(
         display_name=_('Default Timed Transcript'),
         help=_(
             'Default transcripts are uploaded automatically from a video platform '
-            'to the list of available transcripts.'
+            'to the list of available transcripts.<br/>'
+            '<b>Note: "Video API Token" should be given in order to make auto fetching possible.</b>'
         ),
         resettable_editor=False
     )
@@ -281,7 +282,7 @@ class VideoXBlock(
             validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
             data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
         """
-        is_brightcove = str(self.player_name) == 'brightcove-player'
+        is_brightcove = str(self.player_name) == PlayerName.BRIGHTCOVE
 
         if is_brightcove:
             self.validate_account_id_data(validation, data)
@@ -386,6 +387,7 @@ class VideoXBlock(
         # Prepare basic_fields and advanced_fields for them to be rendered
         basic_fields = self.prepare_studio_editor_fields(player.basic_fields)
         advanced_fields = self.prepare_studio_editor_fields(player.advanced_fields)
+        log.debug("Fetched default transcripts: {}".format(self.default_transcripts))
         context = {
             'courseKey': self.course_key,
             'languages': languages,
@@ -397,6 +399,8 @@ class VideoXBlock(
             'transcripts_autoupload_message': transcripts_autoupload_message,
             'basic_fields': basic_fields,
             'advanced_fields': advanced_fields,
+            'player_name': self.player_name,  # for players identification
+            'players': PlayerName,
         }
 
         fragment.content = render_template('studio-edit.html', **context)
@@ -750,13 +754,16 @@ class VideoXBlock(
         reference_name = create_reference(lang_label, video_id, source)
 
         # Fetch default transcript
-        sub_unicode = player.download_default_transcript(
+        unicode_subs_text = player.download_default_transcript(
             url=sub_url, language_code=lang_code
         )
-        sub = self.convert_caps_to_vtt(caps=sub_unicode)
+        if not player.default_transcripts_in_vtt:
+            prepared_subs = self.convert_caps_to_vtt(caps=unicode_subs_text)
+        else:
+            prepared_subs = unicode_subs_text
 
         file_name, external_url = self.create_transcript_file(
-            trans_str=sub, reference_name=reference_name
+            trans_str=prepared_subs, reference_name=reference_name
         )
 
         # Exceptions are handled on the frontend

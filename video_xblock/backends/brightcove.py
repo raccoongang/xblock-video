@@ -9,7 +9,6 @@ import json
 import httplib
 import logging
 import re
-from xml.sax.saxutils import unescape
 
 import requests
 from xblock.fragment import Fragment
@@ -17,7 +16,7 @@ from xblock.fragment import Fragment
 from video_xblock.backends.base import BaseVideoPlayer, BaseApiClient
 from video_xblock.constants import TranscriptSource
 from video_xblock.exceptions import ApiClientError, VideoXBlockException
-from video_xblock.utils import ugettext as _
+from video_xblock.utils import ugettext as _, remove_escaping
 
 log = logging.getLogger(__name__)
 
@@ -343,7 +342,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
     @property
     def advanced_fields(self):
         """
-        Tuple of VideoXBlock fields to display in Basic tab of edit modal window.
+        Tuple of VideoXBlock fields to display in Advanced tab of edit modal window.
 
         Brightcove videos require Brightcove Account id.
         """
@@ -585,16 +584,5 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             raise VideoXBlockException(_('`url` parameter is required.'))
         data = requests.get(url)
         text = data.content.decode('utf8')
-        # To clean subs text from special symbols here, we need `unescape()` from xml.sax.saxutils
-        # Reference: https://wiki.python.org/moin/EscapingHtml
-        html_unescape_table = {
-            "&amp;": "&",
-            "&quot;": '"',
-            "&amp;#39;": "'",
-            "&apos;": "'",
-            "&gt;": ">",
-            "&lt;": "<"
-        }
-        unescaped_text = unescape(text, html_unescape_table)
-        sub = unicode(unescaped_text)
-        return sub
+        cleaned_captions_text = remove_escaping(text)
+        return unicode(cleaned_captions_text)
