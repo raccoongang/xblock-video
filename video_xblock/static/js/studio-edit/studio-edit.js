@@ -225,7 +225,7 @@ function StudioEditableXBlock(runtime, element) {
                 source: source
             };
             // Create a standard transcript
-            pushTranscript(newLang, newLabel, newUrl, '', transcriptsValue);
+            pushTranscript(newLang, newLabel, newUrl, source, '', transcriptsValue);
             pushTranscriptsValue(transcriptsValue);
             createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
             bindRemovalListenerEnabledTranscript(newLang, newLabel, newUrl);
@@ -260,7 +260,8 @@ function StudioEditableXBlock(runtime, element) {
             var defaultTranscript = {
                 lang: langCode,
                 label: langLabel,
-                url: downloadUrlApi
+                url: downloadUrlApi,
+                source: $fileUploader.data('source-default')
             };
             uploadDefaultTranscriptsToServer(defaultTranscript);
             // Affect standard transcripts
@@ -422,7 +423,7 @@ function StudioEditableXBlock(runtime, element) {
             if (successMessage && response.transcripts) {
                 response.transcripts.forEach(function(item) {
                     createTranscriptBlock(item.lang, item.label, transcriptsValue, item.url);
-                    pushTranscript(item.lang, item.label, item.url, '', transcriptsValue);
+                    pushTranscript(item.lang, item.label, item.url, item.source, '', transcriptsValue);
                     pushTranscriptsValue(transcriptsValue);
                 });
             }
@@ -516,6 +517,7 @@ function StudioEditableXBlock(runtime, element) {
         var downloadUrlServer;
         var defaultTranscript;
         var isValidated = validateTranscriptFile(event, fieldName, filename, $fileUploader);
+        var source = $fileUploader.data('source-manual');
         if (fieldName === 'handout' && isValidated) {
             $parentDiv = $('.file-uploader');
             $('.download-setting', $parentDiv).attr('href', downloadUrl).removeClass('is-hidden');
@@ -523,7 +525,7 @@ function StudioEditableXBlock(runtime, element) {
             showStatus($('.status', $parentDiv), SUCCESS, successMessage);
             $('input[data-field-name=' + fieldName + ']').val(url).change();
         } else if (fieldName === 'transcripts' && isValidated) {
-            pushTranscript(lang, label, url, '', transcriptsValue);
+            pushTranscript(lang, label, url, source, '', transcriptsValue);
             $('.add-transcript').removeClass('is-disabled');
             $('input[data-field-name=' + fieldName + ']').val(JSON.stringify(transcriptsValue)).change();
             $(currentLiTag).find('.upload-transcript').text('Replace');

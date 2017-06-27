@@ -12,6 +12,8 @@ import pkg_resources
 from django.template import Engine, Context, Template
 from xblockutils.resources import ResourceLoader
 
+from .constants import TranscriptSource
+
 html_parser = HTMLParser()  # pylint: disable=invalid-name
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
 
@@ -108,3 +110,19 @@ def create_reference(lang_label, video_id, source="default"):
         source=source,
     ).encode('utf8')
     return reference
+
+
+def filter_transcripts_by_source(transcripts, source=TranscriptSource.DEFAULT):
+    """
+    Filter given transcripts by source attribute.
+    """
+    return [tr for tr in transcripts if tr['source'] == source]
+
+
+def normalize_transcripts(transcripts):
+    """
+    Add to manually uploaded transcripts "source" attribute.
+    """
+    for tr_dict in transcripts:
+        tr_dict.setdefault('source', TranscriptSource.MANUAL)
+    return transcripts

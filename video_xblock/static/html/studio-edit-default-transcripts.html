@@ -12,7 +12,7 @@
       <div class="custom-field-section-label enabled-transcripts">{% trans "Enabled transcripts" %}</div>
       {% if transcripts  %}
       <!-- Display a list of transcripts fetched from a video xblock -->
-        {% for transcript in transcripts %}
+        {% for transcript in enabled_default_transcripts %}
           <div class="enabled-default-transcripts-section">
             <div class="default-transcripts-label" value="{{ transcript.lang }}">
               {{ transcript.label }}

@@ -24,7 +24,17 @@ class TranscriptSource(object):
     """
 
     DEFAULT = 'default'
+    MANUAL = 'manual'
     THREE_PLAY_MEDIA = '3play-media'
+
+    ALL = ['DEFAULT', 'MANUAL', 'THREE_PLAY_MEDIA']
+
+    @classmethod
+    def to_dict(cls):
+        """
+        Make dict of available sources.
+        """
+        return {k: getattr(cls, k) for k in cls.ALL}
 
 
 class TPMApiTranscriptFormatID(object):

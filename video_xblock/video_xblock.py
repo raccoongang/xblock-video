@@ -20,13 +20,15 @@ from xblockutils.studio_editable import StudioEditableXBlockMixin
 from webob import Response
 
 from .backends.base import BaseVideoPlayer
-from .constants import PlayerName
+from .constants import PlayerName, TranscriptSource
 from .exceptions import ApiClientError
 from .mixins import ContentStoreMixin, LocationMixin, PlaybackStateMixin, SettingsMixin, TranscriptsMixin
 from .workbench.mixin import WorkbenchMixin
 from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
-from .utils import render_template, render_resource, resource_string, ugettext as _, create_reference
+from .utils import (
+    render_template, render_resource, resource_string, ugettext as _, create_reference, filter_transcripts_by_source,
+    normalize_transcripts)
 from . import __version__
 
 log = logging.getLogger(__name__)
@@ -369,7 +371,7 @@ class VideoXBlock(
         player = self.get_player()
         languages = [{'label': label, 'code': lang} for lang, label in ALL_LANGUAGES]
         languages.sort(key=lambda l: l['label'])
-        transcripts = json.loads(self.transcripts) if self.transcripts else []
+        transcripts = normalize_transcripts(json.loads(self.transcripts)) if self.transcripts else []
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
         auth_error_message = ''
 
@@ -389,18 +391,21 @@ class VideoXBlock(
         advanced_fields = self.prepare_studio_editor_fields(player.advanced_fields)
         log.debug("Fetched default transcripts: {}".format(self.default_transcripts))
         context = {
+            'advanced_fields': advanced_fields,
+            'auth_error_message': auth_error_message,
+            'basic_fields': basic_fields,
             'courseKey': self.course_key,
             'languages': languages,
-            'transcripts': transcripts,
-            'download_transcript_handler_url': download_transcript_handler_url,
-            'default_transcripts': self.default_transcripts,
-            'initial_default_transcripts': initial_default_transcripts,
-            'auth_error_message': auth_error_message,
-            'transcripts_autoupload_message': transcripts_autoupload_message,
-            'basic_fields': basic_fields,
-            'advanced_fields': advanced_fields,
             'player_name': self.player_name,  # for players identification
             'players': PlayerName,
+            'sources': TranscriptSource.to_dict().items(),
+            # transcripts context:
+            'transcripts': transcripts,
+            'default_transcripts': self.default_transcripts,
+            'enabled_default_transcripts': filter_transcripts_by_source(transcripts),
+            'initial_default_transcripts': initial_default_transcripts,
+            'transcripts_autoupload_message': transcripts_autoupload_message,
+            'download_transcript_handler_url': download_transcript_handler_url,
         }
 
         fragment.content = render_template('studio-edit.html', **context)
