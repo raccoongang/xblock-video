@@ -5,7 +5,6 @@ Video xblock helpers.
 from HTMLParser import HTMLParser
 from importlib import import_module
 from xml.sax.saxutils import unescape
-
 import os.path
 import pkg_resources
 

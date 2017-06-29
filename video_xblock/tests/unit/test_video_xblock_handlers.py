@@ -87,7 +87,7 @@ class UploadDefaultTranscriptHandlerTests(VideoXBlockTestBase):
             convert_caps_mock.assert_called_with(caps=test_subs_text)
             create_transcript_file_mock.assert_called_with(trans_str=prepared_subs_mock, reference_name=test_reference)
             self.assertEqual(
-                response.body,
+                response.body,  # pylint: disable=no-member
                 json.dumps({
                     'success_message': 'Successfully uploaded "test_file_name".',
                     'lang': assert_data['lang'],
