@@ -71,7 +71,7 @@
           </div>
           <div class="api-response upload-default-transcript {{ default_transcript.lang }} status"></div>
         {% endfor %}
-        {% for transcript in transcripts %}
+        {% for transcript in enabled_default_transcripts %}
           <!-- Success message of enabled transcript removal is to be displayed. -->
           <div class="api-response remove-default-transcript {{ transcripts.lang }} status"></div>
         {% endfor %}

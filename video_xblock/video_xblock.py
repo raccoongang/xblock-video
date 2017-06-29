@@ -5,31 +5,31 @@ All you need to provide is video url, this XBlock does the rest for you.
 """
 
 import datetime
-import json
 import httplib
+import json
 import logging
 import os.path
-import requests
 
+import requests
+from webob import Response
 from xblock.core import XBlock
 from xblock.fields import Scope, Boolean, String, Dict
 from xblock.fragment import Fragment
 from xblock.validation import ValidationMessage
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
-from webob import Response
-
+from . import __version__
 from .backends.base import BaseVideoPlayer
 from .constants import PlayerName, TranscriptSource
 from .exceptions import ApiClientError
-from .mixins import ContentStoreMixin, LocationMixin, PlaybackStateMixin, SettingsMixin, TranscriptsMixin
-from .workbench.mixin import WorkbenchMixin
-from .settings import ALL_LANGUAGES
 from .fields import RelativeTime
+from .mixins import ContentStoreMixin, LocationMixin, PlaybackStateMixin, SettingsMixin, TranscriptsMixin
+from .settings import ALL_LANGUAGES
 from .utils import (
-    render_template, render_resource, resource_string, ugettext as _, create_reference, filter_transcripts_by_source,
-    normalize_transcripts)
-from . import __version__
+    create_reference_name, filter_transcripts_by_source, normalize_transcripts,
+    render_resource, render_template, resource_string, ugettext as _,
+)
+from .workbench.mixin import WorkbenchMixin
 
 log = logging.getLogger(__name__)
 
@@ -756,7 +756,7 @@ class VideoXBlock(
         source = str(data.get(u'source', ''))
         sub_url = str(data.get(u'url'))
 
-        reference_name = create_reference(lang_label, video_id, source)
+        reference_name = create_reference_name(lang_label, video_id, source)
 
         # Fetch default transcript
         unicode_subs_text = player.download_default_transcript(

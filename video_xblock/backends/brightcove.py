@@ -557,7 +557,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             return default_transcripts, message
 
         # Populate default_transcripts
-        transcripts_data = [[cap_data.get('src'), cap_data.get('srclang')] for cap_data in captions_data]
+        transcripts_data = ([cap_data.get('src'), cap_data.get('srclang')] for cap_data in captions_data)
 
         for transcript_url, lang_code in transcripts_data:
             lang_label = self.get_transcript_language_parameters(lang_code)[1]

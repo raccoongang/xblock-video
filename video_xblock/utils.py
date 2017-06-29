@@ -98,7 +98,7 @@ def remove_escaping(text):
     return unescape(text, html_unescape_table)
 
 
-def create_reference(lang_label, video_id, source="default"):
+def create_reference_name(lang_label, video_id, source="default"):
     """
     Build transcript file reference based on input information.
 
@@ -116,7 +116,9 @@ def filter_transcripts_by_source(transcripts, source=TranscriptSource.DEFAULT):
     """
     Filter given transcripts by source attribute.
     """
-    return [tr for tr in transcripts if tr['source'] == source]
+    if not transcripts:
+        return transcripts
+    return (tr for tr in transcripts if tr['source'] == source)
 
 
 def normalize_transcripts(transcripts):

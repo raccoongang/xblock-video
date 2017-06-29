@@ -127,6 +127,7 @@ function validateTranscriptFile(event, fieldName, filename, $fileUploader) {
  * @param {String} lang
  * @param {String} label
  * @param {String} url
+ * @param {String} source
  * @param {String} oldLang
  * @param {Array} transcriptsValue
  */

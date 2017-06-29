@@ -48,8 +48,8 @@ class UploadDefaultTranscriptHandlerTests(VideoXBlockTestBase):
     Test cases for `VideoXBlock.upload_default_transcript_handler`
     """
 
-    @patch('video_xblock.video_xblock.create_reference')
-    def test_upload_handler_default_transcript_not_in_vtt_case(self, create_reference_mock):
+    @patch('video_xblock.video_xblock.create_reference_name')
+    def test_upload_handler_default_transcript_not_in_vtt_case(self, create_reference_name_mock):
         # Arrange
         request_body = """{"label": "test_label","lang": "test_lang","source": "test_source","url": "test_url"}"""
         assert_data = json.loads(request_body)
@@ -60,7 +60,7 @@ class UploadDefaultTranscriptHandlerTests(VideoXBlockTestBase):
         test_external_url = 'test_external_url'
 
         request_mock = arrange_request_mock(request_body)
-        create_reference_mock.return_value = test_reference
+        create_reference_name_mock.return_value = test_reference
 
         with patch.object(self.xblock, 'get_player') as get_player_mock, \
                 patch.object(self.xblock, 'convert_caps_to_vtt') as convert_caps_mock, \
@@ -80,7 +80,7 @@ class UploadDefaultTranscriptHandlerTests(VideoXBlockTestBase):
             player_mock.download_default_transcript.assert_called_with(
                 url=assert_data['url'], language_code=assert_data['lang']
             )
-            create_reference_mock.assert_called_with(assert_data['label'], test_media_id, assert_data['source'])
+            create_reference_name_mock.assert_called_with(assert_data['label'], test_media_id, assert_data['source'])
             player_mock.download_default_transcript.assert_called_with(
                 url=assert_data['url'], language_code=assert_data['lang']
             )

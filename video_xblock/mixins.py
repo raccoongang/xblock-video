@@ -14,7 +14,7 @@ from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Scope, Boolean, Float, String
 
 from .constants import DEFAULT_LANG, TPMApiTranscriptFormatID, TPMApiLanguage, TranscriptSource
-from .utils import import_from, ugettext as _, underscore_to_mixedcase, create_reference
+from .utils import create_reference_name, import_from, ugettext as _, underscore_to_mixedcase
 
 log = logging.getLogger(__name__)
 
@@ -205,7 +205,7 @@ class TranscriptsMixin(XBlock):
             video_id = self.get_player().media_id(self.href)
             source = TranscriptSource.THREE_PLAY_MEDIA
 
-            reference_name = create_reference(lang_label, video_id, source)
+            reference_name = create_reference_name(lang_label, video_id, source)
 
             _file_name, external_url = self.create_transcript_file(
                 trans_str=formatted_content,
