@@ -56,3 +56,65 @@ describe('Transcripts manual upload', function() {
         expect(validateTranscripts(e, $testTranscriptsBlock)).toBeTruthy();
     });
 });
+
+describe('Function "pushTranscript"', function () {
+    var newTranscriptAdded;
+    var transcriptsValue;
+
+    afterEach(function () {
+        newTranscriptAdded = null;
+        transcriptsValue = null;
+    });
+
+    var testData = {
+        "lang": "en",
+        "label": "English",
+        "url": "testUrl",
+        "source": "manual",
+        "oldLang": ""
+    };
+    var oldData = {
+        "lang": "en",
+        "label": "English",
+        "url": "otherTestUrl",
+        "source": "default"
+    };
+
+    it('called with empty "transcriptsValue"', function () {
+        var transcriptsValue = [];
+        newTranscriptAdded = pushTranscript(
+            testData.lang,
+            testData.label,
+            testData.url,
+            testData.source,
+            testData.oldLang,
+            transcriptsValue
+        );
+        expect(newTranscriptAdded).toBeTruthy();
+        expect(transcriptsValue).toEqual([{
+            lang: testData.lang,
+            url: testData.url,
+            label: testData.label,
+            source: testData.source
+        }]);
+    });
+
+    it('called with the "transcriptsValue" that already contains pushed language', function () {
+        transcriptsValue = [oldData];
+        newTranscriptAdded = pushTranscript(
+            testData.lang,
+            testData.label,
+            testData.url,
+            testData.source,
+            testData.oldLang,
+            transcriptsValue
+        );
+        expect(newTranscriptAdded).toBeFalsy();
+        expect(transcriptsValue).toEqual([{
+            lang: testData.lang,
+            url: testData.url,
+            label: testData.label,
+            source: testData.source
+        }]);
+    })
+});
