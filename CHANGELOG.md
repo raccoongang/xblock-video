@@ -210,4 +210,5 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 [0.6.6]: https://github.com/raccoongang/xblock-video/compare/v0.6.5...v0.6.6
 [0.7.0]: https://github.com/raccoongang/xblock-video/compare/v0.6.6...v0.7.0
 [0.7.1]: https://github.com/raccoongang/xblock-video/compare/v0.7.0...v0.7.1
-[Unreleased]: https://github.com/raccoongang/xblock-video/compare/v0.7.1...HEAD
+[0.8.0]: https://github.com/raccoongang/xblock-video/compare/v0.7.1...v0.8.0
+[Unreleased]: https://github.com/raccoongang/xblock-video/compare/v0.8.0...HEAD
