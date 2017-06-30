@@ -7,9 +7,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.8.0] - 2017-06-30
+
+### Added
+
+- Vimeo: default transcripts fetching.
+
+## Changed
+
+- Use new 3PlayMedia API to fetch transcripts translations.
+- Increase test coverage. Which means better stability.
+
 ### Fixed
 
 - Bug preventing setting Video Platform API key. E.g. `BC_TOKEN` for Brightcove.
+- Transcripts collision bug, which prevented teachers to replace
+  transcript for a given language.
 
 ## [0.7.1] - 2017-05-18
 
