@@ -57,31 +57,33 @@ describe('Transcripts manual upload', function() {
     });
 });
 
-describe('Function "pushTranscript"', function () {
+describe('Function "pushTranscript"', function() {
+    'use strict';
     var newTranscriptAdded;
     var transcriptsValue;
+    var testData = {
+        lang: 'en',
+        label: 'English',
+        url: 'testUrl',
+        source: 'manual',
+        oldLang: ''
+    };
+    var oldData = {
+        lang: 'en',
+        label: 'English',
+        url: 'otherTestUrl',
+        source: 'default'
+    };
 
-    afterEach(function () {
+    afterEach(function() {
         newTranscriptAdded = null;
         transcriptsValue = null;
     });
 
-    var testData = {
-        "lang": "en",
-        "label": "English",
-        "url": "testUrl",
-        "source": "manual",
-        "oldLang": ""
-    };
-    var oldData = {
-        "lang": "en",
-        "label": "English",
-        "url": "otherTestUrl",
-        "source": "default"
-    };
 
-    it('called with empty "transcriptsValue"', function () {
-        var transcriptsValue = [];
+    it('called with empty "transcriptsValue"', function() {
+        transcriptsValue = [];
+        // eslint-disable-next-line no-undef
         newTranscriptAdded = pushTranscript(
             testData.lang,
             testData.label,
@@ -99,8 +101,9 @@ describe('Function "pushTranscript"', function () {
         }]);
     });
 
-    it('called with the "transcriptsValue" that already contains pushed language', function () {
+    it('called with the "transcriptsValue" that already contains pushed language', function() {
         transcriptsValue = [oldData];
+        // eslint-disable-next-line no-undef
         newTranscriptAdded = pushTranscript(
             testData.lang,
             testData.label,
@@ -116,5 +119,5 @@ describe('Function "pushTranscript"', function () {
             label: testData.label,
             source: testData.source
         }]);
-    })
+    });
 });
