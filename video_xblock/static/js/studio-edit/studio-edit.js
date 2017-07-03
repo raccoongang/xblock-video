@@ -13,6 +13,11 @@ function StudioEditableXBlock(runtime, element) {
 
     var fields = [];
     var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
+
+    var $threePlayMediaModeSwitcher = $('#threepm-transcript-onoff-switch');
+    var $threePlayMediaDownloadModeLabel = $("#downloadModeLabel");
+    var $threePlayMediaDirectModeLabel = $("#directModeLabel");
+
     var $defaultTranscriptsSwitcher = $('input.default-transcripts-switch-input');
     var $enabledLabel = $('div.custom-field-section-label.enabled-transcripts');
     var $availableLabel = $('div.custom-field-section-label.available-transcripts');
@@ -703,5 +708,11 @@ function StudioEditableXBlock(runtime, element) {
         $enabledLabel.toggleClass('is-hidden', $('.enabled-default-transcripts-section:visible').length);
         $availableLabel.toggleClass('is-hidden', $('.available-default-transcripts-section:visible').length);
     });
+
+    $threePlayMediaModeSwitcher.change(function () {
+        $threePlayMediaDownloadModeLabel.toggleClass('is-active');
+        $threePlayMediaDirectModeLabel.toggleClass('is-active');
+    });
+
     // End of Raccoongang addons
 }

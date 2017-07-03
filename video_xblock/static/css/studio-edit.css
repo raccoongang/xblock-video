@@ -1,3 +1,7 @@
+.push-right {
+    float: right;
+}
+
 .wrapper-translations-settings .list-settings .list-settings-item select {
   width: 80%;
   margin-right: 10px;
@@ -33,7 +37,7 @@
 #video-api-authenticate,
 #threeplaymedia-api-transcripts {
   margin-top: 10px;
-  width: 92%;
+  width: 100%;
   padding: 10px;
 }
 
@@ -144,6 +148,27 @@
     border-radius: 34px;
 }
 
+#threepm-transcripts-slider {
+    margin: 0 10px;
+    background-color: #ccc;
+}
+
+threepm-switch {
+    display: inherit;
+    float: right;
+}
+
+span.is-active {
+    color: green;
+    font-weight: 500;
+}
+
+#xb-field-edit-threeplaymedia-file-id,
+#xb-field-edit-threeplaymedia-api-key {
+    width: inherit;
+}
+
+#threepm-transcripts-slider:before,
 .default-transcripts-slider:before {
     position: absolute;
     content: "";
@@ -163,6 +188,7 @@
     background-color: #009fe6;
 }
 
+.default-transcripts-switch-input:checked + .default-transcripts-switch .default-transcripts-slider:before {
 .default-transcripts-switch-input:checked + .default-transcripts-switch .default-transcripts-slider:before {
     -webkit-transform: translateX(23px);
     -ms-transform: translateX(23px);
@@ -195,6 +221,7 @@
     width: 70%;
     display: inline-block;
     min-width: 240px;
+    margin-bottom: 5px;
 }
 
 .api-response.status-success {

@@ -11,7 +11,7 @@ from webob import Response
 
 from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
-from xblock.fields import Scope, Boolean, Float, String
+from xblock.fields import Scope, Boolean, Float, String, Dict
 
 from .constants import DEFAULT_LANG, TPMApiTranscriptFormatID, TPMApiLanguage, TranscriptSource
 from .utils import create_reference_name, import_from, ugettext as _, underscore_to_mixedcase
@@ -442,7 +442,7 @@ class SettingsMixin(XBlock):
         Return xblock settings set in .json config.
 
         Returned value depends on the context:
-        - `studio_view()` is being executed in CMS context and gets data from `lms.env.json`.
+        - `studio_view()` is being executed in CMS context and gets data from `cms.env.json`.
         - `student_view` is being executed in LMS context and gets data from `lms.env.json`.
 
         Returns:

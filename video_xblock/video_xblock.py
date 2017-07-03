@@ -156,6 +156,16 @@ class VideoXBlock(
         resettable_editor=False
     )
 
+    threeplaymedia = Dict(
+        default='default',
+        display_name=_('3PlayMedia'),
+        help='{}\n{}'.format(
+            _('<a href="http://www.3playmedia.com">3playmedia</a> file ID with transcripts to use.'),
+            _("You can generate a client token following official documentation of your video platform's API.")),
+        scope=Scope.content,
+        resettable_editor=False
+    )
+
     threeplaymedia_apikey = String(
         default='default',
         display_name=_('API Key'),
@@ -559,7 +569,9 @@ class VideoXBlock(
                 'has_list_values': False,
                 'type': 'string',
             }
-        elif field_name in ('handout', 'transcripts', 'default_transcripts', 'token', 'threeplaymedia_apikey'):
+        elif field_name in (
+                'handout', 'transcripts', 'default_transcripts', 'token', 'threeplaymedia_apikey', 'threeplaymedia'
+        ):
             info = self.initialize_studio_field_info(field_name, field, field_type=field_name)
         else:
             info = self.initialize_studio_field_info(field_name, field)

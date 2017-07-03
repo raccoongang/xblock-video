@@ -1,0 +1,44 @@
+{% load i18n %}
+
+<div class="custom-field-list">
+  <div class="field-elements-wrapper">
+    <div class="custom-field-section-label">
+      {% trans "Usage mode:" %}
+    </div>
+    <div class="threepm-switch" id="threepm-switch">
+      <span class="is-active" id="downloadModeLabel">{% trans "Download" %}</span>
+      <input type="checkbox" class="default-transcripts-switch-input" id="threepm-transcript-onoff-switch">
+      <label class="default-transcripts-switch" for="threepm-transcript-onoff-switch">
+        <div class="default-transcripts-slider" id="threepm-transcripts-slider"></div>
+      </label>
+      <span class="" id="directModeLabel">{% trans "Direct" %}</span>
+    </div>
+  </div>
+
+  <div class="field-elements-wrapper threepm-inputs">
+    <div class="custom-field-section-label">{% trans "File ID:" %}</div>
+    <input
+      type="text"
+      class="field-data-control threeplaymedia-file-id push-right text"
+      id="xb-field-edit-{{field.name}}-file-id"
+      value="{{field.value|default_if_none:''}}"
+    >
+  </div>
+
+  <div class="field-elements-wrapper threepm-inputs">
+    <div class="custom-field-section-label">{% trans "API key:" %}</div>
+    <input
+      type="text"
+      class="field-data-control {{field.name}}-api-key push-right text"
+      id="xb-field-edit-{{field.name}}-api-key"
+      value="{{field.value|default_if_none:''}}"
+    >
+  </div>
+  <div class="field-elements-wrapper">
+    <button id="threeplaymedia-api-transcripts">
+      <span aria-hidden="true"></span>
+      {% trans "Fetch transcripts from 3PlayMedia service" %}<span class="sr"></span>
+    </button>
+  </div>
+  <div class="api-request threeplaymedia status"></div>
+</div>
