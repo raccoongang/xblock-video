@@ -156,22 +156,6 @@ class VideoXBlock(
         resettable_editor=False
     )
 
-    threeplaymedia_apikey = String(
-        default='default',
-        display_name=_('API Key'),
-        help=_('You can generate a client token following official documentation of your video platform\'s API.'),
-        scope=Scope.content,
-        resettable_editor=False
-    )
-
-    threeplaymedia_file_id = String(
-        default='default',
-        display_name=_('File Id'),
-        help=_('3playmedia file id for download bind transcripts.'),
-        scope=Scope.content,
-        resettable_editor=False
-    )
-
     token = String(
         default='',
         display_name=_('Video API Token'),
@@ -317,7 +301,7 @@ class VideoXBlock(
                 display_name=self.display_name,
                 usage_id=self.usage_id,
                 handout=self.handout,
-                transcripts=self.route_transcripts(self.transcripts),
+                transcripts=self.route_transcripts(),
                 download_transcript_allowed=self.download_transcript_allowed,
                 download_video_url=self.get_download_video_url(),
                 handout_file_name=self.get_file_name_from_path(self.handout),
@@ -435,7 +419,7 @@ class VideoXBlock(
         save_state_url = self.runtime.handler_url(self, 'save_player_state')
         transcripts = render_resource(
             'static/html/transcripts.html',
-            transcripts=self.route_transcripts(self.transcripts)
+            transcripts=self.route_transcripts()
         ).strip()
         return player.get_player_html(
             url=self.href, account_id=self.account_id, player_id=self.player_id,
@@ -782,3 +766,15 @@ class VideoXBlock(
         }
         log.debug("Uploaded default transcript: {}".format(response))
         return response
+
+    def get_enabled_transcripts(self):
+        """
+        Get transcripts from different sources depending on current usage mode.
+        """
+        if self.direct_enabled:
+            transcripts = self.fetch_available_3pm_transcripts()
+        else:
+            transcripts = json.loads(self.transcripts) if self.transcripts else []
+
+        for transcript in transcripts:
+            yield transcript
