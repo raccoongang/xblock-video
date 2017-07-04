@@ -2,7 +2,6 @@
 Video XBlock mixins geared toward specific subsets of functionality.
 """
 
-import json
 import logging
 
 import requests
@@ -204,7 +203,7 @@ class TranscriptsMixin(XBlock):
 
         :return: (generator of OrderedDicts) all transcript's data
         """
-        results = self._get_available_3pm_transcripts(self.threeplaymedia_file_id, self.threeplaymedia_apikey)
+        results = self.get_available_3pm_transcripts(self.threeplaymedia_file_id, self.threeplaymedia_apikey)
         errors = isinstance(results, dict) and results.get('errors')
         log.debug("Fetched 3PM transcripts:\n{}".format(results))
         if errors:
@@ -218,7 +217,7 @@ class TranscriptsMixin(XBlock):
             transcript_ordered_dict['content'] = ''  # we don't want to parse it to JSON
             yield transcript_ordered_dict
 
-    def _get_available_3pm_transcripts(self, file_id, apikey):
+    def get_available_3pm_transcripts(self, file_id, apikey):
         """
         Make API request to fetch list of available transcripts for given file ID.
         """
@@ -232,7 +231,8 @@ class TranscriptsMixin(XBlock):
 
     def fetch_3pm_translation(self, transcript_data, format_id=TPMApiTranscriptFormatID.WEBVTT):
         """
-        Fetch single transcript for given file ID in given format
+        Fetch single transcript for given file ID in given format.
+
         :param transcript_data:
         :param format_id: defauts to VTT
         :return: (namedtuple instance) transcript data
@@ -248,8 +248,8 @@ class TranscriptsMixin(XBlock):
         )
         try:
             content = requests.get(external_api_url).text
-        except Exception as e:
-            log.exception(e.message)
+        except Exception as exc:  # pylint: disable=broad-except
+            log.exception(exc.message)
             return
 
         lang_code = TPMApiLanguage(lang_id)
@@ -260,7 +260,7 @@ class TranscriptsMixin(XBlock):
             id=tid,
             content=content,
             lang=lang_code.iso_639_1_code,
-            lang_id = lang_id,
+            lang_id=lang_id,
             label=lang_label,
             video_id=video_id,
             format=format_id,
@@ -295,15 +295,15 @@ class TranscriptsMixin(XBlock):
             if transcript is None:
                 return 'error', {'error_message': '3PlayMedia API error has occured while transcript fetching.'}
 
-            reference_name = create_reference_name(transcript.lang_label, transcript.video_id, transcript.source)
+            reference_name = create_reference_name(transcript.label, transcript.video_id, transcript.source)
 
             _file_name, external_edx_url = self.create_transcript_file(
                 trans_str=transcript.content,
                 reference_name=reference_name
             )
             translations.append({
-                "lang": transcript.lang_code.iso_639_1_code,
-                "label": transcript.lang_label,
+                "lang": transcript.lang.iso_639_1_code,
+                "label": transcript.label,
                 "url": external_edx_url,
                 "source": transcript.source,
             })

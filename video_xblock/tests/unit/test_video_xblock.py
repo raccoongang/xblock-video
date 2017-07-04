@@ -143,7 +143,7 @@ class VideoXBlockTests(VideoXBlockTestBase):
         )
         resource_string_mock.assert_called_with('static/css/student-view.css')
         handler_url.assert_called_with(self.xblock, 'download_transcript')
-        route_transcripts.assert_called_once_with(self.xblock.transcripts)
+        route_transcripts.assert_called_once_with()
 
     @patch('video_xblock.video_xblock.ALL_LANGUAGES', new_callable=MagicMock)
     @patch('video_xblock.video_xblock.render_template')
