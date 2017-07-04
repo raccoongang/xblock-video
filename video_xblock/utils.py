@@ -131,5 +131,5 @@ def normalize_transcripts(transcripts):
 
 
 Transcript = namedtuple('Transcript', [
-    'id', 'label', 'lang', 'content', 'format', 'video_id', 'source', 'url'
+    'id', 'label', 'lang', 'lang_id', 'content', 'format', 'video_id', 'source', 'url'
 ])

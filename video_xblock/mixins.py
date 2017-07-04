@@ -102,7 +102,10 @@ class TranscriptsMixin(XBlock):
 
     def route_transcripts(self):
         """
-        Re-route non .vtt transcripts to `str_to_vtt` handler.
+        Re-route transcripts to appropriate handler.
+
+        While direct 3PlayMedia transcripts enabled: to transcript fetcher
+        and to `str_to_vtt` handler for non .vtt transcripts if opposite.
 
         Arguments:
             transcripts (unicode): Raw transcripts.
@@ -110,8 +113,9 @@ class TranscriptsMixin(XBlock):
         transcripts = self.get_enabled_transcripts()
         for tran in transcripts:
             if self.direct_enabled:
-                # redirect to fetch_tree_play_media handler
-                pass
+                tran['url'] = self.runtime.handler_url(
+                    self, 'fetch_from_tree_play_media', query="{}={}".format(tran['lang_id'], tran['id'])
+                )
             else:
                 if not tran['url'].endswith('.vtt'):
                     tran['url'] = self.runtime.handler_url(
@@ -256,6 +260,7 @@ class TranscriptsMixin(XBlock):
             id=tid,
             content=content,
             lang=lang_code.iso_639_1_code,
+            lang_id = lang_id,
             label=lang_label,
             video_id=video_id,
             format=format_id,
@@ -369,6 +374,22 @@ class TranscriptsMixin(XBlock):
         caps_path = request.query_string
         caps = requests.get(request.host_url + caps_path).text
         return Response(self.convert_caps_to_vtt(caps))
+
+    @XBlock.handler
+    def fetch_from_tree_play_media(self, request, _suffix=''):
+        """
+        Proxy handler to hide real API url.
+
+        Arguments:
+            request (webob.Request): The request to handle
+            suffix (string): not used
+            query string: 'language_id=transcript_id'
+        Returns:
+            webob.Response: WebVTT transcripts wrapped in Response object.
+        """
+        lang_id, tid = request.query_string.split('=')
+        transcript = self.fetch_3pm_translation(transcript_data={'id': tid, 'language_id': lang_id})
+        return Response(transcript.content)
 
 
 @XBlock.needs('modulestore')
