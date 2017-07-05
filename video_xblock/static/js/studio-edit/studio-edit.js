@@ -383,9 +383,28 @@ function StudioEditableXBlock(runtime, element) {
         });
     }
 
-    // Raccoongang changes
+    /**
+     * Validate if 3PlayMedia combination: fileId + apiKey is actual.
+     * @returns {boolean}
+     */
+    function validateThreePlayMediaCreds() {
+        // TBD
+        return true;
+    }
+
+    /**
+     * Validation handlers' results combiner.
+     * @returns {boolean}
+     */
+    function validationSucceeded(event) {
+        return [
+            validateTranscripts(event, $langChoiceItem),
+            validateThreePlayMediaCreds()
+        ].every(Boolean);
+    }
+
     $('.save-button', element).bind('click', function(event) {
-        if (validateTranscripts(event, $langChoiceItem)) {
+        if (validationSucceeded(event)) {
             studioSubmit(fillValues(fields));
         }
     });
@@ -394,7 +413,6 @@ function StudioEditableXBlock(runtime, element) {
         event.preventDefault();
         runtime.notify('cancel', {});
     });
-    // End of Raccoongang changes
 
     if (gotTranscriptsValue) {
         transcriptsValue = JSON.parse(gotTranscriptsValue);
