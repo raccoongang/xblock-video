@@ -387,26 +387,65 @@ function StudioEditableXBlock(runtime, element) {
      * Validate if 3PlayMedia combination: fileId + apiKey is actual.
      * @returns {boolean}
      */
-    function validateThreePlayMediaCreds() {
-        // TBD
-        return true;
+    function validateThreePlayMediaConfig(data) {
+        var message;
+        var status;  // eslint-disable-line no-unused-vars
+        var options = {
+            type: 'POST',
+            url: runtimeHandlers.validateThreePlayMediaConfig,
+            dataType: 'json',
+            data: JSON.stringify(data)
+        };
+
+        return $.ajax(
+            options
+        )
+        .done(function(response) {
+            message = response.message;
+            if (!response.isValid) {
+                status = ERROR;
+                runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
+            }
+        })
+        .fail(function(jqXHR) {
+            status = ERROR;
+            if (jqXHR.responseText) { // Try to get more specific error message we can show to user.
+                message = extractErrorMessage(jqXHR.responseText);
+            } else {
+                message = gettext('This may be happening because of an error with our server or your ' +
+                'internet connection. Try refreshing the page or making sure you are online.');
+            }
+            runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
+        });
     }
 
     /**
-     * Validation handlers' results combiner.
-     * @returns {boolean}
+     * Grab 3PlayMedia API configuration data.
+     * @returns (object) 3PlayMedia's: apiKey + fileId
      */
-    function validationSucceeded(event) {
-        return [
-            validateTranscripts(event, $langChoiceItem),
-            validateThreePlayMediaCreds()
-        ].every(Boolean);
+    function getThreePlayMediaConfig() {
+        var $apiKey = $('.threeplaymedia-api-key', element).val();
+        var $fileId = $('#xb-field-edit-threeplaymedia_file_id', element).val();
+
+        return {api_key: $apiKey, file_id: $fileId};
     }
 
     $('.save-button', element).bind('click', function(event) {
-        if (validationSucceeded(event)) {
-            studioSubmit(fillValues(fields));
-        }
+        var validationSucceeded = false;
+        event.preventDefault();
+
+        $.when(validateThreePlayMediaConfig(getThreePlayMediaConfig())).then(
+            function(response) {
+                validationSucceeded = [
+                    response.isValid,
+                    validateTranscripts($langChoiceItem)
+                ].every(Boolean);
+
+                if (validationSucceeded) {
+                    studioSubmit(fillValues(fields));
+                }
+            }
+        );
     });
 
     $(element).find('.cancel-button').bind('click', function(event) {
@@ -627,11 +666,10 @@ function StudioEditableXBlock(runtime, element) {
     });
 
     $3playmediaTranscriptsApi.on('click', function(event) {
-        var $apiKey = $('.threeplaymedia-api-key', element).val();
-        var $fileId = $('#xb-field-edit-threeplaymedia_file_id', element).val();
+        var apiConfig = getThreePlayMediaConfig();
         event.preventDefault();
         event.stopPropagation();
-        getTranscripts3playmediaApi({api_key: $apiKey, file_id: $fileId});
+        getTranscripts3playmediaApi(apiConfig);
     });
 
     $('.lang-select').on('change', function(event) {
