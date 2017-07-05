@@ -121,27 +121,27 @@ class TestCustomBackends(VideoXBlockTestBase):
     expected_advanced_fields = [
         [  # Youtube
             'start_time', 'end_time', 'handout', 'transcripts',
-            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'direct_enabled', 'download_transcript_allowed',
             'default_transcripts', 'download_video_allowed', 'download_video_url'
         ],
         [  # Brightcove
             'player_id', 'start_time', 'end_time', 'handout', 'transcripts', 'token',
-            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'direct_enabled', 'download_transcript_allowed',
             'default_transcripts', 'download_video_allowed', 'download_video_url'
         ],
         [  # Wistia
             'start_time', 'end_time', 'handout', 'transcripts', 'token',
-            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'direct_enabled', 'download_transcript_allowed',
             'default_transcripts', 'download_video_allowed', 'download_video_url'
         ],
         [  # Vimeo
             'start_time', 'end_time', 'handout', 'transcripts', 'token',
-            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'direct_enabled', 'download_transcript_allowed',
             'default_transcripts', 'download_video_allowed', 'download_video_url'
         ],
         [  # Html5
             'start_time', 'end_time', 'handout', 'transcripts',
-            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'download_transcript_allowed',
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'direct_enabled', 'download_transcript_allowed',
             'download_video_allowed',
         ],
     ]
