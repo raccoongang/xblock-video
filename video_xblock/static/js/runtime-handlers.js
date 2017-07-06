@@ -10,6 +10,7 @@ function getHandlers(runtime, element) {
         authenticateVideoApi: runtime.handlerUrl(element, 'authenticate_video_api_handler'),
         uploadDefaultTranscript: runtime.handlerUrl(element, 'upload_default_transcript_handler'),
         getTranscripts3playmediaApi: runtime.handlerUrl(element, 'get_transcripts_3playmedia_api_handler'),
+        validateThreePlayMediaConfig: runtime.handlerUrl(element, 'validate_three_play_media_config'),
         saveState: runtime.handlerUrl(element, 'save_player_state'),
         publishEvent: runtime.handlerUrl(element, 'publish_event')
     };

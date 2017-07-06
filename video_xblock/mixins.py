@@ -1,7 +1,6 @@
 """
 Video XBlock mixins geared toward specific subsets of functionality.
 """
-
 import logging
 
 import requests
@@ -222,11 +221,15 @@ class TranscriptsMixin(XBlock):
         Make API request to fetch list of available transcripts for given file ID.
         """
         domain = self.THREE_PLAY_MEDIA_API_DOMAIN
-        results = requests.get(
+        response = requests.get(
             '{domain}files/{file_id}/transcripts?apikey={api_key}'.format(
                 domain=domain, file_id=file_id, api_key=apikey
             )
-        ).json()
+        )
+        if response.ok:
+            results = response.json()
+        else:
+            results = {"failed": True}
         return results
 
     def fetch_3pm_translation(self, transcript_data, format_id=TPMApiTranscriptFormatID.WEBVTT):
@@ -390,6 +393,29 @@ class TranscriptsMixin(XBlock):
         lang_id, tid = request.query_string.split('=')
         transcript = self.fetch_3pm_translation(transcript_data={'id': tid, 'language_id': lang_id})
         return Response(transcript.content)
+
+    @XBlock.handler
+    def validate_three_play_media_config(self, request, _suffix=''):
+        """
+        Handler to validate actuality of provided API credentials.
+
+        Arguments:
+            request (webob.Request):
+            suffix (string): not used
+        Returns:
+            webob.Response: (json) {'isValid': true/false}
+        """
+        api_key = request.json.get('api_key')
+        file_id = request.json.get('file_id')
+
+        if not (api_key and file_id):
+            return Response(status=400)
+
+        results = self.get_available_3pm_transcripts(file_id, api_key)
+
+        is_valid = not isinstance(results, dict)
+        message = _('Success') if is_valid else _('Check provided 3PlayMedia configuration')
+        return Response(json={'isValid': is_valid, 'message': message})
 
 
 @XBlock.needs('modulestore')
