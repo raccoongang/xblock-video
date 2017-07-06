@@ -772,7 +772,7 @@ class VideoXBlock(
         Get transcripts from different sources depending on current usage mode.
         """
         if self.threeplaymedia_streaming:
-            transcripts = self.fetch_available_3pm_transcripts()
+            transcripts = list(self.fetch_available_3pm_transcripts())
         else:
             transcripts = json.loads(self.transcripts) if self.transcripts else []
 

@@ -7,13 +7,13 @@ from collections import Iterable, OrderedDict
 
 from django.test import RequestFactory
 from mock import patch, Mock, MagicMock, PropertyMock
-from video_xblock.tests.unit.test_video_xblock_handlers import arrange_request_mock
 from webob import Response
 from xblock.exceptions import NoSuchServiceError
 
 from video_xblock.constants import DEFAULT_LANG, TPMApiLanguage
 from video_xblock.tests.unit.base import VideoXBlockTestBase
 from video_xblock.tests.unit.mocks.base import ResponseStub
+from video_xblock.tests.unit.test_video_xblock_handlers import arrange_request_mock
 from video_xblock.utils import loader, Transcript
 from video_xblock.video_xblock import VideoXBlock
 
