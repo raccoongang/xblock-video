@@ -1,12 +1,12 @@
 """
 Test utils.
 """
-
 import unittest
+
 from ddt import ddt, data
 from mock import patch, Mock, PropertyMock
 
-from video_xblock.utils import import_from, underscore_to_mixedcase
+from video_xblock.utils import import_from, underscore_to_mixedcase, create_reference_name, normalize_transcripts
 
 
 @ddt
@@ -37,3 +37,22 @@ class UtilsTest(unittest.TestCase):
         self.assertEqual(import_from('test_module', 'test_class'), 'a_class')
         import_module_mock.assert_called_once_with('test_module')
         class_mock.assert_called_once_with()
+
+    def test_create_reference_name(self):
+        # Arrange:
+        lang_label = 'test_lang_label'
+        video_id = 'test_video_id'
+        source = 'test_source'
+        expected_ref = 'test_lang_label_test_source_captions_video_test_video_id'
+        # Act:
+        reference = create_reference_name(lang_label, video_id, source)
+        # Assert:
+        self.assertEqual(reference, expected_ref)
+
+    def test_normalize_transcripts(self):
+        # Arrange
+        test_transcripts = [{'source': 'default'}, {}]
+        # Act
+        normalized_transcripts = normalize_transcripts(test_transcripts)
+        # Assert
+        self.assertEqual(test_transcripts, normalized_transcripts)

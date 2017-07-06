@@ -2,17 +2,18 @@
 VideoXBlock mixins test cases.
 """
 
-from collections import Iterable, OrderedDict
 import json
-
-from mock import patch, Mock, MagicMock, PropertyMock
+from collections import Iterable, OrderedDict
 
 from django.test import RequestFactory
+from mock import patch, Mock, MagicMock, PropertyMock
+from video_xblock.tests.unit.test_video_xblock_handlers import arrange_request_mock
 from webob import Response
 from xblock.exceptions import NoSuchServiceError
 
-from video_xblock.constants import DEFAULT_LANG
+from video_xblock.constants import DEFAULT_LANG, TPMApiLanguage
 from video_xblock.tests.unit.base import VideoXBlockTestBase
+from video_xblock.tests.unit.mocks.base import ResponseStub
 from video_xblock.utils import loader, Transcript
 from video_xblock.video_xblock import VideoXBlock
 
@@ -360,23 +361,23 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
         convert_caps_to_vtt_mock.assert_called_once_with(text_mock)
 
     def test_fetch_available_3pm_transcripts_with_errors(self):
-        # Arrange
+        # Arrange:
         test_results = {'errors': ['test_errors']}
         with patch.object(self.xblock, 'get_available_3pm_transcripts') as threepm_transcripts_mock, \
                 patch.object(self.xblock, 'threeplaymedia_file_id') as file_id_mock, \
                 patch.object(self.xblock, 'threeplaymedia_apikey') as apikey_mock:
 
             threepm_transcripts_mock.return_value = test_results
-            # Act
+            # Act:
             transcripts_gen = self.xblock.fetch_available_3pm_transcripts()
             transcripts = list(transcripts_gen)
-            # Assert
+            # Assert:
             self.assertEqual(transcripts, [])
             self.assertRaises(StopIteration, transcripts_gen.next)
             threepm_transcripts_mock.assert_called_once_with(file_id_mock, apikey_mock)
 
     def test_fetch_available_3pm_transcripts_success(self):
-        # Arrange
+        # Arrange:
         test_transcript_data = [{'id': 'test_id', 'language_id': '2'}]
         test_args = ['id', 'label', 'lang', 'lang_id', 'content', 'format', 'video_id', 'source', 'url']
         with patch.object(self.xblock, 'get_available_3pm_transcripts') as threepm_transcripts_mock, \
@@ -386,14 +387,110 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
 
             threepm_transcripts_mock.return_value = test_transcript_data
             fetch_3pm_translation_mock.return_value = Transcript(*test_args)
-            # Act
+            # Act:
             transcripts_gen = self.xblock.fetch_available_3pm_transcripts()
             transcripts = list(transcripts_gen)
-            # Assert
+            # Assert:
             self.assertIsInstance(transcripts[0], OrderedDict)
             self.assertSequenceEqual(test_args, transcripts[0].keys())
             threepm_transcripts_mock.assert_called_once_with(file_id_mock, apikey_mock)
             fetch_3pm_translation_mock.assert_called_once_with(test_transcript_data[0])
+
+    @patch('video_xblock.mixins.requests.get')
+    def test_get_available_3pm_transcripts(self, requests_get_mock):
+        # Arrange:
+        test_json = '{"test":"json_string"}'
+        requests_get_mock.return_value = ResponseStub(
+            body=test_json,
+            ok=True
+        )
+        file_id = 'test_file_id'
+        api_key = 'test_api_key'
+        test_api_url = 'https://static.3playmedia.com/files/test_file_id/transcripts?apikey=test_api_key'
+        # Act:
+        results = self.xblock.get_available_3pm_transcripts(file_id, api_key)
+        # Assert:
+        self.assertTrue(requests_get_mock.ok)
+        self.assertTrue(requests_get_mock.json.assert_called)
+        self.assertEqual(results, test_json)
+        requests_get_mock.assert_called_once_with(test_api_url)
+
+    @patch.object(VideoXBlock, 'get_player')
+    @patch('video_xblock.mixins.requests.get')
+    def test_fetch_3pm_translation(self, requests_get_mock, player_mock):
+        # Arrange:
+        test_lang_id = '1'
+        test_transcript_text = 'test_transcript_text'
+        test_format = 51
+        test_transcript_id = 'test_id'
+        test_video_id = 'test_video_id'
+        test_source = '3play-media'
+        file_id = 'test_file_id'
+        api_key = 'test_api_key'
+
+        test_transcript_data = {'id': test_transcript_id, 'language_id': test_lang_id}
+        test_lang_code = TPMApiLanguage(test_lang_id)
+        test_api_url = 'https://static.3playmedia.com/files/test_file_id/transcripts/test_id?' \
+                       'apikey=test_api_key&format_id=51'
+
+        requests_get_mock.return_value = ResponseStub(body=test_transcript_text)
+        media_id_mock = player_mock.return_value.media_id
+        media_id_mock.return_value = test_video_id
+        self.xblock.threeplaymedia_file_id = file_id
+        self.xblock.threeplaymedia_apikey = api_key
+
+        test_args = [
+            test_transcript_id,
+            test_lang_code.name,
+            test_lang_code.iso_639_1_code,
+            test_lang_id,
+            test_transcript_text,
+            test_format,
+            test_video_id,
+            test_source,
+            test_api_url
+        ]
+
+        # Act:
+        transcript = self.xblock.fetch_3pm_translation(test_transcript_data)
+        # Assert:
+        self.assertEqual(transcript, Transcript(*test_args))
+
+    @patch.object(VideoXBlock, 'get_translations_from_3playmedia')
+    def test_get_transcripts_3playmedia_api_handler_success(self, threeplaymedia_fetcher_mock):
+        # Arrange:
+        request_body = '{"api_key": "test_api_key","file_id": "test_file_id"}'
+        request_mock = arrange_request_mock(request_body)
+
+        test_status = "not_error"
+        test_transcripts = 'test_transcripts'
+        threeplaymedia_fetcher_mock.return_value = test_status, test_transcripts
+
+        # Act:
+        response = self.xblock.get_transcripts_3playmedia_api_handler(request_mock)
+
+        # Assert:
+        self.assertEqual(
+            '{"transcripts": "test_transcripts", "success_message": "Successfully fetched transcripts '
+            'from 3playMedia. Please check transcripts list above."}',
+            response.body  # pylint: disable=no-member
+        )
+
+    @patch.object(VideoXBlock, 'get_translations_from_3playmedia')
+    def test_get_transcripts_3playmedia_api_handler_failure(self, threeplaymedia_fetcher_mock):
+        # Arrange:
+        request_body = '{"api_key": "test_api_key","file_id": "test_file_id"}'
+        request_mock = arrange_request_mock(request_body)
+
+        test_status = "error"
+        test_transcripts = 'test_transcripts'
+        threeplaymedia_fetcher_mock.return_value = test_status, test_transcripts
+
+        # Act:
+        response = self.xblock.get_transcripts_3playmedia_api_handler(request_mock)
+
+        # Assert:
+        self.assertEqual('"test_transcripts"', response.body)  # pylint: disable=no-member
 
 
 class WorkbenchMixinTest(VideoXBlockTestBase):
