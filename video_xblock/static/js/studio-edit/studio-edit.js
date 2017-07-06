@@ -396,10 +396,6 @@ function StudioEditableXBlock(runtime, element) {
             data: JSON.stringify(data)
         };
 
-        if (!(data.api_key && data.file_id)) {
-            return {isValid: true};
-        }
-
         return $.ajax(
             options
         )
@@ -425,10 +421,11 @@ function StudioEditableXBlock(runtime, element) {
      * @returns (object) 3PlayMedia's: apiKey + fileId
      */
     function getThreePlayMediaConfig() {
-        var $apiKey = $('.threeplaymedia-api-key', element).val();
-        var $fileId = $('#xb-field-edit-threeplaymedia_file_id', element).val();
+        var apiKey = $('.threeplaymedia-api-key', element).val();
+        var fileId = $('#xb-field-edit-threeplaymedia_file_id', element).val();
+        var streamingEnabled = $('#xb-field-edit-threeplaymedia_streaming', element).prop('selectedIndex');
 
-        return {api_key: $apiKey, file_id: $fileId};
+        return {api_key: apiKey, file_id: fileId, streaming_enabled: !streamingEnabled};
     }
 
     $('.save-button', element).bind('click', function(event) {

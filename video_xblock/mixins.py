@@ -220,6 +220,8 @@ class TranscriptsMixin(XBlock):
     def get_available_3pm_transcripts(self, file_id, apikey):
         """
         Make API request to fetch list of available transcripts for given file ID.
+
+        :return: (list of dicts OR dict) all available transcripts attached to file with ID OR error dict
         """
         domain = self.THREE_PLAY_MEDIA_API_DOMAIN
         response = requests.get(
@@ -410,14 +412,28 @@ class TranscriptsMixin(XBlock):
         """
         api_key = request.json.get('api_key')
         file_id = request.json.get('file_id')
+        streaming_enabled = request.json.get('streaming_enabled')
 
+        # the very first request during xblock creating:
+        if api_key is None and file_id is None:
+            return Response(json={'isValid': True, 'message': _("Initialization")})
+
+        # the case when no options provided, and streaming is disabled:
+        success_message = _('Success')
+        if not api_key and not file_id and not streaming_enabled:
+            return Response(json={'isValid': True, 'message': success_message})
+
+        # options partially provided or both empty, but streaming is enabled:
+        message = _('Check provided 3PlayMedia configuration')
         if not (api_key and file_id):
-            return Response(status=400, json={"message": _("'api_key' or 'file_id' is missing")})
+            return Response(json={'isValid': False, 'message': message})
 
         results = self.get_available_3pm_transcripts(file_id, api_key)
 
         is_valid = False if isinstance(results, dict) else True
-        message = _('Success') if is_valid else _('Check provided 3PlayMedia configuration')
+        if is_valid:
+            message = success_message
+
         return Response(json={'isValid': is_valid, 'message': message})
 
 
