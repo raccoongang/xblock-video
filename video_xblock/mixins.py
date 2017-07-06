@@ -66,7 +66,7 @@ class TranscriptsMixin(XBlock):
     )
 
     threeplaymedia_apikey = String(
-        default='default',
+        default='',
         display_name=_('API Key'),
         help=_('You can generate a client token following official documentation of your video platform\'s API.'),
         scope=Scope.content,
@@ -74,7 +74,7 @@ class TranscriptsMixin(XBlock):
     )
 
     threeplaymedia_file_id = String(
-        default='default',
+        default='',
         display_name=_('File Id'),
         help=_('3playmedia file id for download bind transcripts.'),
         scope=Scope.content,
@@ -408,7 +408,7 @@ class TranscriptsMixin(XBlock):
         file_id = request.json.get('file_id')
 
         if not (api_key and file_id):
-            return Response(status=400, message=_("'api_key' or 'file_id' is missing"))
+            return Response(status=400, json={"message": _("'api_key' or 'file_id' is missing")})
 
         results = self.get_available_3pm_transcripts(file_id, api_key)
 

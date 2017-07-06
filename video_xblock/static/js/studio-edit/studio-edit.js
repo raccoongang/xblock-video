@@ -396,6 +396,10 @@ function StudioEditableXBlock(runtime, element) {
             data: JSON.stringify(data)
         };
 
+        if (!(data.api_key && data.file_id)) {
+            return {isValid: true};
+        }
+
         return $.ajax(
             options
         )
