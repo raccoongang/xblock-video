@@ -384,12 +384,11 @@ function StudioEditableXBlock(runtime, element) {
     }
 
     /**
-     * Validate if 3PlayMedia combination: fileId + apiKey is actual.
+     * Validate if 3PlayMedia options: fileId, apiKey.
      * @returns {boolean}
      */
     function validateThreePlayMediaConfig(data) {
         var message;
-        var status;  // eslint-disable-line no-unused-vars
         var options = {
             type: 'POST',
             url: runtimeHandlers.validateThreePlayMediaConfig,
@@ -403,12 +402,10 @@ function StudioEditableXBlock(runtime, element) {
         .done(function(response) {
             message = response.message;
             if (!response.isValid) {
-                status = ERROR;
                 runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
             }
         })
         .fail(function(jqXHR) {
-            status = ERROR;
             if (jqXHR.responseText) { // Try to get more specific error message we can show to user.
                 message = extractErrorMessage(jqXHR.responseText);
             } else {

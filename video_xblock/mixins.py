@@ -114,11 +114,10 @@ class TranscriptsMixin(XBlock):
                 tran['url'] = self.runtime.handler_url(
                     self, 'fetch_from_three_play_media', query="{}={}".format(tran['lang_id'], tran['id'])
                 )
-            else:
-                if not tran['url'].endswith('.vtt'):
-                    tran['url'] = self.runtime.handler_url(
-                        self, 'srt_to_vtt', query=tran['url']
-                    )
+            elif not tran['url'].endswith('.vtt'):
+                tran['url'] = self.runtime.handler_url(
+                    self, 'srt_to_vtt', query=tran['url']
+                )
             yield tran
 
     def get_transcript_download_link(self):
@@ -251,8 +250,8 @@ class TranscriptsMixin(XBlock):
         )
         try:
             content = requests.get(external_api_url).text
-        except Exception as exc:  # pylint: disable=broad-except
-            log.exception(exc.message)
+        except Exception:  # pylint: disable=broad-except
+            log.exception(_("Transcript fetching failure: language [{}]").format(TPMApiLanguage(lang_id)))
             return
 
         lang_code = TPMApiLanguage(lang_id)
@@ -409,11 +408,11 @@ class TranscriptsMixin(XBlock):
         file_id = request.json.get('file_id')
 
         if not (api_key and file_id):
-            return Response(status=400)
+            return Response(status=400, message=_("'api_key' or 'file_id' is missing"))
 
         results = self.get_available_3pm_transcripts(file_id, api_key)
 
-        is_valid = not isinstance(results, dict)
+        is_valid = False if isinstance(results, dict) else True
         message = _('Success') if is_valid else _('Check provided 3PlayMedia configuration')
         return Response(json={'isValid': is_valid, 'message': message})
 
@@ -501,7 +500,7 @@ class PlaybackStateMixin(XBlock):
         """
         Return video player state as a dictionary.
         """
-        transcripts = list(self.get_enabled_transcripts())
+        transcripts = self.get_enabled_transcripts()
         transcripts_object = {
             trans['lang']: {'url': trans['url'], 'label': trans['label']}
             for trans in transcripts

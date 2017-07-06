@@ -776,5 +776,4 @@ class VideoXBlock(
         else:
             transcripts = json.loads(self.transcripts) if self.transcripts else []
 
-        for transcript in transcripts:
-            yield transcript
+        return transcripts
