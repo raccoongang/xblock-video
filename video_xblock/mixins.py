@@ -211,6 +211,8 @@ class TranscriptsMixin(XBlock):
             raise StopIteration
         for transcript_data in results:
             transcript = self.fetch_3pm_translation(transcript_data)
+            if transcript is None:
+                raise StopIteration
             transcript_ordered_dict = transcript._asdict()
             transcript_ordered_dict['content'] = ''  # we don't want to parse it to JSON
             yield transcript_ordered_dict
@@ -391,6 +393,8 @@ class TranscriptsMixin(XBlock):
         """
         lang_id, tid = request.query_string.split('=')
         transcript = self.fetch_3pm_translation(transcript_data={'id': tid, 'language_id': lang_id})
+        if transcript is None:
+            return Response()
         return Response(transcript.content)
 
     @XBlock.handler
