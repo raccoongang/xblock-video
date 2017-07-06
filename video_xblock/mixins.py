@@ -58,7 +58,7 @@ class TranscriptsMixin(XBlock):
 
     THREE_PLAY_MEDIA_API_DOMAIN = 'https://static.3playmedia.com/'
 
-    direct_enabled = Boolean(
+    threeplaymedia_streaming = Boolean(
         default=False,
         display_name=_('Direct 3PlayMedia'),
         scope=Scope.settings,
@@ -110,7 +110,7 @@ class TranscriptsMixin(XBlock):
         """
         transcripts = self.get_enabled_transcripts()
         for tran in transcripts:
-            if self.direct_enabled:
+            if self.threeplaymedia_streaming:
                 tran['url'] = self.runtime.handler_url(
                     self, 'fetch_from_tree_play_media', query="{}={}".format(tran['lang_id'], tran['id'])
                 )

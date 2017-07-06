@@ -330,7 +330,7 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
             handler_url_mock = runtime_mock.handler_url
             handler_url_mock.return_value = 'test-trans.vtt'
             get_enabled_transcripts_mock.return_value = transcripts
-            self.xblock.direct_enabled = False
+            self.xblock.threeplaymedia_streaming = False
 
             # Act
             transcripts_routes = self.xblock.route_transcripts()
