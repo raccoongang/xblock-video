@@ -61,7 +61,7 @@ class TranscriptsMixin(XBlock):
     threeplaymedia_streaming = Boolean(
         default=False,
         display_name=_('Direct 3PlayMedia'),
-        scope=Scope.settings,
+        scope=Scope.content,
         help=_("Direct <a href='http://www.3playmedia.com/'>3PlayMedia</a> transcripts usage enabled.")
     )
 
