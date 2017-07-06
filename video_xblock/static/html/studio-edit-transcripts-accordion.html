@@ -1,0 +1,116 @@
+{% load i18n %}
+
+<style type="text/css">
+  /* Style the buttons that are used to open and close the accordion panel */
+  .accordion-btn {
+      background-color: #eee;
+      color: #444;
+      cursor: pointer;
+      padding: 18px;
+      width: 100%;
+      text-align: left;
+      border: none;
+      outline: none;
+      transition: 0.4s;
+  }
+
+  .accordion-btn::after {
+    content: '\002B';
+    color: #777;
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;
+  }
+
+  .accordion-btn.active::after {
+    content: "\2212";
+  }
+
+  /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+  .accordion-btn.active, .accordion-btn:hover {
+      background-color: #009fe6;
+      color: #fff;
+  }
+
+  /* Style the accordion panel. Note: hidden by default */
+  .accordion-panel {
+      border: 1px;
+      border-color: #009fe6;
+      border-style: solid;
+      padding: 0 18px;
+      background-color: white;
+      display: none;
+      transition: max-height 0.2s ease-out;
+  }
+  .accordion-panel.active {
+    padding: 0 18px;
+    background-color: white;
+    display: block;
+  }
+</style>
+
+<div class="accordion">
+  <button class="accordion-btn {% if transcripts_type == 'manual' %}active{% endif %}">Manual & default transcripts</button>
+  <div class="accordion-panel {% if transcripts_type == 'manual' %}active{% endif %}">
+
+      {% include 'studio-edit-transcripts.html' %}
+
+      {% include 'studio-edit-default-transcripts.html' %}
+      {% if t.help %}
+        <span class="tip setting-help"> {{ field.help|safe }} </span>
+      {% endif %}
+  </div>
+
+  <button class="accordion-btn {% if transcripts_type == '3PM' %}active{% endif %}">3PlayMedia transcripts</button>
+  <div class="accordion-panel {% if transcripts_type == '3PM' %}active{% endif %}">
+    {% for field in three_pm_fields %}
+    <li
+      class="field comp-setting-entry metadata_entry {% if field.is_set %}is-set{% endif %}"
+      data-field-name="{{field.name}}"
+      data-default="{% if field.type == 'boolean' %}{{ field.default|yesno:'1,0' }}{% else %}{{ field.default|default_if_none:"" }}{% endif %}"
+      data-cast="{{field.type}}"
+    >
+      <div class='wrapper-comp-setting {% if field.type == "set" %}metadata-list-enum{% endif %} {% if field.type == "handout" %}file-uploader{% endif %}{% if field.type == "transcripts" %}metadata-video-translations{% endif %}'>
+
+        <label class="label setting-label" for="xb-field-edit-{{field.name}}">{{field.display_name}}</label>
+        {% if field.type == "boolean" %}
+          {% include "fields/boolean.html" with field=field %}
+        {% elif field.type == "string" or field.type == 'threeplaymedia_apikey' %}
+          {% include "fields/string.html" with field=field %}
+        {% endif %}
+      </div>
+      {% if field.help %}
+        <span class="tip setting-help"> {{ field.help|safe }} </span>
+      {% endif %}
+    {% endfor %}
+    </li>
+    {#% include 'studio-edit-3playmedia-apikey.html' %#}
+
+  </div>
+</div>
+
+<script type="text/javascript">
+  var accButtons = document.getElementsByClassName('accordion-btn');
+  var accPanels = document.getElementsByClassName('accordion-panel');
+
+  Array.prototype.forEach.call(accButtons, function(accButton) {
+    accButton.onclick = function() {
+      // Toggle all buttons and panels inactive
+      Array.prototype.forEach.call(accPanels, function(panel) {
+        panel.classList.remove('active');
+      });
+
+      Array.prototype.forEach.call(accButtons, function(button) {
+        button.classList.remove('active');
+      });
+
+      // Toggle clicked button and panel to active
+      this.classList.add('active');
+
+      var panel = this.nextElementSibling;
+      panel.classList.add('active')
+    }
+  });
+</script>
+
+

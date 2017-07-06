@@ -1,113 +1,51 @@
 {% load i18n %}
 
-<style type="text/css">
-  /* Style the buttons that are used to open and close the accordion panel */
-  .accordion-btn {
-      background-color: #eee;
-      color: #444;
-      cursor: pointer;
-      padding: 18px;
-      width: 100%;
-      text-align: left;
-      border: none;
-      outline: none;
-      transition: 0.4s;
-  }
-
-  /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
-  .accordion-btn.active, .accordion-btn:hover {
-      background-color: #ddd;
-  }
-
-  /* Style the accordion panel. Note: hidden by default */
-  .accordion-panel {
-      padding: 0 18px;
-      background-color: white;
-      display: none;
-  }
-  .accordion-panel.active {
-    padding: 0 18px;
-    background-color: white;
-    display: block;
-  }
-</style>
-
-<div class="accordion">
-  <button class="accordion-btn">Manual & default transcripts</button>
-  <div class="accordion-panel active">
-    <p>English</p>
-    <p>Ukrainian</p>
-  </div>
-
-  <button class="accordion-btn">3PlayMedia transcripts</button>
-  <div class="accordion-panel">
-    <p>File ID</p>
-    <p>API key</p>
-  </div>
-</div>
-
-<script type="text/javascript">
-  var accButtons = document.getElementsByClassName('accordion-btn');
-  var accPanels = document.getElementsByClassName('accordion-panel');
-
-  Array.prototype.forEach.call(accButtons, function(accButton) {
-    accButton.onclick = function() {
-      // debugger;
-      Array.prototype.forEach.call(accPanels, function(panel) {
-        panel.classList.remove('active');
-      });
-
-      /* Toggle between adding and removing the "active" class,
-      to highlight the button that controls the panel */
-      this.classList.add('active');
-
-      /* Toggle between hiding and showing the active panel */
-      var panel = this.nextElementSibling;
-      panel.classList.add('active')
-    }
-  });
-</script>
+<label class="label setting-label" for="xb-field-edit-{{transcripts_field.name}}">{{transcripts_field.display_name}}</label>
 
 <div class="wrapper-uploader-actions xblock-edit-settings wrapper-translations-settings">
-      <ol class="list-settings language-transcript-selector">
-        {% for transcript in transcripts %}
-        <li class="list-settings-item">
-          <select name="language" class="lang-select">
-            <option></option>
-            {% for language in languages %}
-            <option value="{{ language.code }}" {% if language.code == transcript.lang %}selected{% endif %} data-lang-label="{{ language.label }}">{{ language.label }}</option>
-            {% endfor %}
-          </select>
-          <a href="#" class="remove-action remove-setting" data-value=""><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>
-          <div class="list-settings-buttons">
-            <a href="#" class="upload-setting upload-transcript {% if not transcript.lang %}is-hidden{% endif %}" data-change-field-name="{{field.name}}" data-lang-code="{{ transcript.lang }}" data-lang-label="{{ transcript.label }}">{% trans "Replace" %}</a>
-            <a href="{{ download_transcript_handler_url }}?{{ transcript.url }}" class="download-transcript download-setting">{% trans "Download" %}</a>
-          </div>
-          <div class="status"></div>
-        </li>
+  <ol class="list-settings language-transcript-selector">
+    {% for transcript in transcripts %}
+    <li class="list-settings-item">
+      <select name="language" class="lang-select">
+        <option></option>
+        {% for language in languages %}
+        <option value="{{ language.code }}" {% if language.code == transcript.lang %}selected{% endif %} data-lang-label="{{ language.label }}">{{ language.label }}</option>
         {% endfor %}
-        <li class="list-settings-item is-hidden">
-          <select name="language" class="lang-select">
-            <option></option>
-            {% for language in languages %}
-            <option value="{{ language.code }}" data-lang-label="{{ language.label }}">{{ language.label }}</option>
-            {% endfor %}
-          </select>
-          <a href="#" class="remove-action remove-setting" data-value=""><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>
-          <div class="list-settings-buttons">
-            <a href="#" class="upload-setting upload-transcript is-hidden" data-change-field-name="{{field.name}}" data-lang-code="" data-lang-label="">{% trans "Upload" %}</a>
-            <a href="#" class="download-transcript download-setting is-hidden">Download</a>
-          </div>
-          <div class="status"></div>
-        </li>
+      </select>
+      <a href="#" class="remove-action remove-setting" data-value=""><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>
+      <div class="list-settings-buttons">
+        <a href="#" class="upload-setting upload-transcript {% if not transcript.lang %}is-hidden{% endif %}" data-change-field-name="{{field.name}}" data-lang-code="{{ transcript.lang }}" data-lang-label="{{ transcript.label }}">{% trans "Replace" %}</a>
+        <a href="{{ download_transcript_handler_url }}?{{ transcript.url }}" class="download-transcript download-setting">{% trans "Download" %}</a>
+      </div>
+      <div class="status"></div>
+    </li>
+    {% endfor %}
+    <li class="list-settings-item is-hidden">
+      <select name="language" class="lang-select">
+        <option></option>
+        {% for language in languages %}
+        <option value="{{ language.code }}" data-lang-label="{{ language.label }}">{{ language.label }}</option>
+        {% endfor %}
+      </select>
+      <a href="#" class="remove-action remove-setting" data-value=""><span class="icon fa fa-times-circle" aria-hidden="true"></span><span class="sr">Remove</span></a>
+      <div class="list-settings-buttons">
+        <a href="#" class="upload-setting upload-transcript is-hidden" data-change-field-name="{{field.name}}" data-lang-code="" data-lang-label="">{% trans "Upload" %}</a>
+        <a href="#" class="download-transcript download-setting is-hidden">Download</a>
+      </div>
+      <div class="status"></div>
+    </li>
 
-      </ol>
-      <input type="hidden" class="field-data-control" data-field-name="{{field.name}}" id="metadata-transcript-uploader-{{ field.name }}" value='{{ field.value }}'>
+  </ol>
+  <input type="hidden" class="field-data-control" data-field-name="{{field.name}}" id="metadata-transcript-uploader-{{ field.name }}" value='{{ field.value }}'>
 
-    <a href="#" class="add-transcript create-setting">
-      <span class="icon fa fa-plus" aria-hidden="true"></span>{% trans 'Add' %}<span class="sr"></span>
-    </a>
+  <a href="#" class="add-transcript create-setting">
+    <span class="icon fa fa-plus" aria-hidden="true"></span>{% trans 'Add' %}<span class="sr"></span>
+  </a>
 </div>
+
+{% if transcripts_field.help %}
+    <span class="tip setting-help"> {{ transcripts_field.help|safe }} </span>
+{% endif %}
 
 <form method="POST" action="/assets/{{ courseKey }}/"
       class="file-uploader-form is-hidden"
@@ -116,3 +54,4 @@
          data-change-field-name="" data-lang-code=""
          data-lang-label="" {% for source in sources %}data-source-{{ source.0 }}="{{ source.1 }}" {% endfor %}>
 </form>
+
