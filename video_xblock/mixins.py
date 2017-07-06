@@ -112,7 +112,7 @@ class TranscriptsMixin(XBlock):
         for tran in transcripts:
             if self.threeplaymedia_streaming:
                 tran['url'] = self.runtime.handler_url(
-                    self, 'fetch_from_tree_play_media', query="{}={}".format(tran['lang_id'], tran['id'])
+                    self, 'fetch_from_three_play_media', query="{}={}".format(tran['lang_id'], tran['id'])
                 )
             else:
                 if not tran['url'].endswith('.vtt'):
@@ -379,7 +379,7 @@ class TranscriptsMixin(XBlock):
         return Response(self.convert_caps_to_vtt(caps))
 
     @XBlock.handler
-    def fetch_from_tree_play_media(self, request, _suffix=''):
+    def fetch_from_three_play_media(self, request, _suffix=''):
         """
         Proxy handler to hide real API url.
 
