@@ -257,12 +257,12 @@ class TranscriptsMixin(XBlock):
         :param format_id: defauts to VTT
         :return: (namedtuple instance) transcript data
         """
-        tid = transcript_data.get('id', '')
+        transcript_id = transcript_data.get('id', '')
         lang_id = transcript_data.get('language_id')
         external_api_url = '{domain}files/{file_id}/transcripts/{tid}?apikey={api_key}&format_id={format_id}'.format(
             domain=self.THREE_PLAY_MEDIA_API_DOMAIN,
             file_id=self.threeplaymedia_file_id,
-            tid=tid,
+            tid=transcript_id,
             api_key=self.threeplaymedia_apikey,
             format_id=format_id
         )
@@ -277,7 +277,7 @@ class TranscriptsMixin(XBlock):
         video_id = self.get_player().media_id(self.href)
         source = TranscriptSource.THREE_PLAY_MEDIA
         return Transcript(
-            id=tid,
+            id=transcript_id,
             content=content,
             lang=lang_code.iso_639_1_code,
             lang_id=lang_id,
@@ -339,8 +339,8 @@ class TranscriptsMixin(XBlock):
         Returns:
             webob.Response: WebVTT transcripts wrapped in Response object.
         """
-        lang_id, tid = request.query_string.split('=')
-        transcript = self.fetch_single_3pm_translation(transcript_data={'id': tid, 'language_id': lang_id})
+        lang_id, transcript_id = request.query_string.split('=')
+        transcript = self.fetch_single_3pm_translation(transcript_data={'id': transcript_id, 'language_id': lang_id})
         if transcript is None:
             return Response()
         return Response(transcript.content)
