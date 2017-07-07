@@ -151,7 +151,7 @@ class VideoXBlock(
         help=_(
             'Default transcripts are uploaded automatically from a video platform '
             'to the list of available transcripts.<br/>'
-            '<b>Note: "Video API Token" should be given in order to make auto fetching possible.</b>'
+            '<b>Note: valid "Video API Token" should be given in order to make auto fetching possible.</b>'
         ),
         resettable_editor=False
     )
@@ -364,7 +364,7 @@ class VideoXBlock(
         # whilst for Wistia, a sample authorised request is to be made to ensure authentication succeeded,
         # since it is needed for the auth status message generation and the player's state update with auth status.
         if self.token:
-            _auth_data, auth_error_message = self.authenticate_video_api(self.token)
+            _auth_data, auth_error_message = self.authenticate_video_api(self.token.encode(encoding='utf-8'))
 
         initial_default_transcripts, transcripts_autoupload_message = self._update_default_transcripts(
             player, transcripts
