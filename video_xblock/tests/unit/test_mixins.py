@@ -422,7 +422,7 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
 
     @patch.object(VideoXBlock, 'get_player')
     @patch('video_xblock.mixins.requests.get')
-    def test_fetch_3pm_translation(self, requests_get_mock, player_mock):
+    def test_fetch_single_3pm_translation_success(self, requests_get_mock, player_mock):
         # Arrange:
         test_lang_id = '1'
         test_transcript_text = 'test_transcript_text'
@@ -460,6 +460,26 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
         transcript = self.xblock.fetch_single_3pm_translation(test_transcript_data)
         # Assert:
         self.assertEqual(transcript, Transcript(*test_args))
+
+    @patch('video_xblock.mixins.requests.get')
+    def test_fetch_single_3pm_translation_failure(self, requests_get_mock):
+        # Arrange:
+        test_lang_id = '1'
+        test_transcript_id = 'test_id'
+        test_video_id = 'test_video_id'
+        file_id = 'test_file_id'
+        api_key = 'test_api_key'
+
+        test_transcript_data = {'id': test_transcript_id, 'language_id': test_lang_id}
+        requests_get_mock.side_effect = IOError()
+
+        self.xblock.threeplaymedia_file_id = file_id
+        self.xblock.threeplaymedia_apikey = api_key
+
+        # Act:
+        transcript = self.xblock.fetch_single_3pm_translation(test_transcript_data)
+        # Assert:
+        self.assertIsNone(transcript)
 
 
 class WorkbenchMixinTest(VideoXBlockTestBase):
