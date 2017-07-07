@@ -335,6 +335,7 @@ class VideoXBlock(
             default_transcripts, transcripts_autoupload_message = player.get_default_transcripts(**kwargs)
         except ApiClientError:
             default_transcripts, transcripts_autoupload_message = [], _('Failed to fetch default transcripts.')
+        log.debug("Autofetch message: '{}'".format(transcripts_autoupload_message))
         # Default transcripts should contain transcripts of distinct languages only
         distinct_default_transcripts = player.clean_default_transcripts(default_transcripts)
         # Needed for frontend
@@ -373,7 +374,7 @@ class VideoXBlock(
         # Prepare basic_fields and advanced_fields for them to be rendered
         basic_fields = self.prepare_studio_editor_fields(player.basic_fields)
         advanced_fields = self.prepare_studio_editor_fields(player.advanced_fields)
-        log.debug("Fetched default transcripts: {}".format(self.default_transcripts))
+        log.debug("Fetched default transcripts: {}".format(initial_default_transcripts))
         context = {
             'advanced_fields': advanced_fields,
             'auth_error_message': auth_error_message,
