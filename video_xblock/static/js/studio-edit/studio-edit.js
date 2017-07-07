@@ -460,53 +460,6 @@ function StudioEditableXBlock(runtime, element) {
     });
 
     /**
-     * Get transcripts from 3playmedia's API and show result message.
-     */
-    function getTranscripts3playmediaApi(data) {
-        var message, status;
-        var options = {
-            type: 'POST',
-            url: runtimeHandlers.getTranscripts3playmediaApi,
-            dataType: 'json',
-            data: JSON.stringify(data)
-        };
-
-        $.ajax(options)
-        .done(function(response) {
-            var errorMessage = response.error_message;
-            var successMessage = response.success_message;
-            if (successMessage && response.transcripts) {
-                response.transcripts.forEach(function(item) {
-                    createTranscriptBlock(item.lang, item.label, transcriptsValue, item.url);
-                    pushTranscript(item.lang, item.label, item.url, item.source, '', transcriptsValue);
-                    pushTranscriptsValue(transcriptsValue);
-                });
-            }
-
-            if (successMessage) {
-                message = successMessage;
-                status = SUCCESS;
-            } else {
-                message = errorMessage;
-                status = ERROR;
-            }
-        })
-        .fail(function(jqXHR) {
-            status = ERROR;
-            if (jqXHR.responseText) { // Try to get more specific error message we can show to user.
-                message = extractErrorMessage(jqXHR.responseText);
-            } else {
-                message = gettext('This may be happening because of an error with our server or your ' +
-                'internet connection. Try refreshing the page or making sure you are online.');
-            }
-            runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
-        })
-        .always(function() {
-            showStatus($('.threeplaymedia.status'), status, message);
-        });
-    }
-
-    /**
      * Authenticate to video platform's API and show result message.
      */
     function authenticateVideoApi(data) {
@@ -661,13 +614,6 @@ function StudioEditableXBlock(runtime, element) {
         event.preventDefault();
         event.stopPropagation();
         authenticateVideoApi($data);
-    });
-
-    $3playmediaTranscriptsApi.on('click', function(event) {
-        var apiConfig = getThreePlayMediaConfig();
-        event.preventDefault();
-        event.stopPropagation();
-        getTranscripts3playmediaApi(apiConfig);
     });
 
     $('.lang-select').on('change', function(event) {

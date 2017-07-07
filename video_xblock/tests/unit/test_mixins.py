@@ -456,42 +456,6 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
         # Assert:
         self.assertEqual(transcript, Transcript(*test_args))
 
-    @patch.object(VideoXBlock, 'get_translations_from_3playmedia')
-    def test_get_transcripts_3playmedia_api_handler_success(self, threeplaymedia_fetcher_mock):
-        # Arrange:
-        request_body = '{"api_key": "test_api_key","file_id": "test_file_id"}'
-        request_mock = arrange_request_mock(request_body)
-
-        test_status = "not_error"
-        test_transcripts = 'test_transcripts'
-        threeplaymedia_fetcher_mock.return_value = test_status, test_transcripts
-
-        # Act:
-        response = self.xblock.get_transcripts_3playmedia_api_handler(request_mock)
-
-        # Assert:
-        self.assertEqual(
-            '{"transcripts": "test_transcripts", "success_message": "Successfully fetched transcripts '
-            'from 3playMedia. Please check transcripts list above."}',
-            response.body  # pylint: disable=no-member
-        )
-
-    @patch.object(VideoXBlock, 'get_translations_from_3playmedia')
-    def test_get_transcripts_3playmedia_api_handler_failure(self, threeplaymedia_fetcher_mock):
-        # Arrange:
-        request_body = '{"api_key": "test_api_key","file_id": "test_file_id"}'
-        request_mock = arrange_request_mock(request_body)
-
-        test_status = "error"
-        test_transcripts = 'test_transcripts'
-        threeplaymedia_fetcher_mock.return_value = test_status, test_transcripts
-
-        # Act:
-        response = self.xblock.get_transcripts_3playmedia_api_handler(request_mock)
-
-        # Assert:
-        self.assertEqual('"test_transcripts"', response.body)  # pylint: disable=no-member
-
 
 class WorkbenchMixinTest(VideoXBlockTestBase):
     """Test WorkbenchMixin"""

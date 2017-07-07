@@ -494,7 +494,7 @@ class VimeoApiClientTest(VideoXBlockTestBase):
         """
 
         # Arrange
-        failure_message = _('No timed transcript may be fetched from a video platform.')
+        failure_message = _('No timed transcript may be fetched from a video platform.<br>')
 
         with patch.object(self.vimeo_player, 'api_client') as api_client_mock:
             type(api_client_mock).access_token = PropertyMock(return_value="test_token")
