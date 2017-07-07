@@ -1,8 +1,12 @@
 """
 Lists of constants that can be used in the video xblock.
 """
+from collections import namedtuple
 
 DEFAULT_LANG = 'en'
+
+# STATUS - (instance of namedtuple) - may be used like: "STATUS.success", returns status string value.
+STATUS = namedtuple('STATUS', ['success', 'error', 'warning'])._make(['success', 'error', 'warning'])
 
 
 class PlayerName(object):

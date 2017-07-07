@@ -11,8 +11,8 @@ from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Scope, Boolean, Float, String
 
-from .constants import DEFAULT_LANG, TPMApiTranscriptFormatID, TPMApiLanguage, TranscriptSource
-from .utils import create_reference_name, import_from, ugettext as _, underscore_to_mixedcase, Transcript
+from .constants import DEFAULT_LANG, TPMApiTranscriptFormatID, TPMApiLanguage, TranscriptSource, STATUS
+from .utils import import_from, ugettext as _, underscore_to_mixedcase, Transcript
 
 log = logging.getLogger(__name__)
 
@@ -201,41 +201,55 @@ class TranscriptsMixin(XBlock):
 
         :return: (generator of OrderedDicts) all transcript's data
         """
-        results = self.get_available_3pm_transcripts(self.threeplaymedia_file_id, self.threeplaymedia_apikey)
-        errors = isinstance(results, dict) and results.get('errors')
-        log.debug("Fetched 3PM transcripts:\n{}".format(results))
-        if errors:
-            log.error("3PlayMedia transcripts fetching API request has failed!\n{}".format(
-                results.get('errors')
-            ))
+        feedback, transcripts_list = self.get_3pm_transcripts_list(
+            self.threeplaymedia_file_id, self.threeplaymedia_apikey
+        )
+        log.debug("Fetched 3PM transcripts list results:\n{}".format(feedback))
+
+        if feedback['status'] is STATUS.error:    # pylint: disable=no-member
+            log.error("3PlayMedia transcripts fetching API request has failed!\n{}".format(feedback['message']))
             raise StopIteration
-        for transcript_data in results:
-            transcript = self.fetch_3pm_translation(transcript_data)
+
+        for transcript_data in transcripts_list:
+            transcript = self.fetch_single_3pm_translation(transcript_data)
             if transcript is None:
                 raise StopIteration
             transcript_ordered_dict = transcript._asdict()
             transcript_ordered_dict['content'] = ''  # we don't want to parse it to JSON
             yield transcript_ordered_dict
 
-    def get_available_3pm_transcripts(self, file_id, apikey):
+    def get_3pm_transcripts_list(self, file_id, apikey):
         """
         Make API request to fetch list of available transcripts for given file ID.
 
         :return: (list of dicts OR dict) all available transcripts attached to file with ID OR error dict
         """
         domain = self.THREE_PLAY_MEDIA_API_DOMAIN
-        response = requests.get(
-            '{domain}files/{file_id}/transcripts?apikey={api_key}'.format(
-                domain=domain, file_id=file_id, api_key=apikey
-            )
-        )
-        if response.ok:
-            results = response.json()
-        else:
-            results = {"failed": True}
-        return results
 
-    def fetch_3pm_translation(self, transcript_data, format_id=TPMApiTranscriptFormatID.WEBVTT):
+        transcripts_list = []
+        failure_message = _("3PlayMedia transcripts fetching API request has failed!")
+        success_message = _("3PlayMedia transcripts fetched successfully.")
+        feedback = {'status': STATUS.error, 'message': failure_message}  # pylint: disable=no-member
+
+        try:
+            response = requests.get(
+                '{domain}files/{file_id}/transcripts?apikey={api_key}'.format(
+                    domain=domain, file_id=file_id, api_key=apikey
+                )
+            )
+        except Exception:  # pylint: disable=broad-except
+            log.exception(failure_message)
+            return feedback, transcripts_list
+
+        if response.ok and isinstance(response.json(), list):
+            transcripts_list = response.json()
+            feedback['status'] = STATUS.success  # pylint: disable=no-member
+            feedback['message'] = success_message
+        else:
+            feedback['status'] = STATUS.error  # pylint: disable=no-member
+        return feedback, transcripts_list
+
+    def fetch_single_3pm_translation(self, transcript_data, format_id=TPMApiTranscriptFormatID.WEBVTT):
         """
         Fetch single transcript for given file ID in given format.
 
@@ -326,7 +340,7 @@ class TranscriptsMixin(XBlock):
             webob.Response: WebVTT transcripts wrapped in Response object.
         """
         lang_id, tid = request.query_string.split('=')
-        transcript = self.fetch_3pm_translation(transcript_data={'id': tid, 'language_id': lang_id})
+        transcript = self.fetch_single_3pm_translation(transcript_data={'id': tid, 'language_id': lang_id})
         if transcript is None:
             return Response()
         return Response(transcript.content)
@@ -345,26 +359,31 @@ class TranscriptsMixin(XBlock):
         api_key = request.json.get('api_key')
         file_id = request.json.get('file_id')
         streaming_enabled = request.json.get('streaming_enabled')
+        is_valid = True
+        success_message = _('Success')
+        invalid_message = _('Check provided 3PlayMedia configuration')
 
         # the very first request during xblock creating:
         if api_key is None and file_id is None:
-            return Response(json={'isValid': True, 'message': _("Initialization")})
+            return Response(json={'isValid': is_valid, 'message': _("Initialization")})
 
         # the case when no options provided, and streaming is disabled:
-        success_message = _('Success')
         if not api_key and not file_id and not streaming_enabled:
-            return Response(json={'isValid': True, 'message': success_message})
+            return Response(json={'isValid': is_valid, 'message': success_message})
 
         # options partially provided or both empty, but streaming is enabled:
-        message = _('Check provided 3PlayMedia configuration')
         if not (api_key and file_id):
-            return Response(json={'isValid': False, 'message': message})
+            is_valid = False
+            return Response(json={'isValid': is_valid, 'message': invalid_message})
 
-        results = self.get_available_3pm_transcripts(file_id, api_key)
+        feedback, transcripts_list = self.get_3pm_transcripts_list(file_id, api_key)
 
-        is_valid = False if isinstance(results, dict) else True
-        if is_valid:
+        if transcripts_list and feedback['status'] is STATUS.success:  # pylint: disable=no-member
             message = success_message
+            is_valid = True
+        else:
+            message = feedback['message']
+            is_valid = False
 
         return Response(json={'isValid': is_valid, 'message': message})
 

@@ -2,7 +2,7 @@
 removeEnabledTranscriptBlock bindUploadListenerAvailableTranscript pushTranscript pushTranscriptsValue
 createEnabledTranscriptBlock createTranscriptBlock parseRelativeTime removeAllEnabledTranscripts tinyMCE baseUrl
 validateTranscripts fillValues validateTranscriptFile removeTranscriptBlock clickUploader
-languageChecker $3playmediaTranscriptsApi getHandlers */
+languageChecker getHandlers */
 /**
     Set up the Video xblock studio editor. This part is responsible for validation and sending of the data to a backend.
     Reference:
@@ -31,7 +31,6 @@ function StudioEditableXBlock(runtime, element) {
     var $standardTranscriptRemover = $('.remove-action');
     var $langChoiceItem = $('.language-transcript-selector', element);
     var $videoApiAuthenticator = $('#video-api-authenticate', element);
-    var $3playmediaTranscriptsApi = $('#threeplaymedia-api-transcripts', element);
     var gotTranscriptsValue = $('input[data-field-name="transcripts"]').val();
     var runtimeHandlers = getHandlers(runtime, element);
     var currentLanguageCode;
