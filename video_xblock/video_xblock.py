@@ -151,7 +151,8 @@ class VideoXBlock(
         help=_(
             'Default transcripts are uploaded automatically from a video platform '
             'to the list of available transcripts.<br/>'
-            '<b>Note: valid "Video API Token" should be given in order to make auto fetching possible.</b>'
+            '<b>Note: valid "Video API Token" should be given in order to make auto fetching possible.</b><br/>'
+            'Advice: disable transcripts displaying on your video service to avoid transcripts overlapping.'
         ),
         resettable_editor=False
     )
