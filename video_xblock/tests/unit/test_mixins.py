@@ -13,6 +13,7 @@ from xblock.exceptions import NoSuchServiceError
 from video_xblock.constants import DEFAULT_LANG, TPMApiLanguage, STATUS
 from video_xblock.tests.unit.base import VideoXBlockTestBase
 from video_xblock.tests.unit.mocks.base import ResponseStub
+from video_xblock.tests.unit.test_video_xblock_handlers import arrange_request_mock
 from video_xblock.utils import loader, Transcript, ugettext as _
 from video_xblock.video_xblock import VideoXBlock
 
@@ -461,12 +462,32 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
         # Assert:
         self.assertEqual(transcript, Transcript(*test_args))
 
+    @patch.object(VideoXBlock, 'get_3pm_transcripts_list')
+    def test_validate_three_play_media_config_with_3pm_streaming(self, get_3pm_transcripts_list_mock):
+        # Arrange:
+        success_message = _('Success')
+        test_feedback = {'status': STATUS.success, 'message': success_message}  # pylint: disable=no-member
+        test_transcripts_list = [{"test_transcript"}]
+        get_3pm_transcripts_list_mock.return_value = test_feedback, test_transcripts_list
+        request_mock = arrange_request_mock(
+            '{"api_key": "test_apikey", "file_id": "test_fileid", "streaming_enabled": "0"}'  # JSON string
+        )
+        # Act:
+        result_response = self.xblock.validate_three_play_media_config(request_mock)
+        result = result_response.body  # pylint: disable=no-member
+
+        # Assert:
+        self.assertEqual(
+            result,
+            json.dumps({'isValid': True, 'message': success_message}, separators=(',', ':'))
+        )
+        get_3pm_transcripts_list_mock.assert_called_once_with("test_fileid", "test_apikey")  # Python string
+
     @patch('video_xblock.mixins.requests.get')
     def test_fetch_single_3pm_translation_failure(self, requests_get_mock):
         # Arrange:
         test_lang_id = '1'
         test_transcript_id = 'test_id'
-        test_video_id = 'test_video_id'
         file_id = 'test_file_id'
         api_key = 'test_api_key'
 
