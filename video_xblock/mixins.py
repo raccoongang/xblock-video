@@ -358,7 +358,8 @@ class TranscriptsMixin(XBlock):
         """
         api_key = request.json.get('api_key')
         file_id = request.json.get('file_id')
-        streaming_enabled = request.json.get('streaming_enabled')
+        streaming_enabled = bool(int(request.json.get('streaming_enabled')))
+
         is_valid = True
         success_message = _('Success')
         invalid_message = _('Check provided 3PlayMedia configuration')
@@ -368,7 +369,7 @@ class TranscriptsMixin(XBlock):
             return Response(json={'isValid': is_valid, 'message': _("Initialization")})
 
         # the case when no options provided, and streaming is disabled:
-        if not api_key and not file_id and not streaming_enabled:
+        if not streaming_enabled:
             return Response(json={'isValid': is_valid, 'message': success_message})
 
         # options partially provided or both empty, but streaming is enabled:

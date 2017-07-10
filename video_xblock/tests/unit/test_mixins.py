@@ -462,6 +462,54 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
         # Assert:
         self.assertEqual(transcript, Transcript(*test_args))
 
+    def test_validate_three_play_media_config_initial_case(self):
+        # Arrange:
+        success_message = _("Initialization")
+        request_mock = arrange_request_mock(
+            '{"streaming_enabled": "0"}'  # JSON string
+        )
+        # Act:
+        result_response = self.xblock.validate_three_play_media_config(request_mock)
+        result = result_response.body  # pylint: disable=no-member
+
+        # Assert:
+        self.assertEqual(
+            result,
+            json.dumps({'isValid': True, 'message': success_message}, separators=(',', ':'))
+        )
+
+    def test_validate_three_play_media_config_without_streaming(self):
+        # Arrange:
+        success_message = _('Success')
+        request_mock = arrange_request_mock(
+            '{"api_key": "test_apikey", "file_id": "test_fileid", "streaming_enabled": "0"}'  # JSON string
+        )
+        # Act:
+        result_response = self.xblock.validate_three_play_media_config(request_mock)
+        result = result_response.body  # pylint: disable=no-member
+
+        # Assert:
+        self.assertEqual(
+            result,
+            json.dumps({'isValid': True, 'message': success_message}, separators=(',', ':'))
+        )
+
+    def test_validate_three_play_media_config_partially_configured(self):
+        # Arrange:
+        invalid_message = _('Check provided 3PlayMedia configuration')
+        request_mock = arrange_request_mock(
+            '{"file_id": "test_fileid", "streaming_enabled": "1"}'  # "api_key" not provided
+        )
+        # Act:
+        result_response = self.xblock.validate_three_play_media_config(request_mock)
+        result = result_response.body  # pylint: disable=no-member
+
+        # Assert:
+        self.assertEqual(
+            result,
+            json.dumps({'isValid': False, 'message': invalid_message}, separators=(',', ':'))
+        )
+
     @patch.object(VideoXBlock, 'get_3pm_transcripts_list')
     def test_validate_three_play_media_config_with_3pm_streaming(self, get_3pm_transcripts_list_mock):
         # Arrange:
@@ -470,7 +518,7 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
         test_transcripts_list = [{"test_transcript"}]
         get_3pm_transcripts_list_mock.return_value = test_feedback, test_transcripts_list
         request_mock = arrange_request_mock(
-            '{"api_key": "test_apikey", "file_id": "test_fileid", "streaming_enabled": "0"}'  # JSON string
+            '{"api_key": "test_apikey", "file_id": "test_fileid", "streaming_enabled": "1"}'  # JSON string
         )
         # Act:
         result_response = self.xblock.validate_three_play_media_config(request_mock)
