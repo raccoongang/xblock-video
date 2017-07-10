@@ -470,7 +470,7 @@ class VimeoApiClientTest(VideoXBlockTestBase):
             self.assertIsInstance(transcripts, list)
             self.assertEqual(message, success_message)
 
-    def test_get_default_transcripts_no_token(self):
+    def test_vimeo_get_default_transcripts_no_token(self):
         """
         Test Vimeo's default transcripts fetching without provided API token.
         """
@@ -488,7 +488,7 @@ class VimeoApiClientTest(VideoXBlockTestBase):
                 # Assert
                 self.assertEqual(str(raised.exception), failure_message)
 
-    def test_get_default_transcripts_get_failed(self):
+    def test_vimeo_get_default_transcripts_get_failed(self):
         """
         Test Vimeo's default transcripts fetching with GET request failure.
         """

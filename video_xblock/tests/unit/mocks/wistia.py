@@ -133,26 +133,32 @@ class WistiaDefaultTranscriptsMock(BaseMock):
             default_transcripts[0]['language'] = 'en'
             return_value_by_event = {
                 'success_and_data_lang_code_exception': {
+                    'ok': True,
                     'status_code': 200,
                     'body': json.dumps(default_transcripts)
                 },
                 'success_and_data_lang_code': {
+                    'ok': True,
                     'status_code': 200,
                     'body': json.dumps(self._default_transcripts)
                 },
                 'success_no_data': {
+                    'ok': True,
                     'status_code': 200,
                     'body': '{}'
                 },
                 'success_invalid_json': {
+                    'ok': True,
                     'status_code': 200,
                     'body': '{{invalid_json'
                 },
                 'returned_not_found': {
+                    'ok': False,
                     'status_code': 404,
                     'body': '{}'
                 },
                 'invalid_request': {
+                    'ok': False,
                     'status_code': 400,
                     'body': 'Invalid request.'
                 }
