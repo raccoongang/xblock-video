@@ -12,6 +12,10 @@ function StudioEditableXBlock(runtime, element) {
     'use strict';
 
     var fields = [];
+    var tryRefreshPageMessage = gettext(
+        'This may be happening because of an error with our server or your internet connection. ' +
+        'Try refreshing the page or making sure you are online.'
+    );
     var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
     var $defaultTranscriptsSwitcher = $('input.default-transcripts-switch-input');
     var $enabledLabel = $('div.custom-field-section-label.enabled-transcripts');
@@ -232,8 +236,7 @@ function StudioEditableXBlock(runtime, element) {
             status = SUCCESS;
         })
         .fail(function(jqXHR) {
-            message = gettext('This may be happening because of an error with our server or your ' +
-                'internet connection. Try refreshing the page or making sure you are online.');
+            message = tryRefreshPageMessage;
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
                 message += extractErrorMessage(jqXHR.responseText);
             }
@@ -373,8 +376,7 @@ function StudioEditableXBlock(runtime, element) {
             global: false,
             success: function() { runtime.notify('save', {state: 'end'}); }
         }).fail(function(jqXHR) {
-            message = gettext('This may be happening because of an error with our server or your internet' +
-                ' connection. Try refreshing the page or making sure you are online.');
+            message = tryRefreshPageMessage;
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
                 message = extractErrorMessage(jqXHR.responseText);
             }
@@ -408,8 +410,7 @@ function StudioEditableXBlock(runtime, element) {
             if (jqXHR.responseText) { // Try to get more specific error message we can show to user.
                 message = extractErrorMessage(jqXHR.responseText);
             } else {
-                message = gettext('This may be happening because of an error with our server or your ' +
-                'internet connection. Try refreshing the page or making sure you are online.');
+                message = tryRefreshPageMessage;
             }
             runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
         });
@@ -483,8 +484,7 @@ function StudioEditableXBlock(runtime, element) {
             }
         })
         .fail(function(jqXHR) {
-            message = gettext('This may be happening because of an error with our server or your ' +
-                'internet connection. Try refreshing the page or making sure you are online.');
+            message = tryRefreshPageMessage;
             status = ERROR;
 
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
