@@ -81,7 +81,7 @@ describe('Function "pushTranscript"', function() {
     });
 
 
-    it('called with empty "transcriptsValue"', function() {
+    it('will push new transcript', function() {
         transcriptsValue = [];
         // eslint-disable-next-line no-undef
         newTranscriptAdded = pushTranscript(
@@ -101,7 +101,7 @@ describe('Function "pushTranscript"', function() {
         }]);
     });
 
-    it('called with the "transcriptsValue" that already contains pushed language', function() {
+    it('dismiss pushing of new transcript because of already existing one', function() {
         transcriptsValue = [oldData];
         // eslint-disable-next-line no-undef
         newTranscriptAdded = pushTranscript(
