@@ -389,7 +389,7 @@ class VideoXBlock(
             'transcripts': transcripts,
             'transcripts_fields': self.prepare_studio_editor_fields(player.trans_fields),
             'three_pm_fields': self.prepare_studio_editor_fields(player.three_pm_fields),
-            'transcripts_type': '3PM' if self.direct_enabled else 'manual',
+            'transcripts_type': '3PM' if self.threeplaymedia_streaming else 'manual',
             'default_transcripts': self.default_transcripts,
             'enabled_default_transcripts': filter_transcripts_by_source(transcripts),
             'initial_default_transcripts': initial_default_transcripts,

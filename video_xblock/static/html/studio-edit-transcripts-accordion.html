@@ -4,14 +4,14 @@
   /* Style the buttons that are used to open and close the accordion panel */
   .accordion-btn {
       background-color: #eee;
+      border: none;
       color: #444;
       cursor: pointer;
-      padding: 18px;
-      width: 100%;
-      text-align: left;
-      border: none;
       outline: none;
+      padding: 18px;
+      text-align: left;
       transition: 0.4s;
+      width: 100%;
   }
 
   .accordion-btn::after {
@@ -34,17 +34,18 @@
 
   /* Style the accordion panel. Note: hidden by default */
   .accordion-panel {
-      border: 1px;
-      border-color: #009fe6;
-      border-style: solid;
-      padding: 0 18px;
       background-color: white;
+      border: 1px solid #009fe6;
       display: none;
+      /*max-height: 0;*/
+      overflow: hidden;
+      padding: 0 18px;
       transition: max-height 0.2s ease-out;
   }
   .accordion-panel.active {
-    padding: 0 18px;
-    background-color: white;
+    /*max-height: auto;*/
+    /*padding: 0 18px;*/
+    /*background-color: white;*/
     display: block;
   }
 </style>
@@ -98,6 +99,7 @@
       // Toggle all buttons and panels inactive
       Array.prototype.forEach.call(accPanels, function(panel) {
         panel.classList.remove('active');
+        // panel.style.maxHeight = null;
       });
 
       Array.prototype.forEach.call(accButtons, function(button) {
@@ -108,7 +110,8 @@
       this.classList.add('active');
 
       var panel = this.nextElementSibling;
-      panel.classList.add('active')
+      panel.classList.add('active');
+      // panel.style.maxHeight = panel.scrollHeight + 'px';
     }
   });
 </script>
