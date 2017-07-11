@@ -12,6 +12,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Direct transcripts streaming from 3PlayMedia service.
   Now Video Xblock will always use up-to-date transcripts from 3PM.
 
+### Changed
+
+- UI: Transcripts settings section now split into two panels:
+  - "Manual & default transcripts"
+  - "3PlayMedia transcripts"
+  This makes more apparent how different options are related and which
+  transcripts are going to be diplayed.
+
 ## [0.8.0] - 2017-06-30
 
 ### Added
