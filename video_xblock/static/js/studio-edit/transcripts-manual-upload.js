@@ -240,11 +240,14 @@ function createTranscriptBlock(langCode, langLabel, transcriptsValue, downloadTr
  */
 function clickUploader(event, $fileUploader) {
     'use strict';
+    var handoutsAllowedFileTypes = '.png, .jpeg, .jpg, .gif, .tiff';
     var $buttonBlock = $(event.currentTarget);
     var indexOfParentLi = $('.language-transcript-selector').children().index($buttonBlock.closest('li'));
     var langCode = $buttonBlock.attr('data-lang-code');
     var langLabel = $buttonBlock.attr('data-lang-label');
-    var fieldNameDetails = $buttonBlock.attr('data-change-field-name') === 'transcripts' ? '.srt, .vtt' : '';
+    var fieldNameDetails = $buttonBlock.attr('data-change-field-name') === 'transcripts'
+        ? '.srt, .vtt'
+        : handoutsAllowedFileTypes;
     var fieldName = $buttonBlock.attr('data-change-field-name');
     var dataLiIndex = $buttonBlock.attr('data-change-field-name') === 'transcripts' ? indexOfParentLi : '';
     event.preventDefault();
