@@ -143,6 +143,7 @@ class BaseVideoPlayer(Plugin):
     ]
 
     trans_fields = ['transcripts', 'default_transcripts']
+
     @property
     def fields_help(self):
         """
