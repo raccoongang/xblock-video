@@ -65,14 +65,12 @@ class TestCustomBackends(VideoXBlockTestBase):
     default_trans_mocks = [
         youtube_mock.YoutubeDefaultTranscriptsMock,
         brightcove_mock.BrightcoveDefaultTranscriptsMock,
-        wistia_mock.WistiaDefaultTranscriptsMock,
         vimeo_mock.VimeoDefaultTranscriptsMock,
     ]
 
     download_transcript_mocks = [
         youtube_mock.YoutubeDownloadTranscriptMock,
         brightcove_mock.BrightcoveDownloadTranscriptMock,
-        wistia_mock.WistiaDownloadTranscriptMock,
         vimeo_mock.VimeoDownloadTranscriptMock,
     ]
 
@@ -299,10 +297,6 @@ class TestCustomBackends(VideoXBlockTestBase):
                     (  # brightcove
                         {'url': None, 'language_code': None},
                         {'url': 'http://example.com', 'language_code': 'en'}
-                    ),
-                    (  # wistia
-                        {'url': 'test_url', 'language_code': 'en'},
-                        {'url': 'test_url', 'language_code': 'uk'}
                     ),
                     (  # vimeo
                         {'url': None, 'language_code': None},
@@ -565,3 +559,5 @@ class VimeoApiClientTest(VideoXBlockTestBase):
         # Assert
         requests_get_mock.assert_called_once_with('test_url')
         self.assertTrue(unescape_mock.called)
+
+
