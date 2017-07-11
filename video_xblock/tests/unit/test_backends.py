@@ -120,7 +120,7 @@ class TestCustomBackends(VideoXBlockTestBase):
 
     expected_advanced_fields = [
         [  # Youtube
-            'start_time', 'end_time', 'handout','download_transcript_allowed',
+            'start_time', 'end_time', 'handout', 'download_transcript_allowed',
             'download_video_allowed', 'download_video_url'
         ],
         [  # Brightcove

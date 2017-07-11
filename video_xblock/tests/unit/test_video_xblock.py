@@ -165,12 +165,12 @@ class VideoXBlockTests(VideoXBlockTestBase):
             ['stub1', 'stub2'], 'Stub autoupload messate'
         )
         prepare_fields_mock.side_effect = \
-        basic_fields_stub, advanced_fields_stub, transcripts_fields_stub, three_pm_fields_stub = [
-            [{'name': 'display_name'}],
-            [{'name': 'href'}],
-            [{'transcripts': 'foo'}],
-            [{'threeplaymedia_file_id': '12345'}]
-        ]
+            basic_fields_stub, advanced_fields_stub, transcripts_fields_stub, three_pm_fields_stub = [
+                [{'name': 'display_name'}],
+                [{'name': 'href'}],
+                [{'transcripts': 'foo'}],
+                [{'threeplaymedia_file_id': '12345'}]
+            ]
         resource_string_mock.side_effect = [
             'static/css/student-view.css',
             'static/css/transcripts-upload.css',
