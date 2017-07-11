@@ -215,25 +215,30 @@ function StudioEditableXBlock(runtime, element) {
             dataType: 'json'
         })
         .done(function(response) {
-            var newLang = response.lang;
-            var newLabel = response.label;
-            var newUrl = response.url;
-            var source = response.source;
-            // Add a default transcript to the list of enabled ones
-            var downloadUrl = runtimeHandlers.downloadTranscript + '?' + newUrl;
-            var defaultTranscript = {
-                lang: newLang,
-                label: newLabel,
-                url: downloadUrl,
-                source: source
-            };
-            // Create a standard transcript
-            pushTranscript(newLang, newLabel, newUrl, source, '', transcriptsValue);
-            pushTranscriptsValue(transcriptsValue);
-            createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
-            bindRemovalListenerEnabledTranscript(newLang, newLabel, newUrl);
-            message = response.success_message;
-            status = SUCCESS;
+            if (typeof response.failure_message !== 'undefined') {
+                message = response.failure_message;
+                status = ERROR;
+            } else {
+                var newLang = response.lang;
+                var newLabel = response.label;
+                var newUrl = response.url;
+                var source = response.source;
+                // Add a default transcript to the list of enabled ones
+                var downloadUrl = runtimeHandlers.downloadTranscript + '?' + newUrl;
+                var defaultTranscript = {
+                    lang: newLang,
+                    label: newLabel,
+                    url: downloadUrl,
+                    source: source
+                };
+                // Create a standard transcript
+                pushTranscript(newLang, newLabel, newUrl, source, '', transcriptsValue);
+                pushTranscriptsValue(transcriptsValue);
+                createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
+                bindRemovalListenerEnabledTranscript(newLang, newLabel, newUrl);
+                message = response.success_message;
+                status = SUCCESS;
+            }
         })
         .fail(function(jqXHR) {
             message = tryRefreshPageMessage;
