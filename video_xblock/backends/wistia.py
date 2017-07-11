@@ -39,7 +39,8 @@ class WistiaPlayer(BaseVideoPlayer):
         # To check on authentication status; reference: https://wistia.com/doc/data-api#authentication
         'auth_sample_url': 'api.wistia.com/v1/medias.json?api_password={token}',
         # To fetch a specific transcript; reference: https://wistia.com/doc/data-api#captions_show
-        'download_url': 'api.wistia.com/v1/medias/{media_id}/captions.json?api_password={token}',
+        'download_url': 'http://api.wistia.com/v1/medias/{media_id}/captions/'
+                        '{lang_code}.json?api_password={token}',
         # To get list of captions; reference: https://wistia.com/doc/data-api#captions_index
         'url': 'api.wistia.com/v1/medias/{media_id}/captions.json?api_password={token}',
         'response': {
