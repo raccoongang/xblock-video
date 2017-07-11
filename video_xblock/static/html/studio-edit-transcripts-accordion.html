@@ -3,9 +3,11 @@
 <div class="accordion">
   <button class="accordion-btn {% if transcripts_type == 'manual' %}active{% endif %}">Manual & default transcripts</button>
   <div class="accordion-panel {% if transcripts_type == 'manual' %}active{% endif %}">
-      <div class="field comp-setting-entry metadata_entry is-set" data-field-name="transcripts" data-default="" data-cast="transcripts">
-        {% include 'studio-edit-transcripts.html' %}
-      </div>
+      <li class="field comp-setting-entry metadata_entry is-set" data-field-name="transcripts" data-default="" data-cast="transcripts">
+        <div class='wrapper-comp-setting metadata-video-translations'>
+          {% include 'studio-edit-transcripts.html' with field=transcripts_fields.0 %}
+        </div>
+      </li>
 
       {% include 'studio-edit-default-transcripts.html' %}
       {% if field.help %}
@@ -66,5 +68,3 @@
     }
   });
 </script>
-
-
