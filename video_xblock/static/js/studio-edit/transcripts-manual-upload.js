@@ -240,7 +240,14 @@ function createTranscriptBlock(langCode, langLabel, transcriptsValue, downloadTr
  */
 function clickUploader(event, $fileUploader) {
     'use strict';
-    var handoutsAllowedFileTypes = '.png, .jpeg, .jpg, .gif, .tiff';
+    var handoutsAllowedFileTypes = (
+        '.gif, .ico, .jpg, .jpeg, .png, .tif, .tiff, .bmp, .svg, ' +  // images
+        '.pdf, .txt, .rtf, .csv, ' +                                  // documents
+        '.doc, .docx, .xls, .xlsx, .ppt, .pptx, .pub, ' +             // MSOffice
+        '.odt, .ods, .odp, ' +                                        // openOffice
+        '.zip, .7z, .gzip, .tar ' +                                   // archives
+        '.html, .xml, .js, .sjson'                                    // other
+    );
     var $buttonBlock = $(event.currentTarget);
     var indexOfParentLi = $('.language-transcript-selector').children().index($buttonBlock.closest('li'));
     var langCode = $buttonBlock.attr('data-lang-code');
