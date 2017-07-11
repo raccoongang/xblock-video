@@ -346,8 +346,12 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
 
         Brightcove videos require Brightcove Account id.
         """
-        fields_list = ['player_id'] + super(BrightcovePlayer, self).advanced_fields
+        return ['player_id'] + super(BrightcovePlayer, self).advanced_fields
+
+    @property
+    def three_pm_fields(self):
         # Add `token` field before `threeplaymedia_file_id`
+        fields_list = super(BrightcovePlayer, self).three_pm_fields
         fields_list.insert(fields_list.index('threeplaymedia_file_id'), 'token')
         return fields_list
 

@@ -126,7 +126,11 @@ class VimeoPlayer(BaseVideoPlayer):
 
         Vimeo videos require Access token to be set.
         """
-        fields_list = super(VimeoPlayer, self).advanced_fields
+        return super(VimeoPlayer, self).advanced_fields
+
+    @property
+    def three_pm_fields(self):
+        fields_list = super(VimeoPlayer, self).three_pm_fields
         # Add `token` field before `threeplaymedia_file_id`
         fields_list.insert(fields_list.index('threeplaymedia_file_id'), 'token')
         return fields_list

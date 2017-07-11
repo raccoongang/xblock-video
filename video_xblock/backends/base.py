@@ -138,9 +138,11 @@ class BaseVideoPlayer(Plugin):
             'download_video_allowed', 'download_video_url',
         ]
 
-    three_pm_fields = [
-        'threeplaymedia_file_id', 'threeplaymedia_apikey', 'threeplaymedia_streaming'
-    ]
+    @property
+    def three_pm_fields(self):
+        return [
+            'threeplaymedia_file_id', 'threeplaymedia_apikey', 'threeplaymedia_streaming'
+        ]
 
     trans_fields = ['transcripts', 'default_transcripts']
 
