@@ -350,8 +350,11 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
 
     @property
     def three_pm_fields(self):
-        # Add `token` field before `threeplaymedia_file_id`
+        """
+        Tuple of VideoXBlock fields to display on `3PlayMedia transcripts` panel.
+        """
         fields_list = super(BrightcovePlayer, self).three_pm_fields
+        # Add `token` field before `threeplaymedia_file_id`
         fields_list.insert(fields_list.index('threeplaymedia_file_id'), 'token')
         return fields_list
 

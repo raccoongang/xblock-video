@@ -140,11 +140,19 @@ class BaseVideoPlayer(Plugin):
 
     @property
     def three_pm_fields(self):
+        """
+        Tuple of VideoXBlock fields to display on `3PlayMedia transcripts` panel.
+        """
         return [
             'threeplaymedia_file_id', 'threeplaymedia_apikey', 'threeplaymedia_streaming'
         ]
 
-    trans_fields = ['transcripts', 'default_transcripts']
+    @property
+    def trans_fields(self):
+        """
+        Tuple of VideoXBlock fields to display on `Manual & default transcripts` panel.
+        """
+        return ['transcripts', 'default_transcripts']
 
     @property
     def fields_help(self):
