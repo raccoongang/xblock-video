@@ -53,11 +53,12 @@
 <div class="accordion">
   <button class="accordion-btn {% if transcripts_type == 'manual' %}active{% endif %}">Manual & default transcripts</button>
   <div class="accordion-panel {% if transcripts_type == 'manual' %}active{% endif %}">
-
-      {% include 'studio-edit-transcripts.html' %}
+      <div class="field comp-setting-entry metadata_entry is-set" data-field-name="transcripts" data-default="" data-cast="transcripts">
+        {% include 'studio-edit-transcripts.html' %}
+      </div>
 
       {% include 'studio-edit-default-transcripts.html' %}
-      {% if t.help %}
+      {% if field.help %}
         <span class="tip setting-help"> {{ field.help|safe }} </span>
       {% endif %}
   </div>
@@ -65,26 +66,26 @@
   <button class="accordion-btn {% if transcripts_type == '3PM' %}active{% endif %}">3PlayMedia transcripts</button>
   <div class="accordion-panel {% if transcripts_type == '3PM' %}active{% endif %}">
     {% for field in three_pm_fields %}
-    <li
-      class="field comp-setting-entry metadata_entry {% if field.is_set %}is-set{% endif %}"
-      data-field-name="{{field.name}}"
-      data-default="{% if field.type == 'boolean' %}{{ field.default|yesno:'1,0' }}{% else %}{{ field.default|default_if_none:"" }}{% endif %}"
-      data-cast="{{field.type}}"
-    >
-      <div class='wrapper-comp-setting {% if field.type == "set" %}metadata-list-enum{% endif %} {% if field.type == "handout" %}file-uploader{% endif %}{% if field.type == "transcripts" %}metadata-video-translations{% endif %}'>
+      <li
+        class="field comp-setting-entry metadata_entry {% if field.is_set %}is-set{% endif %}"
+        data-field-name="{{field.name}}"
+        data-default="{% if field.type == 'boolean' %}{{ field.default|yesno:'1,0' }}{% else %}{{ field.default|default_if_none:"" }}{% endif %}"
+        data-cast="{{field.type}}"
+      >
+        <div class='wrapper-comp-setting {% if field.type == "set" %}metadata-list-enum{% endif %} {% if field.type == "handout" %}file-uploader{% endif %}{% if field.type == "transcripts" %}metadata-video-translations{% endif %}'>
 
-        <label class="label setting-label" for="xb-field-edit-{{field.name}}">{{field.display_name}}</label>
-        {% if field.type == "boolean" %}
-          {% include "fields/boolean.html" with field=field %}
-        {% elif field.type == "string" or field.type == 'threeplaymedia_apikey' %}
-          {% include "fields/string.html" with field=field %}
+          <label class="label setting-label" for="xb-field-edit-{{field.name}}">{{field.display_name}}</label>
+          {% if field.type == "boolean" %}
+            {% include "fields/boolean.html" with field=field %}
+          {% elif field.type == "string" or field.type == 'threeplaymedia_apikey' %}
+            {% include "fields/string.html" with field=field %}
+          {% endif %}
+        </div>
+        {% if field.help %}
+          <span class="tip setting-help"> {{ field.help|safe }} </span>
         {% endif %}
-      </div>
-      {% if field.help %}
-        <span class="tip setting-help"> {{ field.help|safe }} </span>
-      {% endif %}
+      </li>
     {% endfor %}
-    </li>
     {#% include 'studio-edit-3playmedia-apikey.html' %#}
 
   </div>

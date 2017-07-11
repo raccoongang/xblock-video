@@ -548,7 +548,7 @@ class VideoXBlock(
                 'has_list_values': False,
                 'type': 'string',
             }
-        elif field_name in ('handout', 'transcripts', 'default_transcripts', 'token', 'threeplaymedia_apikey'):
+        elif field_name in ('handout', 'transcripts', 'default_transcripts', 'token'):
             info = self.initialize_studio_field_info(field_name, field, field_type=field_name)
         else:
             info = self.initialize_studio_field_info(field_name, field)

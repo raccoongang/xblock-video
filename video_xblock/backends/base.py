@@ -112,7 +112,10 @@ class BaseVideoPlayer(Plugin):
 
         Defaults to concatenation of `basic_fields` and `advanced_fields`.
         """
-        return tuple(itertools.chain(self.basic_fields, self.advanced_fields))
+        return tuple(itertools.chain(
+            self.basic_fields, self.advanced_fields, self.trans_fields,
+            self.three_pm_fields
+        ))
 
     @property
     def basic_fields(self):
