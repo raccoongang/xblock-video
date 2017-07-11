@@ -1,6 +1,8 @@
 {% load i18n %}
 
-<label class="label setting-label" for="xb-field-edit-{{transcripts_field.name}}">{{transcripts_field.display_name}}</label>
+<label class="label setting-label" for="xb-field-edit-{{field.name}}">
+    {{field.display_name}}
+</label>
 
 <div class="wrapper-uploader-actions xblock-edit-settings wrapper-translations-settings">
   <ol class="list-settings language-transcript-selector">
@@ -43,8 +45,8 @@
   </a>
 </div>
 
-{% if transcripts_field.help %}
-    <span class="tip setting-help"> {{ transcripts_field.help|safe }} </span>
+{% if field.help %}
+    <span class="tip setting-help"> {{ field.help|safe }} </span>
 {% endif %}
 
 <form method="POST" action="/assets/{{ courseKey }}/"

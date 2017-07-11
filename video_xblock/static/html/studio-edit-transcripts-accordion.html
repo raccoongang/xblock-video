@@ -24,8 +24,7 @@
         data-default="{% if field.type == 'boolean' %}{{ field.default|yesno:'1,0' }}{% else %}{{ field.default|default_if_none:"" }}{% endif %}"
         data-cast="{{field.type}}"
       >
-        <div class='wrapper-comp-setting {% if field.type == "set" %}metadata-list-enum{% endif %} {% if field.type == "handout" %}file-uploader{% endif %}{% if field.type == "transcripts" %}metadata-video-translations{% endif %}'>
-
+        <div class='wrapper-comp-setting'>
           <label class="label setting-label" for="xb-field-edit-{{field.name}}">{{field.display_name}}</label>
           {% if field.type == "boolean" %}
             {% include "fields/boolean.html" with field=field %}
