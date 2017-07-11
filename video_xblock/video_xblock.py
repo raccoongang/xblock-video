@@ -151,7 +151,8 @@ class VideoXBlock(
         help=_(
             'Default transcripts are uploaded automatically from a video platform '
             'to the list of available transcripts.<br/>'
-            '<b>Note: "Video API Token" should be given in order to make auto fetching possible.</b>'
+            '<b>Note: valid "Video API Token" should be given in order to make auto fetching possible.</b><br/>'
+            'Advice: disable transcripts displaying on your video service to avoid transcripts overlapping.'
         ),
         resettable_editor=False
     )
@@ -335,6 +336,7 @@ class VideoXBlock(
             default_transcripts, transcripts_autoupload_message = player.get_default_transcripts(**kwargs)
         except ApiClientError:
             default_transcripts, transcripts_autoupload_message = [], _('Failed to fetch default transcripts.')
+        log.debug("Autofetch message: '{}'".format(transcripts_autoupload_message))
         # Default transcripts should contain transcripts of distinct languages only
         distinct_default_transcripts = player.clean_default_transcripts(default_transcripts)
         # Needed for frontend
@@ -364,7 +366,7 @@ class VideoXBlock(
         # whilst for Wistia, a sample authorised request is to be made to ensure authentication succeeded,
         # since it is needed for the auth status message generation and the player's state update with auth status.
         if self.token:
-            _auth_data, auth_error_message = self.authenticate_video_api(self.token)
+            _auth_data, auth_error_message = self.authenticate_video_api(self.token.encode(encoding='utf-8'))
 
         initial_default_transcripts, transcripts_autoupload_message = self._update_default_transcripts(
             player, transcripts
@@ -373,7 +375,7 @@ class VideoXBlock(
         # Prepare basic_fields and advanced_fields for them to be rendered
         basic_fields = self.prepare_studio_editor_fields(player.basic_fields)
         advanced_fields = self.prepare_studio_editor_fields(player.advanced_fields)
-        log.debug("Fetched default transcripts: {}".format(self.default_transcripts))
+        log.debug("Fetched default transcripts: {}".format(initial_default_transcripts))
         context = {
             'advanced_fields': advanced_fields,
             'auth_error_message': auth_error_message,
@@ -774,10 +776,9 @@ class VideoXBlock(
         """
         Get transcripts from different sources depending on current usage mode.
         """
-        if self.direct_enabled:
-            transcripts = self.fetch_available_3pm_transcripts()
+        if self.threeplaymedia_streaming:
+            transcripts = list(self.fetch_available_3pm_transcripts())
         else:
             transcripts = json.loads(self.transcripts) if self.transcripts else []
 
-        for transcript in transcripts:
-            yield transcript
+        return transcripts

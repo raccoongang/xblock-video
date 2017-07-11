@@ -2,7 +2,19 @@
 Lists of constants that can be used in the video xblock.
 """
 
+from enum import Enum
+
 DEFAULT_LANG = 'en'
+
+
+class Status(Enum):
+    """
+    Status flags enumeration.
+    """
+
+    success = 'success'
+    error = 'error'
+    warning = 'warning'
 
 
 class PlayerName(object):

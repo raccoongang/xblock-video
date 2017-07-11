@@ -131,13 +131,12 @@ class BaseVideoPlayer(Plugin):
         Subclasses can extend or redefine list if needed. Defaults to a tuple defined by VideoXBlock.
         """
         return [
-            'start_time', 'end_time', 'handout',
-            'download_transcript_allowed',
-            'download_video_allowed', 'download_video_url'
+            'start_time', 'end_time', 'handout', 'download_transcript_allowed',
+            'download_video_allowed', 'download_video_url',
         ]
 
     three_pm_fields = [
-        'threeplaymedia_file_id', 'threeplaymedia_apikey', 'direct_enabled'
+        'threeplaymedia_file_id', 'threeplaymedia_apikey', 'threeplaymedia_streaming'
     ]
 
     trans_fields = ['transcripts', 'default_transcripts']
