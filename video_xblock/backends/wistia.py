@@ -171,7 +171,7 @@ class WistiaPlayer(BaseVideoPlayer):
         token = kwargs.get('token')
         url = self.captions_api['url'].format(token=token, media_id=video_id)
 
-        message = ''
+        message = _('Success.')
         self.default_transcripts = []
         # Fetch available transcripts' languages (codes and English labels), and assign its' urls.
         try:
@@ -195,7 +195,7 @@ class WistiaPlayer(BaseVideoPlayer):
             return self.default_transcripts, message
 
         try:
-            wistia_data = json.loads(response.text)
+            wistia_data = response.json()
         except ValueError:
             wistia_data = ''
 
