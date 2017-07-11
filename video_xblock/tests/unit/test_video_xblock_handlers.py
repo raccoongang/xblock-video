@@ -79,11 +79,11 @@ class UploadDefaultTranscriptHandlerTests(VideoXBlockTestBase):
             response = self.xblock.upload_default_transcript_handler(request_mock)
         # Assert
             player_mock.download_default_transcript.assert_called_with(
-                url=assert_data['url'], language_code=assert_data['lang']
+                assert_data['url'], assert_data['lang']
             )
             create_reference_name_mock.assert_called_with(assert_data['label'], test_media_id, assert_data['source'])
             player_mock.download_default_transcript.assert_called_with(
-                url=assert_data['url'], language_code=assert_data['lang']
+                assert_data['url'], assert_data['lang']
             )
             convert_caps_mock.assert_called_with(caps=test_subs_text)
             create_transcript_file_mock.assert_called_with(trans_str=prepared_subs_mock, reference_name=test_reference)

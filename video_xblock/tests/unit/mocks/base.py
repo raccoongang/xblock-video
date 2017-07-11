@@ -20,7 +20,7 @@ class ResponseStub(object):
         """
         Delegate kwargs to class properties.
         """
-        self.ok = True  # successful by default
+        self.ok = True  # pylint: disable=invalid-name
 
         for key, val in kwargs.items():
             setattr(self, key, val)

@@ -11,12 +11,10 @@ import re
 
 import requests
 import babelfish
-from simplejson import JSONDecodeError
 
 from video_xblock import BaseVideoPlayer
 from video_xblock.constants import TranscriptSource
 from video_xblock.utils import ugettext as _
-from video_xblock.exceptions import VideoXBlockException
 
 log = logging.getLogger(__name__)
 
@@ -207,11 +205,11 @@ class WistiaPlayer(BaseVideoPlayer):
             return self.default_transcripts, message
 
         transcripts_data = [
-            [el.get('language'), el.get('english_name'), el.get('text')]
+            [el.get('language'), el.get('english_name')]
             for el in wistia_data
         ]
         # Populate default_transcripts
-        for lang_code, lang_label, text in transcripts_data:
+        for lang_code, lang_label in transcripts_data:
             download_url = self.captions_api['download_url'].format(
                 media_id=video_id,
                 lang_code=lang_code,
@@ -267,7 +265,7 @@ class WistiaPlayer(BaseVideoPlayer):
             text = unicode(unescaped_text)
         return text
 
-    def download_default_transcript(self, url, lang_code):
+    def download_default_transcript(self, url, language_code):
         """
         Get default transcript fetched from a video platform API and format it to WebVTT-like unicode.
 
@@ -277,20 +275,19 @@ class WistiaPlayer(BaseVideoPlayer):
 
         Arguments:
             url (str): API url to fetch a default transcript from.
-            lang_code (str): Language ISO-639-2 code of a default transcript to be downloaded.
+            language_code (str): Language ISO-639-2 code of a default transcript to be downloaded.
         Returns:
             text (unicode): Text of transcripts.
         """
-
         try:
             response = requests.get(url)
             json_data = response.json()
             return json_data[u'text']
         except IOError:
-            log.exception("Transcript fetching failure: language [{}]".format(lang_code))
+            log.exception("Transcript fetching failure: language [{}]".format(language_code))
             return u''
-        except (JSONDecodeError, KeyError):
-            log.exception("Can't parse fetched transcript: language [{}]".format(lang_code))
+        except (ValueError, KeyError, TypeError):
+            log.exception("Can't parse fetched transcript: language [{}]".format(language_code))
             return u''
 
     def dispatch(self, request, suffix):

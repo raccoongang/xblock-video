@@ -301,9 +301,8 @@ class TestCustomBackends(VideoXBlockTestBase):
                         {'url': 'http://example.com', 'language_code': 'en'}
                     ),
                     (  # wistia
-                        {'url': None, 'language_code': None},
-                        {'url': 'http://example.com', 'language_code': 'en'},
-                        {'url': 'http://example.com', 'language_code': 'uk'}
+                        {'url': 'test_url', 'language_code': 'en'},
+                        {'url': 'test_url', 'language_code': 'uk'}
                     ),
                     (  # vimeo
                         {'url': None, 'language_code': None},

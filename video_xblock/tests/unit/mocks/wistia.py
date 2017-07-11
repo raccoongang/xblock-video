@@ -8,6 +8,7 @@ import requests
 from xblock.core import XBlock
 
 from video_xblock.backends import wistia
+from video_xblock.constants import TranscriptSource
 from video_xblock.tests.unit.mocks.base import BaseMock, RequestsMock, ResponseStub
 
 
@@ -48,23 +49,21 @@ class WistiaDefaultTranscriptsMock(BaseMock):
     _expected = [
         {
             'lang': u'en',
-            'url': 'url_can_not_be_generated',
-            'text': u'http://video.google.com/timedtext?lang=en&name=&v=set_video_id_here',
-            'label': u'English'
+            'label': u'English',
+            'url': 'http://api.wistia.com/v1/medias/test_media_id/captions/eng.json?api_password=test_token',
+            'source': TranscriptSource.DEFAULT
         },
         {
             'lang': u'uk',
-            'url': 'url_can_not_be_generated',
-            'text': u'http://video.google.com/timedtext?lang=uk&name=&v=set_video_id_here',
-            'label': u'Ukrainian'
+            'label': u'Ukrainian',
+            'url': 'http://api.wistia.com/v1/medias/test_media_id/captions/eng.json?api_password=test_token',
+            'source': TranscriptSource.DEFAULT
         }
     ]
 
     _default_transcripts = [
-        {'english_name': u'English', 'language': u'eng',
-         'text': 'http://video.google.com/timedtext?lang=en&name=&v=set_video_id_here'},
-        {'english_name': u'Ukrainian', 'language': u'ukr',
-         'text': 'http://video.google.com/timedtext?lang=uk&name=&v=set_video_id_here'}
+        {'english_name': u'English', 'language': u'en', 'url': u'test_url', 'source': 'default'},
+        {'english_name': u'Ukrainian', 'language': u'uk', 'url': u'test_url', 'source': 'default'}
     ]
 
     outcomes = (
@@ -185,37 +184,30 @@ class WistiaDownloadTranscriptMock(BaseMock):
     _default_transcripts = [
         {
             'lang': u'en',
-            'url': 'url_can_not_be_generated',
-            'text': u'http://video.google.com/timedtext?lang=en&name=&v=set_video_id_here',
-            'label': u'English'
+            'label': u'English',
+            'url': 'http://api.wistia.com/v1/medias/test_media_id/captions/eng.json?api_password=test_token',
+            'source': TranscriptSource.DEFAULT
         },
         {
             'lang': u'uk',
-            'url': 'url_can_not_be_generated',
-            'text': u'http://video.google.com/timedtext?lang=uk&name=&v=set_video_id_here',
-            'label': u'Ukrainian'
+            'label': u'Ukrainian',
+            'url': 'http://api.wistia.com/v1/medias/test_media_id/captions/eng.json?api_password=test_token',
+            'source': TranscriptSource.DEFAULT
         }
     ]
 
     outcomes = (
         (
-            'wrong_arguments',
-            {
-                'transcript': [],
-                'message': '`language_code` parameter is required.'
-            }
-        ),
-        (
             'success_en',
             {
-                'transcript': 'WEBVTT\n\nhttp://video.google.com/timedtext?lang=en&name=&v=set_video_id_here ',
+                'transcript': u'',
                 'message': ''
             }
         ),
         (
             'success_uk',
             {
-                'transcript': 'WEBVTT\n\nhttp://video.google.com/timedtext?lang=uk&name=&v=set_video_id_here ',
+                'transcript': u'',
                 'message': ''
             }
         )

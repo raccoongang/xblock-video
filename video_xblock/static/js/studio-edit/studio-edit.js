@@ -215,17 +215,19 @@ function StudioEditableXBlock(runtime, element) {
             dataType: 'json'
         })
         .done(function(response) {
+            var downloadUrl, defaultTranscript;
+            var newLang = response.lang;
+            var newLabel = response.label;
+            var newUrl = response.url;
+            var source = response.source;
+
             if (typeof response.failure_message !== 'undefined') {
                 message = response.failure_message;
                 status = ERROR;
             } else {
-                var newLang = response.lang;
-                var newLabel = response.label;
-                var newUrl = response.url;
-                var source = response.source;
                 // Add a default transcript to the list of enabled ones
-                var downloadUrl = runtimeHandlers.downloadTranscript + '?' + newUrl;
-                var defaultTranscript = {
+                downloadUrl = runtimeHandlers.downloadTranscript + '?' + newUrl;
+                defaultTranscript = {
                     lang: newLang,
                     label: newLabel,
                     url: downloadUrl,
