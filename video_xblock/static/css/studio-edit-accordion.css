@@ -4,7 +4,6 @@
   border: none;
   color: #444;
   cursor: pointer;
-  outline: none;
   padding: 18px;
   text-align: left;
   transition: 0.4s;
@@ -38,6 +37,7 @@
   padding: 0 18px;
   transition: max-height 0.2s ease-out;
 }
+
 .accordion-panel.active {
   display: block;
 }
