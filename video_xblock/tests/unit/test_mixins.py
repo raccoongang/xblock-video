@@ -10,7 +10,7 @@ from mock import patch, Mock, MagicMock, PropertyMock
 from webob import Response
 from xblock.exceptions import NoSuchServiceError
 
-from video_xblock.constants import DEFAULT_LANG, TPMApiLanguage, STATUS
+from video_xblock.constants import DEFAULT_LANG, TPMApiLanguage, Status
 from video_xblock.tests.unit.base import VideoXBlockTestBase
 from video_xblock.tests.unit.mocks.base import ResponseStub
 from video_xblock.tests.unit.test_video_xblock_handlers import arrange_request_mock
@@ -362,7 +362,7 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
 
     def test_fetch_available_3pm_transcripts_with_errors(self):
         # Arrange:
-        test_feedback = {'status': STATUS.error, 'message': 'test_message'}  # pylint: disable=no-member
+        test_feedback = {'status': Status.error, 'message': 'test_message'}
         test_transcripts_list = []
         with patch.object(self.xblock, 'get_3pm_transcripts_list') as threepm_transcripts_mock, \
                 patch.object(self.xblock, 'threeplaymedia_file_id') as file_id_mock, \
@@ -379,7 +379,7 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
 
     def test_fetch_available_3pm_transcripts_success(self):
         # Arrange:
-        test_feedback = {'status': STATUS.success, 'message': 'test_message'}  # pylint: disable=no-member
+        test_feedback = {'status': Status.success, 'message': 'test_message'}
         test_transcripts_list = [{'id': 'test_id', 'language_id': '2'}]
         test_args = ['id', 'label', 'lang', 'lang_id', 'content', 'format', 'video_id', 'source', 'url']
 
@@ -404,7 +404,7 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
         # Arrange:
         test_json = [{"test": "json_string"}]
         test_message = _("3PlayMedia transcripts fetched successfully.")
-        test_feedback = {'status': STATUS.success, 'message': test_message}  # pylint: disable=no-member
+        test_feedback = {'status': Status.success, 'message': test_message}
         requests_get_mock.return_value = ResponseStub(
             body=test_json,
             ok=True
@@ -514,7 +514,7 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
     def test_validate_three_play_media_config_with_3pm_streaming(self, get_3pm_transcripts_list_mock):
         # Arrange:
         success_message = _('Success')
-        test_feedback = {'status': STATUS.success, 'message': success_message}  # pylint: disable=no-member
+        test_feedback = {'status': Status.success, 'message': success_message}
         test_transcripts_list = [{"test_transcript"}]
         get_3pm_transcripts_list_mock.return_value = test_feedback, test_transcripts_list
         request_mock = arrange_request_mock(

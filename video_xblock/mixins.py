@@ -11,7 +11,7 @@ from xblock.core import XBlock
 from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Scope, Boolean, Float, String
 
-from .constants import DEFAULT_LANG, TPMApiTranscriptFormatID, TPMApiLanguage, TranscriptSource, STATUS
+from .constants import DEFAULT_LANG, TPMApiTranscriptFormatID, TPMApiLanguage, TranscriptSource, Status
 from .utils import import_from, ugettext as _, underscore_to_mixedcase, Transcript
 
 log = logging.getLogger(__name__)
@@ -67,7 +67,7 @@ class TranscriptsMixin(XBlock):
 
     threeplaymedia_apikey = String(
         default='',
-        display_name=_('API Key'),
+        display_name=_('3PlayMedia API Key'),
         help=_('You can generate a client token following official documentation of your video platform\'s API.'),
         scope=Scope.content,
         resettable_editor=False
@@ -207,7 +207,7 @@ class TranscriptsMixin(XBlock):
         )
         log.debug("Fetched 3PM transcripts list results:\n{}".format(feedback))
 
-        if feedback['status'] is STATUS.error:    # pylint: disable=no-member
+        if feedback['status'] is Status.error:
             log.error("3PlayMedia transcripts fetching API request has failed!\n{}".format(feedback['message']))
             raise StopIteration
 
@@ -230,7 +230,7 @@ class TranscriptsMixin(XBlock):
         transcripts_list = []
         failure_message = _("3PlayMedia transcripts fetching API request has failed!")
         success_message = _("3PlayMedia transcripts fetched successfully.")
-        feedback = {'status': STATUS.error, 'message': failure_message}  # pylint: disable=no-member
+        feedback = {'status': Status.error, 'message': failure_message}
 
         try:
             response = requests.get(
@@ -238,16 +238,16 @@ class TranscriptsMixin(XBlock):
                     domain=domain, file_id=file_id, api_key=apikey
                 )
             )
-        except Exception:  # pylint: disable=broad-except
+        except IOError:
             log.exception(failure_message)
             return feedback, transcripts_list
 
         if response.ok and isinstance(response.json(), list):
             transcripts_list = response.json()
-            feedback['status'] = STATUS.success  # pylint: disable=no-member
+            feedback['status'] = Status.success
             feedback['message'] = success_message
         else:
-            feedback['status'] = STATUS.error  # pylint: disable=no-member
+            feedback['status'] = Status.error
         return feedback, transcripts_list
 
     def fetch_single_3pm_translation(self, transcript_data, format_id=TPMApiTranscriptFormatID.WEBVTT):
@@ -349,7 +349,7 @@ class TranscriptsMixin(XBlock):
     @XBlock.handler
     def validate_three_play_media_config(self, request, _suffix=''):
         """
-        Handler to validate actuality of provided API credentials.
+        Handler to validate provided API credentials.
 
         Arguments:
             request (webob.Request):
@@ -359,7 +359,7 @@ class TranscriptsMixin(XBlock):
         """
         api_key = request.json.get('api_key')
         file_id = request.json.get('file_id')
-        streaming_enabled = bool(int(request.json.get('streaming_enabled')))
+        streaming_enabled = bool(int(request.json.get('streaming_enabled')))  # streaming_enabled is expected to be "1"
 
         is_valid = True
         success_message = _('Success')
@@ -380,7 +380,7 @@ class TranscriptsMixin(XBlock):
 
         feedback, transcripts_list = self.get_3pm_transcripts_list(file_id, api_key)
 
-        if transcripts_list and feedback['status'] is STATUS.success:  # pylint: disable=no-member
+        if transcripts_list and feedback['status'] is Status.success:
             message = success_message
             is_valid = True
         else:

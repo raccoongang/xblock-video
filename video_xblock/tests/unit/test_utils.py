@@ -49,10 +49,20 @@ class UtilsTest(unittest.TestCase):
         # Assert:
         self.assertEqual(reference, expected_ref)
 
-    def test_normalize_transcripts(self):
+    def test_normalize_transcripts_abnormal(self):
         # Arrange
         test_transcripts = [{'source': 'default'}, {}]
+        expected_transcripts = [{'source': 'default'}, {'source': 'manual'}]
         # Act
         normalized_transcripts = normalize_transcripts(test_transcripts)
         # Assert
-        self.assertEqual(test_transcripts, normalized_transcripts)
+        self.assertEqual(normalized_transcripts, expected_transcripts)
+
+    def test_normalize_transcripts_normal(self):
+        # Arrange
+        test_transcripts = [{'source': 'default'}, {'source': 'some_else'}]
+        expected_transcripts = [{'source': 'default'}, {'source': 'some_else'}]
+        # Act
+        normalized_transcripts = normalize_transcripts(test_transcripts)
+        # Assert
+        self.assertEqual(normalized_transcripts, expected_transcripts)
