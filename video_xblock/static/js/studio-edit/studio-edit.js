@@ -2,7 +2,7 @@
 removeEnabledTranscriptBlock bindUploadListenerAvailableTranscript pushTranscript pushTranscriptsValue
 createEnabledTranscriptBlock createTranscriptBlock parseRelativeTime removeAllEnabledTranscripts tinyMCE baseUrl
 validateTranscripts fillValues validateTranscriptFile removeTranscriptBlock clickUploader
-languageChecker $3playmediaTranscriptsApi getHandlers */
+languageChecker getHandlers */
 /**
     Set up the Video xblock studio editor. This part is responsible for validation and sending of the data to a backend.
     Reference:
@@ -12,6 +12,10 @@ function StudioEditableXBlock(runtime, element) {
     'use strict';
 
     var fields = [];
+    var tryRefreshPageMessage = gettext(
+        'This may be happening because of an error with our server or your internet connection. ' +
+        'Try refreshing the page or making sure you are online.'
+    );
     var datepickerAvailable = (typeof $.fn.datepicker !== 'undefined'); // Studio includes datepicker jQuery plugin
     var $defaultTranscriptsSwitcher = $('input.default-transcripts-switch-input');
     var $enabledLabel = $('div.custom-field-section-label.enabled-transcripts');
@@ -31,7 +35,6 @@ function StudioEditableXBlock(runtime, element) {
     var $standardTranscriptRemover = $('.remove-action');
     var $langChoiceItem = $('.language-transcript-selector', element);
     var $videoApiAuthenticator = $('#video-api-authenticate', element);
-    var $3playmediaTranscriptsApi = $('#threeplaymedia-api-transcripts', element);
     var gotTranscriptsValue = $('input[data-field-name="transcripts"]').val();
     var runtimeHandlers = getHandlers(runtime, element);
     var currentLanguageCode;
@@ -215,15 +218,17 @@ function StudioEditableXBlock(runtime, element) {
             var newLang = response.lang;
             var newLabel = response.label;
             var newUrl = response.url;
+            var source = response.source;
             // Add a default transcript to the list of enabled ones
             var downloadUrl = runtimeHandlers.downloadTranscript + '?' + newUrl;
             var defaultTranscript = {
                 lang: newLang,
                 label: newLabel,
-                url: downloadUrl
+                url: downloadUrl,
+                source: source
             };
             // Create a standard transcript
-            pushTranscript(newLang, newLabel, newUrl, '', transcriptsValue);
+            pushTranscript(newLang, newLabel, newUrl, source, '', transcriptsValue);
             pushTranscriptsValue(transcriptsValue);
             createEnabledTranscriptBlock(defaultTranscript, downloadUrl);
             bindRemovalListenerEnabledTranscript(newLang, newLabel, newUrl);
@@ -231,8 +236,7 @@ function StudioEditableXBlock(runtime, element) {
             status = SUCCESS;
         })
         .fail(function(jqXHR) {
-            message = gettext('This may be happening because of an error with our server or your ' +
-                'internet connection. Try refreshing the page or making sure you are online.');
+            message = tryRefreshPageMessage;
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
                 message += extractErrorMessage(jqXHR.responseText);
             }
@@ -258,7 +262,8 @@ function StudioEditableXBlock(runtime, element) {
             var defaultTranscript = {
                 lang: langCode,
                 label: langLabel,
-                url: downloadUrlApi
+                url: downloadUrlApi,
+                source: $fileUploader.data('source-default')
             };
             uploadDefaultTranscriptsToServer(defaultTranscript);
             // Affect standard transcripts
@@ -371,8 +376,7 @@ function StudioEditableXBlock(runtime, element) {
             global: false,
             success: function() { runtime.notify('save', {state: 'end'}); }
         }).fail(function(jqXHR) {
-            message = gettext('This may be happening because of an error with our server or your internet' +
-                ' connection. Try refreshing the page or making sure you are online.');
+            message = tryRefreshPageMessage;
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
                 message = extractErrorMessage(jqXHR.responseText);
             }
@@ -380,18 +384,72 @@ function StudioEditableXBlock(runtime, element) {
         });
     }
 
-    // Raccoongang changes
+    /**
+     * Validate if 3PlayMedia options: fileId, apiKey.
+     * @returns {boolean}
+     */
+    function validateThreePlayMediaConfig(data) {
+        var message;
+        var options = {
+            type: 'POST',
+            url: runtimeHandlers.validateThreePlayMediaConfig,
+            dataType: 'json',
+            data: JSON.stringify(data)
+        };
+
+        return $.ajax(
+            options
+        )
+        .done(function(response) {
+            message = response.message;
+            if (!response.isValid) {
+                runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
+            }
+        })
+        .fail(function(jqXHR) {
+            if (jqXHR.responseText) { // Try to get more specific error message we can show to user.
+                message = extractErrorMessage(jqXHR.responseText);
+            } else {
+                message = tryRefreshPageMessage;
+            }
+            runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
+        });
+    }
+
+    /**
+     * Grab 3PlayMedia API configuration data.
+     * @returns (object) 3PlayMedia's: apiKey + fileId
+     */
+    function getThreePlayMediaConfig() {
+        var apiKey = $('#xb-field-edit-threeplaymedia_apikey', element).val();
+        var fileId = $('#xb-field-edit-threeplaymedia_file_id', element).val();
+        var streamingEnabled = $('#xb-field-edit-threeplaymedia_streaming', element).prop('selectedIndex');
+
+        return {api_key: apiKey, file_id: fileId, streaming_enabled: !streamingEnabled};
+    }
+
     $('.save-button', element).bind('click', function(event) {
-        if (validateTranscripts(event, $langChoiceItem)) {
-            studioSubmit(fillValues(fields));
-        }
+        var validationSucceeded = false;
+        event.preventDefault();
+
+        $.when(validateThreePlayMediaConfig(getThreePlayMediaConfig())).then(
+            function(response) {
+                validationSucceeded = [
+                    response.isValid,
+                    validateTranscripts($langChoiceItem)
+                ].every(Boolean);
+
+                if (validationSucceeded) {
+                    studioSubmit(fillValues(fields));
+                }
+            }
+        );
     });
 
     $(element).find('.cancel-button').bind('click', function(event) {
         event.preventDefault();
         runtime.notify('cancel', {});
     });
-    // End of Raccoongang changes
 
     if (gotTranscriptsValue) {
         transcriptsValue = JSON.parse(gotTranscriptsValue);
@@ -400,59 +458,6 @@ function StudioEditableXBlock(runtime, element) {
     transcriptsValue.forEach(function(transcriptValue) {
         disabledLanguages.push(transcriptValue.lang);
     });
-
-    /**
-     * Get transcripts from 3playmedia's API and show result message.
-     */
-    function getTranscripts3playmediaApi(data) {
-        var message, status, includeLang;
-        var options = {
-            type: 'POST',
-            url: runtimeHandlers.getTranscripts3playmediaApi,
-            dataType: 'json',
-            data: JSON.stringify(data)
-        };
-
-        $.ajax(options)
-        .done(function(response) {
-            var errorMessage = response.error_message;
-            var successMessage = response.success_message;
-            if (successMessage && response.transcripts) {
-                response.transcripts.forEach(function(item) {
-                    includeLang = transcriptsValue.find(function(element) { // eslint-disable-line no-shadow
-                        return element.lang === item.lang;
-                    });
-                    // Add a transcript from the 3playmedia only for non exists language
-                    if (!includeLang) {
-                        createTranscriptBlock(item.lang, item.label, transcriptsValue, item.url);
-                        pushTranscript(item.lang, item.label, item.url, '', transcriptsValue);
-                        pushTranscriptsValue(transcriptsValue);
-                    }
-                });
-            }
-
-            if (successMessage) {
-                message = successMessage;
-                status = SUCCESS;
-            } else {
-                message = errorMessage;
-                status = ERROR;
-            }
-        })
-        .fail(function(jqXHR) {
-            status = ERROR;
-            if (jqXHR.responseText) { // Try to get more specific error message we can show to user.
-                message = extractErrorMessage(jqXHR.responseText);
-            } else {
-                message = gettext('This may be happening because of an error with our server or your ' +
-                'internet connection. Try refreshing the page or making sure you are online.');
-            }
-            runtime.notify('error', {title: gettext('Unable to update settings'), message: message});
-        })
-        .always(function() {
-            showStatus($('.threeplaymedia.status'), status, message);
-        });
-    }
 
     /**
      * Authenticate to video platform's API and show result message.
@@ -479,8 +484,7 @@ function StudioEditableXBlock(runtime, element) {
             }
         })
         .fail(function(jqXHR) {
-            message = gettext('This may be happening because of an error with our server or your ' +
-                'internet connection. Try refreshing the page or making sure you are online.');
+            message = tryRefreshPageMessage;
             status = ERROR;
 
             if (jqXHR.responseText) { // Is there a more specific error message we can show?
@@ -520,6 +524,7 @@ function StudioEditableXBlock(runtime, element) {
         var downloadUrlServer;
         var defaultTranscript;
         var isValidated = validateTranscriptFile(event, fieldName, filename, $fileUploader);
+        var source = $fileUploader.data('source-manual');
         if (fieldName === 'handout' && isValidated) {
             $parentDiv = $('.file-uploader');
             $('.download-setting', $parentDiv).attr('href', downloadUrl).removeClass('is-hidden');
@@ -527,7 +532,7 @@ function StudioEditableXBlock(runtime, element) {
             showStatus($('.status', $parentDiv), SUCCESS, successMessage);
             $('input[data-field-name=' + fieldName + ']').val(url).change();
         } else if (fieldName === 'transcripts' && isValidated) {
-            pushTranscript(lang, label, url, '', transcriptsValue);
+            pushTranscript(lang, label, url, source, '', transcriptsValue);
             $('.add-transcript').removeClass('is-disabled');
             $('input[data-field-name=' + fieldName + ']').val(JSON.stringify(transcriptsValue)).change();
             $(currentLiTag).find('.upload-transcript').text('Replace');
@@ -610,14 +615,6 @@ function StudioEditableXBlock(runtime, element) {
         authenticateVideoApi($data);
     });
 
-    $3playmediaTranscriptsApi.on('click', function(event) {
-        var $apiKey = $('.threeplaymedia-api-key', element).val();
-        var $fileId = $('#xb-field-edit-threeplaymedia_file_id', element).val();
-        event.preventDefault();
-        event.stopPropagation();
-        getTranscripts3playmediaApi({api_key: $apiKey, file_id: $fileId});
-    });
-
     $('.lang-select').on('change', function(event) {
         languageChecker(event, transcriptsValue, disabledLanguages);
         disableOption($langChoiceItem, disabledLanguages);
@@ -665,10 +662,12 @@ function StudioEditableXBlock(runtime, element) {
         var langCode = $currentTarget.attr('data-lang-code');
         var label = $currentTarget.attr('data-lang-label');
         var url = $currentTarget.attr('data-download-url');
+        var source = $currentTarget.attr('data-source');
         var defaultTranscript = {
             lang: langCode,
             label: label,
-            url: url
+            url: url,
+            source: source
         };
         event.preventDefault();
         event.stopPropagation();

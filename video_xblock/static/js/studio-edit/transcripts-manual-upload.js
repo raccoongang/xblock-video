@@ -53,12 +53,11 @@ function getTranscriptUrl(transcriptsArray, langCode) {
 /**
  * Validate transcript data before save it to video xblock.
  */
-function validateTranscripts(e, $langChoiceItem) {
+function validateTranscripts($langChoiceItem) {
     'use strict';
     var isValid = [];
     var $visibleLangChoiceItems = $langChoiceItem.find('li:visible');
     var urls;
-    e.preventDefault();
     $visibleLangChoiceItems.each(function(idx, el) {
         urls = $('.download-setting', $(el)).filter('.is-hidden');
         if (urls.length) {
@@ -127,10 +126,11 @@ function validateTranscriptFile(event, fieldName, filename, $fileUploader) {
  * @param {String} lang
  * @param {String} label
  * @param {String} url
+ * @param {String} source
  * @param {String} oldLang
  * @param {Array} transcriptsValue
  */
-function pushTranscript(lang, label, url, oldLang, transcriptsValue) {
+function pushTranscript(lang, label, url, source, oldLang, transcriptsValue) {
     'use strict';
     var indexLanguage;
     var i;
@@ -143,6 +143,7 @@ function pushTranscript(lang, label, url, oldLang, transcriptsValue) {
     if (indexLanguage !== undefined) {
         transcriptsValue[indexLanguage].lang = lang;  // eslint-disable-line no-param-reassign
         transcriptsValue[indexLanguage].label = label;  // eslint-disable-line no-param-reassign
+        transcriptsValue[indexLanguage].source = source;  // eslint-disable-line no-param-reassign
         if (url) {
             transcriptsValue[indexLanguage].url = url;  // eslint-disable-line no-param-reassign
         }
@@ -151,7 +152,8 @@ function pushTranscript(lang, label, url, oldLang, transcriptsValue) {
         transcriptsValue.push({
             lang: lang,
             url: url,
-            label: label
+            label: label,
+            source: source
         });
         return true;
     }
@@ -267,10 +269,11 @@ function languageChecker(event, transcriptsValue, disabledLanguages) {
     var $langSelectParent = $(event.currentTarget).parent('li');
     var $uploadButton = $('.upload-transcript', $langSelectParent);
     var oldLang = $uploadButton.data('lang-code');
+    var source = $('.input-file-uploader').data('source-manual');
     var newTranscriptAdded;
     event.stopPropagation();
     if (selectedLanguage !== oldLang && selectedLanguage !== '') {
-        newTranscriptAdded = pushTranscript(selectedLanguage, languageLabel, '', oldLang, transcriptsValue);
+        newTranscriptAdded = pushTranscript(selectedLanguage, languageLabel, '', source, oldLang, transcriptsValue);
         if (newTranscriptAdded) {
             $uploadButton.removeClass('is-hidden');
         }
