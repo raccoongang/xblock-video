@@ -1,14 +1,9 @@
 """
 Lists of constants that can be used in the video xblock.
 """
-from collections import namedtuple
-
 from enum import Enum
 
 DEFAULT_LANG = 'en'
-
-# STATUS - (instance of namedtuple) - may be used like: "STATUS.success", returns status string value.
-STATUS = namedtuple('STATUS', ['success', 'error', 'warning'])._make(['success', 'error', 'warning'])
 
 
 class Status(Enum):
