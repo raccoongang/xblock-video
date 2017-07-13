@@ -6,6 +6,7 @@ import json
 from collections import Iterable, OrderedDict
 
 from django.test import RequestFactory
+from django.test.utils import override_settings
 from mock import patch, Mock, MagicMock, PropertyMock
 from webob import Response
 from xblock.exceptions import NoSuchServiceError
@@ -191,41 +192,51 @@ class SettingsMixinTests(VideoXBlockTestBase):
     def test_block_settings_key_is_correct(self):
         self.assertEqual(self.xblock.block_settings_key, 'video_xblock')
 
-    @patch('video_xblock.mixins.import_from')
-    def test_settings_property_with_runtime_service(self, import_from_mock):
-        with patch.object(self.xblock, 'runtime') as runtime_mock:
-            # Arrange
-            service_mock = runtime_mock.service
-            settings_bucket_mock = service_mock.return_value.get_settings_bucket
-            settings_bucket_mock.return_value = {'foo': 'bar'}
+    @override_settings(
+        XBLOCK_SETTINGS={
+            'video_xblock': {
+                'field1': 'value1',
+                'field2': 'value2'
+            },
+            'foo': {
+                'field1': 'value1foo',
+                'field2': 'value2foo'
+            }
+        }
+    )
+    @patch('video_xblock.mixins.get_current_microsite_prefix')
+    def test_settings_property_with_microsite_enabled(self, get_microsite_prefix_mock):
+        # Arrange
+        get_microsite_prefix_mock.return_value = 'foo'  # e.g. "foo.example.com"
 
-            # Act
-            settings = self.xblock.settings
+        # Act
+        settings = self.xblock.settings
 
-            # Assert
-            self.assertEqual(settings, {'foo': 'bar'})
-            service_mock.assert_called_once_with(self.xblock, 'settings')
-            settings_bucket_mock.assert_called_once_with(self.xblock)
-            import_from_mock.assert_not_called()
+        # Assert
+        self.assertEqual(settings, {'field1': 'value1foo', 'field2': 'value2foo'})
 
-    @patch('video_xblock.mixins.import_from')
-    def test_settings_property_without_runtime_service(self, import_from_mock):
-        with patch.object(self.xblock, 'runtime') as runtime_mock:
-            # Arrange
-            service_mock = runtime_mock.service
-            service_mock.return_value = None
-            get_settings_mock = import_from_mock.return_value.XBLOCK_SETTINGS.get
-            get_settings_mock.return_value = {'foo': 'bar'}
+    @override_settings(
+        XBLOCK_SETTINGS={
+            'video_xblock': {
+                'field1': 'value1',
+                'field2': 'value2'
+            },
+            'foo': {
+                'field1': 'value1foo',
+                'field2': 'value2foo'
+            }
+        }
+    )
+    @patch('video_xblock.mixins.get_current_microsite_prefix')
+    def test_settings_property_with_microsite_disabled(self, get_microsite_prefix_mock):
+        # Arrange
+        get_microsite_prefix_mock.return_value = None  # e.g. "example.com"
 
-            # Act
-            settings = self.xblock.settings
+        # Act
+        settings = self.xblock.settings
 
-            # Assert
-            self.assertEqual(settings, {'foo': 'bar'})
-            import_from_mock.assert_called_once_with('django.conf', 'settings')
-            get_settings_mock.assert_called_once_with(
-                self.xblock.block_settings_key, {}
-            )
+        # Assert
+        self.assertEqual(settings, {'field1': 'value1', 'field2': 'value2'})
 
     @patch.object(VideoXBlock, 'settings', new_callable=PropertyMock)
     def test_populate_default_values(self, settings_mock):
@@ -367,7 +378,6 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
         with patch.object(self.xblock, 'get_3pm_transcripts_list') as threepm_transcripts_mock, \
                 patch.object(self.xblock, 'threeplaymedia_file_id') as file_id_mock, \
                 patch.object(self.xblock, 'threeplaymedia_apikey') as apikey_mock:
-
             threepm_transcripts_mock.return_value = test_feedback, test_transcripts_list
             # Act:
             transcripts_gen = self.xblock.fetch_available_3pm_transcripts()
@@ -387,7 +397,6 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
                 patch.object(self.xblock, 'fetch_single_3pm_translation') as fetch_3pm_translation_mock, \
                 patch.object(self.xblock, 'threeplaymedia_file_id') as file_id_mock, \
                 patch.object(self.xblock, 'threeplaymedia_apikey') as apikey_mock:
-
             threepm_transcripts_mock.return_value = test_feedback, test_transcripts_list
             fetch_3pm_translation_mock.return_value = Transcript(*test_args)
             # Act:

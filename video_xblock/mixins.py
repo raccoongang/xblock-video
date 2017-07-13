@@ -12,7 +12,7 @@ from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Scope, Boolean, Float, String
 
 from .constants import DEFAULT_LANG, TPMApiTranscriptFormatID, TPMApiLanguage, TranscriptSource, Status
-from .utils import import_from, ugettext as _, underscore_to_mixedcase, Transcript
+from .utils import import_from, ugettext as _, underscore_to_mixedcase, Transcript, get_current_microsite_prefix
 
 log = logging.getLogger(__name__)
 
@@ -535,6 +535,25 @@ class SettingsMixin(XBlock):
         "account_id": "1234567890"
       }
     }
+
+    In case of enabled microsites (suppose configured "foo" and "bar" microsites):
+    "XBLOCK_SETTINGS": {
+        "video_xblock": {
+            "3playmedia_api_key": "987654321",
+            "account_id": "1234567890",
+        },
+        "foo": {
+            "player_id": "real_player_id",
+        },
+        "bar": {
+            "3playmedia_api_key": "1234567890",
+            "account_id": "987654321",
+        }
+    }
+
+    Here above "video_xblock" key name represents global (installation-wide) fallback settings defaults and
+    "foo", "bar" - microsites - must match the key name of MICROSITE_CONFIGURATION dict,
+    otherwise the settings definition will not be valid.
     """
 
     block_settings_key = 'video_xblock'
@@ -544,8 +563,10 @@ class SettingsMixin(XBlock):
         """
         Return xblock settings set in .json config.
 
+        Try to fetch microsite prefix if microsite usage enabled. If fetched, get appropriate block_settings.
+
         Returned value depends on the context:
-        - `studio_view()` is being executed in CMS context and gets data from `lms.env.json`.
+        - `studio_view` is being executed in CMS context and gets data from `cms.env.json`.
         - `student_view` is being executed in LMS context and gets data from `lms.env.json`.
 
         Returns:
@@ -555,22 +576,24 @@ class SettingsMixin(XBlock):
                     "account_id": "1234567890"
                 }
         """
-        s_service = self.runtime.service(self, 'settings')
-        if s_service:
-            # At the moment SettingsService is not available in the context
-            # of Studio Edit modal. See https://github.com/edx/edx-platform/pull/14648
-            return s_service.get_settings_bucket(self)
+        microsite_prefix = get_current_microsite_prefix()
+        if microsite_prefix:
+            self.block_settings_key = microsite_prefix
 
         settings = import_from('django.conf', 'settings')
         return settings.XBLOCK_SETTINGS.get(self.block_settings_key, {})
 
-    def populate_default_values(self, fields_dict):
+    def populate_default_values(self, submit_data):
         """
         Populate unset default values from settings file.
         """
         for key, value in self.settings.items():
-            fields_dict.setdefault(key, value)
-        return fields_dict
+            submit_data.setdefault(key, value)
+            # if key is present in submit data but set to empty value:
+            if key in submit_data and not submit_data[key]:
+                submit_data[key] = value
+
+        return submit_data
 
 
 class LocationMixin(XBlock):

@@ -133,3 +133,18 @@ def normalize_transcripts(transcripts):
 Transcript = namedtuple('Transcript', [
     'id', 'label', 'lang', 'lang_id', 'content', 'format', 'video_id', 'source', 'url'
 ])
+
+
+def get_current_microsite_prefix():
+    """
+    Fetch current microsite subdomain.
+
+    :return: (unicode) or None
+    """
+    settings = import_from('django.conf', 'settings')
+
+    if settings.FEATURES.get('USE_MICROSITES'):
+        try:
+            return settings.get('SITE_NAME').split('.')[0]
+        except (AttributeError, IndexError):
+            return
