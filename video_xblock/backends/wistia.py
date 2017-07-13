@@ -264,7 +264,7 @@ class WistiaPlayer(BaseVideoPlayer):
         new_text = [
             self.format_transcript_text_line(line)
             for line in text[0].splitlines()
-            ]
+        ]
         new_text = '\n'.join(new_text)
         html_parser = HTMLParser.HTMLParser()
         unescaped_text = html_parser.unescape(new_text)
