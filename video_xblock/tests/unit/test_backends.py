@@ -628,6 +628,26 @@ class WistiaPlayerTest(VideoXBlockTestBase):
             self.assertEqual(message, test_message)
 
     @patch('video_xblock.backends.wistia.requests.get')
+    def test_wistia_get_default_transcripts(self, requests_get_mock):
+        """
+        Test Wistia's default transcripts fetching (request failure).
+        """
+        # Arrange
+        kwargs = {
+            'video_id': 'test_video_id',
+            'token': 'test_token'
+        }
+        test_message = _('No timed transcript may be fetched from a video platform.\nError details: test_exc_message')
+        test_url = 'https://api.wistia.com/v1/medias/test_video_id/captions.json?api_password=test_token'
+        requests_get_mock.side_effect = requests.RequestException("test_exc_message")
+        # Act
+        transcripts, message = self.wistia_player.get_default_transcripts(**kwargs)
+        # Assert
+        requests_get_mock.assert_called_once_with(test_url)
+        self.assertEqual(transcripts, [])
+        self.assertEqual(message, test_message)
+
+    @patch('video_xblock.backends.wistia.requests.get')
     def test_wistia_download_default_transcript(self, requests_get_mock):
         """
         Test Wistia's default transcripts downloading (positive scenario).
