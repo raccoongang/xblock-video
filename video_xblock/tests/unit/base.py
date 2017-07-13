@@ -13,7 +13,7 @@ from video_xblock.video_xblock import VideoXBlock
 
 def arrange_request_mock(request_body):
     """
-    Helper factory to create request mocks
+    Helper factory to create request mocks.
     """
     request_mock = mock.Mock()
     request_mock.method = 'POST'
