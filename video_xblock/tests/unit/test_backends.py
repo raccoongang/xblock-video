@@ -592,7 +592,7 @@ class WistiaPlayerTest(VideoXBlockTestBase):
 
     @patch('video_xblock.backends.wistia.babelfish.Language')
     @patch('video_xblock.backends.wistia.requests.get')
-    def test_wistia_get_default_transcripts(self, requests_get_mock, babel_mock):
+    def test_wistia_get_default_transcripts_success(self, requests_get_mock, babel_mock):
         """
         Test Wistia's default transcripts fetching (positive scenario).
         """
@@ -628,7 +628,7 @@ class WistiaPlayerTest(VideoXBlockTestBase):
             self.assertEqual(message, test_message)
 
     @patch('video_xblock.backends.wistia.requests.get')
-    def test_wistia_get_default_transcripts(self, requests_get_mock):
+    def test_wistia_get_default_transcripts_api_failure(self, requests_get_mock):
         """
         Test Wistia's default transcripts fetching (request failure).
         """
@@ -648,7 +648,7 @@ class WistiaPlayerTest(VideoXBlockTestBase):
         self.assertEqual(message, test_message)
 
     @patch('video_xblock.backends.wistia.requests.get')
-    def test_wistia_download_default_transcript(self, requests_get_mock):
+    def test_wistia_download_default_transcript_success(self, requests_get_mock):
         """
         Test Wistia's default transcripts downloading (positive scenario).
         """
@@ -668,7 +668,7 @@ class WistiaPlayerTest(VideoXBlockTestBase):
         requests_get_mock.assert_called_once_with(test_url)
 
     @patch('video_xblock.backends.wistia.requests.get')
-    def test_wistia_download_default_transcript(self, requests_get_mock):
+    def test_wistia_download_default_transcript_api_failure(self, requests_get_mock):
         """
         Test Wistia's default transcripts downloading (request failure).
         """
@@ -687,7 +687,7 @@ class WistiaPlayerTest(VideoXBlockTestBase):
         requests_get_mock.assert_called_once_with(test_url)
 
     @patch('video_xblock.backends.wistia.requests.get')
-    def test_wistia_download_default_transcript(self, requests_get_mock):
+    def test_wistia_download_default_transcript_parsing_failure(self, requests_get_mock):
         """
         Test Wistia's default transcripts downloading (request parsing failure).
         """
