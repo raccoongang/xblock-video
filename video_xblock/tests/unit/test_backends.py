@@ -4,6 +4,7 @@ Test cases for video_xblock backends.
 import unittest
 
 import babelfish
+import requests
 from ddt import ddt, data, unpack
 from django.test.utils import override_settings
 from lxml import etree
@@ -457,7 +458,7 @@ class VimeoApiClientTest(VideoXBlockTestBase):
         # Act & Assert
         self.assertRaises(vimeo.VimeoApiClientError, self.vimeo_player.parse_vimeo_texttracks, transcripts_data)
 
-    def test_get_default_transcripts(self):
+    def test_vimeo_get_default_transcripts(self):
         """
         Test Vimeo's default transcripts fetching (positive scenario).
         """
@@ -519,7 +520,7 @@ class VimeoApiClientTest(VideoXBlockTestBase):
             self.assertEqual(default_transcripts, [])
             self.assertEqual(message, failure_message)
 
-    def test_get_default_transcripts_no_data(self):
+    def test_vimeo_get_default_transcripts_no_data(self):
         """
         Test Vimeo's default transcripts fetching with no data returned.
         """
@@ -539,7 +540,7 @@ class VimeoApiClientTest(VideoXBlockTestBase):
             self.assertEqual(transcripts, [])
             self.assertEqual(message, success_message)
 
-    def test_get_default_transcripts_parsing_failure(self):
+    def test_vimeo_get_default_transcripts_parsing_failure(self):
         """
         Test Vimeo's default transcripts fetching with data parsing failure.
         """
@@ -563,7 +564,7 @@ class VimeoApiClientTest(VideoXBlockTestBase):
 
     @patch('video_xblock.backends.vimeo.remove_escaping')
     @patch('video_xblock.backends.vimeo.requests.get')
-    def test_download_default_transcript(self, requests_get_mock, unescape_mock):
+    def test_vimeo_download_default_transcript(self, requests_get_mock, unescape_mock):
         """
         Test Vimeo's default transcripts downloading.
         """
@@ -591,7 +592,7 @@ class WistiaPlayerTest(VideoXBlockTestBase):
 
     @patch('video_xblock.backends.wistia.babelfish.Language')
     @patch('video_xblock.backends.wistia.requests.get')
-    def test_get_default_transcripts(self, requests_get_mock, babel_mock):
+    def test_wistia_get_default_transcripts(self, requests_get_mock, babel_mock):
         """
         Test Wistia's default transcripts fetching (positive scenario).
         """
@@ -625,3 +626,61 @@ class WistiaPlayerTest(VideoXBlockTestBase):
             requests_get_mock.assert_called_once_with(test_url)
             self.assertEqual(transcripts, test_transcripts)
             self.assertEqual(message, test_message)
+
+    @patch('video_xblock.backends.wistia.requests.get')
+    def test_wistia_download_default_transcript(self, requests_get_mock):
+        """
+        Test Wistia's default transcripts downloading (positive scenario).
+        """
+
+        # Arrange
+        test_api_data = {'text': 'test_content'}
+        test_url = u"test_url"
+        test_language_code = u"test_language_code"
+
+        requests_get_mock.return_value = ResponseStub(status_code=200, body=test_api_data)
+
+        # Act
+        content = self.wistia_player.download_default_transcript(test_url, test_language_code)
+
+        # Assert
+        self.assertEqual(content, 'test_content')
+        requests_get_mock.assert_called_once_with(test_url)
+
+    @patch('video_xblock.backends.wistia.requests.get')
+    def test_wistia_download_default_transcript(self, requests_get_mock):
+        """
+        Test Wistia's default transcripts downloading (request failure).
+        """
+
+        # Arrange
+        test_url = u"test_url"
+        test_language_code = u"test_language_code"
+
+        requests_get_mock.side_effect = requests.RequestException()
+
+        # Act
+        content = self.wistia_player.download_default_transcript(test_url, test_language_code)
+
+        # Assert
+        self.assertEqual(content, u'')
+        requests_get_mock.assert_called_once_with(test_url)
+
+    @patch('video_xblock.backends.wistia.requests.get')
+    def test_wistia_download_default_transcript(self, requests_get_mock):
+        """
+        Test Wistia's default transcripts downloading (request parsing failure).
+        """
+
+        # Arrange
+        test_url = u"test_url"
+        test_language_code = u"test_language_code"
+
+        requests_get_mock.return_value = []     # has no 'text' attribute
+
+        # Act
+        content = self.wistia_player.download_default_transcript(test_url, test_language_code)
+
+        # Assert
+        self.assertEqual(content, u'')
+        requests_get_mock.assert_called_once_with(test_url)
