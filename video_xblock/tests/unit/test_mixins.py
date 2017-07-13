@@ -5,6 +5,7 @@ VideoXBlock mixins test cases.
 import json
 from collections import Iterable, OrderedDict
 
+import requests
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from mock import patch, Mock, MagicMock, PropertyMock
@@ -409,7 +410,7 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
             fetch_3pm_translation_mock.assert_called_once_with(test_transcripts_list[0])
 
     @patch('video_xblock.mixins.requests.get')
-    def test_get_available_3pm_transcripts(self, requests_get_mock):
+    def test_get_3pm_transcripts_list_success(self, requests_get_mock):
         # Arrange:
         test_json = [{"test": "json_string"}]
         test_message = _("3PlayMedia transcripts fetched successfully.")
@@ -427,6 +428,22 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
         self.assertTrue(requests_get_mock.ok)
         self.assertTrue(requests_get_mock.json.assert_called)
         self.assertEqual(transcripts_list, test_json)
+        self.assertEqual(feedback, test_feedback)
+        requests_get_mock.assert_called_once_with(test_api_url)
+
+    @patch('video_xblock.mixins.requests.get')
+    def test_get_3pm_transcripts_list_api_failure(self, requests_get_mock):
+        # Arrange:
+        test_message = _("3PlayMedia transcripts fetching API request has failed!")
+        test_feedback = {'status': Status.error, 'message': test_message}
+        requests_get_mock.side_effect = requests.RequestException()
+        file_id = 'test_file_id'
+        api_key = 'test_api_key'
+        test_api_url = 'https://static.3playmedia.com/files/test_file_id/transcripts?apikey=test_api_key'
+        # Act:
+        feedback, transcripts_list = self.xblock.get_3pm_transcripts_list(file_id, api_key)
+        # Assert:
+        self.assertEqual(transcripts_list, [])
         self.assertEqual(feedback, test_feedback)
         requests_get_mock.assert_called_once_with(test_api_url)
 
