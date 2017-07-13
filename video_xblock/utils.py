@@ -145,6 +145,6 @@ def get_current_microsite_prefix():
 
     if settings.FEATURES.get('USE_MICROSITES'):
         try:
-            return settings.get('SITE_NAME').split('.')[0]
+            return settings.SITE_NAME.split('.')[0]
         except (AttributeError, IndexError):
             return

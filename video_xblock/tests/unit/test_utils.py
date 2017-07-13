@@ -4,9 +4,12 @@ Test utils.
 import unittest
 
 from ddt import ddt, data
+from django.test.utils import override_settings
 from mock import patch, Mock, PropertyMock
 
-from video_xblock.utils import import_from, underscore_to_mixedcase, create_reference_name, normalize_transcripts
+from video_xblock.utils import (
+    import_from, underscore_to_mixedcase, create_reference_name, normalize_transcripts, get_current_microsite_prefix
+)
 
 
 @ddt
@@ -66,3 +69,42 @@ class UtilsTest(unittest.TestCase):
         normalized_transcripts = normalize_transcripts(test_transcripts)
         # Assert
         self.assertEqual(normalized_transcripts, expected_transcripts)
+
+    @override_settings(
+        # Arrange
+        FEATURES={
+            'USE_MICROSITES': True,
+        },
+        SITE_NAME='foo.domain.name'
+    )
+    def test_get_current_microsite_prefix_microsites_enabled_success(self):
+        # Act
+        prefix = get_current_microsite_prefix()
+        # Assert
+        self.assertEqual(prefix, 'foo')
+
+    @override_settings(
+        # Arrange
+        FEATURES={
+            'USE_MICROSITES': True,
+        },
+        SITE_NAME=None
+    )
+    def test_get_current_microsite_prefix_microsites_enabled_failure(self):
+        # Act
+        prefix = get_current_microsite_prefix()
+        # Assert
+        self.assertIsNone(prefix)
+
+    @override_settings(
+        # Arrange
+        FEATURES={
+            'USE_MICROSITES': False,
+        },
+        SITE_NAME='foo.domain.name'
+    )
+    def test_get_current_microsite_prefix_microsites_disabled(self):
+        # Act
+        prefix = get_current_microsite_prefix()
+        # Assert
+        self.assertIsNone(prefix)
