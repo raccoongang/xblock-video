@@ -7,18 +7,7 @@ import json
 from mock import patch, Mock, PropertyMock
 
 from video_xblock import VideoXBlock
-from video_xblock.tests.unit.base import VideoXBlockTestBase
-
-
-def arrange_request_mock(request_body):
-    """
-    Helper factory to create request mocks
-    """
-    request_mock = Mock()
-    request_mock.method = 'POST'
-    request_mock.body = request_body
-    request_mock.json = json.loads(request_body)
-    return request_mock
+from video_xblock.tests.unit.base import VideoXBlockTestBase, arrange_request_mock
 
 
 class AuthenticateApiHandlerTests(VideoXBlockTestBase):
