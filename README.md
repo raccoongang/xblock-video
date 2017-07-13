@@ -123,6 +123,16 @@ To do so:
 
 Re-transcode is performed by Brightcove's Videocloud and takes few minutes. After it's done `Brightcove Video tech info` section will be updated.
 
+### Wistia 
+
+#### How to disable captions auto uploading in Wistia plugin
+
+1. Open your Project in Wistia Platform - > Open video which you want to use with Video X-Block
+2. Click the Video Actions drop-down menu -> Select the Customize menu item
+3. In the left side of the screen find the Captions menu item -> Turn the trigger to Off to disable captions autouploading to video x-block
+
+![disable captions in Wistia](doc/img/wistia_1.png)
+
 ### Set default values in config files
 
 Sample default settings in `/edx/app/edxapp/cms.env.json`:
