@@ -221,10 +221,7 @@ function StudioEditableXBlock(runtime, element) {
             var newUrl = response.url;
             var source = response.source;
 
-            if (typeof response.failure_message !== 'undefined') {
-                message = response.failure_message;
-                status = ERROR;
-            } else {
+            if (response.failure_message === undefined) {
                 // Add a default transcript to the list of enabled ones
                 downloadUrl = runtimeHandlers.downloadTranscript + '?' + newUrl;
                 defaultTranscript = {
@@ -240,6 +237,9 @@ function StudioEditableXBlock(runtime, element) {
                 bindRemovalListenerEnabledTranscript(newLang, newLabel, newUrl);
                 message = response.success_message;
                 status = SUCCESS;
+            } else {
+                message = response.failure_message;
+                status = ERROR;
             }
         })
         .fail(function(jqXHR) {
