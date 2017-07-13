@@ -236,10 +236,11 @@ function createTranscriptBlock(langCode, langLabel, transcriptsValue, downloadTr
 }
 
 /**
- * Assign transcript's data to file uploader's attributes.
+ * Return string with allowed for uploading file extensions by given uploading context ('transcripts'/'handouts').
  */
-function clickUploader(event, $fileUploader) {
+function getAllowedFileExtensions(uploadingContext) {
     'use strict';
+    var transcriptsAllowedFileExtensions = '.srt, .vtt';
     var handoutsAllowedFileTypes = (
         '.gif, .ico, .jpg, .jpeg, .png, .tif, .tiff, .bmp, .svg, ' +  // images
         '.pdf, .txt, .rtf, .csv, ' +                                  // documents
@@ -248,13 +249,25 @@ function clickUploader(event, $fileUploader) {
         '.zip, .7z, .gzip, .tar ' +                                   // archives
         '.html, .xml, .js, .sjson'                                    // other
     );
+    switch (uploadingContext) {
+    case 'transcripts':
+        return transcriptsAllowedFileExtensions;
+    default:
+        return handoutsAllowedFileTypes;
+    }
+}
+
+/**
+ * Assign transcript's data to file uploader's attributes.
+ */
+function clickUploader(event, $fileUploader) {
+    'use strict';
+
     var $buttonBlock = $(event.currentTarget);
     var indexOfParentLi = $('.language-transcript-selector').children().index($buttonBlock.closest('li'));
     var langCode = $buttonBlock.attr('data-lang-code');
     var langLabel = $buttonBlock.attr('data-lang-label');
-    var fieldNameDetails = $buttonBlock.attr('data-change-field-name') === 'transcripts'
-        ? '.srt, .vtt'
-        : handoutsAllowedFileTypes;
+    var fieldNameDetails = getAllowedFileExtensions($buttonBlock.attr('data-change-field-name'));
     var fieldName = $buttonBlock.attr('data-change-field-name');
     var dataLiIndex = $buttonBlock.attr('data-change-field-name') === 'transcripts' ? indexOfParentLi : '';
     event.preventDefault();
