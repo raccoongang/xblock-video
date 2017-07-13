@@ -295,7 +295,7 @@ class WistiaPlayer(BaseVideoPlayer):
         except IOError:
             log.exception("Transcript fetching failure: language [{}]".format(language_code))
             return u''
-        except (ValueError, KeyError, TypeError):
+        except (ValueError, KeyError, TypeError, AttributeError):
             log.exception("Can't parse fetched transcript: language [{}]".format(language_code))
             return u''
 
