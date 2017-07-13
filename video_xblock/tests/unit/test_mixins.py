@@ -190,25 +190,22 @@ class SettingsMixinTests(VideoXBlockTestBase):
     Test SettingsMixin
     """
 
-    def test_block_settings_key_is_correct(self):
-        self.assertEqual(self.xblock.block_settings_key, 'video_xblock')
-
     @override_settings(
         XBLOCK_SETTINGS={
-            'video_xblock': {
+            'domain.com': {
                 'field1': 'value1',
                 'field2': 'value2'
             },
-            'foo': {
+            'foo.domain.com': {
                 'field1': 'value1foo',
                 'field2': 'value2foo'
             }
         }
     )
-    @patch('video_xblock.mixins.get_current_microsite_prefix')
-    def test_settings_property_with_microsite_enabled(self, get_microsite_prefix_mock):
+    @patch('video_xblock.mixins.get_current_site_name')
+    def test_settings_property_with_microsite_enabled(self, get_current_site_name_mock):
         # Arrange
-        get_microsite_prefix_mock.return_value = 'foo'  # e.g. "foo.example.com"
+        get_current_site_name_mock.return_value = 'foo.domain.com'
 
         # Act
         settings = self.xblock.settings
@@ -218,26 +215,22 @@ class SettingsMixinTests(VideoXBlockTestBase):
 
     @override_settings(
         XBLOCK_SETTINGS={
-            'video_xblock': {
+            'domain.com': {
                 'field1': 'value1',
                 'field2': 'value2'
             },
-            'foo': {
-                'field1': 'value1foo',
-                'field2': 'value2foo'
-            }
         }
     )
-    @patch('video_xblock.mixins.get_current_microsite_prefix')
-    def test_settings_property_with_microsite_disabled(self, get_microsite_prefix_mock):
+    @patch('video_xblock.mixins.get_current_site_name')
+    def test_settings_property_with_microsite_disabled(self, get_current_site_name_mock):
         # Arrange
-        get_microsite_prefix_mock.return_value = None  # e.g. "example.com"
+        get_current_site_name_mock.return_value = None  # SITE_NAME env variable isn't set
 
         # Act
         settings = self.xblock.settings
 
         # Assert
-        self.assertEqual(settings, {'field1': 'value1', 'field2': 'value2'})
+        self.assertEqual(settings, {})
 
     @patch.object(VideoXBlock, 'settings', new_callable=PropertyMock)
     def test_populate_default_values(self, settings_mock):

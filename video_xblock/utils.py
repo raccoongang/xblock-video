@@ -135,16 +135,15 @@ Transcript = namedtuple('Transcript', [
 ])
 
 
-def get_current_microsite_prefix():
+def get_current_site_name():
     """
-    Fetch current microsite subdomain.
+    Fetch current site domain.
 
     :return: (unicode) or None
     """
     settings = import_from('django.conf', 'settings')
 
-    if settings.FEATURES.get('USE_MICROSITES'):
-        try:
-            return settings.SITE_NAME.split('.')[0]
-        except (AttributeError, IndexError):
-            return
+    try:
+        return settings.SITE_NAME
+    except AttributeError:
+        return

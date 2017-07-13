@@ -12,7 +12,7 @@ from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Scope, Boolean, Float, String
 
 from .constants import DEFAULT_LANG, TPMApiTranscriptFormatID, TPMApiLanguage, TranscriptSource, Status
-from .utils import import_from, ugettext as _, underscore_to_mixedcase, Transcript, get_current_microsite_prefix
+from .utils import import_from, ugettext as _, underscore_to_mixedcase, Transcript, get_current_site_name
 
 log = logging.getLogger(__name__)
 
@@ -530,40 +530,34 @@ class SettingsMixin(XBlock):
 
     Sample default settings in /edx/app/edxapp/cms.env.json:
     "XBLOCK_SETTINGS": {
-      "video_xblock": {
+      "domain.com": {
         "3playmedia_api_key": "987654321",
         "account_id": "1234567890"
       }
     }
 
-    In case of enabled microsites (suppose configured "foo" and "bar" microsites):
+    In case of enabled microsites (suppose configured "foo" and "bar" microsites) it can be extended to:
     "XBLOCK_SETTINGS": {
-        "video_xblock": {
+        "domain.com": {
             "3playmedia_api_key": "987654321",
             "account_id": "1234567890",
         },
-        "foo": {
+        "foo.domain.com": {
             "player_id": "real_player_id",
         },
-        "bar": {
+        "bar.domain.com": {
             "3playmedia_api_key": "1234567890",
             "account_id": "987654321",
         }
     }
 
-    Here above "video_xblock" key name represents global (installation-wide) fallback settings defaults and
-    "foo", "bar" - microsites - must match the key name of MICROSITE_CONFIGURATION dict,
-    otherwise the settings definition will not be valid.
+    Here above each provided key corresponds to SITE_NAME environment variable value.
     """
-
-    block_settings_key = 'video_xblock'
 
     @property
     def settings(self):
         """
-        Return xblock settings set in .json config.
-
-        Try to fetch microsite prefix if microsite usage enabled. If fetched, get appropriate block_settings.
+        Return xblock settings for current domain set in .json config.
 
         Returned value depends on the context:
         - `studio_view` is being executed in CMS context and gets data from `cms.env.json`.
@@ -576,12 +570,12 @@ class SettingsMixin(XBlock):
                     "account_id": "1234567890"
                 }
         """
-        microsite_prefix = get_current_microsite_prefix()
-        if microsite_prefix:
-            self.block_settings_key = microsite_prefix
+        site_name = get_current_site_name()
+        if not site_name:
+            return {}
 
         settings = import_from('django.conf', 'settings')
-        return settings.XBLOCK_SETTINGS.get(self.block_settings_key, {})
+        return settings.XBLOCK_SETTINGS.get(site_name, {})
 
     def populate_default_values(self, submit_data):
         """
