@@ -133,7 +133,7 @@ function validateTranscriptFile(event, fieldName, filename, $fileUploader) {
 function pushTranscript(lang, label, url, source, oldLang, transcriptsValue) {
     'use strict';
     var languageIndex = transcriptsValue.findIndex(function(tran) {
-        return oldLang === tran.lang || lang === tran.lang;
+        return oldLang === tran.lang || lang == tran.lang;
     });
 
     if (languageIndex !== -1) {
