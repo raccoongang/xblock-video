@@ -782,8 +782,8 @@ class VideoXBlock(
         else:
             try:
                 transcripts = json.loads(self.transcripts) if self.transcripts else []
-                transcripts[0]
-            except (ValueError, IndexError, KeyError):
+                assert isinstance(transcripts, list)
+            except (ValueError, AssertionError):
                 log.exception("JSON parser can't handle 'self.transcripts' field value: {}".format(self.transcripts))
                 return []
         return normalize_transcripts(transcripts)
