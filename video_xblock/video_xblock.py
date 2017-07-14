@@ -360,7 +360,6 @@ class VideoXBlock(
         transcripts = self.get_enabled_transcripts()
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
         auth_error_message = ''
-
         # Authenticate to API of the player video platform and update metadata with auth information.
         # Note that there is no need to authenticate to Youtube API,
         # whilst for Wistia, a sample authorised request is to be made to ensure authentication succeeded,
@@ -475,6 +474,7 @@ class VideoXBlock(
             if player_class.match(data['href']):
                 data['player_name'] = player_name
                 data = self.populate_default_values(data)
+                log.debug("Submitted player[{}] with data: {}".format(player_name, data))
                 break
 
     def get_player(self):
@@ -748,10 +748,11 @@ class VideoXBlock(
 
         reference_name = create_reference_name(lang_label, video_id, source)
 
-        # Fetch default transcript
-        unicode_subs_text = player.download_default_transcript(
-            url=sub_url, language_code=lang_code
-        )
+        # Fetch text of single default transcript:
+        unicode_subs_text = player.download_default_transcript(sub_url, lang_code)
+        if not unicode_subs_text:
+            return {'failure_message': _("Couldn't upload transcript text.")}
+
         if not player.default_transcripts_in_vtt:
             prepared_subs = self.convert_caps_to_vtt(caps=unicode_subs_text)
         else:
