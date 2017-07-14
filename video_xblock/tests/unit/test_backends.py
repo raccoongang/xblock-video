@@ -648,6 +648,105 @@ class WistiaPlayerTest(VideoXBlockTestBase):
         self.assertEqual(message, test_message)
 
     @patch('video_xblock.backends.wistia.requests.get')
+    def test_wistia_get_default_transcripts_wrong_video(self, requests_get_mock):
+        """
+        Test Wistia's default transcripts fetching (not found case).
+        """
+        # Arrange
+        kwargs = {
+            'video_id': 'test_wrong_video_id',
+            'token': 'test_token'
+        }
+        test_message = "Wistia video test_wrong_video_id doesn't exist."
+        test_url = 'https://api.wistia.com/v1/medias/test_wrong_video_id/captions.json?api_password=test_token'
+        requests_get_mock.return_value = ResponseStub(status_code=404, body=[])
+        # Act
+        transcripts, message = self.wistia_player.get_default_transcripts(**kwargs)
+        # Assert
+        requests_get_mock.assert_called_once_with(test_url)
+        self.assertEqual(transcripts, [])
+        self.assertEqual(message, test_message)
+
+    @patch('video_xblock.backends.wistia.requests.get')
+    def test_wistia_get_default_transcripts_bad_request_or_else(self, requests_get_mock):
+        """
+        Test Wistia's default transcripts fetching (request.ok == False).
+        """
+        # Arrange
+        kwargs = {
+            'video_id': 'test_video_id',
+            'token': 'test_token'
+        }
+        test_message = "Invalid request."
+        test_url = 'https://api.wistia.com/v1/medias/test_video_id/captions.json?api_password=test_token'
+        requests_get_mock.return_value = ResponseStub(status_code=400, ok=False, body=[])
+        # Act
+        transcripts, message = self.wistia_player.get_default_transcripts(**kwargs)
+        # Assert
+        requests_get_mock.assert_called_once_with(test_url)
+        self.assertEqual(transcripts, [])
+        self.assertEqual(message, test_message)
+
+    @patch('video_xblock.backends.wistia.requests.get')
+    def test_wistia_get_default_transcripts_bad_json(self, requests_get_mock):
+        """
+        Test Wistia's default transcripts fetching (can't parse response JSON).
+        """
+        # Arrange
+        kwargs = {
+            'video_id': 'test_video_id',
+            'token': 'test_token'
+        }
+        test_message = "For now, video platform doesn't have any timed transcript for this video."
+        test_url = 'https://api.wistia.com/v1/medias/test_video_id/captions.json?api_password=test_token'
+        requests_get_mock.return_value = response_mock = ResponseStub(status_code=200)
+        response_mock.json = Mock(side_effect=ValueError())
+        # Act
+        transcripts, message = self.wistia_player.get_default_transcripts(**kwargs)
+        # Assert
+        requests_get_mock.assert_called_once_with(test_url)
+        self.assertEqual(transcripts, [])
+        self.assertEqual(message, test_message)
+
+    @patch('video_xblock.backends.wistia.babelfish.Language')
+    @patch('video_xblock.backends.wistia.requests.get')
+    def test_wistia_get_default_transcripts_baberlfish(self, requests_get_mock, babel_mock):
+        """
+        Test Wistia's default transcripts fetching (babelfish fallback).
+        """
+        # Arrange
+        # ref: https://wistia.com/doc/data-api#captions_index
+        test_api_data = [{'language': 'eng', 'english_name': 'English', }]
+        requests_get_mock.return_value = ResponseStub(status_code=200, body=test_api_data)
+        babel_mock.return_value = lang_code_mock = Mock()
+        type(lang_code_mock).alpha2 = PropertyMock(side_effect=ValueError())
+
+        kwargs = {
+            'video_id': 'test_video_id',
+            'token': 'test_token'
+        }
+        test_url = 'https://api.wistia.com/v1/medias/test_video_id/captions.json?api_password=test_token'
+        test_download_url = 'http://api.wistia.com/v1/medias/test_video_id/captions/eng.json?api_password=test_token'
+        test_message = _('Success.')
+        test_transcripts = [{
+            'lang': babel_mock.fromalpha3b().alpha2,
+            'label': 'English',
+            'url': test_download_url,
+            'source': TranscriptSource.DEFAULT
+        }]
+
+        with patch.object(self.wistia_player, 'get_transcript_language_parameters') as get_params_mock:
+            get_params_mock.return_value = ('en', 'English')
+
+            # Act
+            transcripts, message = self.wistia_player.get_default_transcripts(**kwargs)
+
+            # Assert
+            requests_get_mock.assert_called_once_with(test_url)
+            self.assertEqual(transcripts, test_transcripts)
+            self.assertEqual(message, test_message)
+
+    @patch('video_xblock.backends.wistia.requests.get')
     def test_wistia_download_default_transcript_success(self, requests_get_mock):
         """
         Test Wistia's default transcripts downloading (positive scenario).
