@@ -262,13 +262,13 @@ class VideoXBlockTests(VideoXBlockTestBase):
         # Assert
         self.assertIsInstance(transcripts, list)
         self.assertEqual(transcripts, json.loads(test_transcripts))
-        normalize_transcripts_mock.assert_called_once
+        normalize_transcripts_mock.assert_called_once()
 
     @patch('video_xblock.video_xblock.normalize_transcripts')
     def test_get_enabled_transcripts_failure(self, normalize_transcripts_mock):
         # Arrange
         normalize_transcripts_mock.side_effect = lambda x: x
-        self.xblock.transcripts = test_transcripts = '[{"transcript":bad_json}]'
+        self.xblock.transcripts = '[{"transcript":bad_json}]'
         # Act
         transcripts = self.xblock.get_enabled_transcripts()
         # Assert
