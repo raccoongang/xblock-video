@@ -132,15 +132,11 @@ function validateTranscriptFile(event, fieldName, filename, $fileUploader) {
  */
 function pushTranscript(lang, label, url, source, oldLang, transcriptsValue) {
     'use strict';
-    var languageIndex;
-    var i;
-    for (i = 0; i < transcriptsValue.length; i++) {
-        if (oldLang === transcriptsValue[i].lang || lang === transcriptsValue[i].lang) {
-            languageIndex = i;
-            break;
-        }
-    }
-    if (languageIndex !== undefined) {
+    var languageIndex = transcriptsValue.findIndex(function(tran) {
+        return oldLang === tran.lang || lang == tran.lang;
+    });
+
+    if (languageIndex !== -1) {
         transcriptsValue[languageIndex].lang = lang;  // eslint-disable-line no-param-reassign
         transcriptsValue[languageIndex].label = label;  // eslint-disable-line no-param-reassign
         transcriptsValue[languageIndex].source = source;  // eslint-disable-line no-param-reassign
