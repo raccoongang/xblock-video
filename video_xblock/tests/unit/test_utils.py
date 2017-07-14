@@ -4,11 +4,10 @@ Test utils.
 import unittest
 
 from ddt import ddt, data
-from django.test.utils import override_settings
 from mock import patch, Mock, PropertyMock
 
 from video_xblock.utils import (
-    import_from, underscore_to_mixedcase, create_reference_name, normalize_transcripts, get_current_site_name
+    import_from, underscore_to_mixedcase, create_reference_name, normalize_transcripts
 )
 
 
@@ -69,23 +68,3 @@ class UtilsTest(unittest.TestCase):
         normalized_transcripts = normalize_transcripts(test_transcripts)
         # Assert
         self.assertEqual(normalized_transcripts, expected_transcripts)
-
-    @override_settings(
-        # Arrange
-        SITE_NAME='foo.domain.name'
-    )
-    def test_get_current_site_name_success(self):
-        # Act
-        prefix = get_current_site_name()
-        # Assert
-        self.assertEqual(prefix, 'foo.domain.name')
-
-    @override_settings(
-        # Arrange
-        SITE_NAME=None
-    )
-    def test_get_current_site_name_failure(self):
-        # Act
-        prefix = get_current_site_name()
-        # Assert
-        self.assertIsNone(prefix)

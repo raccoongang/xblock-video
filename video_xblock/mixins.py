@@ -12,7 +12,7 @@ from xblock.exceptions import NoSuchServiceError
 from xblock.fields import Scope, Boolean, Float, String
 
 from .constants import DEFAULT_LANG, TPMApiTranscriptFormatID, TPMApiLanguage, TranscriptSource, Status
-from .utils import import_from, ugettext as _, underscore_to_mixedcase, Transcript, get_current_site_name
+from .utils import import_from, ugettext as _, underscore_to_mixedcase, Transcript
 
 log = logging.getLogger(__name__)
 
@@ -530,7 +530,7 @@ class SettingsMixin(XBlock):
 
     Sample default settings in /edx/app/edxapp/cms.env.json:
     "XBLOCK_SETTINGS": {
-      "domain.com": {
+      "example.com": {
         "3playmedia_api_key": "987654321",
         "account_id": "1234567890"
       }
@@ -538,14 +538,14 @@ class SettingsMixin(XBlock):
 
     In case of enabled microsites (suppose configured "foo" and "bar" microsites) it can be extended to:
     "XBLOCK_SETTINGS": {
-        "domain.com": {
+        "example.com": {
             "3playmedia_api_key": "987654321",
             "account_id": "1234567890",
         },
-        "foo.domain.com": {
+        "foo.example.com": {
             "player_id": "real_player_id",
         },
-        "bar.domain.com": {
+        "bar.example.com": {
             "3playmedia_api_key": "1234567890",
             "account_id": "987654321",
         }
@@ -570,7 +570,7 @@ class SettingsMixin(XBlock):
                     "account_id": "1234567890"
                 }
         """
-        site_name = get_current_site_name()
+        site_name = self.get_current_site_name()
         if not site_name:
             return {}
 
@@ -588,6 +588,19 @@ class SettingsMixin(XBlock):
                 submit_data[key] = value
 
         return submit_data
+
+    def get_current_site_name(self):
+        """
+        Fetch current site domain.
+
+        :return: (unicode) or None
+        """
+        settings = import_from('django.conf', 'settings')
+
+        try:
+            return settings.SITE_NAME
+        except AttributeError:
+            return
 
 
 class LocationMixin(XBlock):

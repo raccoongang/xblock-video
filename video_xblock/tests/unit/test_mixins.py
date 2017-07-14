@@ -202,16 +202,16 @@ class SettingsMixinTests(VideoXBlockTestBase):
             }
         }
     )
-    @patch('video_xblock.mixins.get_current_site_name')
-    def test_settings_property_with_microsite_enabled(self, get_current_site_name_mock):
+    def test_settings_property_with_microsite_enabled(self):
         # Arrange
-        get_current_site_name_mock.return_value = 'foo.domain.com'
+        with patch.object(self.xblock, 'get_current_site_name') as get_current_site_name_mock:
+            get_current_site_name_mock.return_value = 'foo.domain.com'
 
-        # Act
-        settings = self.xblock.settings
+            # Act
+            settings = self.xblock.settings
 
-        # Assert
-        self.assertEqual(settings, {'field1': 'value1foo', 'field2': 'value2foo'})
+            # Assert
+            self.assertEqual(settings, {'field1': 'value1foo', 'field2': 'value2foo'})
 
     @override_settings(
         XBLOCK_SETTINGS={
@@ -221,16 +221,16 @@ class SettingsMixinTests(VideoXBlockTestBase):
             },
         }
     )
-    @patch('video_xblock.mixins.get_current_site_name')
-    def test_settings_property_with_microsite_disabled(self, get_current_site_name_mock):
+    def test_settings_property_with_microsite_disabled(self):
         # Arrange
-        get_current_site_name_mock.return_value = None  # SITE_NAME env variable isn't set
+        with patch.object(self.xblock, 'get_current_site_name') as get_current_site_name_mock:
+            get_current_site_name_mock.return_value = None  # SITE_NAME env variable isn't set
 
-        # Act
-        settings = self.xblock.settings
+            # Act
+            settings = self.xblock.settings
 
-        # Assert
-        self.assertEqual(settings, {})
+            # Assert
+            self.assertEqual(settings, {})
 
     @patch.object(VideoXBlock, 'settings', new_callable=PropertyMock)
     def test_populate_default_values(self, settings_mock):
@@ -243,6 +243,26 @@ class SettingsMixinTests(VideoXBlockTestBase):
 
         # Assert
         self.assertEqual(populated_xblock_fields, {'foo': 'bar', 'spam': 'eggs'})
+
+    @override_settings(
+        # Arrange
+        SITE_NAME='foo.domain.name'
+    )
+    def test_get_current_site_name_success(self):
+        # Act
+        prefix = self.xblock.get_current_site_name()
+        # Assert
+        self.assertEqual(prefix, 'foo.domain.name')
+
+    @override_settings(
+        # Arrange
+        SITE_NAME=None
+    )
+    def test_get_current_site_name_failure(self):
+        # Act
+        prefix = self.xblock.get_current_site_name()
+        # Assert
+        self.assertIsNone(prefix)
 
 
 class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inherits-tests

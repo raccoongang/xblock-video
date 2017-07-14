@@ -133,17 +133,3 @@ def normalize_transcripts(transcripts):
 Transcript = namedtuple('Transcript', [
     'id', 'label', 'lang', 'lang_id', 'content', 'format', 'video_id', 'source', 'url'
 ])
-
-
-def get_current_site_name():
-    """
-    Fetch current site domain.
-
-    :return: (unicode) or None
-    """
-    settings = import_from('django.conf', 'settings')
-
-    try:
-        return settings.SITE_NAME
-    except AttributeError:
-        return
