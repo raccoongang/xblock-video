@@ -1,13 +1,15 @@
 """
 Test utils.
 """
+import types
 import unittest
 
 from ddt import ddt, data
 from mock import patch, Mock, PropertyMock
 
+from video_xblock.constants import TranscriptSource
 from video_xblock.utils import (
-    import_from, underscore_to_mixedcase, create_reference_name, normalize_transcripts
+    import_from, underscore_to_mixedcase, create_reference_name, normalize_transcripts, filter_transcripts_by_source
 )
 
 
@@ -68,3 +70,44 @@ class UtilsTest(unittest.TestCase):
         normalized_transcripts = normalize_transcripts(test_transcripts)
         # Assert
         self.assertEqual(normalized_transcripts, expected_transcripts)
+
+    def test_filter_transcripts_by_source_empty(self):
+        # Arrange
+        test_transcripts = []
+
+        # Act
+        filtered_transcripts = filter_transcripts_by_source(test_transcripts)
+
+        # Assert
+        self.assertIsInstance(filtered_transcripts, list)
+        self.assertListEqual(filtered_transcripts, test_transcripts)
+
+    def test_filter_transcripts_by_source_by_default(self):
+        # Arrange
+        default_transcripts = [{'id': 'DT1', 'source': 'default'}, {'id': 'DT2', 'source': 'default'}]
+        manual_transcripts = [{'id': 'MT1', 'source': 'manual'}, {'id': 'MT2', 'source': 'manual'}]
+        three_pm_transcripts = [{'id': 'PM1', 'source': '3play-media'}, {'id': 'PM2', 'source': '3play-media'}]
+        test_transcripts = default_transcripts + manual_transcripts + three_pm_transcripts
+
+        # Act
+        filtered_transcripts = filter_transcripts_by_source(test_transcripts)
+
+        # Assert
+        self.assertIsInstance(filtered_transcripts, types.GeneratorType)
+        self.assertListEqual(list(filtered_transcripts), default_transcripts)
+
+    def test_filter_transcripts_by_source_exclude(self):
+        # Arrange
+        default_transcripts = [{'id': 'DT1', 'source': 'default'}, {'id': 'DT2', 'source': 'default'}]
+        manual_transcripts = [{'id': 'MT1', 'source': 'manual'}, {'id': 'MT2', 'source': 'manual'}]
+        three_pm_transcripts = [{'id': 'PM1', 'source': '3play-media'}, {'id': 'PM2', 'source': '3play-media'}]
+        test_transcripts = default_transcripts + manual_transcripts + three_pm_transcripts
+
+        # Act
+        filtered_transcripts = filter_transcripts_by_source(
+            test_transcripts, sources=[TranscriptSource.DEFAULT, TranscriptSource.MANUAL], exclude=True
+        )
+
+        # Assert
+        self.assertIsInstance(filtered_transcripts, types.GeneratorType)
+        self.assertListEqual(list(filtered_transcripts), three_pm_transcripts)

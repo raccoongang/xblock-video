@@ -385,12 +385,15 @@ class VideoXBlock(
             'players': PlayerName,
             'sources': TranscriptSource.to_dict().items(),
             # transcripts context:
-            'transcripts': transcripts,
+            'transcripts': filter_transcripts_by_source(
+                transcripts, sources=[TranscriptSource.THREE_PLAY_MEDIA], exclude=True
+            ),
             'transcripts_fields': self.prepare_studio_editor_fields(player.trans_fields),
             'three_pm_fields': self.prepare_studio_editor_fields(player.three_pm_fields),
             'transcripts_type': '3PM' if self.threeplaymedia_streaming else 'manual',
             'default_transcripts': self.default_transcripts,
             'enabled_default_transcripts': filter_transcripts_by_source(transcripts),
+            'enabled_managed_transcripts': self.get_enabled_managed_transcripts(),
             'initial_default_transcripts': initial_default_transcripts,
             'transcripts_autoupload_message': transcripts_autoupload_message,
             'download_transcript_handler_url': download_transcript_handler_url,
@@ -779,12 +782,21 @@ class VideoXBlock(
         Get transcripts from different sources depending on current usage mode.
         """
         if self.threeplaymedia_streaming:
-            transcripts = list(self.fetch_available_3pm_transcripts())
+            transcripts = normalize_transcripts(list(self.fetch_available_3pm_transcripts()))
         else:
-            try:
-                transcripts = json.loads(self.transcripts) if self.transcripts else []
-                assert isinstance(transcripts, list)
-            except (ValueError, AssertionError):
-                log.exception("JSON parser can't handle 'self.transcripts' field value: {}".format(self.transcripts))
-                return []
-        return normalize_transcripts(transcripts)
+            transcripts = self.get_enabled_managed_transcripts()
+        return transcripts
+
+    def get_enabled_managed_transcripts(self):
+        """
+        Get `managed transcripts` (not directly streamed, like "3PlayMedia" ones) - e.g. "manual", "default".
+
+        :return: (list) transcripts that enabled but not directly streamed
+        """
+        try:
+            transcripts = json.loads(self.transcripts) if self.transcripts else []
+            assert isinstance(transcripts, list)
+            return normalize_transcripts(transcripts)
+        except (ValueError, AssertionError):
+            log.exception("JSON parser can't handle 'self.transcripts' field value: {}".format(self.transcripts))
+            return []

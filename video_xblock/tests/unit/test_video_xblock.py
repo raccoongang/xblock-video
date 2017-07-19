@@ -189,6 +189,7 @@ class VideoXBlockTests(VideoXBlockTestBase):
             'default_transcripts': self.xblock.default_transcripts,
             'download_transcript_handler_url': handler_url_mock.return_value,
             'enabled_default_transcripts': [],
+            'enabled_managed_transcripts': [],
             'initial_default_transcripts': ['stub1', 'stub2'],
             'languages': [{'code': 'en', 'label': 'English'}],
             'player_name': self.xblock.player_name,
@@ -253,7 +254,7 @@ class VideoXBlockTests(VideoXBlockTestBase):
         self.assertEqual(studio_view.resources, expected_fragment_resources)
 
     @patch('video_xblock.video_xblock.normalize_transcripts')
-    def test_get_enabled_transcripts_success(self, normalize_transcripts_mock):
+    def test_get_enabled_managed_transcripts_success(self, normalize_transcripts_mock):
         # Arrange
         normalize_transcripts_mock.side_effect = lambda x: x
         self.xblock.transcripts = test_transcripts = '[{"transcript":"json"}]'
@@ -265,7 +266,7 @@ class VideoXBlockTests(VideoXBlockTestBase):
         normalize_transcripts_mock.assert_called_once()
 
     @patch('video_xblock.video_xblock.normalize_transcripts')
-    def test_get_enabled_transcripts_failure(self, normalize_transcripts_mock):
+    def test_get_enabled_managed_transcripts_failure(self, normalize_transcripts_mock):
         # Arrange
         normalize_transcripts_mock.side_effect = lambda x: x
         self.xblock.transcripts = '[{"transcript":bad_json}]'
@@ -275,3 +276,50 @@ class VideoXBlockTests(VideoXBlockTestBase):
         self.assertIsInstance(transcripts, list)
         self.assertEqual(transcripts, [])
         self.assertFalse(normalize_transcripts_mock.called)
+
+    @patch.object(VideoXBlock, 'get_enabled_managed_transcripts')
+    @patch.object(VideoXBlock, 'fetch_available_3pm_transcripts')
+    @patch('video_xblock.video_xblock.normalize_transcripts')
+    def test_get_enabled_transcripts_with_3pm_streaming(
+            self, normalize_transcripts_mock,
+            fetch_3pm_transcripts_mock,
+            get_managed_transcripts_mock
+    ):
+        # Arrange
+        self.xblock.threeplaymedia_streaming = True
+        three_pm_transcripts = [{'id': 'PM1', 'source': '3play-media'}, {'id': 'PM2', 'source': '3play-media'}]
+        test_default_transcripts = [{'id': 'DT1', 'source': 'default'}, {'id': 'DT2', 'source': 'default'}]
+        normalize_transcripts_mock.side_effect = lambda x: x
+        fetch_3pm_transcripts_mock.return_value = three_pm_transcripts
+        get_managed_transcripts_mock.return_value = test_default_transcripts
+
+        # Act
+        transcripts = self.xblock.get_enabled_transcripts()
+
+        # Assert
+        self.assertIsInstance(transcripts, list)
+        self.assertEqual(transcripts, three_pm_transcripts)
+        normalize_transcripts_mock.assert_called_once()
+
+    @patch.object(VideoXBlock, 'get_enabled_managed_transcripts')
+    @patch.object(VideoXBlock, 'fetch_available_3pm_transcripts')
+    @patch('video_xblock.video_xblock.normalize_transcripts')
+    def test_get_enabled_transcripts_without_3pm_streaming(
+            self, normalize_transcripts_mock,
+            fetch_3pm_transcripts_mock,
+            get_managed_transcripts_mock
+    ):
+        # Arrange
+        self.xblock.threeplaymedia_streaming = False
+        three_pm_transcripts = [{'id': 'PM1', 'source': '3play-media'}, {'id': 'PM2', 'source': '3play-media'}]
+        test_default_transcripts = [{'id': 'DT1', 'source': 'default'}, {'id': 'DT2', 'source': 'default'}]
+        normalize_transcripts_mock.side_effect = lambda x: x
+        fetch_3pm_transcripts_mock.return_value = three_pm_transcripts
+        get_managed_transcripts_mock.return_value = test_default_transcripts
+
+        # Act
+        transcripts = self.xblock.get_enabled_transcripts()
+
+        # Assert
+        self.assertIsInstance(transcripts, list)
+        self.assertEqual(transcripts, test_default_transcripts)

@@ -112,13 +112,24 @@ def create_reference_name(lang_label, video_id, source="default"):
     return reference
 
 
-def filter_transcripts_by_source(transcripts, source=TranscriptSource.DEFAULT):
+def filter_transcripts_by_source(transcripts, sources=None, exclude=False):
     """
     Filter given transcripts by source attribute.
+
+    Arguments:
+        transcripts (iterable): transcripts dicts to be filtered.
+        sources (list): TranscriptSources filters.
+        exclude (str): Type of filtering.
+    Returns:
+        filtered transcripts (generator): only those transcript dicts which met the filter condition.
     """
+    if sources is None:
+        sources = [TranscriptSource.DEFAULT]
     if not transcripts:
         return transcripts
-    return (tr for tr in transcripts if tr['source'] == source)
+    if exclude:
+        return (tr for tr in transcripts if tr['source'] not in sources)
+    return (tr for tr in transcripts if tr['source'] in sources)
 
 
 def normalize_transcripts(transcripts):
