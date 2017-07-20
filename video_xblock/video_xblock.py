@@ -789,9 +789,9 @@ class VideoXBlock(
 
     def get_enabled_managed_transcripts(self):
         """
-        Get `managed transcripts` (not directly streamed, like "3PlayMedia" ones) - e.g. "manual", "default".
+        Get currently enabled in player `managed` transcripts (e.g. "manual", "default").
 
-        :return: (list) transcripts that enabled but not directly streamed
+        :return: (list) transcripts that enabled but not directly streamed.
         """
         try:
             transcripts = json.loads(self.transcripts) if self.transcripts else []

@@ -117,11 +117,11 @@ def filter_transcripts_by_source(transcripts, sources=None, exclude=False):
     Filter given transcripts by source attribute.
 
     Arguments:
-        transcripts (iterable): transcripts dicts to be filtered.
+        transcripts (list, generator): transcripts to be filtered.
         sources (list): TranscriptSources filters.
         exclude (str): Type of filtering.
     Returns:
-        filtered transcripts (generator): only those transcript dicts which met the filter condition.
+        filtered transcripts (list, generator): only those transcript dicts which met the filter condition.
     """
     if sources is None:
         sources = [TranscriptSource.DEFAULT]
