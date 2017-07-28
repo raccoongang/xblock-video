@@ -2,6 +2,14 @@
 Video XBlock provides a convenient way to embed videos hosted on supported platforms into your course.
 
 All you need to provide is video url, this XBlock does the rest for you.
+
+Some terms could be useful for subject understanding:
+- manual transcripts - which we upload to xBlock from our file system;
+- default transcripts - which are available with a video clip on a video content store service;
+- 3PlayMedia transcripts - those ones which can be fetched from 3-rd-party service (http://www.3playmedia.com/);
+- enabled transcripts - equals to "active", which are available to choose in the player;
+- managed transcripts - those ones we can manage (enable or disable by our choice selectively), for now it equals
+to "manual" + "default".
 """
 
 import datetime
@@ -790,14 +798,14 @@ class VideoXBlock(
 
     def get_enabled_managed_transcripts(self):
         """
-        Get currently enabled in player `managed` transcripts (e.g. "manual", "default").
+        Get currently enabled in player `managed` ("manual" & "default") transcripts.
 
+        Please, for term definitions refer to the module docstring.
         :return: (list) transcripts that enabled but not directly streamed.
         """
         try:
             transcripts = json.loads(self.transcripts) if self.transcripts else []
-            assert isinstance(transcripts, list)
             return normalize_transcripts(transcripts)
-        except (ValueError, AssertionError):
+        except ValueError:
             log.exception("JSON parser can't handle 'self.transcripts' field value: {}".format(self.transcripts))
             return []
