@@ -149,6 +149,16 @@ Sample default settings in `/edx/app/edxapp/cms.env.json`:
     }
 ```
 
+### Allowed Handouts file types
+
++ __images:__ .gif, .ico, .jpg, .jpeg, .png, .tif, .tiff, .bmp, .svg,
++ __documents:__ .pdf, .txt, .rtf, .csv,
++ __MSOffice:__ .doc, .docx, .xls, .xlsx, .ppt, .pptx, .pub,
++ __openOffice:__ .odt, .ods, .odp,
++ __archives:__ .zip, .7z, .gzip, .tar,
++ __other:__ .html, .xml, .js, .sjson,
++ __transcripts:__ .srt, .vtt
+
 ## Development
 
 Prereqs: [NodeJS >= 4.0](https://docs.npmjs.com/getting-started/installing-node#updating-npm)
