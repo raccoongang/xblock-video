@@ -589,7 +589,9 @@ class VideoXBlock(
         prepared_fields = []
         for field_name in field_names:
             # set default from json XBLOCK_SETTINGS config:
-            populated_field = self.populate_default_value(self.fields[field_name])
+            populated_field = self.populate_default_value(
+                self.fields[field_name]  # pylint:disable=unsubscriptable-object
+            )
             # make extra field configuration for frontend rendering:
             field_info = self._make_field_info(field_name, populated_field)
             prepared_fields.append(field_info)

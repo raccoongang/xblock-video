@@ -295,16 +295,16 @@ class SettingsMixinTests(VideoXBlockTestBase):
         settings_mock.return_value = {'foo': 'bar', 'spam': 'eggs'}
         field_mock = Mock()
         field_mock.name = 'foo'
-        field_mock.default = ''
+        field_mock.default = field_mock._default = ''
 
         # Act
         populated_field = self.xblock.populate_default_value(field_mock)
 
         # Assert
-        self.assertEqual(populated_field.default, 'bar')
+        self.assertEqual(populated_field._default, 'bar')  # pylint: disable=protected-access
 
     @patch.object(VideoXBlock, 'settings', new_callable=PropertyMock)
-    def test_populate_default_value_for_empty_default(self, settings_mock):
+    def test_populate_default_value_for_falsy_value(self, settings_mock):
         """
         Test xBlock fields' default value will be set from json settings.
         """
