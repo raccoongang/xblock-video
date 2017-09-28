@@ -559,7 +559,7 @@ body .video-js .vjs-menu-button-popup .vjs-menu .vjs-menu-item:hover {
     width: 100px !important;
     left: -30px !important;
 }
-
+/* Malyavin was here */
 .vjs-menu-content .vjs-icon-placeholder::before {
    display: none;
 }
@@ -607,5 +607,9 @@ div.vjs-volume-control.vjs-control.vjs-volume-horizontal {
 }
 
 .vjs-mouse-display .vjs-time-tooltip {
+    display: none !important;
+}
+
+.vjs-menu-content li:first-child {
     display: none !important;
 }
