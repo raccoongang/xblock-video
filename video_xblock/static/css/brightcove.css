@@ -545,7 +545,8 @@ body .video-js .vjs-menu-button-popup .vjs-menu .vjs-menu-item:hover {
 .vjs-text-track-display div div {
     width: 100% !important;
 } 
-.video-js .vjs-play-control .vjs-icon-placeholder {
+/* Malyavin was here */
+.vjs-v6.video-js .vjs-play-control .vjs-icon-placeholder {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -555,4 +556,62 @@ body .video-js .vjs-menu-button-popup .vjs-menu .vjs-menu-item:hover {
 .vjs-menu-content {
     width: 100px !important;
     left: -30px !important;
+}
+
+.display-flex {
+    display: flex;
+}
+
+.vjs-v6 .vjs-menu-content .vjs-icon-placeholder::before {
+   display: none;
+}
+
+.vjs-v6 .vjs-fullscreen-control::before {
+    display: none !important;
+}
+.vjs-v6 .vjs-fullscreen-control.vjs-button > .vjs-icon-placeholder:before {
+    line-height: 1.8 !important;
+    font-size: 2.8em;
+}
+
+.vjs-v6 .vjs-subs-caps-button.vjs-button > .vjs-icon-placeholder:before {
+    line-height: 1.4 !important;
+    font-size: 2.8em;
+}
+
+.video-js.vjs-v6 .vjs-play-control:before {
+    display: none;
+}
+
+.video-js.vjs-v6 .vjs-play-control.vjs-button > .vjs-icon-placeholder:before {
+    line-height: 1.8 !important;
+    font-size: 2.8em;
+}
+
+.vjs-v6 .vjs-volume-panel.vjs-control.vjs-volume-panel-horizontal {
+    display: flex;
+    align-items: center;
+}
+.vjs-v6 .vjs-volume-panel.vjs-control.vjs-volume-panel-horizontal .vjs-button > .vjs-icon-placeholder:before {
+    line-height: 2.2;
+}
+
+.video-js.vjs-v6 .vjs-mute-control.vjs-vol-2:before {
+    display: none;
+}
+
+.vjs-v6 div.vjs-volume-control.vjs-control.vjs-volume-horizontal {
+    margin-top: -4px;
+}
+
+.video-js.vjs-v6 .vjs-big-play-button .vjs-icon-placeholder:before {
+    display: none;
+}
+
+.vjs-v6 .vjs-mouse-display .vjs-time-tooltip {
+    display: none !important;
+}
+
+.vjs-v6 .vjs-menu-content li:first-child {
+    display: none !important;
 }
