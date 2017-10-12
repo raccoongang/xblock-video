@@ -575,14 +575,15 @@ body .video-js .vjs-menu-button-popup .vjs-menu .vjs-menu-item:hover {
 /*.vjs-v6 .vjs-menu-content li:first-child {*/
     /*display: none !important;*/
 /*}*/
-.vjs-v6 div.vjs-menu-button.vjs-menu-button-popup.vjs-control.vjs-button.icon.fa.fa-cc.vjs-singleton {
+.vjs-v6 .vjs-subs-caps-button.vjs-menu-button.vjs-menu-button-popup.vjs-control.vjs-button {
     display: none;
 }
 .vjs-v6.video-js .vjs-fullscreen-control {
     right: 125px !important;
 }
 .vjs-v6 .fa-quote-left:before,
-.vjs-v6 .vjs-menu-button.vjs-menu-button-popup.vjs-control.vjs-button.icon.fa.fa-caret-left.vjs-singleton:before {
+.vjs-v6 .vjs-menu-button.vjs-menu-button-popup.vjs-control.vjs-button.icon.fa.fa-caret-left.vjs-singleton:before,
+.vjs-v6 .vjs-menu-button.vjs-menu-button-popup.vjs-control.vjs-button.icon.fa.fa-cc.vjs-singleton:before {
     top: 50%;
     position: absolute;
     transform: translate(-50%, -60%);
