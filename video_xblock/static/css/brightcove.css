@@ -632,6 +632,6 @@ body .video-js .vjs-menu-button-popup .vjs-menu .vjs-menu-item:hover {
 .vjs-v6.video-js .vjs-control-enabled:before {
     padding: 0;
 }
-body .vjs-v6 .vjs-custom-caption-button.vjs-menu-button.vjs-menu-button-popup.vjs-button.vjs-control-enabled {
+body .vjs-v6.video-js .vjs-custom-caption-button {
     right: 0 !important;
 }
