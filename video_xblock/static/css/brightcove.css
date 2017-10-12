@@ -619,7 +619,9 @@ body .video-js .vjs-menu-button-popup .vjs-menu .vjs-menu-item:hover {
     position: relative !important;
     right: 0 !important;
 }
-
+.video-js .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+    max-height: 18em !important;
+}
 @media screen and (max-width: 742px) {
     .video-js .vjs-playback-rate {
         width: 120px;
