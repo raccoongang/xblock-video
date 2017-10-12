@@ -637,3 +637,7 @@ body .video-js .vjs-menu-button-popup .vjs-menu .vjs-menu-item:hover {
 body .vjs-v6.video-js .vjs-custom-caption-button {
     right: 0 !important;
 }
+div.vjs-control-bar > div.vjs-menu-button.vjs-menu-button-popup.vjs-control.vjs-button.icon.fa.fa-cc.vjs-singleton:hover .vjs-menu,
+div.vjs-control-bar > div.vjs-menu-button.vjs-menu-button-popup.vjs-control.vjs-button.icon.fa.fa-quote-left.vjs-singleton:hover .vjs-menu {
+     display: none !important;
+ }
