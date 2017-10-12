@@ -625,4 +625,13 @@ body .video-js .vjs-menu-button-popup .vjs-menu .vjs-menu-item:hover {
         width: 120px;
     }
 }
-
+.vjs-v6.video-js .vjs-control-enabled {
+    background: none;
+    font-size: 10px;
+}
+.vjs-v6.video-js .vjs-control-enabled:before {
+    padding: 0;
+}
+body .vjs-v6 .vjs-custom-caption-button.vjs-menu-button.vjs-menu-button-popup.vjs-button.vjs-control-enabled {
+    right: 0 !important;
+}
