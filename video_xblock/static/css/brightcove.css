@@ -639,6 +639,7 @@ body .vjs-v6.video-js .vjs-custom-caption-button {
 }
 div.vjs-control-bar > div.vjs-menu-button.vjs-menu-button-popup.vjs-control.vjs-button.icon.fa.fa-cc.vjs-singleton:hover .vjs-menu,
 div.vjs-control-bar > div.vjs-menu-button.vjs-menu-button-popup.vjs-control.vjs-button.icon.fa.fa-quote-left.vjs-singleton:hover .vjs-menu,
-div.vjs-control-bar > div.vjs-menu-button.vjs-menu-button-popup.vjs-control.vjs-button.icon.fa.fa-cc.vjs-singleton.vjs-control-enabled .vjs-menu {
-     display: none !important;
+div.vjs-control-bar > div.vjs-menu-button.vjs-menu-button-popup.vjs-control.vjs-button.icon.fa.fa-cc.vjs-singleton.vjs-control-enabled .vjs-menu,
+div.vjs-control-bar > div.vjs-custom-caption-button.vjs-menu-button.vjs-menu-button-popup.vjs-control.vjs-button.icon.fa.fa-cc.vjs-singleton.vjs-control-enabled .vjs-menu {
+    display: none !important;
  }
