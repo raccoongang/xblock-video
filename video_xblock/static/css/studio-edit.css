@@ -263,6 +263,7 @@
     border: 1px solid #0075b4;
     background-color: #fff;
     color: #0075b4;
+    padding: 10px;
 }
 
 .retranscode-button:hover {
