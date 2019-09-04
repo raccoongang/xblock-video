@@ -413,6 +413,7 @@ class VideoXBlock(
             'initial_default_transcripts': initial_default_transcripts,
             'transcripts_autoupload_message': transcripts_autoupload_message,
             'download_transcript_handler_url': download_transcript_handler_url,
+            'usage_id': self.usage_id,
         }
 
         fragment.content = render_template('studio-edit.html', **context)
