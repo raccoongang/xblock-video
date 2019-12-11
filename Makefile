@@ -43,7 +43,7 @@ test-acceptance:
 quality: quality-py quality-js ## Run code quality checks
 
 quality-py:
-	pep8 . --format=pylint --max-line-length=120
+	pycodestyle . --format=pylint --max-line-length=120
 	pydocstyle
 	pylint -f colorized video_xblock
 
@@ -55,6 +55,7 @@ dev-install:
 	pip install --process-dependency-links -e .
 
 deps-test: ## Install dependencies required to run tests
+	pip install -Ur requirements.txt
 	pip install -Ur test_requirements.txt
 	pip install -r $(VIRTUAL_ENV)/src/xblock-sdk/requirements/base.txt
 
