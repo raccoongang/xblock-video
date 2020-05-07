@@ -449,6 +449,7 @@ class VimeoApiClientTest(VideoXBlockTestBase):
         self.assertEqual(parsed, [{
             'lang': transcripts_data[0][u'language'],
             'label': u'English',
+            'source': TranscriptSource.DEFAULT,
             'url': transcripts_data[0][u'link']
         }])
 
