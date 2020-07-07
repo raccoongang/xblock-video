@@ -10,6 +10,7 @@ import os.path
 import pkg_resources
 
 from django.template import Engine, Context, Template
+
 from xblockutils.resources import ResourceLoader
 
 from .constants import TranscriptSource
@@ -51,15 +52,8 @@ def render_template(template_name, **context):
 
     Returns: django.utils.safestring.SafeText
     """
-    template_dirs = [os.path.join(os.path.dirname(__file__), 'static/html')]
-    engine = Engine.get_default()
-    engine.dirs = template_dirs
-    engine.debug = True
-    html = engine.get_template(template_name)
-
-    return html_parser.unescape(
-        html.render(Context(context))
-    )
+    html = loader.render_django_template('static/html/{}'.format(template_name), context)
+    return html_parser.unescape(html)
 
 
 def ugettext(text):
