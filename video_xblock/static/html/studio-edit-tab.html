@@ -53,6 +53,11 @@
     </li>
 {% endfor %}
 
+<li class="field comp-setting-entry metadata_entry">
+    <label class="label setting-label">Component Location ID</label>
+    <span>{{ usage_id }}</span>
+</li>
+
 {% if name == 'advanced' %}
     {% include 'studio-edit-brightcove-encryption.html' %}
 {% endif %}
