@@ -513,7 +513,7 @@ class VideoXBlock(
         and lastly fall back to empty string.
         """
         backend_fields_help = self.get_player().fields_help
-        if field_name in backend_fields_help:
+        if field_name in backend_fields_help: # pylint: disable=no-else-return
             return backend_fields_help[field_name]
         elif field.help:
             return field.help
@@ -675,7 +675,7 @@ class VideoXBlock(
             else:
                 resp['data'] = {'canShow': False}
 
-        response = Response(json.dumps(resp), content_type='application/json')
+        response = Response(json.dumps(resp), content_type='application/json', charset='utf8')
         return response
 
     def authenticate_video_api(self, token):

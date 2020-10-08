@@ -171,7 +171,7 @@ class TranscriptsMixin(XBlock):
             content_loc,
             file_name,
             'application/json',
-            trans_str.encode('UTF-8')
+            trans_str
         )  # StaticContent object
         external_url = '/' + str(content_loc)
 
@@ -623,6 +623,5 @@ class LocationMixin(XBlock):
 
         Returns stub value if `location` property is unavailabe. E.g. in workbench runtime.
         """
-        if hasattr(self, 'location'):
-            return self.location.to_deprecated_string()
-        return 'usage_id'
+        # TODO: Replace usage_id property to block_id, to_deprecated_string does not exists furthermore.
+        return self.block_id

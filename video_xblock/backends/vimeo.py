@@ -3,7 +3,7 @@
 Vimeo Video player plugin.
 """
 
-import httplib
+import http.client as http_client
 import json
 import logging
 import re
@@ -51,13 +51,13 @@ class VimeoApiClient(BaseApiClient):
             Response in python native data format.
         """
         headers_ = {
-            'Authorization': 'Bearer {}'.format(self.access_token.encode(encoding='utf-8')),
+            'Authorization': 'Bearer {}'.format(self.access_token),
             'Accept': 'application/json'
         }
         if headers is not None:
             headers_.update(headers)
         resp = requests.get(url, headers=headers_)
-        if resp.status_code == httplib.OK:
+        if resp.status_code == http_client.OK:
             return resp.json()
         else:
             raise VimeoApiClientError(_("Can't fetch requested data from API."))
@@ -275,6 +275,6 @@ class VimeoPlayer(BaseVideoPlayer):
             sub (unicode): Transcripts formatted per WebVTT format https://w3c.github.io/webvtt/
         """
         data = requests.get(url)
-        text = data.content.decode('utf8')
-        cleaned_captions_text = remove_escaping(text)
-        return unicode(cleaned_captions_text)
+        cleaned_captions_text = remove_escaping(data.content)
+
+        return cleaned_captions_text

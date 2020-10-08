@@ -11,12 +11,12 @@ from web_fragments.fragment import FragmentResource
 from xblock.fragment import Fragment
 
 from video_xblock import VideoXBlock, __version__
-from video_xblock.constants import PlayerName
+from video_xblock.constants import PlayerName, TranscriptSource
 from video_xblock.utils import ugettext as _
 from video_xblock.tests.unit.base import VideoXBlockTestBase
 
 
-class VideoXBlockTests(VideoXBlockTestBase):
+class VideoXBlockTests(VideoXBlockTestBase):  # pylint: disable=test-inherits-tests
     """
     Test cases for video_xblock.
     """
@@ -144,7 +144,7 @@ class VideoXBlockTests(VideoXBlockTestBase):
             player_url='/player/url',
             transcript_download_link='/transcript/download/url'+'/transcript/link.vtt',
             transcripts=['transcripts.vtt'],
-            usage_id='usage_id',
+            usage_id='block_id',
             version=__version__,
         )
         resource_string_mock.assert_called_with('static/css/student-view.css')
@@ -205,7 +205,7 @@ class VideoXBlockTests(VideoXBlockTestBase):
             'languages': [{'code': 'en', 'label': 'English'}],
             'player_name': self.xblock.player_name,
             'players': PlayerName,
-            'sources': [('DEFAULT', 'default'), ('THREE_PLAY_MEDIA', '3play-media'), ('MANUAL', 'manual')],
+            'sources': TranscriptSource.to_dict().items(),
             'three_pm_fields': three_pm_fields_stub,
             'transcripts': [],
             'transcripts_fields': transcripts_fields_stub,
@@ -256,8 +256,10 @@ class VideoXBlockTests(VideoXBlockTestBase):
             'static/js/studio-edit/transcripts-manual-upload.js',
         ]
 
-        expected_fragment_resources = map(
-            self._make_fragment_resource, expected_resources
+        expected_fragment_resources = list(
+            map(
+                self._make_fragment_resource, expected_resources
+            )
         )
 
         # Act

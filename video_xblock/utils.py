@@ -3,7 +3,7 @@ Video xblock helpers.
 """
 
 from collections import namedtuple
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 from importlib import import_module
 from xml.sax.saxutils import unescape
 import os.path
@@ -79,7 +79,7 @@ def underscore_to_mixedcase(value):
             yield str.capitalize
 
     mix = mixedcase()
-    return "".join(mix.next()(x) if x else '_' for x in value.split("_"))
+    return "".join(next(mix)(x) if x else '_' for x in value.split("_"))
 
 
 def remove_escaping(text):
@@ -96,6 +96,8 @@ def remove_escaping(text):
         "&gt;": ">",
         "&lt;": "<"
     }
+    if isinstance(text, bytes):
+        text = text.decode()
     return unescape(text, html_unescape_table)
 
 
@@ -109,7 +111,7 @@ def create_reference_name(lang_label, video_id, source="default"):
         lang_label=lang_label,
         video_id=video_id,
         source=source,
-    ).encode('utf8')
+    )
     return reference
 
 

@@ -22,7 +22,7 @@ from video_xblock.exceptions import VideoXBlockException
 from video_xblock.utils import render_resource, render_template, resource_string, ugettext as _
 
 
-class BaseApiClient(object):
+class BaseApiClient:
     """
     Low level video platform API client.
 
@@ -78,7 +78,7 @@ class BaseVideoPlayer(Plugin):
         """
         self.xblock = xblock
 
-    @abc.abstractproperty
+    @abc.abstractmethod
     def url_re(self):
         """
         Regex (list) to match video url.
@@ -87,7 +87,8 @@ class BaseVideoPlayer(Plugin):
         """
         return [] or re.compile('') or ''
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def captions_api(self):
         """
         Dictionary of url, request parameters, and response structure of video platform's captions API.
@@ -312,11 +313,11 @@ class BaseVideoPlayer(Plugin):
 
         `cls.url_re` attribute, defined in subclassess, is used for the check.
         """
-        if isinstance(cls.url_re, list):
+        if isinstance(cls.url_re, list):  # pylint: disable=no-else-return
             return any(regex.search(href) for regex in cls.url_re)
         elif isinstance(cls.url_re, type(re.compile(''))):
             return cls.url_re.search(href)  # pylint: disable=no-member
-        elif isinstance(cls.url_re, basestring):
+        elif isinstance(cls.url_re, str):
             return re.search(cls.url_re, href, re.I)
 
     def add_js_content(self, path, **context):
@@ -413,16 +414,16 @@ class BaseVideoPlayer(Plugin):
         default_transcripts.sort(key=get_values)
         distinct_transcripts = []
         for _key, group in itertools.groupby(default_transcripts, get_values):
-            distinct_transcripts.append(group.next())
+            distinct_transcripts.append(next(group))
         return distinct_transcripts
 
     def filter_default_transcripts(self, default_transcripts, transcripts):
         """
         Exclude enabled transcripts (fetched from API) from the list of available ones (fetched from video xblock).
         """
-        enabled_languages_codes = [t[u'lang'] for t in transcripts]
+        enabled_languages_codes = [t['lang'] for t in transcripts]
         default_transcripts = [
             dt for dt in default_transcripts
-            if (unicode(dt.get('lang')) not in enabled_languages_codes) and default_transcripts
+            if (dt.get('lang') not in enabled_languages_codes) and default_transcripts
         ]
         return default_transcripts
