@@ -188,6 +188,23 @@ Run tests:
 VideoXBlock is bundled with a set of XBlock-SDK Workbench scenarios.
 See [workbench docs](/video_xblock/workbench/README.md) for details.
 
+## Translations
+
+To add new language for translation:
+
+```shell
+> make deps-test
+```
+
+- add appropriate language to the translations.settings.LANGUAGE variable
+- create `<lang>`/LC_MESSAGES/ directory and copy there the text.po file from english language
+- run:
+
+```shell
+> make compile_translations
+```
+
+
 ## License
 
 The code in this repository is licensed under the GPL v3 licence unless
