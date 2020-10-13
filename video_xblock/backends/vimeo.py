@@ -12,6 +12,7 @@ import requests
 
 from video_xblock import BaseVideoPlayer, ApiClientError
 from video_xblock.backends.base import BaseApiClient
+from video_xblock.constants import TranscriptSource
 from video_xblock.utils import ugettext as _, remove_escaping
 
 log = logging.getLogger(__name__)
@@ -259,6 +260,7 @@ class VimeoPlayer(BaseVideoPlayer):
                     'lang': lang_code,
                     'label': lang_label,
                     'url': t_data["link"],
+                    'source': TranscriptSource.DEFAULT,
                 })
             except KeyError:
                 raise VimeoApiClientError(_('Transcripts API has been changed.'))
