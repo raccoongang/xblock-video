@@ -299,12 +299,11 @@ class VideoXBlock(
         Else return `False` which will hide "download video" button.
         """
         return self.download_video_allowed and self.get_player().download_video_url
-    
+
     @staticmethod
     def _get_statici18n_js_url():
         """
-        Returns the Javascript translation file for the currently selected language, if any found by
-        `pkg_resources`
+        Returns the Javascript translation file for the selected language.
         """
         lang_code = get_language()
 
@@ -313,10 +312,10 @@ class VideoXBlock(
 
         country_code = lang_code.split('-')[0]
         text_js = 'static/js/translations/{lang_code}/text.js'
+
         for code in (lang_code, country_code):
             if pkg_resources.resource_exists(loader.module_name, text_js.format(lang_code=code)):
                 return text_js.format(lang_code=code)
-        return None
     
     def add_i18n_resource(self, frag):
         """
