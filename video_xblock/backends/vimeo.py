@@ -275,6 +275,5 @@ class VimeoPlayer(BaseVideoPlayer):
             sub (unicode): Transcripts formatted per WebVTT format https://w3c.github.io/webvtt/
         """
         data = requests.get(url)
-        cleaned_captions_text = remove_escaping(data.content)
 
-        return cleaned_captions_text
+        return remove_escaping(data.content)

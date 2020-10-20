@@ -612,6 +612,5 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         if url is None:
             raise VideoXBlockException(_('`url` parameter is required.'))
         data = requests.get(url)
-        cleaned_captions_text = remove_escaping(data.content)
 
-        return cleaned_captions_text
+        return remove_escaping(data.content)

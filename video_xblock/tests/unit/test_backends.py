@@ -285,7 +285,9 @@ class TestCustomBackends(VideoXBlockTestBase):
 
     def split_transcript_data(self, transcripts):
         """
-        Splits transcript data to:
+        Split transcript data.
+
+        Divides the transcripts into:
             - url_params (dict) - split query params of the url to params
             - other data (dict)
         Arguments:
@@ -343,7 +345,7 @@ class TestCustomBackends(VideoXBlockTestBase):
                 default_transcripts, message = res = player(self.xblock).get_default_transcripts(video_id=media_id)
                 expected_default_transcripts = mock.expected_value[0]
 
-                # Due to the urllib.parse.urlencode function prepares a not ordered dict,
+                # NOTE: Due to the urllib.parse.urlencode function prepares a not ordered dict,
                 # we get a different order of query params in url,
                 # that's why we need to split transcript's data to url params and other data
                 # then parse the url query params to compare dict data rather than string url

@@ -4,14 +4,14 @@ YouTube Video player plugin.
 """
 
 from html.parser import HTMLParser
-import json
 import http.client as http_client
+import json
 import re
 import textwrap
 import urllib
 
-import requests
 from lxml import etree
+import requests
 
 from video_xblock.constants import TranscriptSource
 from video_xblock.exceptions import VideoXBlockException
