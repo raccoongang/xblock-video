@@ -15,10 +15,12 @@ def arrange_request_mock(request_body):
     """
     Helper factory to create request mocks.
     """
+    if isinstance(request_body, str):
+        request_body = request_body.encode()
     request_mock = mock.Mock()
     request_mock.method = 'POST'
     request_mock.body = request_body
-    request_mock.json = json.loads(request_body)
+    request_mock.json = json.loads(request_body.decode())
     return request_mock
 
 

@@ -10,7 +10,7 @@ from video_xblock import VideoXBlock
 from video_xblock.tests.unit.base import VideoXBlockTestBase, arrange_request_mock
 
 
-class AuthenticateApiHandlerTests(VideoXBlockTestBase):
+class AuthenticateApiHandlerTests(VideoXBlockTestBase):  # pylint: disable=test-inherits-tests
     """
     Test cases for `VideoXBlock.authenticate_video_api_handler`.
     """
@@ -31,12 +31,12 @@ class AuthenticateApiHandlerTests(VideoXBlockTestBase):
         # Assert
         self.assertEqual(
             result,
-            json.dumps({'success_message': 'Successfully authenticated to the video platform.'})
+            json.dumps({'success_message': 'Successfully authenticated to the video platform.'}).encode()
         )
         auth_video_api_mock.assert_called_once_with('test-token-123')  # Python string
 
 
-class UploadDefaultTranscriptHandlerTests(VideoXBlockTestBase):
+class UploadDefaultTranscriptHandlerTests(VideoXBlockTestBase):  # pylint: disable=test-inherits-tests
     """
     Test cases for `VideoXBlock.upload_default_transcript_handler`.
     """
@@ -84,7 +84,7 @@ class UploadDefaultTranscriptHandlerTests(VideoXBlockTestBase):
             convert_caps_mock.assert_called_with(caps=test_subs_text)
             create_transcript_file_mock.assert_called_with(trans_str=prepared_subs_mock, reference_name=test_reference)
             self.assertEqual(
-                response.body,  # pylint: disable=no-member
+                response.body.decode(),  # pylint: disable=no-member
                 json.dumps({
                     'success_message': 'Successfully uploaded "test_file_name".',
                     'lang': assert_data['lang'],

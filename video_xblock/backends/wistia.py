@@ -3,9 +3,9 @@
 Wistia Video player plugin.
 """
 
-import HTMLParser
+from html.parser import HTMLParser
 import json
-import httplib
+import http.client as http_client
 import logging
 import re
 
@@ -146,7 +146,7 @@ class WistiaPlayer(BaseVideoPlayer):
         auth_data['token'] = token
         url = self.captions_api.get('auth_sample_url').format(token=str(token))
         response = requests.get('https://' + url)
-        if response.status_code == httplib.UNAUTHORIZED:
+        if response.status_code == http_client.UNAUTHORIZED:
             error_message = "Authentication failed. " \
                             "Please ensure you have provided a valid master token, using Video API Token field."
         return auth_data, error_message
@@ -187,14 +187,14 @@ class WistiaPlayer(BaseVideoPlayer):
         except IOError as exc:
             # Probably, current API has changed
             message = _('No timed transcript may be fetched from a video platform.\nError details: {}').format(
-                exc.message
+                exc
             )
             log.exception("Transcripts INDEX request failure.")
             return self.default_transcripts, message
 
         # If a video does not exist, the response will be an empty HTTP 404 Not Found.
         # Reference: https://wistia.com/doc/data-api#captions_index
-        if response.status_code == httplib.NOT_FOUND:
+        if response.status_code == http_client.NOT_FOUND:
             message = _("Wistia video {} doesn't exist.").format(video_id)
             return self.default_transcripts, message
 
@@ -250,11 +250,10 @@ class WistiaPlayer(BaseVideoPlayer):
         """
         Replace comma with dot in timings, e.g. 00:00:10,500 should be 00:00:10.500.
         """
-        new_line = u""
+        new_line = ""
         for token in line.split():
-            decoded_token = token.encode('utf8', 'ignore')
-            formatted_token = re.sub(r'(\d{2}:\d{2}:\d{2}),(\d{3})', r'\1.\2', decoded_token)
-            new_line += unicode(formatted_token.decode('utf8')) + u" "
+            formatted_token = re.sub(r'(\d{2}:\d{2}:\d{2}),(\d{3})', r'\1.\2', token)
+            new_line += formatted_token + " "
         return new_line
 
     def format_transcript_text(self, text):
@@ -266,12 +265,12 @@ class WistiaPlayer(BaseVideoPlayer):
             for line in text[0].splitlines()
         ]
         new_text = '\n'.join(new_text)
-        html_parser = HTMLParser.HTMLParser()
+        html_parser = HTMLParser()
         unescaped_text = html_parser.unescape(new_text)
         if u"WEBVTT" not in text:
-            text = u"WEBVTT\n\n" + unicode(unescaped_text)
+            text = "WEBVTT\n\n" + unescaped_text
         else:
-            text = unicode(unescaped_text)
+            text = unescaped_text
         return text
 
     def download_default_transcript(self, url, language_code):
@@ -291,10 +290,10 @@ class WistiaPlayer(BaseVideoPlayer):
         try:
             response = requests.get(url)
             json_data = response.json()
-            return json_data[u'text']
+            return json_data['text']
         except IOError:
             log.exception("Transcript fetching failure: language [{}]".format(language_code))
-            return u''
+            return ''
         except (ValueError, KeyError, TypeError, AttributeError):
             log.exception("Can't parse fetched transcript: language [{}]".format(language_code))
             return u''

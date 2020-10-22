@@ -3,15 +3,15 @@
 YouTube Video player plugin.
 """
 
-import HTMLParser
+from html.parser import HTMLParser
+import http.client as http_client
 import json
-import httplib
 import re
 import textwrap
 import urllib
 
-import requests
 from lxml import etree
+import requests
 
 from video_xblock.constants import TranscriptSource
 from video_xblock.exceptions import VideoXBlockException
@@ -124,7 +124,7 @@ class YoutubePlayer(BaseVideoPlayer):
                       'Error: {}'.format(str(exception))
             return available_languages, message
 
-        if data.status_code == httplib.OK and data.text:
+        if data.status_code == http_client.OK and data.text:
             youtube_data = etree.fromstring(data.content, parser=utf8_parser)
             empty_subs = False if [el.get('transcript_list') for el in youtube_data] else True
             available_languages = [
@@ -151,7 +151,7 @@ class YoutubePlayer(BaseVideoPlayer):
             self.captions_api['params']['name'] = transcript_name
             transcript_url = 'http://{url}?{params}'.format(
                 url=self.captions_api['url'],
-                params=urllib.urlencode(self.captions_api['params'])
+                params=urllib.parse.urlencode(self.captions_api['params'])
             )
             # Update default transcripts languages parameters in accordance with pre-configured language settings
             lang_code, lang_label = self.get_transcript_language_parameters(lang_code)
@@ -194,7 +194,7 @@ class YoutubePlayer(BaseVideoPlayer):
         Format transcript's element in order for it to be converted to WebVTT format.
         """
         sub_element = u"\n\n"
-        html_parser = HTMLParser.HTMLParser()
+        html_parser = HTMLParser()
         if element.tag == "text":
             start = float(element.get("start"))
             duration = float(element.get("dur", 0))  # dur is not mandatory
@@ -204,9 +204,8 @@ class YoutubePlayer(BaseVideoPlayer):
                 formatted_start = self.format_transcript_timing(start)
                 formatted_end = self.format_transcript_timing(end, 'end')
                 timing = '{} --> {}'.format(formatted_start, formatted_end)
-                text_encoded = text.encode('utf8', 'ignore')
-                text = text_encoded.replace('\n', ' ')
-                unescaped_text = html_parser.unescape(text.decode('utf8'))
+                text = text.replace('\n', ' ')
+                unescaped_text = html_parser.unescape(text)
                 sub_element = u"""\
                 {element_number}
                 {timing}
@@ -226,19 +225,18 @@ class YoutubePlayer(BaseVideoPlayer):
         """
         if url is None:
             raise VideoXBlockException(_('`url` parameter is required.'))
-        utf8_parser = etree.XMLParser(encoding='utf-8')
+        utf8_parser = etree.XMLParser()
         data = requests.get(url)
-        xmltree = etree.fromstring(data.content, parser=utf8_parser)
+        xmltree = etree.fromstring(data.content.encode(), parser=utf8_parser)
         sub = [
             self.format_transcript_element(element, i)
             for i, element in enumerate(xmltree, 1)
         ]
         sub = "".join(sub)
-        sub = u"WEBVTT\n\n" + unicode(sub) if "WEBVTT" not in sub else unicode(sub)
+        sub = "WEBVTT\n\n" + sub if "WEBVTT" not in sub else sub
         return sub
 
     def dispatch(self, request, suffix):
         """
         Youtube dispatch method.
         """
-        pass
