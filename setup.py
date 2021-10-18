@@ -53,10 +53,10 @@ setup(
         'git+https://github.com/edx/xblock-utils.git@v1.0.5#egg=xblock-utils==1.0.5',
     ],
     install_requires=[
-        'le-pycaption==2.2.0a1',
+        'pycaption==2.0.1',
         'requests>=2.9.1,<3.0.0',
         'babelfish>=0.5.5,<0.6.0',
-        'XBlock==1.3.1',
+        'XBlock==1.4.0',
         'xblock-utils==2.1.1'
     ],
     entry_points={
