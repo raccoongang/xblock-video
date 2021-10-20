@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.1] - 2021-10-20
+
+## Fixed
+
+- Add support for Koa+ Open edX releases
+
 ## [0.10.1] - 2018-02-13
 
 ## Added
