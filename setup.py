@@ -64,6 +64,7 @@ setup(
             'video_xblock = video_xblock:VideoXBlock',
         ],
         'video_xblock.v1': [
+            'tencent-player = video_xblock.backends.tencent:TencentPlayer',
             'youtube-player = video_xblock.backends.youtube:YoutubePlayer',
             'wistia-player = video_xblock.backends.wistia:WistiaPlayer',
             'brightcove-player = video_xblock.backends.brightcove:BrightcovePlayer',

@@ -15,6 +15,7 @@ import re
 from webob import Response
 from xblock.fragment import Fragment
 from xblock.plugin import Plugin
+from xblock.validation import ValidationMessage
 
 from django.conf import settings
 
@@ -180,6 +181,27 @@ class BaseVideoPlayer(Plugin):
         Return: (bool) if default transcripts fetched already in VTT format.
         """
         return False
+
+    @staticmethod
+    def add_validation_message(validation, message_text):
+        """
+        Add error message on xblock fields validation.
+
+        Attributes:
+            validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
+            message_text (unicode): Message text per se.
+        """
+        validation.add(ValidationMessage(ValidationMessage.ERROR, message_text))
+
+    def validate_data(self, validation, data):
+        """
+        Validate fields data.
+
+        Attributes:
+            validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
+            data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
+        """
+        pass
 
     def get_frag(self, **context):
         """

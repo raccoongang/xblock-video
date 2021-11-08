@@ -382,6 +382,54 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
         fields_list.append('token')
         return fields_list
 
+    @staticmethod
+    def get_js_url(account_id, player_id):
+        """
+        Return url to brightcove player js file, considering `account_id` and `player_id`.
+
+        Arguments:
+            account_id (str): Account id fetched from video xblock.
+            player_id (str): Player id fetched from video xblock.
+        Returns:
+            Url to brightcove player js (str).
+        """
+        return "https://players.brightcove.net/{account_id}/{player_id}_default/index.min.js".format(
+            account_id=account_id,
+            player_id=player_id
+        )
+
+    def validate_data(self, validation, data):
+        """
+        Validate account id value which is mandatory.
+
+        Attributes:
+            validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
+            data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
+        """
+        account_id_is_empty = data.account_id in ['', u'']  # pylint: disable=unsubscriptable-object
+        # Validate provided account id
+        if account_id_is_empty:
+            # Account Id field is mandatory
+            self.add_validation_message(
+                validation,
+                _(u"Account ID can not be empty. Please provide a valid Brightcove Account ID.")
+            )
+            return
+
+        try:
+            response = requests.head(self.get_js_url(data.account_id, data.player_id))
+            if not response.ok:
+                self.add_validation_message(validation, _(
+                    u"Invalid Account ID or Player ID, please recheck."
+                ))
+
+        except requests.ConnectionError:
+            self.add_validation_message(
+                validation,
+                _(u"Can't validate submitted account ID at the moment. "
+                  u"Please try to save settings one more time.")
+            )
+
     fields_help = {
         'token': 'You can generate a BC token following the guide of '
                  '<a href="https://docs.brightcove.com/en/video-cloud/oauth-api/guides/get-client-credentials.html" '
