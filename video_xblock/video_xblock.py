@@ -260,7 +260,7 @@ class VideoXBlock(
         for code in (lang_code, country_code):
             if pkg_resources.resource_exists(loader.module_name, text_js.format(lang_code=code)):
                 return text_js.format(lang_code=code)
-    
+
     def add_i18n_resource(self, frag):
         """
         Add translations source for frontend.
@@ -491,7 +491,7 @@ class VideoXBlock(
         and lastly fall back to empty string.
         """
         backend_fields_help = self.get_player().fields_help
-        if field_name in backend_fields_help: # pylint: disable=no-else-return
+        if field_name in backend_fields_help:  # pylint: disable=no-else-return
             return backend_fields_help[field_name]
         elif field.help:
             return field.help
