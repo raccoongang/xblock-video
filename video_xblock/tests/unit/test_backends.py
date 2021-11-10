@@ -19,6 +19,7 @@ from video_xblock.backends import (
     wistia,
     youtube,
     vimeo,
+    tencent,
 )
 from video_xblock.constants import TranscriptSource
 from video_xblock.exceptions import VideoXBlockException
@@ -56,7 +57,7 @@ class TestCustomBackends(VideoXBlockTestBase):
     """
     Unit tests for custom video xblock backends.
     """
-    backends = ['youtube', 'brightcove', 'wistia', 'vimeo', 'html5']
+    backends = ['youtube', 'brightcove', 'wistia', 'vimeo', 'html5', 'tencent']
 
     auth_mocks = [
         youtube_mock.YoutubeAuthMock,
@@ -82,6 +83,7 @@ class TestCustomBackends(VideoXBlockTestBase):
     @XBlock.register_temp_plugin(youtube.YoutubePlayer, 'youtube')
     @XBlock.register_temp_plugin(vimeo.VimeoPlayer, 'vimeo')
     @XBlock.register_temp_plugin(html5.Html5Player, 'html5')
+    @XBlock.register_temp_plugin(tencent.TencentPlayer, 'tencent')
     def setUp(self):
         super(TestCustomBackends, self).setUp()
         self.player = {}
@@ -109,7 +111,7 @@ class TestCustomBackends(VideoXBlockTestBase):
         for backend in self.backends:
             player = self.player[backend]
             res = player(self.xblock).get_player_html(**context)
-            self.assertIn('window.videojs', res.body.decode())
+            self.assertIn('</video>', res.body.decode())
 
     expected_basic_fields = [
         ['display_name', 'href'],
@@ -117,6 +119,7 @@ class TestCustomBackends(VideoXBlockTestBase):
         ['display_name', 'href'],
         ['display_name', 'href'],
         ['display_name', 'href'],
+        ['display_name', 'href', 'app_id'],
     ]
 
     expected_advanced_fields = [
@@ -139,6 +142,10 @@ class TestCustomBackends(VideoXBlockTestBase):
         [  # Html5
             'start_time', 'end_time', 'handout',
             'download_transcript_allowed', 'download_video_allowed',
+        ],
+        [  # Tencent
+            'start_time', 'end_time', 'handout',
+            'download_transcript_allowed', 'download_video_allowed', 'download_video_url'
         ],
     ]
 
@@ -922,3 +929,17 @@ class BrightcovePlayerTest(VideoXBlockTestBase):  # pylint: disable=test-inherit
         # Assert
         self.assertEqual(auth_data, {})
         self.assertEqual(error_message, test_message)
+
+    def test_get_brightcove_js_url(self):
+        """
+        Test brightcove.js url generation.
+        """
+        player_id = 123
+        account_id = 321
+        self.assertEqual(
+            self.bc_player.get_js_url(account_id, player_id),
+            "https://players.brightcove.net/{account_id}/{player_id}_default/index.min.js".format(
+                account_id=account_id,
+                player_id=player_id
+            )
+        )
