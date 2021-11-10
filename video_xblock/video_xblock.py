@@ -70,8 +70,11 @@ class VideoXBlock(
 
     href = String(
         default='',
-        display_name=_('Video URL'),
-        help=_('URL of the video page. E.g. https://example.wistia.com/medias/12345abcde'),
+        display_name=_('Video URL or FileId'),
+        help=_(
+            "Video URL of the video page. E.g. https://example.wistia.com/medias/12345abcde<br/>"
+            "FileId for Tencent Player E.g. 5285890799710670616"
+        ),
         scope=Scope.content
     )
 
@@ -105,7 +108,7 @@ class VideoXBlock(
     app_id = String(
         default='',
         display_name=_('AppID'),
-        help=_('Your appID of the VOD account'),
+        help=_('Your AppID of the VOD account. E.g. 1400329073'),
         scope=Scope.content,
     )
 

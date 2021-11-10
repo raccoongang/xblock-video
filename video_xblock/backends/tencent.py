@@ -56,7 +56,7 @@ class TencentPlayer(BaseVideoPlayer):
             )
 
     fields_help = {
-        'href': _('Your fileID of the video to be played. E.g. 5285890799710670616'),
+        'href': _('Your FileID of the video to be played. E.g. 5285890799710670616'),
     }
 
     def media_id(self, href):
