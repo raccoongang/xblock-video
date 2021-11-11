@@ -7,11 +7,11 @@ import json
 import logging
 import re
 
+from django.utils.translation import get_language
 from xblock.fragment import Fragment
 
-from video_xblock import BaseVideoPlayer, ApiClientError
-from video_xblock.backends.base import BaseApiClient
-from video_xblock.utils import ugettext as _, remove_escaping
+from video_xblock import BaseVideoPlayer
+from video_xblock.utils import ugettext as _
 
 log = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ class TencentPlayer(BaseVideoPlayer):
     TencentPlayer is used for videos hosted on tencent cloud.
     """
 
-    url_re = re.compile(r'([0-9]+)')
+    url_re = re.compile(r'^([0-9]+)$')
 
     def __init__(self, xblock):
         """
@@ -70,6 +70,7 @@ class TencentPlayer(BaseVideoPlayer):
         Return a Fragment required to render video player on the client side.
         """
         context['player_state'] = json.dumps(context['player_state'])
+        context['lang_code'] = get_language()
 
         frag = Fragment(
             self.render_template('tencent.html', **context)
