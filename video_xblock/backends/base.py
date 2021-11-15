@@ -190,7 +190,7 @@ class BaseVideoPlayer(Plugin):
 
         Attributes:
             validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
-            message_text (unicode): Message text per se.
+            message_text (str): Message text per se.
         """
         validation.add(ValidationMessage(ValidationMessage.ERROR, message_text))
 

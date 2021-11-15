@@ -147,7 +147,7 @@ class TestCustomBackends(VideoXBlockTestBase):
         [],  # Tencent
     ]
 
-    expected_advanced_tab = [
+    expected_advanced_tab_enabled = [
         True,  # Brightcove
         True,  # Wistia
         True,  # Wistia
@@ -170,22 +170,22 @@ class TestCustomBackends(VideoXBlockTestBase):
     @patch.object(VideoXBlock, 'get_enabled_transcripts')
     @patch.object(VideoXBlock, '_update_default_transcripts')
     @patch.object(VideoXBlock, 'get_player')
-    @data(*zip(backends, expected_advanced_tab))
+    @data(*zip(backends, expected_advanced_tab_enabled))
     @unpack
-    def test_advanced_tab_enabled(self, backend, expected_advanced_tab, player_mock, 
+    def test_advanced_tab_enabled(self, backend, expected_advanced_tab_enabled, player_mock, 
             update_default_transcripts_mock, get_enabled_transcripts, initialize_js_mock):
         """
         Test advanced tab visibility for {0} backend
         """
         context = {}
         test_js_context = {
-            'advancedTabEnabled': expected_advanced_tab,
+            'advancedTabEnabled': expected_advanced_tab_enabled,
         }
         player = self.player[backend](self.xblock)
         player_mock.return_value = player
         self.xblock.runtime.handler_url = Mock()
         update_default_transcripts_mock.return_value = (
-            ['stub1', 'stub2'], 'Stub autoupload messate'
+            ['stub1', 'stub2'], 'Stub auto upload message'
         )
         self.xblock.studio_view(context)
         initialize_js_mock.assert_called_once_with('StudioEditableXBlock', test_js_context)
