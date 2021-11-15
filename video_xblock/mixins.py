@@ -230,12 +230,12 @@ class TranscriptsMixin(XBlock):
 
         if feedback['status'] is Status.error:
             log.error("3PlayMedia transcripts fetching API request has failed!\n{}".format(feedback['message']))
-            raise StopIteration
+            return
 
         for transcript_data in transcripts_list:
             transcript = self.fetch_single_3pm_translation(transcript_data)
             if transcript is None:
-                raise StopIteration
+                return
             transcript_ordered_dict = transcript._asdict()
             transcript_ordered_dict['content'] = ''  # we don't want to parse it to JSON
             yield transcript_ordered_dict

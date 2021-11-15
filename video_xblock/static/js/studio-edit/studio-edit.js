@@ -8,7 +8,7 @@ languageChecker getHandlers */
     Reference:
         https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/templates/studio_edit.html
 */
-function StudioEditableXBlock(runtime, element) {
+function StudioEditableXBlock(runtime, element, context) {
     'use strict';
 
     var fields = [];
@@ -22,7 +22,7 @@ function StudioEditableXBlock(runtime, element) {
     var $availableLabel = $('div.custom-field-section-label.available-transcripts');
     var $modalHeaderTabs = $('.editor-modes.action-list.action-modes');
     var currentTabName;
-    var isNotDummy = $('#xb-field-edit-href').val() !== '';
+    var advancedTabEnabled = context.advancedTabEnabled;
     var SUCCESS = 'success';
     var ERROR = 'error';
 
@@ -64,7 +64,7 @@ function StudioEditableXBlock(runtime, element) {
 
     // Create advanced and basic tabs
     (function() {
-        if (isNotDummy) {
+        if (advancedTabEnabled) {
             $modalHeaderTabs
                 .append(
                     '<li class="inner_tab_wrap">' +

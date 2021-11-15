@@ -9,7 +9,7 @@ import requests
 from ddt import ddt, data, unpack
 from django.test.utils import override_settings
 from lxml import etree
-from mock import PropertyMock, Mock, patch
+from mock import PropertyMock, Mock, MagicMock, patch
 from xblock.core import XBlock
 
 from video_xblock.backends import (
@@ -19,7 +19,9 @@ from video_xblock.backends import (
     wistia,
     youtube,
     vimeo,
+    tencent,
 )
+from video_xblock import VideoXBlock
 from video_xblock.constants import TranscriptSource
 from video_xblock.exceptions import VideoXBlockException
 from video_xblock.settings import ALL_LANGUAGES
@@ -56,7 +58,7 @@ class TestCustomBackends(VideoXBlockTestBase):
     """
     Unit tests for custom video xblock backends.
     """
-    backends = ['youtube', 'brightcove', 'wistia', 'vimeo', 'html5']
+    backends = ['youtube', 'brightcove', 'wistia', 'vimeo', 'html5', 'tencent']
 
     auth_mocks = [
         youtube_mock.YoutubeAuthMock,
@@ -82,6 +84,7 @@ class TestCustomBackends(VideoXBlockTestBase):
     @XBlock.register_temp_plugin(youtube.YoutubePlayer, 'youtube')
     @XBlock.register_temp_plugin(vimeo.VimeoPlayer, 'vimeo')
     @XBlock.register_temp_plugin(html5.Html5Player, 'html5')
+    @XBlock.register_temp_plugin(tencent.TencentPlayer, 'tencent')
     def setUp(self):
         super(TestCustomBackends, self).setUp()
         self.player = {}
@@ -109,7 +112,7 @@ class TestCustomBackends(VideoXBlockTestBase):
         for backend in self.backends:
             player = self.player[backend]
             res = player(self.xblock).get_player_html(**context)
-            self.assertIn('window.videojs', res.body.decode())
+            self.assertIn('</video>', res.body.decode())
 
     expected_basic_fields = [
         ['display_name', 'href'],
@@ -117,6 +120,7 @@ class TestCustomBackends(VideoXBlockTestBase):
         ['display_name', 'href'],
         ['display_name', 'href'],
         ['display_name', 'href'],
+        ['display_name', 'href', 'app_id'],
     ]
 
     expected_advanced_fields = [
@@ -140,6 +144,16 @@ class TestCustomBackends(VideoXBlockTestBase):
             'start_time', 'end_time', 'handout',
             'download_transcript_allowed', 'download_video_allowed',
         ],
+        [],  # Tencent
+    ]
+
+    expected_advanced_tab_enabled = [
+        True,  # Brightcove
+        True,  # Wistia
+        True,  # Wistia
+        True,  # Vimeo
+        True,  # Html5
+        False,  # Tencent
     ]
 
     @data(*zip(backends, expected_basic_fields, expected_advanced_fields))
@@ -151,6 +165,30 @@ class TestCustomBackends(VideoXBlockTestBase):
         player = self.player[backend](self.xblock)
         self.assertListEqual(player.basic_fields, expected_basic_fields)
         self.assertListEqual(player.advanced_fields, expected_advanced_fields)
+
+    @patch('xblock.fragment.Fragment.initialize_js')
+    @patch.object(VideoXBlock, 'get_enabled_transcripts')
+    @patch.object(VideoXBlock, '_update_default_transcripts')
+    @patch.object(VideoXBlock, 'get_player')
+    @data(*zip(backends, expected_advanced_tab_enabled))
+    @unpack
+    def test_advanced_tab_enabled(self, backend, expected_advanced_tab_enabled, player_mock, 
+            update_default_transcripts_mock, get_enabled_transcripts, initialize_js_mock):
+        """
+        Test advanced tab visibility for {0} backend
+        """
+        context = {}
+        test_js_context = {
+            'advancedTabEnabled': expected_advanced_tab_enabled,
+        }
+        player = self.player[backend](self.xblock)
+        player_mock.return_value = player
+        self.xblock.runtime.handler_url = Mock()
+        update_default_transcripts_mock.return_value = (
+            ['stub1', 'stub2'], 'Stub auto upload message'
+        )
+        self.xblock.studio_view(context)
+        initialize_js_mock.assert_called_once_with('StudioEditableXBlock', test_js_context)
 
     expected_3pm_fields = [
         ['threeplaymedia_file_id', 'threeplaymedia_apikey', 'threeplaymedia_streaming'],
@@ -922,3 +960,17 @@ class BrightcovePlayerTest(VideoXBlockTestBase):  # pylint: disable=test-inherit
         # Assert
         self.assertEqual(auth_data, {})
         self.assertEqual(error_message, test_message)
+
+    def test_get_brightcove_js_url(self):
+        """
+        Test brightcove.js url generation.
+        """
+        player_id = 123
+        account_id = 321
+        self.assertEqual(
+            self.bc_player.get_js_url(account_id, player_id),
+            "https://players.brightcove.net/{account_id}/{player_id}_default/index.min.js".format(
+                account_id=account_id,
+                player_id=player_id
+            )
+        )

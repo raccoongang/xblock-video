@@ -15,6 +15,7 @@ class DummyPlayer(BaseVideoPlayer):
 
     url_re = re.compile(r'')
     advanced_fields = ()
+    advanced_tab_enabled = False
 
     def get_frag(self, **context):  # pylint: disable=unused-argument
         """
