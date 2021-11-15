@@ -72,6 +72,7 @@ class BaseVideoPlayer(Plugin):
     __metaclass__ = abc.ABCMeta
 
     entry_point = 'video_xblock.v1'
+    advanced_tab_enabled = True
 
     def __init__(self, xblock):
         """

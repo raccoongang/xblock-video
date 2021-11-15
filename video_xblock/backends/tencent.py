@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 """
-Tencent Video player plugin.
+Tencent Video player backend.
 """
 
 import json
@@ -22,12 +21,11 @@ class TencentPlayer(BaseVideoPlayer):
     """
 
     url_re = re.compile(r'^([0-9]+)$')
-
-    def __init__(self, xblock):
-        """
-        Initialize Tencent player class object.
-        """
-        super(TencentPlayer, self).__init__(xblock)
+    advanced_fields = []
+    advanced_tab_enabled = False
+    fields_help = {
+        'href': _('Your FileID of the video to be played. E.g. 5285890799710670616'),
+    }
 
     @property
     def basic_fields(self):
@@ -46,18 +44,13 @@ class TencentPlayer(BaseVideoPlayer):
             validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
             data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
         """
-        app_id_is_empty = data.app_id in ['', u'']  # pylint: disable=unsubscriptable-object
         # Validate provided app id
-        if app_id_is_empty:
+        if not data.app_id:
             # AppId field is mandatory
             self.add_validation_message(
                 validation,
-                _(u"AppID can not be empty. Please provide a valid Tencent AppID.")
+                _("AppID can not be empty. Please provide a valid Tencent AppID.")
             )
-
-    fields_help = {
-        'href': _('Your FileID of the video to be played. E.g. 5285890799710670616'),
-    }
 
     def media_id(self, href):
         """

@@ -9,7 +9,7 @@ import requests
 from ddt import ddt, data, unpack
 from django.test.utils import override_settings
 from lxml import etree
-from mock import PropertyMock, Mock, patch
+from mock import PropertyMock, Mock, MagicMock, patch
 from xblock.core import XBlock
 
 from video_xblock.backends import (
@@ -21,6 +21,7 @@ from video_xblock.backends import (
     vimeo,
     tencent,
 )
+from video_xblock import VideoXBlock
 from video_xblock.constants import TranscriptSource
 from video_xblock.exceptions import VideoXBlockException
 from video_xblock.settings import ALL_LANGUAGES
@@ -143,10 +144,16 @@ class TestCustomBackends(VideoXBlockTestBase):
             'start_time', 'end_time', 'handout',
             'download_transcript_allowed', 'download_video_allowed',
         ],
-        [  # Tencent
-            'start_time', 'end_time', 'handout',
-            'download_transcript_allowed', 'download_video_allowed', 'download_video_url'
-        ],
+        [],  # Tencent
+    ]
+
+    expected_advanced_tab = [
+        True,  # Brightcove
+        True,  # Wistia
+        True,  # Wistia
+        True,  # Vimeo
+        True,  # Html5
+        False,  # Tencent
     ]
 
     @data(*zip(backends, expected_basic_fields, expected_advanced_fields))
@@ -158,6 +165,30 @@ class TestCustomBackends(VideoXBlockTestBase):
         player = self.player[backend](self.xblock)
         self.assertListEqual(player.basic_fields, expected_basic_fields)
         self.assertListEqual(player.advanced_fields, expected_advanced_fields)
+
+    @patch('xblock.fragment.Fragment.initialize_js')
+    @patch.object(VideoXBlock, 'get_enabled_transcripts')
+    @patch.object(VideoXBlock, '_update_default_transcripts')
+    @patch.object(VideoXBlock, 'get_player')
+    @data(*zip(backends, expected_advanced_tab))
+    @unpack
+    def test_advanced_tab_enabled(self, backend, expected_advanced_tab, player_mock, 
+            update_default_transcripts_mock, get_enabled_transcripts, initialize_js_mock):
+        """
+        Test advanced tab visibility for {0} backend
+        """
+        context = {}
+        test_js_context = {
+            'advancedTabEnabled': expected_advanced_tab,
+        }
+        player = self.player[backend](self.xblock)
+        player_mock.return_value = player
+        self.xblock.runtime.handler_url = Mock()
+        update_default_transcripts_mock.return_value = (
+            ['stub1', 'stub2'], 'Stub autoupload messate'
+        )
+        self.xblock.studio_view(context)
+        initialize_js_mock.assert_called_once_with('StudioEditableXBlock', test_js_context)
 
     expected_3pm_fields = [
         ['threeplaymedia_file_id', 'threeplaymedia_apikey', 'threeplaymedia_streaming'],

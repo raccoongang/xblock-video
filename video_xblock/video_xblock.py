@@ -391,6 +391,9 @@ class VideoXBlock(
             'download_transcript_handler_url': download_transcript_handler_url,
             'i18n_service': self.runtime.service(self, 'i18n'),
         }
+        js_context = {
+            'advancedTabEnabled': player.advanced_tab_enabled,
+        }
 
         fragment.content = render_template('studio-edit.html', **context)
         fragment.add_css(resource_string("static/css/student-view.css"))
@@ -404,7 +407,7 @@ class VideoXBlock(
         fragment.add_javascript(resource_string("static/js/studio-edit/studio-edit.js"))
         fragment.add_javascript(resource_string("static/js/studio-edit/transcripts-autoload.js"))
         fragment.add_javascript(resource_string("static/js/studio-edit/transcripts-manual-upload.js"))
-        fragment.initialize_js('StudioEditableXBlock')
+        fragment.initialize_js('StudioEditableXBlock', js_context)
         return fragment
 
     @XBlock.handler
