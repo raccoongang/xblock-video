@@ -34,7 +34,7 @@ class TencentPlayer(BaseVideoPlayer):
 
         Tencent videos require AppId.
         """
-        return super(TencentPlayer, self).basic_fields + ['app_id']
+        return super(TencentPlayer, self).basic_fields + ['app_id', 'alternative_link']
 
     def validate_data(self, validation, data):
         """

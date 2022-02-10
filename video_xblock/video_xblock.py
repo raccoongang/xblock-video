@@ -112,6 +112,13 @@ class VideoXBlock(
         scope=Scope.content,
     )
 
+    alternative_link = String(
+        default='',
+        display_name=_('Alternative YouTube Video Link'),
+        help=_('If you have your video in YouTube platform, please provide a link to it.'),
+        scope=Scope.content,
+    )
+
     player_id = String(
         default='default',
         display_name=_('Player Id'),
@@ -439,6 +446,7 @@ class VideoXBlock(
             brightcove_js_url=player.get_js_url(self.account_id, self.player_id) if is_brightcove else '',
             transcripts=transcripts,
             app_id=self.app_id,
+            alternative_link=self.alternative_link,
         )
 
     @XBlock.json_handler
