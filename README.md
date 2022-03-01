@@ -27,7 +27,7 @@ support:
 [wistia-xblock]: https://appsembler.com/blog/why-open-edx-needs-an-alternative-video-xblock/
 [see the Github repo]: https://github.com/appsembler/xblock-wistia
 
-Appsembler and Raccoon Gang will be co-presenting [a talk about the
+Appsembler and Raccoon Gang presented [a talk about the
 video-xblock] at the Open edX Con 2017 in Madrid.
 
 [a talk about the video-xblock]: https://openedx2017.sched.com/event/9zf6/lightning-talks
@@ -47,7 +47,7 @@ version of the Video XBlock!
 sudo -sHu edxapp
 source ~/edxapp_env
 # Install VideoXBlock using pip
-pip install --process-dependency-links -e "git+https://github.com/appsembler/xblock-video.git@dev#egg=video_xblock"
+pip install -e git+https://github.com/raccoongang/xblock-video.git@master#egg=video_xblock
 ```
 
 ## Enabling in Studio
@@ -139,7 +139,7 @@ Re-transcode is performed by Brightcove's Videocloud and takes few minutes. Afte
 ### Set default values in config files
 
 Now it is possible to indicate prepopulated values for any xblock field
-per site installation (see note below). 
+per site installation (see note below).
 
 Sample default settings in `/edx/app/edxapp/cms.env.json`:
 
