@@ -47,7 +47,7 @@ version of the Video XBlock!
 sudo -sHu edxapp
 source ~/edxapp_env
 # Install VideoXBlock using pip
-pip install -e git+https://github.com/raccoongang/xblock-video.git@master#egg=video_xblock
+pip install git+https://github.com/raccoongang/xblock-video.git@master#egg=video_xblock
 ```
 
 ## Enabling in Studio
