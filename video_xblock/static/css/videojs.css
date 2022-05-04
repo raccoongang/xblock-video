@@ -11,7 +11,6 @@ body {
 .video-js .vjs-control-bar {
     background-color: #282C2E;
     display: flex;
-    margin-bottom: -30px;
     color: #CFD8DC;
     height: 40px;
 }
@@ -357,6 +356,8 @@ body {
 }
 .video-js {
     width: 100% !important;
+    height: 0;
+    padding-bottom: 56.25%;
 }
 
 .video-js .vjs-captions-button {
@@ -463,4 +464,13 @@ body {
 .vjs-custom-caption-button .vjs-menu,
 .vjs-custom-transcript-button .vjs-menu {
     transform: translate(-75%);
+}
+
+.vimeoFrame {
+    position: static !important;
+}
+
+.vimeoFrame .vimeoplayer {
+    height: 100% !important;
+    top: 0 !important;
 }
