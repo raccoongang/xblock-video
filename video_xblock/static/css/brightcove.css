@@ -1,0 +1,10 @@
+.vjs-subs-caps-button .vjs-menu {
+    left: 0 !important;
+    width: 100%;
+}
+
+.vjs-subs-caps-button .vjs-menu .vjs-menu-content {
+    width: 100px !important;
+    left: 50% !important;
+    transform: translateX(-50%);
+}
