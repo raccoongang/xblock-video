@@ -464,3 +464,7 @@ body {
 .vjs-custom-transcript-button .vjs-menu {
     transform: translate(-75%);
 }
+
+.w-big-play-button {
+    display: none !important;
+}
