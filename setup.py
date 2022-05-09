@@ -53,7 +53,7 @@ setup(
         'git+https://github.com/edx/xblock-utils.git@v1.0.5#egg=xblock-utils==1.0.5',
     ],
     install_requires=[
-        'pycaption==1.0.7',
+        'pycaption==2.0.7',
         'requests>=2.9.1,<3.0.0',
         'babelfish>=0.5.5,<0.6.0',
         'XBlock>=1.4.0,<2',
