@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - a11y fix - title on video iframe
 - Don't override account_id with a blank form value for new XBlock instances when value available from settings
 - Added missing package data to fix installation without -e flag
+- Updated requirements to be compatible with Maple release
 - Fix for videos aspect ratio and responsiveness (all providers)
 
 ## [1.0.1] - 2021-10-20
