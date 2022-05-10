@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Updated requirements to be compatible with Maple release
 - Remove player buttons focus outline
 - Set main theme color for Handout download button
+- Hide default big play button from wistia player
 
 ## [1.0.1] - 2021-10-20
 
