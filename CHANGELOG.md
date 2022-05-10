@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added missing package data to fix installation without -e flag
 - Updated requirements to be compatible with Maple release
 - Remove player buttons focus outline
+- Set main theme color for Handout download button
 
 ## [1.0.1] - 2021-10-20
 
