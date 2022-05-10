@@ -201,6 +201,7 @@ body {
 
 .video-js.vjs-fullscreen .vjs-fullscreen-control:before, .vjs-icon-fullscreen-exit:before {
     content: "\f066";
+    padding: 8px 0 0;
 }
 
 .video-js .vjs-big-play-button:before, .video-js .vjs-play-control:before, .vjs-icon-play:before {
