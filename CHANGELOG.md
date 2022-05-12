@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Minimize player button alignment fix
 - Fix speed dropdown width
 - Fix for videos aspect ratio and responsiveness (all providers)
+- Brightcove subtitles popup fix
 
 ## [1.0.1] - 2021-10-20
 
