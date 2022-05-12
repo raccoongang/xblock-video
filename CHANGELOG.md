@@ -8,13 +8,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Fixed
-
 - Added mute before playing video for chrome to avoid autoplay policy restriction
 - Fix BrightCove styling for players based on video.js v6+ (breaks video.js5 but that's very old now)
 - a11y fix - title on video iframe
 - Don't override account_id with a blank form value for new XBlock instances when value available from settings
 - Added missing package data to fix installation without -e flag
 - Updated requirements to be compatible with Maple release
+- Remove player buttons focus outline
+- Set main theme color for Handout download button
+- Hide default big play button from wistia player
+- Minimize player button alignment fix
+- Fix speed dropdown width
+- Fix for videos aspect ratio and responsiveness (all providers)
 - Brightcove subtitles popup fix
 
 ## [1.0.1] - 2021-10-20
