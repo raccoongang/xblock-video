@@ -430,8 +430,12 @@ body {
     width: 100px;
 }
 
+.vjs-playback-rate .vjs-menu {
+    width: 100%;
+}
+
 .vjs-playback-rate .vjs-menu .vjs-menu-content {
-    width: 120px;
+    width: 100%;
     max-height: 16em;
 }
 

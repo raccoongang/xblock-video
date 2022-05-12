@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Set main theme color for Handout download button
 - Hide default big play button from wistia player
 - Minimize player button alignment fix
+- Fix speed dropdown width
 
 ## [1.0.1] - 2021-10-20
 
