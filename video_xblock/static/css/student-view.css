@@ -4,6 +4,7 @@
     height: 0;
     padding-bottom: 56.25%;
 }
+
 .video-iframe-holder > iframe {
     width:100%;
     height:100%;
@@ -11,9 +12,11 @@
     left: 0;
     top: 0;
 }
+
 .is-hidden {
   display: none !important;
 }
+
 .wrapper-comp-settings .file-uploader .xblock-edit-settings .upload-setting,
 .wrapper-comp-settings .file-uploader .xblock-edit-settings .download-setting {
     width: 47%;
