@@ -27,8 +27,7 @@
 
 .wrapper-downloads-custom {
     margin: 0;
-    padding: 0;
-    background-color: #f0f3f5;
+    padding: 0 !important;
 }
 
 .video-download-button-custom {
@@ -43,13 +42,7 @@
     line-height: 14px;
     float: left;
     border-radius: 3px;
-    background-color: #fff;
     padding: 15px;
-}
-
-.video-download-button-custom a:hover {
-    background-color: #1aa1de;
-    color: #fff;
 }
 
 /* Transcripts download dropdown buttons */
