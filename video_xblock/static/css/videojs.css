@@ -201,6 +201,7 @@ body {
 
 .video-js.vjs-fullscreen .vjs-fullscreen-control:before, .vjs-icon-fullscreen-exit:before {
     content: "\f066";
+    padding: 8px 0 0;
 }
 
 .video-js .vjs-big-play-button:before, .video-js .vjs-play-control:before, .vjs-icon-play:before {
@@ -352,9 +353,7 @@ body {
 .video-js .vjs-play-control {
     width: 39px;
 }
-.video-js .vjs-control:focus {
-    outline: rgb(207, 216, 220) solid 1px;
-}
+
 .video-js {
     width: 100% !important;
 }
@@ -467,4 +466,8 @@ body {
 .vjs-custom-caption-button .vjs-menu,
 .vjs-custom-transcript-button .vjs-menu {
     transform: translate(-75%);
+}
+
+.w-big-play-button {
+    display: none !important;
 }
