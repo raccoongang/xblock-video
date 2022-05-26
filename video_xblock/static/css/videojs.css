@@ -481,3 +481,8 @@ body {
     height: 100% !important;
     top: 0 !important;
 }
+
+.video-js-vimeo .vjs-big-play-button,
+.video-js-vimeo .vjs-control-bar {
+    display: none !important;
+}
