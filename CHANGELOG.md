@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fix for videos aspect ratio and responsiveness (all providers) (RGOeX-980)
 - Brightcove subtitles popup fix (RGOeX-976)
 - Change color for focused items in the player speed dropdown (RGOeX-1344)
+- Remove vjs controls from vimeo videos for avoiding problems with default vimeo controls (RGOeX-978)
 
 ## [1.0.1] - 2021-10-20
 
