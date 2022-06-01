@@ -451,8 +451,8 @@ body {
     font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 .vjs-playback-rate .vjs-menu .vjs-menu-content li:focus {
-    color: #0ea6ec;
-    border-left: 2px solid #0ea6ec;
+    color: #cb598d;
+    border-left: 2px solid #cb598d;
 }
 
 .vjs-text-track-display div div {
