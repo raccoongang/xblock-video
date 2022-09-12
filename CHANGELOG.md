@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.0] 2022-09-12
+
 ### Fixed
 - Fix BrightCove styling for players based on video.js v6+ (breaks video.js5 but that's very old now)
 - a11y fix - title on video iframe
@@ -22,6 +24,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Brightcove subtitles popup fix (RGOeX-976)
 - Change color for focused items in the player speed dropdown (RGOeX-1344)
 - Remove vjs controls from vimeo videos for avoiding problems with default vimeo controls (RGOeX-978)
+
+### Added
+
+- Add support for the Nutmeg release [RGOeX-1644](https://youtrack.raccoongang.com/issue/RGOeX-1644)
+  - bump requirements for pycaption and xblock-utils
+  - this requires the edx-platform to update its requirements to use `lxml>=4.9` (current version is `4.5.0`) because of pycaption requirements.
 
 ## [1.0.1] - 2021-10-20
 
