@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Brightcove subtitles popup fix (RGOeX-976)
 - Change color for focused items in the player speed dropdown (RGOeX-1344)
 - Remove vjs controls from vimeo videos for avoiding problems with default vimeo controls (RGOeX-978)
+- Save scroll position on exit from video xblock fullscreen mode (RGOeX-1240)
 
 ### Added
 

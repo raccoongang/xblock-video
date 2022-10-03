@@ -224,7 +224,8 @@ class BaseVideoPlayer(Plugin):
         js_files += [
             'static/js/videojs/videojs-tabindex.js',
             'static/js/videojs/toggle-button.js',
-            'static/js/videojs/videojs-event-plugin.js'
+            'static/js/videojs/videojs-event-plugin.js',
+            'static/js/videojs/fullscreen-extends.js',
         ]
 
         for js_file in js_files:

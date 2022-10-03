@@ -433,6 +433,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             'static/js/videojs/toggle-button.js',
             'static/js/videojs/videojs-event-plugin.js',
             'static/js/videojs/brightcove-videojs-init.js',
+            'static/js/videojs/fullscreen-extends.js',
         ]
 
         for js_file in js_files:
