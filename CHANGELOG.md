@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.1] 2023-01-25
+
+### Fixed
+- fix: [RGOeX-1240] save scroll position on exit from fullscreen
+
 ## [1.1.0] 2022-09-12
 
 ### Fixed
