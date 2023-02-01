@@ -105,6 +105,8 @@ class TranscriptsMixin(XBlock):
         Utility method to extract text from WebVTT format transcript.
         """
         text_lines = []
+        if isinstance(vtt_content, bytes):
+            vtt_content = str(vtt_content, 'utf-8')
         for line in vtt_content.splitlines():
             if '-->' in line or line == '':
                 continue
