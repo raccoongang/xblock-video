@@ -450,6 +450,23 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
                 self.xblock, 'srt_to_vtt', query='test-trans.srt'
             )
 
+    def test_vtt_to_text(self):
+        """
+        Test utility method to extract text from WebVTT format transcript.
+        
+        Checking if the method works correctly if vtt_content 
+        is a byte data type or vtt_content is a string.
+        """
+        # Act
+        response_byte_to_text = self.xblock.vtt_to_text(b'vtt_content is byte data type')
+        response_text = self.xblock.vtt_to_text('vtt_content is string data type')
+        
+        # Assert
+        self.assertIsInstance(response_byte_to_text, str)
+        self.assertEqual(response_byte_to_text, 'vtt_content is byte data type')
+        self.assertIsInstance(response_text, str)
+        self.assertEqual(response_text, 'vtt_content is string data type')        
+
     @patch('video_xblock.mixins.requests', new_callable=MagicMock)
     @patch.object(VideoXBlock, 'convert_caps_to_vtt')
     def test_srt_to_vtt(self, convert_caps_to_vtt_mock, requests_mock):

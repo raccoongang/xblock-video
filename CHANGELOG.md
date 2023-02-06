@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Error during reading manually added subtitles [RGOeX-24483]
+
 ## [1.1.1] 2023-01-25
 
 ### Fixed
