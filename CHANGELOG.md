@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Fixed
+- The link to download the subtitle file is missing href to the subtitle file [RGOeX-25430]
 - Error during reading manually added subtitles [RGOeX-24483]
 
 ## [1.1.1] 2023-01-25
