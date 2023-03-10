@@ -29,7 +29,7 @@
                 </a>
                 <div class="dropdown-content">
                     {% for transcript in transcripts %}
-                    <a href="{{ transcript.download_url }}"
+                    <a href="{{ transcript.download_url|default:transcript.url }}"
                        download="{{ transcript.label|lower }}_{{ transcript.lang }}.vtt">
                         {{ transcript.label }}
                     </a>
