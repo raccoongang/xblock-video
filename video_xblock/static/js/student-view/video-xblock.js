@@ -5,6 +5,17 @@
  */
 function VideoXBlockStudentViewInit(runtime, element) {
     'use strict';
+
+    let baseColor = getComputedStyle(document.documentElement).getPropertyValue('--base-color');
+    let iframes = document.querySelectorAll('.video-iframe');
+
+    iframes.forEach((iframe) => {
+        iframe.addEventListener('load', () => {
+            let root = iframe.contentWindow.document.querySelector(':root');
+            root.style.setProperty('--base-color', baseColor);
+        });
+    });
+
     var xblockElement = typeof(element[0]) !== 'undefined' ? element[0] : element;
     var stateHandlerUrl = runtime.handlerUrl(xblockElement, 'save_player_state');
     var eventHandlerUrl = runtime.handlerUrl(xblockElement, 'publish_event');

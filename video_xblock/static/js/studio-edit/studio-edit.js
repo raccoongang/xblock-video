@@ -68,10 +68,10 @@ function StudioEditableXBlock(runtime, element) {
             $modalHeaderTabs
                 .append(
                     '<li class="inner_tab_wrap">' +
-                    '<button class="edit-menu-tab" data-tab-name="Advanced">Advanced</button>' +
+                    '<button class="edit-menu-tab video-xblock-edit-menu-tab" data-tab-name="Advanced">Advanced</button>' +
                     '</li>',
                     '<li class="inner_tab_wrap">' +
-                    '<button class="edit-menu-tab current" data-tab-name="Basic">Basic</button>' +
+                    '<button class="edit-menu-tab video-xblock-edit-menu-tab current" data-tab-name="Basic">Basic</button>' +
                     '</li>');
             // Bind listeners to the toggle buttons
             $('.edit-menu-tab').click(function(event) {

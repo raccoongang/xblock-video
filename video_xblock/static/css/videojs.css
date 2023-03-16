@@ -365,7 +365,7 @@ body {
 
 .video-js .vjs-control-enabled {
     background-color: #171a1b;
-    color: #0ea6ec;
+    color: #cb598d;
     font-size: 8px;
 }
 
@@ -390,7 +390,7 @@ body {
     margin-bottom: 8px;
     border: 0;
     padding: 0;
-    color: #0074b5;
+    color: var(--base-color);
     line-height: 1.41575em;
 }
 
@@ -457,7 +457,11 @@ body {
 
 .vjs-text-track-display div div {
     width: 100% !important;
-} 
+}
+
+.vjs-text-track-display * {
+    color: #cb598d !important;
+}
 
 .vjs-menu li.vjs-selected, .vjs-menu li.vjs-selected:focus, .vjs-menu li.vjs-selected:hover {
     background-color: rgba(115,133,159,.5);
