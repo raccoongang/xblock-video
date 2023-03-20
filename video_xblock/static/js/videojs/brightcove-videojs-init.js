@@ -14,7 +14,7 @@ domReady(function() {
 
     registerPlugin('offset', window.vjsoffset);
     player.offset({
-        start: 0, // do not use quotes for these properties for correct plugin work
-        end: 0
+        start: window.playerStartTime,
+        end: window.playerEndTime,
     });
 });
