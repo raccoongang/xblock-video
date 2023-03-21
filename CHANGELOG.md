@@ -8,8 +8,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Fixed
+- Fix transcript appearing and controls buttons positioning for Brightcove player [xblock-video] (RGOeX-25698)
+- Fix for download subtitles button under the video [xblock-video] (RGOeX-24475)
 - The link to download the subtitle file is missing href to the subtitle file [RGOeX-25430]
 - Error during reading manually added subtitles [RGOeX-24483]
+
+## Added
+- Add base color to edit modal window [xblock-video] (RGOeX-25432)
+- Add base color for subtitles list and player control buttons [xblock-video] (RGOeX-25440)
 
 ## [1.1.1] 2023-01-25
 

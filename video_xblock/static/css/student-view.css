@@ -40,8 +40,6 @@
     transition: all 0.25s ease-in-out 0s;
     font-size: 14px;
     line-height: 14px;
-    float: left;
-    border-radius: 3px;
     padding: 15px;
 }
 
@@ -62,23 +60,19 @@
     width: 180px;
     min-width: 180px;
     overflow: visible;
-    background: transparent;
+    background: #fff;
 }
 
 .dropdown-content a {
     color: black;
     text-decoration: none;
     display: block;
-    min-width: 160px;
 }
 
-.dropdown-content a:hover {background-color: #1aa1de}
+.dropdown-content a:hover {
+    text-decoration: none;
+}
 
 .dropdown:hover .dropdown-content {
     display: block;
-}
-
-.dropdown:hover {
-    background-color: #0075b4 !important;
-    color: #fff !important;
 }

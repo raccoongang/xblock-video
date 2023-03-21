@@ -59,6 +59,7 @@
   border: 1px solid #0075b4;
   text-decoration: none;
   box-sizing: border-box;
+  width: calc(100% - 30px);
 }
 
 .upload-transcript:hover,
@@ -268,4 +269,39 @@
 .retranscode-button:hover {
     background-color: #065683;
     color: #fff;
+}
+
+.wrapper-translations-settings .language-transcript-selector .list-settings-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.wrapper-translations-settings .language-transcript-selector .list-settings-item select {
+  width: calc(100% - 30px);
+}
+
+.language-transcript-selector .remove-action {
+  display: flex;
+  width: 15px;
+  height: 15px;
+  align-items: center;
+  justify-content: center;
+}
+
+.language-transcript-selector .list-settings-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: calc(100% - 30px);
+}
+
+.language-transcript-selector .list-settings-buttons a {
+  margin: 0;
+}
+
+.language-transcript-selector .list-settings-buttons .upload-transcript,
+.language-transcript-selector .list-settings-buttons .download-setting {
+  width: 49%;
 }
