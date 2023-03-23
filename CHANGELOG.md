@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - The link to download the subtitle file is missing href to the subtitle file [RGOeX-25430]
 - Error during reading manually added subtitles [RGOeX-24483]
 
-## Added
+### Added
+- Add the ability to set start and end times for video playback for the Brightcove player [RGOeX-25454]
 - Add base color to edit modal window [xblock-video] (RGOeX-25432)
 - Add base color for subtitles list and player control buttons [xblock-video] (RGOeX-25440)
 
