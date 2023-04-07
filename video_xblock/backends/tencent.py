@@ -34,7 +34,7 @@ class TencentPlayer(BaseVideoPlayer):
 
         Tencent videos require AppId.
         """
-        return super(TencentPlayer, self).basic_fields + ['app_id']
+        return super().basic_fields + ['app_id']
 
     def validate_data(self, validation, data):
         """
@@ -44,9 +44,8 @@ class TencentPlayer(BaseVideoPlayer):
             validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
             data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
         """
-        # Validate provided app id
+
         if not data.app_id:
-            # AppId field is mandatory
             self.add_validation_message(
                 validation,
                 _("AppID can not be empty. Please provide a valid Tencent AppID.")

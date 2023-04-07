@@ -9,7 +9,7 @@ import requests
 from ddt import ddt, data, unpack
 from django.test.utils import override_settings
 from lxml import etree
-from mock import PropertyMock, Mock, MagicMock, patch
+from mock import PropertyMock, Mock, patch
 from xblock.core import XBlock
 
 from video_xblock.backends import (
