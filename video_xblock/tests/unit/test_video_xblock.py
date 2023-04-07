@@ -27,6 +27,7 @@ class VideoXBlockTests(VideoXBlockTestBase):  # pylint: disable=test-inherits-te
         """
 
         self.assertEqual(self.xblock.account_id, 'account_id')
+        self.assertEqual(self.xblock.app_id, '')
         self.assertEqual(self.xblock.captions_enabled, False)
         self.assertEqual(self.xblock.captions_language, '')
         self.assertEqual(self.xblock.current_time, 0)
@@ -50,25 +51,12 @@ class VideoXBlockTests(VideoXBlockTestBase):  # pylint: disable=test-inherits-te
         self.assertEqual(self.xblock.transcripts_enabled, False)
         self.assertEqual(self.xblock.volume, 1)
 
-    def test_get_brightcove_js_url(self):
-        """
-        Test brightcove.js url generation.
-        """
-        self.assertEqual(
-            VideoXBlock.get_brightcove_js_url(self.xblock.account_id, self.xblock.player_id),
-            "https://players.brightcove.net/{account_id}/{player_id}_default/index.min.js".format(
-                account_id=self.xblock.account_id,
-                player_id=self.xblock.player_id
-            )
-        )
-
     @patch('video_xblock.video_xblock.render_resource')
     @patch.object(VideoXBlock, 'route_transcripts', return_value=[])
     @patch.object(VideoXBlock, 'get_player')
     @patch.object(VideoXBlock, 'player_state', new_callable=PropertyMock)
-    @patch.object(VideoXBlock, 'get_brightcove_js_url')
     def test_render_player(
-            self, brightcove_js_url_mock, player_state_mock, player_mock,
+            self, player_state_mock, player_mock,
             route_transcripts_mock, render_resource_mock
     ):
         """
@@ -76,10 +64,13 @@ class VideoXBlockTests(VideoXBlockTestBase):  # pylint: disable=test-inherits-te
         """
         # Arrange
         request_mock, suffix_mock = Mock(), Mock()
-        render_resource_mock.return_value = u'vtt transcripts'
+        render_resource_mock.return_value = 'vtt transcripts'
         handler_url = self.xblock.runtime.handler_url = Mock()
         get_player_html_mock = player_mock.return_value.get_player_html
+        brightcove_js_url_mock = player_mock.return_value.get_js_url
+        brightcove_js_url_mock.return_value = 'test_js_url'
         media_id_mock = player_mock.return_value.media_id
+        self.xblock.player_name = PlayerName.BRIGHTCOVE
 
         # Act
         rendered_player = self.xblock.render_player(request_mock, suffix_mock)
@@ -94,10 +85,11 @@ class VideoXBlockTests(VideoXBlockTestBase):  # pylint: disable=test-inherits-te
             player_state=player_state_mock.return_value,
             save_state_url=handler_url.return_value,
             start_time=self.xblock.start_time.total_seconds(),  # pylint: disable=no-member
-            transcripts=u'vtt transcripts',
+            transcripts='vtt transcripts',
             url=self.xblock.href,
             video_id=media_id_mock.return_value,
-            video_player_id='video_player_block_id'
+            video_player_id='video_player_block_id',
+            app_id=self.xblock.app_id,
         )
         brightcove_js_url_mock.assert_called_once_with(
             self.xblock.account_id, self.xblock.player_id

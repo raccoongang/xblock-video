@@ -27,6 +27,7 @@ class PlayerName:
     VIMEO = 'vimeo-player'
     WISTIA = 'wistia-player'
     YOUTUBE = 'youtube-player'
+    TENCENT = 'tencent-player'
 
 
 class TranscriptSource:

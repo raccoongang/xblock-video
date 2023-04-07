@@ -25,7 +25,6 @@ from webob import Response
 from xblock.core import XBlock
 from xblock.fields import Scope, Boolean, String, Dict
 from xblock.fragment import Fragment
-from xblock.validation import ValidationMessage
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 
@@ -71,8 +70,11 @@ class VideoXBlock(
 
     href = String(
         default='',
-        display_name=_('Video URL'),
-        help=_('URL of the video page. E.g. https://example.wistia.com/medias/12345abcde'),
+        display_name=_('Video URL or FileId'),
+        help=_(
+            "Video URL of the video page. E.g. https://example.wistia.com/medias/12345abcde<br/>"
+            "FileId for Tencent Player E.g. 5285890799710670616"
+        ),
         scope=Scope.content
     )
 
@@ -100,6 +102,13 @@ class VideoXBlock(
         default='',
         display_name=_('Account Id'),
         help=_('Your Brightcove account id'),
+        scope=Scope.content,
+    )
+
+    app_id = String(
+        default='',
+        display_name=_('AppID'),
+        help=_('Your AppID of the VOD account. E.g. 1400329073'),
         scope=Scope.content,
     )
 
@@ -194,65 +203,6 @@ class VideoXBlock(
         """
         return self.get_player().editable_fields
 
-    @staticmethod
-    def get_brightcove_js_url(account_id, player_id):
-        """
-        Return url to brightcove player js file, considering `account_id` and `player_id`.
-
-        Arguments:
-            account_id (str): Account id fetched from video xblock.
-            player_id (str): Player id fetched from video xblock.
-        Returns:
-            Url to brightcove player js (str).
-        """
-        return "https://players.brightcove.net/{account_id}/{player_id}_default/index.min.js".format(
-            account_id=account_id,
-            player_id=player_id
-        )
-
-    @staticmethod
-    def add_validation_message(validation, message_text):
-        """
-        Add error message on xblock fields validation.
-
-        Attributes:
-            validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
-            message_text (unicode): Message text per se.
-        """
-        validation.add(ValidationMessage(ValidationMessage.ERROR, message_text))
-
-    def validate_account_id_data(self, validation, data):
-        """
-        Validate account id value which is mandatory.
-
-        Attributes:
-            validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
-            data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
-        """
-        account_id_is_empty = data.account_id in ['', u'']  # pylint: disable=unsubscriptable-object
-        # Validate provided account id
-        if account_id_is_empty:
-            # Account Id field is mandatory
-            self.add_validation_message(
-                validation,
-                _(u"Account ID can not be empty. Please provide a valid Brightcove Account ID.")
-            )
-            return
-
-        try:
-            response = requests.head(VideoXBlock.get_brightcove_js_url(data.account_id, data.player_id))
-            if not response.ok:
-                self.add_validation_message(validation, _(
-                    u"Invalid Account ID or Player ID, please recheck."
-                ))
-
-        except requests.ConnectionError:
-            self.add_validation_message(
-                validation,
-                _(u"Can't validate submitted account ID at the moment. "
-                  u"Please try to save settings one more time.")
-            )
-
     def validate_href_data(self, validation, data):
         """
         Validate href value.
@@ -285,10 +235,7 @@ class VideoXBlock(
             validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
             data (xblock.internal.VideoXBlockWithMixins): Object containing data on xblock.
         """
-        is_brightcove = str(self.player_name) == PlayerName.BRIGHTCOVE
-
-        if is_brightcove:
-            self.validate_account_id_data(validation, data)
+        self.get_player().validate_data(validation, data)
 
         self.validate_href_data(validation, data)
 
@@ -316,7 +263,7 @@ class VideoXBlock(
         for code in (lang_code, country_code):
             if pkg_resources.resource_exists(loader.module_name, text_js.format(lang_code=code)):
                 return text_js.format(lang_code=code)
-    
+
     def add_i18n_resource(self, frag):
         """
         Add translations source for frontend.
@@ -444,6 +391,9 @@ class VideoXBlock(
             'download_transcript_handler_url': download_transcript_handler_url,
             'i18n_service': self.runtime.service(self, 'i18n'),
         }
+        js_context = {
+            'advancedTabEnabled': player.advanced_tab_enabled,
+        }
 
         fragment.content = render_template('studio-edit.html', **context)
         fragment.add_css(resource_string("static/css/student-view.css"))
@@ -457,7 +407,7 @@ class VideoXBlock(
         fragment.add_javascript(resource_string("static/js/studio-edit/studio-edit.js"))
         fragment.add_javascript(resource_string("static/js/studio-edit/transcripts-autoload.js"))
         fragment.add_javascript(resource_string("static/js/studio-edit/transcripts-manual-upload.js"))
-        fragment.initialize_js('StudioEditableXBlock')
+        fragment.initialize_js('StudioEditableXBlock', js_context)
         return fragment
 
     @XBlock.handler
@@ -472,6 +422,7 @@ class VideoXBlock(
             Rendered html string as a Response (webob.Response).
         """
         player = self.get_player()
+        is_brightcove = str(self.player_name) == PlayerName.BRIGHTCOVE
         save_state_url = self.runtime.handler_url(self, 'save_player_state')
         transcripts = render_resource(
             'static/html/transcripts.html',
@@ -485,8 +436,9 @@ class VideoXBlock(
             player_state=self.player_state,
             start_time=int(self.start_time.total_seconds()),  # pylint: disable=no-member
             end_time=int(self.end_time.total_seconds()),  # pylint: disable=no-member
-            brightcove_js_url=VideoXBlock.get_brightcove_js_url(self.account_id, self.player_id),
+            brightcove_js_url=player.get_js_url(self.account_id, self.player_id) if is_brightcove else '',
             transcripts=transcripts,
+            app_id=self.app_id,
         )
 
     @XBlock.json_handler
@@ -545,7 +497,7 @@ class VideoXBlock(
         and lastly fall back to empty string.
         """
         backend_fields_help = self.get_player().fields_help
-        if field_name in backend_fields_help: # pylint: disable=no-else-return
+        if field_name in backend_fields_help:  # pylint: disable=no-else-return
             return backend_fields_help[field_name]
         elif field.help:
             return field.help

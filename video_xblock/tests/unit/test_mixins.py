@@ -3,7 +3,7 @@ VideoXBlock mixins test cases.
 """
 
 import json
-from collections import Iterable, OrderedDict
+from collections import Iterable
 
 import requests
 from django.test import RequestFactory
@@ -531,7 +531,7 @@ class TranscriptsMixinTests(VideoXBlockTestBase):  # pylint: disable=test-inheri
             transcripts = list(transcripts_gen)
 
             # Assert:
-            self.assertIsInstance(transcripts[0], OrderedDict)
+            self.assertIsInstance(transcripts[0], dict)
             self.assertSequenceEqual(test_args, list(transcripts[0].keys()))
 
             threepm_transcripts_mock.assert_called_once_with(file_id_mock, apikey_mock)
