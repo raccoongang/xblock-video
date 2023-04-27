@@ -527,7 +527,7 @@ function StudioEditableXBlock(runtime, element, context) {
     function successHandler(event, response, statusText, xhr, fieldName, lang, label, currentLiTag) {
         var url = '/' + response.asset.id;
         // User can upload a file without extension
-        var filename = $fileUploader[0].files[0].name;
+        var filename = response.asset.display_name;
         var downloadUrl = runtimeHandlers.downloadTranscript + '?' + url;
         var successMessage = gettext('File "{filename}" uploaded successfully').replace('{filename}', filename);
         var $parentDiv;
@@ -597,6 +597,7 @@ function StudioEditableXBlock(runtime, element, context) {
     }
 
     $fileUploader.on('change', function(event) {
+        var handlerUrl = runtimeHandlers.uploadManualTranscript;
         var $currentTarget = $(event.currentTarget);
         var fieldName = $currentTarget.attr('data-change-field-name');
         var lang = $currentTarget.attr('data-lang-code');
@@ -608,11 +609,18 @@ function StudioEditableXBlock(runtime, element, context) {
         }
         $('.upload-setting', element).addClass('is-disabled');
         $('.file-uploader-form', element).ajaxSubmit({
+            url: handlerUrl,
             success: function(response, statusText, xhr) {
                 successHandler(event, response, statusText, xhr, fieldName, lang, label, currentLiTag);
             },
             error: function(jqXHR, textStatus) {
-                runtime.notify('error', {title: gettext('Unable to update settings'), message: textStatus});
+                runtime.notify('error', {title: gettext('Unable to update settings'), message: jqXHR.responseText});
+                var errorMessage = gettext('Failed to upload file. Please try another file or contact the platform administrator.');
+                showStatus(
+                    $('.status', $(currentLiTag)),
+                    ERROR,
+                    errorMessage
+                );
             }
         });
         $('.upload-setting', element).removeClass('is-disabled');

@@ -1,10 +1,15 @@
 """
 Video XBlock mixins geared toward specific subsets of functionality.
 """
+import io
 import logging
-
 import requests
+
+from django.conf import settings
+from django.core.files.uploadedfile import InMemoryUploadedFile
+
 from pycaption import detect_format, WebVTTWriter
+from urllib.parse import urljoin
 from webob import Response
 
 from xblock.core import XBlock
@@ -13,6 +18,11 @@ from xblock.fields import Scope, Boolean, Float, String
 
 from .constants import DEFAULT_LANG, TPMApiTranscriptFormatID, TPMApiLanguage, TranscriptSource, Status, PlayerName
 from .utils import import_from, ugettext as _, underscore_to_mixedcase, Transcript
+
+from common.djangoapps.util.date_utils import get_default_time_display
+from openedx.core.djangoapps.contentserver.middleware import StaticContentServer
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from xmodule.contentstore.content import StaticContent
 
 log = logging.getLogger(__name__)
 
@@ -80,6 +90,48 @@ class TranscriptsMixin(XBlock):
         scope=Scope.content,
         resettable_editor=False
     )
+
+    @staticmethod
+    def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked):
+        """
+        Helper method for formatting the asset information to send to client.
+        """
+        asset_url = StaticContent.serialize_asset_key_with_slash(location)
+        external_url = urljoin(configuration_helpers.get_value('LMS_ROOT_URL', settings.LMS_ROOT_URL), asset_url)
+        return {
+            'display_name': display_name,
+            'content_type': content_type,
+            'date_added': get_default_time_display(date),
+            'url': asset_url,
+            'external_url': external_url,
+            'portable_url': StaticContent.get_static_path_from_location(location),
+            'thumbnail': StaticContent.serialize_asset_key_with_slash(thumbnail_location) if thumbnail_location else None,
+            'locked': locked,
+            # needed for Backbone delete/update.
+            'id': str(location)
+        }
+
+    def _convert_file_to_vtt(self, file, filename):
+        """
+        Helper method for converting srt files to vtt format.
+        """
+        caps_bytes = file.read()
+        caps = caps_bytes.decode('UTF-8')
+        try:
+            transcript_vtt = self.convert_caps_to_vtt(caps)
+        except IndexError:
+            return
+
+        filename = filename.replace(".srt", ".vtt")
+        transcript_bytes = bytes(transcript_vtt, 'utf-8')
+        return InMemoryUploadedFile(
+            file=io.BytesIO(transcript_bytes),
+            name=filename,
+            content_type='text/plain',
+            size=len(transcript_bytes),
+            field_name='transcript',
+            charset=None
+        )
 
     @staticmethod
     def convert_caps_to_vtt(caps):
@@ -335,6 +387,12 @@ class TranscriptsMixin(XBlock):
         response.headerlist = headerlist
         return response
 
+    # TODO: This method should be removed in the future.
+    # For new installations, this method is not needed, since the transcript
+    # files are saved in VTT format.
+    # To support existing installations, we need to create a management command
+    # that can convert the current transcript files to the VTT format. 
+    # Once the command is implemented, we can remove the existing srt_to_vtt method.
     @XBlock.handler
     def srt_to_vtt(self, request, _suffix=''):
         """
@@ -349,7 +407,12 @@ class TranscriptsMixin(XBlock):
             webob.Response: WebVTT transcripts wrapped in Response object.
         """
         caps_path = request.query_string
-        caps = requests.get(request.host_url + caps_path).text
+        loc = StaticContent.get_location_from_path(caps_path)
+        static_cont_serv = StaticContentServer()
+        content_transcript = static_cont_serv.load_asset_from_location(loc)
+        caps_bytes = b''.join(content_transcript.stream_data())
+        caps = caps_bytes.decode('UTF-8')
+
         return Response(self.convert_caps_to_vtt(caps))
 
     @XBlock.handler

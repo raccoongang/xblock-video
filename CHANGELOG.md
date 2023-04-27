@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## Added
+- Convert transcript file to .vtt format on manual upload [xblock-video] (RGOeX-25759)
 
 ### Fixed
 - Fix transcript appearing and controls buttons positioning for Brightcove player [xblock-video] (RGOeX-25698)
