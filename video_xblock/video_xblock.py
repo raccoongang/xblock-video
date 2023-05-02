@@ -16,28 +16,40 @@ import datetime
 import json
 import logging
 import os.path
-
-from django.utils.translation import get_language
-import requests
 import pkg_resources
 
+from cms.djangoapps.contentstore.views.assets import update_course_run_asset
+from django.utils.translation import get_language
+from opaque_keys.edx.keys import CourseKey
 from webob import Response
 from xblock.core import XBlock
-from xblock.fields import Scope, Boolean, String, Dict
+from xblock.fields import Boolean, Dict, Scope, String
 from xblock.fragment import Fragment
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
+from xmodule.contentstore.django import contentstore
 
 from . import __version__
 from .backends.base import BaseVideoPlayer
 from .constants import PlayerName, TranscriptSource
 from .exceptions import ApiClientError
 from .fields import RelativeTime
-from .mixins import ContentStoreMixin, LocationMixin, PlaybackStateMixin, SettingsMixin, TranscriptsMixin
+from .mixins import (
+    ContentStoreMixin,
+    LocationMixin,
+    PlaybackStateMixin,
+    SettingsMixin,
+    TranscriptsMixin
+)
 from .settings import ALL_LANGUAGES
 from .utils import (
-    create_reference_name, filter_transcripts_by_source, normalize_transcripts,
-    render_resource, render_template, resource_string, ugettext as _,
+    create_reference_name,
+    filter_transcripts_by_source,
+    normalize_transcripts,
+    render_resource,
+    render_template,
+    resource_string,
+    ugettext as _
 )
 from .workbench.mixin import WorkbenchMixin
 
@@ -748,6 +760,51 @@ class VideoXBlock(
             self.metadata['access_token'] = ''  # Brightcove API
             self.metadata['client_id'] = ''  # Brightcove API
             self.metadata['client_secret'] = ''  # Brightcove API
+
+    @XBlock.handler
+    def upload_manual_transcript_handler(self, request, suffix=''):
+        """
+        Upload manual transcript for video xblock.
+
+        Saves transcript as the .vtt file.
+        Performs file conversion beforehand (if a different supported file type is received).
+        """
+        upload = request.params.get("file")
+        upload_file = upload.file
+        course_key_string = request.params.get('course_key')
+        course_key = CourseKey.from_string(course_key_string)
+        filename = upload_file.name.replace(" ", "_")
+        
+        # Files in the .vtt format are saved without conversion. 
+        # The transcript in the .srt format should be converted to the .vtt format 
+        # and then saved using the standard flow.
+        if not filename.endswith('.vtt'):
+            upload_file = self._convert_file_to_vtt(upload_file, filename)
+            if not upload_file:
+                return Response(
+                    json.dumps({'message': _("Failed to convert file.")}),
+                    status_code=422,
+                    content_type='application/json',
+                    charset='utf8'
+                )
+        # returns contents of the uploaded file
+        content = update_course_run_asset(course_key, upload_file)
+        # readback the saved content - we need the database timestamp
+        readback = contentstore().find(content.location)
+        locked = getattr(content, 'locked', False)
+        response = {
+            'asset': self._get_asset_json(
+                content.name,
+                content.content_type,
+                readback.last_modified_at,
+                content.location,
+                content.thumbnail_location,
+                locked
+            ),
+            'msg': _('Upload completed')
+        }
+
+        return Response(json.dumps(response), content_type='application/json', charset='utf8')
 
     @XBlock.json_handler
     def upload_default_transcript_handler(self, data, _suffix=''):
