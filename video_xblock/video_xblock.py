@@ -18,7 +18,6 @@ import logging
 import os.path
 import pkg_resources
 
-from cms.djangoapps.contentstore.views.assets import update_course_run_asset
 from django.utils.translation import get_language
 from opaque_keys.edx.keys import CourseKey
 from webob import Response
@@ -769,14 +768,17 @@ class VideoXBlock(
         Saves transcript as the .vtt file.
         Performs file conversion beforehand (if a different supported file type is received).
         """
+        # due to the circular import
+        from cms.djangoapps.contentstore.views.assets import update_course_run_asset
+
         upload = request.params.get("file")
         upload_file = upload.file
         course_key_string = request.params.get('course_key')
         course_key = CourseKey.from_string(course_key_string)
         filename = upload_file.name.replace(" ", "_")
-        
-        # Files in the .vtt format are saved without conversion. 
-        # The transcript in the .srt format should be converted to the .vtt format 
+
+        # Files in the .vtt format are saved without conversion.
+        # The transcript in the .srt format should be converted to the .vtt format
         # and then saved using the standard flow.
         if not filename.endswith('.vtt'):
             upload_file = self._convert_file_to_vtt(upload_file, filename)
