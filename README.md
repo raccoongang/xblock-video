@@ -75,11 +75,32 @@ Sample supported video URLs:
 - Wistia: https://raccoongang.wistia.com/medias/xmpqebzsya
 - Youtube: https://www.youtube.com/watch?v=3_yD_cEKoCk and others.
 
+### Vimeo
+
+Vimeo is an online video platform that allows users to upload, view, and share videos.
+It is designed for storing and publishing professional and user-generated video content,
+including films, music videos, video tutorials, and much more. Vimeo offers both free
+and paid subscriptions, depending on how users want to use the platform.
+
+There is a known issue related to the subtitles/transcripts' functionality.
+The Vimeo player will only display subtitles uploaded through the Vimeo platform account
+web page. To allow users to download Vimeo subtitles you'll need the Vimeo API key added
+to the x-block advanced settings. Transcripts uploaded through the Studio for the video
+block can be used only for download.
+
 ### Brightcove
 
 To successfully use videos hosted on Brightcove Videocloud service one must
 provide valid Brightcove `account_id` associated with the video. To find out
 your `account_id` go to [Videocloud studio] -> _Admin_ -> _Account Information_.
+
+Currently, Brightcove does not provide a free account for working with their service.
+A trial account is available for one month and can be activated with the help of
+their support team. At the moment, RG does not have an account that would allow
+updating and testing the functionality of the Video X-Block with the Brightcove service.
+Our Video X-Block is integrated with the Brightcove service, but we cannot
+test certain features associated with it. As a result, we cannot guarantee error-free
+usage of this provider.
 
 [Videocloud studio]: https://studio.brightcove.com/products/videocloud/home
 
@@ -124,6 +145,12 @@ To do so:
 Re-transcode is performed by Brightcove's Videocloud and takes few minutes. After it's done `Brightcove Video tech info` section will be updated.
 
 ### Wistia
+
+It is currently possible to use the Wistia provider in Video XBlock.
+However, to fully test all the functionality of the XBlock when working
+with this provider, a paid Wistia account is required. RG does not have 
+such an account. Therefore, we are unable to test the functionality of
+transcripts that are connected to videos in the Wistia studio.
 
 #### How to disable captions auto uploading in Wistia plugin
 
