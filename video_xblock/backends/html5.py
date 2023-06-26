@@ -86,3 +86,12 @@ class Html5Player(BaseVideoPlayer):
             "playbackRates": [0.5, 1, 1.5, 2],
         })
         return result
+
+    @property
+    def trans_fields(self):
+        """
+        List of VideoXBlock fields to display on `Manual & default transcripts` panel for Html5 Player.
+        """
+        fields = super().trans_fields
+
+        return [field for field in fields if field not in self.exclude_advanced_fields]
