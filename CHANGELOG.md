@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ## Added
+- Removed the "Default Timed Transcript Functionality" for HTML 5 Video Provider [xblock-video] (RGOeX-25745)
 - Convert transcript file to .vtt format on manual upload [xblock-video] (RGOeX-25759)
 
 ### Fixed
