@@ -11,6 +11,7 @@ Supported video platforms:
 
 - Brightcove
 - Html5
+- Tencent
 - Vimeo
 - Wistia
 - Youtube
@@ -71,7 +72,7 @@ Sample supported video URLs:
 
 - Brightcove: https://studio.brightcove.com/products/videocloud/media/videos/12345678 or https://studio.brightcove.com/products/videos/12345678
 - HTML5: https://example.com/video.mpeg|mp4|ogg|webm
-- Vimeo: https://vimeo.com/abcd1234
+- Vimeo: https://vimeo.com/773500743
 - Wistia: https://raccoongang.wistia.com/medias/xmpqebzsya
 - Youtube: https://www.youtube.com/watch?v=3_yD_cEKoCk and others.
 
@@ -125,9 +126,9 @@ usage of this provider.
 
    3. You should see a prompt appear that contains your BC_TOKEN.
     ![BC_TOKEN sample](https://learning-services-media.brightcove.com/doc-assets/video-cloud-apis/ingest-profiles-api/guides/prompt-with-token-safari.png "Sample BC_TOKEN")
-2. Open Video XBlock settings, Advanced tab. Scroll down to `Video API Token` section.
-3. Put `BC_TOKEN` taken from Brightcvove into `Client Token` field.
-4. Click on `Connect to video platform` button.
+1. Open Video XBlock settings, Advanced tab. Scroll down to `Video API Token` section.
+1. Put `BC_TOKEN` taken from Brightcvove into `Client Token` field.
+1. Click on `Connect to video platform` button.
 
 [Videocloud Studio]: https://studio.brightcove.com/products/videocloud/home
 [BC_TOKEN]: https://docs.brightcove.com/en/video-cloud/media-management/guides/authentication.html
@@ -144,6 +145,18 @@ To do so:
 
 Re-transcode is performed by Brightcove's Videocloud and takes few minutes. After it's done `Brightcove Video tech info` section will be updated.
 
+### Tencent
+
+TencentPlayer is used for videos hosted on tencent cloud.
+To test this player, you need to create a Tencent test account in the cloud.
+But to register for this service, you need to link a card and pass verification.
+
+Internal RG tickets with the testing outputs:
+- [initial implementation and testing](https://youtrack.raccoongang.com/issue/HARROW-976)
+- [RGOeX-25789](https://youtrack.raccoongang.com/issue/RGOeX-25789).
+
+Note: [Tencent Cloud Documentation](https://www.tencentcloud.com/document/product)
+
 ### Wistia
 
 It is currently possible to use the Wistia provider in Video XBlock.
@@ -151,6 +164,15 @@ However, to fully test all the functionality of the XBlock when working
 with this provider, a paid Wistia account is required. RG does not have 
 such an account. Therefore, we are unable to test the functionality of
 transcripts that are connected to videos in the Wistia studio.
+
+Note: There have been [changes](https://wistia.com/support/developers/wistia-deprecation-schedule)
+in the provision of API at this provider.
+
+#### Connect to Wistia Platform
+
+1. Create a Wistia account and create an app. Copy the API Token in the settings.
+1. Write the API Token in the Client Token field in the X-Block settings.
+1. Uploading a video and transcripts to the Wistia service.
 
 #### How to disable captions auto uploading in Wistia plugin
 
@@ -162,6 +184,42 @@ transcripts that are connected to videos in the Wistia studio.
    Video XBlock.
 
 ![disable captions in Wistia](doc/img/wistia_1.png)
+
+### HTML 5
+
+This provider is used to play videos uploaded to the Platform or located
+elsewhere (the backend processes the direct URL to the video).
+Currently, at the backend level, the option to use Default Timed Transcript
+for HTML5 has been disabled through the exclusion of advanced fields:
+`exclude_advanced_fields = ('default_transcripts', 'download_video_url')`
+As a result, for the HTML5 provider, the fields for Default Timed Transcript
+and Video API Token in the Advanced Settings (located below the Enabled
+transcripts field) are disabled.
+
+![disable Default Timed Transcript and Video API Token in HTML_5](doc/img/HTML_5.png)
+
+#### Additional information on downloading default transcripts
+
+When uploading a transcript file to the platform, check the format of the file.
+The format of the uploaded transcript file must be *.vtt* or *.srt*.
+During the loading to the Video Xblock - the .vtt files are fetched
+directly without conversion. If the file format is *.srt*, then the file
+is converted and saved on the platform in *.vtt* format.
+If the file format is *.vtt*, upload it to the platform occurs without any changes.
+
+### Kown issues
+
+1. **YouTube** video hasn't been reproduced in Chrome:
+    - doesnʼt work with Chrome on MacOS
+    - works fine with Safari and Firefox on MacOS
+    - if add a video block and default video to the same page - the video
+    block works only after the default video was played
+1. The operation of the **Brightcove** service has not been fully tested, due
+to the need for a paid account.
+1. The transcription-receiving functionality is only available for paid **Wistia** plans.
+1. The **Vimeo** player will only display subtitles uploaded through the Vimeo
+platform account web page. Transcripts uploaded through the Studio for the video
+block can be used only for download.
 
 ### Set default values in config files
 

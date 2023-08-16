@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## Added
+- Update the README [xblock-video] (RGOeX-26032)
+
 ## [1.2.0] 2023-07-21
 
 ## Added
