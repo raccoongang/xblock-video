@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- 500 error during upload hangout file [RGOeX-25995]
+
 ## Added
 - Update the README [xblock-video] (RGOeX-26032)
 

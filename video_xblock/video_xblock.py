@@ -761,12 +761,11 @@ class VideoXBlock(
             self.metadata['client_secret'] = ''  # Brightcove API
 
     @XBlock.handler
-    def upload_manual_transcript_handler(self, request, suffix=''):
+    def upload_file_handler(self, request, suffix=''):
         """
-        Upload manual transcript for video xblock.
+        Upload manual transcript or handouts for video xblock.
 
-        Saves transcript as the .vtt file.
-        Performs file conversion beforehand (if a different supported file type is received).
+        Transcripts are saved as the `.vtt` files (with the file conversion to `.vtt`).
         """
         # due to the circular import
         from cms.djangoapps.contentstore.views.assets import update_course_run_asset
@@ -777,18 +776,18 @@ class VideoXBlock(
         course_key = CourseKey.from_string(course_key_string)
         filename = upload_file.name.replace(" ", "_")
 
-        # Files in the .vtt format are saved without conversion.
+        # All upload files (except for .srt) are saved without conversion.
         # The transcript in the .srt format should be converted to the .vtt format
         # and then saved using the standard flow.
-        if not filename.endswith('.vtt'):
+        if filename.endswith('.srt'):
             upload_file = self._convert_file_to_vtt(upload_file, filename)
-            if not upload_file:
-                return Response(
-                    json.dumps({'message': _("Failed to convert file.")}),
-                    status_code=422,
-                    content_type='application/json',
-                    charset='utf8'
-                )
+        if not upload_file:
+            return Response(
+                json.dumps({'message': _("Failed to convert file.")}),
+                status_code=422,
+                content_type='application/json',
+                charset='utf8'
+            )
         # returns contents of the uploaded file
         content = update_course_run_asset(course_key, upload_file)
         # readback the saved content - we need the database timestamp
