@@ -95,7 +95,11 @@ function validateTranscriptFile(event, fieldName, filename, $fileUploader) {
     // We still need to validate file extension, since a user can override an `accept` attribute,
     // that is, choose file of any format to submit through a file upload
     if (isNotAcceptedFormat) {
-        errorMessage += 'Please upload a file of "vtt" or "srt" format only. ';
+        if (fieldName === 'transcripts') {
+            errorMessage += 'Please upload a file of "vtt" or "srt" format only. ';
+        } else {
+            errorMessage += 'Unsupported file type. ';
+        }
         isValid = false;
     }
     if (isNotAcceptedSize) {
