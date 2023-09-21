@@ -455,6 +455,11 @@ body {
     border-left: 2px solid #cb598d;
 }
 
+.vjs-playback-rate .vjs-menu .vjs-menu-content li.selected-item {
+    color: #cb598d;
+    border-left: 2px solid #cb598d;
+}
+
 .vjs-text-track-display div div {
     width: 100% !important;
 }

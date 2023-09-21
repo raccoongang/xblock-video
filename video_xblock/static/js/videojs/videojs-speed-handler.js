@@ -44,6 +44,16 @@
         playbackRateMenuButtonExtended.prototype.updateLabel = function() {
             var speed = this.player().playbackRate() || 1;
             this.labelEl_.innerHTML = speed + 'x';
+
+            var playbackRateMenuItems = this.el_.children[0].querySelectorAll('.vjs-menu-item');
+
+            playbackRateMenuItems.forEach((item) => {
+                if (item.innerText === (speed + 'x')) {
+                    item.classList.add('selected-item')
+                } else {
+                    item.classList.remove('selected-item')
+                }
+            })
         };
 
         /**
