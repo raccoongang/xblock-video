@@ -450,11 +450,7 @@ body {
     color: #e7ecee;
     font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
 }
-.vjs-playback-rate .vjs-menu .vjs-menu-content li:focus {
-    color: #cb598d;
-    border-left: 2px solid #cb598d;
-}
-
+.vjs-playback-rate .vjs-menu .vjs-menu-content li:focus,
 .vjs-playback-rate .vjs-menu .vjs-menu-content li.selected-item {
     color: #cb598d;
     border-left: 2px solid #cb598d;

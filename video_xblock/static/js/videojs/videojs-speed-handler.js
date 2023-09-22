@@ -49,9 +49,9 @@
 
             playbackRateMenuItems.forEach((item) => {
                 if (item.innerText === (speed + 'x')) {
-                    item.classList.add('selected-item')
+                    item.classList.add('selected-item');
                 } else {
-                    item.classList.remove('selected-item')
+                    item.classList.remove('selected-item');
                 }
             })
         };
