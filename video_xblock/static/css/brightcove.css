@@ -44,11 +44,12 @@
     font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 14px;
     background-color: inherit;
+    overflow: auto;
 }
 
 .transcript-body {
     max-height: 100%;
-    overflow: scroll;
+    /*overflow: scroll;*/
     padding: 0 0 0 20px;
 }
 
