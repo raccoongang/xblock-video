@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Fixed
+- Fixed progress line styles [RGOeX-25758]
 - Incorrect error message when uploading handouts in an unsupported format [RGOeX-26044]
 - 500 error during upload hangout file [RGOeX-25995]
 
