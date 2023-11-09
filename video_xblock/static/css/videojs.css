@@ -35,6 +35,10 @@ body {
     background: none !important;
 }
 
+.video-js .vjs-progress-holder .vjs-load-progress {
+    overflow: hidden;
+}
+
 .video-js .vjs-progress-holder .vjs-load-progress,
 .video-js .vjs-progress-holder .vjs-load-progress div,
 .video-js .vjs-progress-holder .vjs-play-progress,

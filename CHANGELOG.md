@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Fixed
+- Progress line width exceeded video player limits (HTML5) [RGOeX-26169]
 - Progress line width exceeded video player limits (Brightcove) [RGOeX-25758]
 - Incorrect error message when uploading handouts in an unsupported format [RGOeX-26044]
 - 500 error during upload hangout file [RGOeX-25995]
