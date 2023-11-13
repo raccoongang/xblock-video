@@ -388,7 +388,6 @@ THE SOFTWARE. */
   function injectCss() {
     var css = // iframe blocker to catch mouse events
               '.vjs-vimeo .vjs-iframe-blocker { display: none; }' +
-              '.vjs-vimeo.vjs-user-inactive .vjs-iframe-blocker { display: block; }' +
               '.vjs-vimeo .vjs-poster { background-size: cover; }' +
               // '.vjs-vimeo { height:100%; }' +
               '.vimeoplayer { width:100%; height:180%; position:absolute; left:0; top:-40%; }';
