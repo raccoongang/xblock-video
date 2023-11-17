@@ -7,6 +7,9 @@ domReady(function() {
     videojs(window.videoPlayerId).ready(function() {
         var enableTrack = false;
         var player_ = this;
+        var frozen = false;
+        var autoScrolling = true;
+        var CAPTIONS_FREEZE_TIME = 10000;
         var cssClasses = 'vjs-custom-caption-button vjs-menu-button vjs-menu-button-popup vjs-control vjs-button';
         // attach the widget to the page
         var transcriptContainer = document.getElementById('transcript');
@@ -58,6 +61,15 @@ domReady(function() {
             transcriptContainer.classList.remove('is-hidden');
             this.transcriptsEnabled = true;
             this.trigger('transcriptstatechanged');
+
+            var transcriptContainerItem = transcriptContainer.querySelectorAll('.transcript-line');
+            // Add listening events for transcript's children lines for pausing and starting auto scrolling
+            Array.from(transcriptContainerItem).forEach(function(line) {
+                line.addEventListener('mousedown', captionMouseDown);
+                line.addEventListener('focusin', captionFocus);
+                line.addEventListener('focusout', captionBlur);
+                line.addEventListener('keydown', captionKeyDown);
+            });
         });
         this.on('transcriptdisabled', function() {
             transcriptContainer.classList.add('is-hidden');
@@ -106,5 +118,80 @@ domReady(function() {
             cssClasses: cssClasses,
             tabIndex: 7
         });
+
+        // Add listening events for transcripts block for pausing and starting auto scrolling
+        transcriptContainer.addEventListener('mouseenter', onMouseEnter);
+        transcriptContainer.addEventListener('mouseleave', onMouseLeave);
+        transcriptContainer.addEventListener('mousemove', onMouseEnter);
+        transcriptContainer.addEventListener('mousewheel', onMouseEnter);
+        transcriptContainer.addEventListener('DOMMouseScroll', onMouseEnter);
+
+        // Update transcripts scroll position on player time update.
+        player_.on('timeupdate', scrollCaption);
+
+        // Freezes moving of captions when mouse is over them.
+        function onMouseEnter() {
+            if (frozen) {
+                clearTimeout(frozen);
+            }
+
+            frozen = setTimeout(onMouseLeave, CAPTIONS_FREEZE_TIME);
+        }
+
+        // Unfreezes moving of captions when mouse go out.
+        function onMouseLeave() {
+            if (frozen) {
+                clearTimeout(frozen);
+            }
+
+            frozen = null;
+        }
+
+        // Scrolls caption container to make active caption visible.
+        function scrollCaption() {
+            // Automatic scrolling gets disabled if one of the captions has
+            // received focus through tabbing.
+            if (!frozen && player_.transcriptsEnabled && autoScrolling) {
+                var transcriptContainer = document.getElementById('transcript');
+                var el = transcriptContainer.querySelector('.is-active');
+                transcriptContainer.scrollTo({
+                    top: calculateOffset(el),
+                });
+            }
+        }
+
+        // Calculates offset for paddings.
+        function calculateOffset(element) {
+            var transcriptContainer = document.getElementById('transcript');
+            var captionHeight = transcriptContainer.offsetHeight;
+            return element.offsetTop - captionHeight / 2;
+        }
+
+        // Handles mousedown event on concrete caption.
+        function captionMouseDown() {
+            // Continue auto scrolling if mouse move out from the transcript block.
+            autoScrolling = true;
+        }
+
+        // Handles focus event on concrete caption.
+        function captionFocus() {
+            // If the focus comes from tabbing, turn off automatic scrolling.
+            autoScrolling = false;
+        }
+
+        // Handles blur event on concrete caption.
+        function captionBlur() {
+            // Continue auto scrolling if focus move out from the transcript block.
+            autoScrolling = true;
+        }
+
+        // Handles keydown event on concrete caption.
+        function captionKeyDown(event) {
+            var time = event.target.getAttribute('data-begin');
+
+            if (event.which === 13 && time) { // Enter key
+                player_.currentTime(time);
+            }
+        }
     });
 });
