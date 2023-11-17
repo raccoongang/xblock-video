@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - 500 error during upload hangout file [RGOeX-25995]
 
 ## Added
+- Add transcripts auto-scrolling on play (RGOeX-26175)
 - Update the README [xblock-video] (RGOeX-26032)
 
 ## [1.2.0] 2023-07-21
