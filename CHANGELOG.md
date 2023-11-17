@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Fixed
+- Too fast hiding of video settings menu (Vimeo) [RGOeX-26171]
 - Captions toggling and displaying (HTML5)(Chrome/Safari) [RGOeX-26170]
 - Progress line width exceeded video player limits (HTML5) [RGOeX-26169]
 - Progress line width exceeded video player limits (Brightcove) [RGOeX-25758]
