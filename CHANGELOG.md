@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Progress line width exceeded video player limits (Brightcove) [RGOeX-25758]
 - Incorrect error message when uploading handouts in an unsupported format [RGOeX-26044]
 - 500 error during upload hangout file [RGOeX-25995]
+- Replace `ifequal` with `if` to support Django >= 4
 
 ## Added
 - Add transcripts auto-scrolling on play (RGOeX-26175)
