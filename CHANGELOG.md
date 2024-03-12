@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.0] 2024-03-12
+
 ### Fixed
 - Too fast hiding of video settings menu (Vimeo) [RGOeX-26171]
 - Captions toggling and displaying (HTML5)(Chrome/Safari) [RGOeX-26170]
