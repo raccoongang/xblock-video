@@ -82,3 +82,7 @@
 .is-visible {
     display: block !important;
 }
+
+.vjs-load-progress div[data-start] {
+    left: 0 !important;
+}

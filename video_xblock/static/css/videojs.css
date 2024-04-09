@@ -1,6 +1,7 @@
 body {
     margin: 0;
     display: flex;
+    height: 100%;
 }
 
 .video-js .vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
@@ -32,6 +33,10 @@ body {
     top: -1em;
     height: 10px;
     background: none !important;
+}
+
+.video-js .vjs-progress-holder .vjs-load-progress {
+    overflow: hidden;
 }
 
 .video-js .vjs-progress-holder .vjs-load-progress,
@@ -377,11 +382,11 @@ body {
     font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 14px;
     background-color: inherit;
+    overflow: auto;
 }
 
 .transcript-body {
     max-height: 100%;
-    overflow: scroll;
     padding: 0 0 0 20px;
 }
 

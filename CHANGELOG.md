@@ -7,12 +7,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.0] 2024-03-12
+
 ### Fixed
 - Display selected item in playback menu [RGOeX-25733]
+- Too fast hiding of video settings menu (Vimeo) [RGOeX-26171]
+- Captions toggling and displaying (HTML5)(Chrome/Safari) [RGOeX-26170]
+- Progress line width exceeded video player limits (HTML5) [RGOeX-26169]
+- Progress line width exceeded video player limits (Brightcove) [RGOeX-25758]
 - Incorrect error message when uploading handouts in an unsupported format [RGOeX-26044]
 - 500 error during upload hangout file [RGOeX-25995]
+- Replace `ifequal` with `if` to support Django >= 4
 
 ## Added
+- Add transcripts auto-scrolling on play (RGOeX-26175)
 - Update the README [xblock-video] (RGOeX-26032)
 
 ## [1.2.0] 2023-07-21

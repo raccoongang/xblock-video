@@ -56,6 +56,8 @@ class Html5Player(BaseVideoPlayer):
         """
         data_setup = Html5Player.player_data_setup(context)
         data_setup['sources'][0]['type'] = self.get_type(context['url'])
+        data_setup['html5'] = {'nativeTextTracks': False}
+        data_setup['textTrackSettings'] = True
         context['data_setup'] = json.dumps(data_setup)
 
         frag = super(Html5Player, self).get_frag(**context)
