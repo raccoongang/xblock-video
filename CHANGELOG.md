@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Display selected item in playback menu [RGOeX-25733]
+
 ## [1.3.0] 2024-03-12
 
 ### Fixed
