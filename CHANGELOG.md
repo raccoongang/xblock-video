@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Display selected item in playback menu [RGOeX-25733]
+- Pause on mouse hover or focus on the transcript item/block [RGOeX-26175]
 
 ## [1.3.0] 2024-03-12
 
