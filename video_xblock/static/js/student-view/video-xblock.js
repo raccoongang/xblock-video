@@ -71,7 +71,8 @@ function VideoXBlockStudentViewInit(runtime, element) {
                 // eslint-disable-next-line no-use-before-define
                 updateTranscriptDownloadUrl(event.data.downloadTranscriptUrl);
             }
-            var url = handlers[event.data.action][event.data.xblockUsageId];  // eslint-disable-line vars-on-top
+            var action = handlers[event.data.action];
+            var url = action[event.data.xblockUsageId] || action[event.data.xblockFullUsageId];  // eslint-disable-line vars-on-top
             if (url) {
                 sendData(url, event.data.info);
             }
