@@ -130,12 +130,14 @@
          */
         this.log = function(eventName, data) {
             var xblockUsageId = getXblockUsageId();
+            var xblockFullUsageId = getXblockFullUsageId();
             data = data || {};  //  eslint-disable-line no-param-reassign
             data.eventType = 'xblock-video.' + eventName;  //  eslint-disable-line no-param-reassign
             parent.postMessage({
                 action: 'analytics',
                 info: data,
-                xblockUsageId: xblockUsageId
+                xblockUsageId: xblockUsageId,
+                xblockFullUsageId: xblockFullUsageId,
             }, document.location.protocol + '//' + document.location.host);
         };
         return this;

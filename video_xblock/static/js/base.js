@@ -14,6 +14,15 @@ var getXblockUsageId = function() {
     return window.location.hash.slice(1);
 };
 
+/** Get XblockFullUsageId id from xblock's url. */
+var getXblockFullUsageId = function() {
+    'use strict';
+    var startIdx = window.location.pathname.indexOf('/xblock/') + '/xblock/'.length;
+    var endIdx = window.location.pathname.indexOf('/handler/');
+
+    return window.location.pathname.slice(startIdx, endIdx);
+};
+
 /** Get transcript url for current caption language */
 var getDownloadTranscriptUrl = function(transcripts, player) {
     'use strict';
