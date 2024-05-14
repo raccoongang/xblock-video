@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.1] 2024-05-14
+
 ### Fixed
 - Request URL for sending analytics data [RGA-936]
 - Display selected item in playback menu [RGOeX-25733]
