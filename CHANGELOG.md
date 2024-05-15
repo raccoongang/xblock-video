@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## Added
+- Implement XBlock completion by the view video progress (RGOeX-26584)
+
 ## [1.3.1] 2024-05-14
 
 ### Fixed

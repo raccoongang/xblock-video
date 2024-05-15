@@ -22,6 +22,7 @@ from django.utils.translation import get_language
 from opaque_keys.edx.keys import CourseKey
 from webob import Response
 from xblock.core import XBlock
+from xblock.completable import XBlockCompletionMode
 from xblock.fields import Boolean, Dict, Scope, String
 from xblock.fragment import Fragment
 from xblockutils.resources import ResourceLoader
@@ -69,6 +70,9 @@ class VideoXBlock(
     declare what fields are required for proper configuration of a video.
     See `BaseVideoPlayer.basic_fields` and `BaseVideoPlayer.advanced_fields`.
     """
+
+    has_custom_completion = True
+    completion_mode = XBlockCompletionMode.COMPLETABLE
 
     icon_class = "video"
 

@@ -248,6 +248,7 @@ class BaseVideoPlayer(Plugin):
             'static/js/videojs/videojs-tabindex.js',
             'static/js/videojs/toggle-button.js',
             'static/js/videojs/videojs-event-plugin.js',
+            'static/js/videojs/videojs-completions.js',
             'static/js/videojs/fullscreen-extends.js',
         ]
 
@@ -273,6 +274,12 @@ class BaseVideoPlayer(Plugin):
             "playbackRates": [0.5, 1, 1.5, 2],
             "plugins": {
                 "xblockEventPlugin": {},
+                "xblockCompletionPlugin": {
+                    "completionEnabled": True,
+                    "startTime": context['start_time'],
+                    "endTime": context['end_time'],
+                    "isComplete": False, # TODO: should be replaced with dynamic data from the Backend
+                    },
                 "offset": {
                     "start": context['start_time'],
                     "end": context['end_time'],
