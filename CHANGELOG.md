@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Added adaptability for mobile devices [RGOeX-26487]
+
 ## [1.3.1] 2024-05-14
 
 ### Fixed

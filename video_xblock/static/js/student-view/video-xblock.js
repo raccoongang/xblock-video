@@ -67,6 +67,13 @@ function VideoXBlockStudentViewInit(runtime, element) {
             return;
         }
         try {
+            if (event.data.action === 'transcript') {
+                var iframeWrapper = document.querySelector('.video-iframe-holder');
+                event.data.type === 'transcriptenabled'
+                    ? iframeWrapper.classList.add('transcriptenabled')
+                    : iframeWrapper.classList.remove('transcriptenabled');
+                return;
+            }
             if (event.data.action === 'downloadTranscriptChanged') {
                 // eslint-disable-next-line no-use-before-define
                 updateTranscriptDownloadUrl(event.data.downloadTranscriptUrl);

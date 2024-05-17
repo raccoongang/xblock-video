@@ -62,6 +62,11 @@ domReady(function() {
             this.transcriptsEnabled = true;
             this.trigger('transcriptstatechanged');
 
+            parent.postMessage({
+                action: 'transcript',
+                type: 'transcriptenabled',
+            }, document.location.protocol + '//' + document.location.host);
+
             var transcriptContainerItem = transcriptContainer.querySelectorAll('.transcript-line');
             // Add listening events for transcript's children lines for pausing and starting auto scrolling
             Array.from(transcriptContainerItem).forEach(function(line) {
@@ -75,6 +80,11 @@ domReady(function() {
             transcriptContainer.classList.add('is-hidden');
             this.transcriptsEnabled = false;
             this.trigger('transcriptstatechanged');
+
+            parent.postMessage({
+                action: 'transcript',
+                type: 'transcriptdisabled',
+            }, document.location.protocol + '//' + document.location.host);
         });
 
         // Show or hide the captions block depending on the caption state
