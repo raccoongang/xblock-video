@@ -423,6 +423,11 @@ body {
     cursor: pointer;
 }
 
+.transcript-line:focus {
+    outline: #000 dotted thin;
+    outline-offset: -1px;
+}
+
 .transcript-timestamp {
     display: none;
 }

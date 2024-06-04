@@ -70,7 +70,6 @@ domReady(function() {
             var transcriptContainerItem = transcriptContainer.querySelectorAll('.transcript-line');
             // Add listening events for transcript's children lines for pausing and starting auto scrolling
             Array.from(transcriptContainerItem).forEach(function(line) {
-                line.addEventListener('mousedown', captionMouseDown);
                 line.addEventListener('focusin', captionFocus);
                 line.addEventListener('focusout', captionBlur);
                 line.addEventListener('keydown', captionKeyDown);
@@ -174,13 +173,7 @@ domReady(function() {
         function calculateOffset(element) {
             var transcriptContainer = document.getElementById('transcript');
             var captionHeight = transcriptContainer.offsetHeight;
-            return element.offsetTop - captionHeight / 2;
-        }
-
-        // Handles mousedown event on concrete caption.
-        function captionMouseDown() {
-            // Continue auto scrolling if mouse move out from the transcript block.
-            autoScrolling = true;
+            return element ? element.offsetTop - captionHeight / 2 : 0;
         }
 
         // Handles focus event on concrete caption.
