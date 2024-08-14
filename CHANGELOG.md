@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Added
+- Adaptation for use on Redwood release [RGOeX-26759]
 - Added adaptability for mobile devices [RGOeX-26487]
 
 ## [1.3.1] 2024-05-14

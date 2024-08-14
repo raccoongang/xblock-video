@@ -3,7 +3,7 @@ Video xblock helpers.
 """
 
 from collections import namedtuple
-from html.parser import HTMLParser
+import html
 from importlib import import_module
 from xml.sax.saxutils import unescape
 import os.path
@@ -14,7 +14,6 @@ from xblockutils.resources import ResourceLoader
 
 from .constants import TranscriptSource
 
-html_parser = HTMLParser()  # pylint: disable=invalid-name
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
 
 
@@ -39,9 +38,9 @@ def render_resource(path, **context):
 
     Returns: django.utils.safestring.SafeText
     """
-    html = Template(resource_string(path))
-    return html_parser.unescape(
-        html.render(Context(context))
+    html_template = Template(resource_string(path))
+    return html.unescape(
+        html_template.render(Context(context))
     )
 
 
@@ -54,10 +53,10 @@ def render_template(template_name, **context):
     template_dirs = [os.path.join(os.path.dirname(__file__), 'static/html')]
     libraries = {'video_xblock_tags': 'video_xblock.templatetags'}
     engine = Engine(dirs=template_dirs, debug=True, libraries=libraries)
-    html = engine.get_template(template_name)
+    html_template = engine.get_template(template_name)
 
-    return html_parser.unescape(
-        html.render(Context(context))
+    return html.unescape(
+        html_template.render(Context(context))
     )
 
 

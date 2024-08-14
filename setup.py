@@ -52,7 +52,7 @@ setup(
         'requests>=2.9.1,<3.0.0',
         'babelfish>=0.5.5,<0.6.0',
         'XBlock>=1.4.0,<2',
-        'xblock-utils>=2.1,<4'
+        'xblock-utils==4.0.0'
     ],
     entry_points={
         'xblock.v1': [
