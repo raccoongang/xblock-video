@@ -10,7 +10,7 @@ import os.path
 import pkg_resources
 
 from django.template import Engine, Context, Template
-from xblockutils.resources import ResourceLoader
+from xblock.utils.resources import ResourceLoader
 
 from .constants import TranscriptSource
 

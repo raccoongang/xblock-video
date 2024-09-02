@@ -6,7 +6,7 @@ languageChecker getHandlers */
 /**
     Set up the Video xblock studio editor. This part is responsible for validation and sending of the data to a backend.
     Reference:
-        https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/templates/studio_edit.html
+        https://github.com/openedx/XBlock/blob/v4.0.1/xblock/utils/templates/studio_edit.html
 */
 function StudioEditableXBlock(runtime, element, context) {
     'use strict';
