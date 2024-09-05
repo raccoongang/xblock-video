@@ -3,7 +3,7 @@
 Wistia Video player plugin.
 """
 
-from html.parser import HTMLParser
+import html
 import json
 import http.client as http_client
 import logging
@@ -265,8 +265,7 @@ class WistiaPlayer(BaseVideoPlayer):
             for line in text[0].splitlines()
         ]
         new_text = '\n'.join(new_text)
-        html_parser = HTMLParser()
-        unescaped_text = html_parser.unescape(new_text)
+        unescaped_text = html.unescape(new_text)
         if u"WEBVTT" not in text:
             text = "WEBVTT\n\n" + unescaped_text
         else:

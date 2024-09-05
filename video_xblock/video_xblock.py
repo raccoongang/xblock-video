@@ -24,8 +24,8 @@ from webob import Response
 from xblock.core import XBlock
 from xblock.fields import Boolean, Dict, Scope, String
 from xblock.fragment import Fragment
-from xblockutils.resources import ResourceLoader
-from xblockutils.studio_editable import StudioEditableXBlockMixin
+from xblock.utils.resources import ResourceLoader
+from xblock.utils.studio_editable import StudioEditableXBlockMixin
 from xmodule.contentstore.django import contentstore
 
 from . import __version__
@@ -240,7 +240,7 @@ class VideoXBlock(
         Validate data submitted via xblock edit pop-up.
 
         Reference:
-            https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/studio_editable.py#L245
+            https://github.com/openedx/XBlock/blob/v4.0.1/xblock/utils/studio_editable.py#L245
 
         Attributes:
             validation (xblock.validation.Validation): Object containing validation information for an xblock instance.
@@ -554,7 +554,7 @@ class VideoXBlock(
 
         Create the information that the template needs to render a form field for this field.
         Reference:
-            https://github.com/edx/xblock-utils/blob/v1.0.3/xblockutils/studio_editable.py#L96
+            https://github.com/openedx/XBlock/blob/v4.0.1/xblock/utils/studio_editable.py#L95
 
         Arguments:
             field_name (str): Name of a video XBlock field whose info is to be made.
