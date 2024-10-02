@@ -1,4 +1,4 @@
-pycaption==2.1.0
+pycaption==2.2.15
 requests>=2.9.1,<3.0.0
 babelfish>=0.5.5,<0.6.0
 Xblock>=4.0.1,<5.0.0
