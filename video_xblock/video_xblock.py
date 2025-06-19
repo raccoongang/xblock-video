@@ -22,8 +22,8 @@ from django.utils.translation import get_language
 from opaque_keys.edx.keys import CourseKey
 from webob import Response
 from xblock.core import XBlock
-from xblock.fields import Boolean, Dict, Scope, String
-from xblock.fragment import Fragment
+from xblock.fields import Boolean, Dict, Scope, String, List
+from web_fragments.fragment import Fragment
 from xblock.utils.resources import ResourceLoader
 from xblock.utils.studio_editable import StudioEditableXBlockMixin
 from xmodule.contentstore.django import contentstore
@@ -177,8 +177,8 @@ class VideoXBlock(
         resettable_editor=False
     )
 
-    default_transcripts = String(
-        default='',
+    default_transcripts = List(
+        default=[],
         scope=Scope.content,
         display_name=_('Default Timed Transcript'),
         help=_(

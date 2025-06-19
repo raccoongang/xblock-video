@@ -50,7 +50,7 @@ setup(
     install_requires=[
         'pycaption==2.1.0',
         'requests>=2.9.1,<3.0.0',
-        'babelfish>=0.5.5,<0.6.0',
+        'babelfish>=0.6.0',
         'Xblock>=4.0.1,<5.0.0',
     ],
     entry_points={

@@ -7,8 +7,7 @@ import json
 
 from mock import patch, Mock, MagicMock, PropertyMock
 
-from web_fragments.fragment import FragmentResource
-from xblock.fragment import Fragment
+from web_fragments.fragment import FragmentResource, Fragment
 
 from video_xblock import VideoXBlock, __version__
 from video_xblock.constants import PlayerName, TranscriptSource
