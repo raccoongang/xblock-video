@@ -7,7 +7,7 @@ import logging
 import re
 
 from django.utils.translation import get_language
-from web_fragments.fragment import Fragment
+from xblock.fragment import Fragment
 
 from video_xblock import BaseVideoPlayer
 from video_xblock.utils import ugettext as _

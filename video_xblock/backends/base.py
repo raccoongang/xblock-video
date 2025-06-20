@@ -13,7 +13,7 @@ import operator
 import re
 
 from webob import Response
-from web_fragments.fragment import Fragment
+from xblock.fragment import Fragment
 from xblock.plugin import Plugin
 from xblock.validation import ValidationMessage
 
