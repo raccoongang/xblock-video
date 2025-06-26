@@ -51,8 +51,7 @@ setup(
         'pycaption==2.1.0',
         'requests>=2.9.1,<3.0.0',
         'babelfish>=0.5.5,<0.6.0',
-        'XBlock>=1.4.0,<2',
-        'xblock-utils>=2.1,<4'
+        'Xblock>=4.0.1,<5.0.0',
     ],
     entry_points={
         'xblock.v1': [

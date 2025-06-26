@@ -7,14 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## Added
-- Implement XBlock completion by the view video progress (RGOeX-26584)
+### Added
+- Implement XBlock completion by the view video progress [RGOeX-26584]
+- Adaptation for use on Redwood release [RGOeX-26759]
+- Added adaptability for mobile devices [RGOeX-26487]
 
 ## [1.3.1] 2024-05-14
 
 ### Fixed
 - Request URL for sending analytics data [RGA-936]
 - Display selected item in playback menu [RGOeX-25733]
+- Pause on mouse hover or focus on the transcript item/block [RGOeX-26175]
 
 ## [1.3.0] 2024-03-12
 
