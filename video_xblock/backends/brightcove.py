@@ -480,6 +480,7 @@ class BrightcovePlayer(BaseVideoPlayer, BrightcoveHlsMixin):
             'static/js/videojs/videojs-tabindex.js',
             'static/js/videojs/toggle-button.js',
             'static/js/videojs/videojs-event-plugin.js',
+            'static/js/videojs/videojs-completions.js',
             'static/js/videojs/brightcove-videojs-init.js',
             'static/js/videojs/fullscreen-extends.js',
         ]
