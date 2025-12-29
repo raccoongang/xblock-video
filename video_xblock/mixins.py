@@ -20,7 +20,6 @@ from .constants import DEFAULT_LANG, TPMApiTranscriptFormatID, TPMApiLanguage, T
 from .utils import import_from, ugettext as _, underscore_to_mixedcase, Transcript
 
 from common.djangoapps.util.date_utils import get_default_time_display
-from openedx.core.djangoapps.contentserver.middleware import StaticContentServer
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from xmodule.contentstore.content import StaticContent
 
@@ -387,33 +386,6 @@ class TranscriptsMixin(XBlock):
         response.headerlist = headerlist
         return response
 
-    # TODO: This method should be removed in the future.
-    # For new installations, this method is not needed, since the transcript
-    # files are saved in VTT format.
-    # To support existing installations, we need to create a management command
-    # that can convert the current transcript files to the VTT format. 
-    # Once the command is implemented, we can remove the existing srt_to_vtt method.
-    @XBlock.handler
-    def srt_to_vtt(self, request, _suffix=''):
-        """
-        Fetch raw transcripts, convert them into WebVTT format and return back.
-
-        Path to raw transcripts is passed in as `request.query_string`.
-
-        Arguments:
-            request (webob.Request): The request to handle
-            suffix (string): The remainder of the url, after the handler url prefix, if available.
-        Returns:
-            webob.Response: WebVTT transcripts wrapped in Response object.
-        """
-        caps_path = request.query_string
-        loc = StaticContent.get_location_from_path(caps_path)
-        static_cont_serv = StaticContentServer()
-        content_transcript = static_cont_serv.load_asset_from_location(loc)
-        caps_bytes = b''.join(content_transcript.stream_data())
-        caps = caps_bytes.decode('UTF-8')
-
-        return Response(self.convert_caps_to_vtt(caps))
 
     @XBlock.handler
     def fetch_from_three_play_media(self, request, _suffix=''):
