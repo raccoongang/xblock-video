@@ -389,7 +389,8 @@ class TranscriptsMixin(XBlock):
         ]
         response.headerlist = headerlist
         return response
-    
+
+
     @XBlock.handler
     def fetch_from_three_play_media(self, request, _suffix=''):
         """
