@@ -1,0 +1,546 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-24 03:01+0000\n"
+"PO-Revision-Date: 2026-02-24 05:03+0200\n"
+"Last-Translator: blin4ik\n"
+"Language-Team: Chinese (Simplified)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: video_xblock/backends/base.py:417
+msgid ""
+"Not all the languages of transcripts fetched from video platform are "
+"consistent with the pre-configured ALL_LANGUAGES"
+msgstr "从视频平台获取的字幕语言并不全与预配置的 ALL_LANGUAGES 一致"
+
+#: video_xblock/backends/brightcove.py:29
+msgid "Brightcove API error."
+msgstr "Brightcove API 错误。"
+
+#: video_xblock/backends/brightcove.py:114
+msgid "Connection issue. Couldn't refresh API access token."
+msgstr "连接问题。无法刷新 API 访问令牌（access token）。"
+
+#: video_xblock/backends/brightcove.py:171
+msgid "Can't parse unexpected response during POST request to Brightcove API!"
+msgstr "在向 Brightcove API 发送 POST 请求期间，无法解析异常响应！"
+
+#: video_xblock/backends/brightcove.py:415
+msgid ""
+"Account ID can not be empty. Please provide a valid Brightcove Account ID."
+msgstr "账户 ID 不能为空。请提供有效的 Brightcove 账户 ID。"
+
+#: video_xblock/backends/brightcove.py:423
+msgid "Invalid Account ID or Player ID, please recheck."
+msgstr "无效的账户 ID 或播放器 ID，请重新检查。"
+
+#: video_xblock/backends/brightcove.py:429
+msgid ""
+"Can't validate submitted account ID at the moment. Please try to save "
+"settings one more time."
+msgstr "目前无法验证提交的账户 ID。请尝试再次保存设置。"
+
+#: video_xblock/backends/brightcove.py:521
+#: video_xblock/backends/brightcove.py:612
+msgid "No API credentials provided"
+msgstr "未提供 API 凭据"
+
+#: video_xblock/backends/brightcove.py:623
+#: video_xblock/backends/brightcove.py:627
+msgid "No timed transcript may be fetched from a video platform."
+msgstr "无法从视频平台获取带时间戳的字幕。"
+
+#: video_xblock/backends/brightcove.py:634 video_xblock/backends/wistia.py:213
+msgid ""
+"For now, video platform doesn't have any timed transcript for this video."
+msgstr "目前，该视频在视频平台上没有任何带时间戳的字幕。"
+
+#: video_xblock/backends/brightcove.py:662 video_xblock/backends/youtube.py:226
+msgid "`url` parameter is required."
+msgstr "需要 `url` 参数。"
+
+#: video_xblock/backends/tencent.py:27
+msgid "Your FileID of the video to be played. E.g. 5285890799710670616"
+msgstr "您的视频文件ID。例如 5285890799710670616"
+
+#: video_xblock/backends/tencent.py:51
+msgid "AppID can not be empty. Please provide a valid Tencent AppID."
+msgstr "AppID 不能为空。请提供有效的腾讯 AppID。"
+
+#: video_xblock/backends/vimeo.py:25
+msgid "Vimeo API error."
+msgstr "Vimeo API 错误。"
+
+#: video_xblock/backends/vimeo.py:63
+msgid "Can't fetch requested data from API."
+msgstr "无法从 API 获取请求的数据。"
+
+#: video_xblock/backends/vimeo.py:69
+msgid "Advanced API operations not allowed for now."
+msgstr "目前不允许进行高级 API 操作。"
+
+#: video_xblock/backends/vimeo.py:142
+msgid "URL of the video page. E.g. https://vimeo.com/987654321"
+msgstr "视频页面的 URL。例如 https://vimeo.com/987654321"
+
+#: video_xblock/backends/vimeo.py:144
+msgid ""
+"You can generate a Vimeo access token via <b>Application console's "
+"Authentication section</b> by <a href=\"https://developer.vimeo.com/apps/"
+"new\" target=\"_blank\">creating new app</a>. Please ensure appropriate "
+"operations scope (\"private\") has been set for access token."
+msgstr "您可以通过 <a href=\"https://developer.vimeo.com/apps/new\" target=\"_blank\">创建新应用</a>，在 <b>应用控制台的身份验证部分（Authentication section）</b> 生成 Vimeo 访问令牌。请确保为该令牌设置了适当的操作权限范围（\"private\"）。"
+
+#: video_xblock/backends/vimeo.py:218
+#: video_xblock/tests/unit/test_backends.py:593
+msgid "No API credentials provided."
+msgstr "未提供 API 凭据。"
+
+#: video_xblock/backends/vimeo.py:222
+#: video_xblock/tests/unit/test_backends.py:570
+msgid "Default transcripts successfully fetched from a video platform."
+msgstr "成功从视频平台获取默认字幕。"
+
+#: video_xblock/backends/vimeo.py:228
+#: video_xblock/tests/unit/test_backends.py:610
+msgid "No timed transcript may be fetched from a video platform.<br>"
+msgstr "无法从视频平台获取带时间戳的字幕。<br>"
+
+#: video_xblock/backends/vimeo.py:232
+#: video_xblock/tests/unit/test_backends.py:629
+msgid "There are no default transcripts for the video on the video platform."
+msgstr "视频平台上的此视频没有默认字幕。"
+
+#: video_xblock/backends/vimeo.py:264
+msgid "Transcripts API has been changed."
+msgstr "字幕 API 已更改。"
+
+#: video_xblock/backends/wistia.py:181
+#: video_xblock/tests/unit/test_backends.py:708
+#: video_xblock/tests/unit/test_backends.py:835
+msgid "Success."
+msgstr "成功。"
+
+#: video_xblock/backends/wistia.py:189
+msgid ""
+"No timed transcript may be fetched from a video platform.\n"
+"Error details: {}"
+msgstr ""
+"无法从视频平台获取带时间戳的字幕。\n"
+"错误详情：{}"
+
+#: video_xblock/backends/wistia.py:198
+msgid "Wistia video {} doesn't exist."
+msgstr "Wistia 视频 {} 不存在。"
+
+#: video_xblock/backends/wistia.py:203
+msgid "Invalid request."
+msgstr "无效请求。"
+
+#: video_xblock/exceptions.py:15
+msgid "An exception occurred."
+msgstr "发生异常。"
+
+#: video_xblock/exceptions.py:43
+msgid "A Mock exception occurred."
+msgstr "发生模拟（Mock）异常。"
+
+#: video_xblock/exceptions.py:51
+msgid "API error occurred."
+msgstr "发生 API 错误。"
+
+#: video_xblock/mixins.py:72
+msgid "Direct 3PlayMedia"
+msgstr "直接使用 3PlayMedia"
+
+#: video_xblock/mixins.py:74
+msgid ""
+"Direct <a href='http://www.3playmedia.com/'>3PlayMedia</a> transcripts usage "
+"enabled."
+msgstr "已启用直接使用 <a href='http://www.3playmedia.com/'>3PlayMedia</a> 字幕。"
+
+#: video_xblock/mixins.py:79
+msgid "3PlayMedia API Key"
+msgstr "3PlayMedia API 密钥"
+
+#: video_xblock/mixins.py:80 video_xblock/video_xblock.py:196
+msgid ""
+"You can generate a client token following official documentation of your "
+"video platform's API."
+msgstr "您可以按照视频平台 API 的官方文档生成客户端令牌（client token）。"
+
+#: video_xblock/mixins.py:87
+msgid "File Id"
+msgstr "文件 ID"
+
+#: video_xblock/mixins.py:88
+msgid "3playmedia file id for download bind transcripts."
+msgstr "用于下载绑定字幕的 3PlayMedia 文件 ID。"
+
+#: video_xblock/mixins.py:305 video_xblock/tests/unit/test_mixins.py:573
+msgid "3PlayMedia transcripts fetching API request has failed!"
+msgstr "获取 3PlayMedia 字幕的 API 请求失败！"
+
+#: video_xblock/mixins.py:306 video_xblock/tests/unit/test_mixins.py:547
+msgid "3PlayMedia transcripts fetched successfully."
+msgstr "成功获取 3PlayMedia 字幕。"
+
+#: video_xblock/mixins.py:348
+msgid "Transcript fetching failure: language [{}]"
+msgstr "字幕获取失败：语言 [{}]"
+
+#: video_xblock/mixins.py:424 video_xblock/tests/unit/test_mixins.py:678
+#: video_xblock/tests/unit/test_mixins.py:717
+msgid "Success"
+msgstr "成功"
+
+#: video_xblock/mixins.py:425 video_xblock/tests/unit/test_mixins.py:697
+msgid "Check provided 3PlayMedia configuration"
+msgstr "检查提供的 3PlayMedia 配置"
+
+#: video_xblock/mixins.py:429 video_xblock/tests/unit/test_mixins.py:659
+msgid "Initialization"
+msgstr "初始化"
+
+#: video_xblock/mixins.py:493
+msgid "Enabled transcripts"
+msgstr "已启用的字幕"
+
+#: video_xblock/mixins.py:495
+msgid ""
+"Add transcripts in different languages. Click below to specify a language "
+"and upload an .srt transcript file for that language."
+msgstr "添加不同语言的字幕。点击下方指定一种语言并上传该语言的 .srt 字幕文件。"
+
+#: video_xblock/static/html/fields/file-uploader.html:3
+#: video_xblock/static/html/studio-edit-transcripts.html:15
+msgid "Replace"
+msgstr "替换"
+
+#: video_xblock/static/html/fields/file-uploader.html:3
+#: video_xblock/static/html/studio-edit-transcripts.html:30
+msgid "Upload"
+msgstr "上传"
+
+#: video_xblock/static/html/fields/file-uploader.html:4
+#: video_xblock/static/html/studio-edit-default-transcripts.html:21
+#: video_xblock/static/html/studio-edit-transcripts.html:16
+msgid "Download"
+msgstr "下载"
+
+#: video_xblock/static/html/fields/set.html:17
+msgid "None Available"
+msgstr "暂无可用"
+
+#: video_xblock/static/html/student_view.html:21
+msgid "Download Handout"
+msgstr "下载讲义"
+
+#: video_xblock/static/html/student_view.html:29
+msgid "Download transcripts"
+msgstr "下载字幕"
+
+#: video_xblock/static/html/student_view.html:45
+msgid "Right-click and save link as to download file"
+msgstr "右键点击并选择“链接另存为”以下载文件"
+
+#: video_xblock/static/html/student_view.html:46
+msgid "Download Video file"
+msgstr "下载视频文件"
+
+#: video_xblock/static/html/studio-edit-3playmedia-apikey.html:5
+msgid "3playmedia Key"
+msgstr "3PlayMedia 密钥"
+
+#: video_xblock/static/html/studio-edit-brightcove-encryption.html:10
+msgid "Brightcove content protection"
+msgstr "Brightcove 内容保护"
+
+#: video_xblock/static/html/studio-edit-brightcove-encryption.html:14
+msgid "Video autoquality & encryption"
+msgstr "视频自动质量调节与加密"
+
+#: video_xblock/static/html/studio-edit-brightcove-encryption.html:18
+msgid "Default profile"
+msgstr "默认配置文件"
+
+#: video_xblock/static/html/studio-edit-brightcove-encryption.html:21
+msgid "Autoquality"
+msgstr "自动质量调节"
+
+#: video_xblock/static/html/studio-edit-brightcove-encryption.html:24
+msgid "Autoquality & Encryption"
+msgstr "自动质量调节与加密"
+
+#: video_xblock/static/html/studio-edit-brightcove-encryption.html:30
+msgid "Re-transcode this video"
+msgstr "对此视频重新转码"
+
+#: video_xblock/static/html/studio-edit-brightcove-encryption.html:42
+msgid "Brightcove Video tech info"
+msgstr "Brightcove 视频技术信息"
+
+#: video_xblock/static/html/studio-edit-brightcove-encryption.html:45
+msgid "Renditions count:"
+msgstr "渲染版本（Renditions）计数："
+
+#: video_xblock/static/html/studio-edit-brightcove-encryption.html:46
+msgid "Autoquality:"
+msgstr "自动质量调节："
+
+#: video_xblock/static/html/studio-edit-brightcove-encryption.html:47
+msgid "Encryption:"
+msgstr "加密："
+
+#: video_xblock/static/html/studio-edit-default-transcripts.html:5
+msgid "Show available default transcripts"
+msgstr "显示可用的默认字幕"
+
+#: video_xblock/static/html/studio-edit-default-transcripts.html:27
+msgid "Delete"
+msgstr "删除"
+
+#: video_xblock/static/html/studio-edit-default-transcripts.html:50
+#: video_xblock/static/html/studio-edit-default-transcripts.html:69
+msgid "Fetch"
+msgstr "获取"
+
+#: video_xblock/static/html/studio-edit-default-transcripts.html:77
+msgid "There are no transcripts to upload."
+msgstr "没有可上传的字幕。"
+
+#: video_xblock/static/html/studio-edit-default-transcripts.html:82
+msgid ""
+"You can manually add transcripts using the `+Add` button in \"Enabled "
+"transcript\" field."
+msgstr "您可以使用“已启用的字幕”字段中的“+添加”按钮手动添加字幕。"
+
+#: video_xblock/static/html/studio-edit-tab.html:41
+msgid "Unsupported field type. This setting cannot be edited."
+msgstr "不支持的字段类型。此设置无法编辑。"
+
+#: video_xblock/static/html/studio-edit-tab.html:45
+msgid "Clear"
+msgstr "清除"
+
+#: video_xblock/static/html/studio-edit-tab.html:46
+msgid "Clear Value"
+msgstr "清除值"
+
+#: video_xblock/static/html/studio-edit-token.html:6
+msgid "Application Access Token"
+msgstr "应用访问令牌（Access Token）"
+
+#: video_xblock/static/html/studio-edit-token.html:8
+msgid "Client Token"
+msgstr "客户端令牌（Client Token）"
+
+#: video_xblock/static/html/studio-edit-token.html:20
+msgid "Connect to video platform"
+msgstr "连接到视频平台"
+
+#: video_xblock/static/html/studio-edit-transcripts-accordion.html:5
+msgid "Manual & default transcripts"
+msgstr "手动与默认字幕"
+
+#: video_xblock/static/html/studio-edit-transcripts-accordion.html:28
+msgid "3PlayMedia transcripts"
+msgstr "3PlayMedia 字幕"
+
+#: video_xblock/static/html/studio-edit-transcripts.html:40
+msgid "Add"
+msgstr "添加"
+
+#: video_xblock/static/html/studio-edit.html:11
+msgid "Save"
+msgstr "保存"
+
+#: video_xblock/static/html/studio-edit.html:14
+msgid "Cancel"
+msgstr "取消"
+
+#: video_xblock/tests/unit/test_backends.py:251
+msgid "Not all the languages of transcripts fetched from video platform"
+msgstr "并非所有从视频平台获取的字幕语言"
+
+#: video_xblock/tests/unit/test_backends.py:737
+msgid ""
+"No timed transcript may be fetched from a video platform.\n"
+"Error details: test_exc_message"
+msgstr ""
+"无法从视频平台获取带时间戳的字幕。\n"
+"错误详情：test_exc_message"
+
+#: video_xblock/tests/unit/test_video_xblock.py:35
+#: video_xblock/video_xblock.py:76
+msgid "Video"
+msgstr "视频"
+
+#: video_xblock/video_xblock.py:77
+msgid "Component Display Name"
+msgstr "组件显示名称"
+
+#: video_xblock/video_xblock.py:78
+msgid ""
+"The name students see. This name appears in the course ribbon and as a "
+"header for the video."
+msgstr "学生看到的名称。此名称显示在课程功能导航条中，并作为视频的标题。"
+
+#: video_xblock/video_xblock.py:84
+msgid "Video URL or FileId"
+msgstr "视频 URL 或文件 ID"
+
+#: video_xblock/video_xblock.py:86
+msgid ""
+"Video URL of the video page. E.g. https://example.wistia.com/"
+"medias/12345abcde<br/>FileId for Tencent Player E.g. 5285890799710670616"
+msgstr "视频页面的 URL。例如 https://example.wistia.com/medias/12345abcde<br/>腾讯播放器的文件ID，例如 5285890799710670616"
+
+#: video_xblock/video_xblock.py:95
+msgid "Video Download Allowed"
+msgstr "允许下载视频"
+
+#: video_xblock/video_xblock.py:97
+msgid ""
+"Allow students to download this video if they cannot use the edX video "
+"player. A link to download the file appears below the video."
+msgstr "如果学生无法使用 edX 视频播放器，允许他们下载该视频。下载文件的链接将显示在视频下方。"
+
+#: video_xblock/video_xblock.py:105
+msgid "Video file URL"
+msgstr "视频文件 URL"
+
+#: video_xblock/video_xblock.py:106
+msgid ""
+"The URL where you've posted non hosted versions of the video. URL must end "
+"in .mpeg, .mp4, .ogg, or .webm. (For browser compatibility, we strongly "
+"recommend .mp4 and .webm format.) To allow students to download these "
+"videos, set Video Download Allowed to True."
+msgstr "您发布的非托管版本视频的 URL。URL 必须以 .mpeg、.mp4、.ogg 或 .webm 结尾。（为了浏览器兼容性，我们强烈建议使用 .mp4 和 .webm 格式。）要允许学生下载这些视频，请将“允许下载视频”设置为 True。"
+
+#: video_xblock/video_xblock.py:114
+msgid "Account Id"
+msgstr "账户 ID"
+
+#: video_xblock/video_xblock.py:115
+msgid "Your Brightcove account id"
+msgstr "您的 Brightcove 账户 ID"
+
+#: video_xblock/video_xblock.py:121
+msgid "AppID"
+msgstr "AppID"
+
+#: video_xblock/video_xblock.py:122
+msgid "Your AppID of the VOD account. E.g. 1400329073"
+msgstr "您的 VOD 账户 AppID。例如 1400329073"
+
+#: video_xblock/video_xblock.py:128
+msgid "Player Id"
+msgstr "播放器 ID"
+
+#: video_xblock/video_xblock.py:129
+msgid ""
+"Your Brightcove player id. Use \"Luna\" theme for all your players. You can "
+"choose one of your players from a <a href=\"https://studio.brightcove.com/"
+"products/videocloud/players\" target=\"_blank\">list</a>."
+msgstr "您的 Brightcove 播放器 ID。请为您的所有播放器使用 \"Luna\" 主题。您可以从 <a href=\"https://studio.brightcove.com/products/videocloud/players\" target=\"_blank\">列表</a> 中选择您的播放器之一。"
+
+#: video_xblock/video_xblock.py:141
+msgid ""
+"Time you want the video to start if you don't want the entire video to play. "
+"Not supported in the native mobile app: the full video file will play. "
+"Formatted as HH:MM:SS. The maximum value is 23:59:59."
+msgstr "如果您不希望播放整个视频，设置您希望视频开始的时间。原生移动应用不支持此功能（将播放完整视频）。格式为 HH:MM:SS。最大值为 23:59:59。"
+
+#: video_xblock/video_xblock.py:145
+msgid "Video Start Time"
+msgstr "视频开始时间"
+
+#: video_xblock/video_xblock.py:152
+msgid ""
+"Time you want the video to stop if you don't want the entire video to play. "
+"Not supported in the native mobile app: the full video file will play. "
+"Formatted as HH:MM:SS. The maximum value is 23:59:59."
+msgstr "如果您不希望播放整个视频，设置您希望视频停止的时间。原生移动应用不支持此功能（将播放完整视频）。格式为 HH:MM:SS。最大值为 23:59:59。"
+
+#: video_xblock/video_xblock.py:156
+msgid "Video Stop Time"
+msgstr "视频停止时间"
+
+#: video_xblock/video_xblock.py:164
+msgid "Upload handout"
+msgstr "上传讲义"
+
+#: video_xblock/video_xblock.py:165
+msgid "You can upload handout file for students"
+msgstr "您可以为学生上传讲义文件"
+
+#: video_xblock/video_xblock.py:171
+msgid "Download Transcript Allowed"
+msgstr "允许下载字幕"
+
+#: video_xblock/video_xblock.py:173
+msgid ""
+"Allow students to download the timed transcript. A link to download the file "
+"appears below the video. By default, the transcript is an .vtt or .srt file. "
+"If you want to provide the transcript for download in a format, different "
+"upload a file by using the Upload Handout field."
+msgstr "允许学生下载带时间戳的字幕。下载链接将显示在视频下方。默认情况下，字幕是 .vtt 或 .srt 文件。如果您希望提供其他格式的字幕下载，请使用“上传讲义”字段上传文件。"
+
+#: video_xblock/video_xblock.py:183
+msgid "Default Timed Transcript"
+msgstr "默认带时间戳字幕"
+
+#: video_xblock/video_xblock.py:185
+msgid ""
+"Default transcripts are uploaded automatically from a video platform to the "
+"list of available transcripts.<br/><b>Note: valid \"Video API Token\" should "
+"be given in order to make auto fetching possible.</b><br/>Advice: disable "
+"transcripts displaying on your video service to avoid transcripts "
+"overlapping."
+msgstr "默认字幕将自动从视频平台上传到可用字幕列表中。<br/><b>注意：必须提供有效的“视频 API 令牌（Video API Token）”才能实现自动获取。</b><br/>建议：禁用您视频服务上的字幕显示，以避免字幕重叠。"
+
+#: video_xblock/video_xblock.py:195
+msgid "Video API Token"
+msgstr "视频 API 令牌（Video API Token）"
+
+#: video_xblock/video_xblock.py:203
+msgid "Metadata"
+msgstr "元数据"
+
+#: video_xblock/video_xblock.py:204
+msgid ""
+"This field stores different metadata, e.g. authentication data. If new "
+"metadata item is designed, this is to add an appropriate key to backend's "
+"`metadata_fields` property."
+msgstr "此字段存储不同的元数据，例如身份验证数据。如果设计了新的元数据项，则需向后端的 `metadata_fields` 属性添加适当的键。"
+
+#: video_xblock/video_xblock.py:235
+msgid "Incorrect or unsupported video URL, please recheck."
+msgstr "不正确或不支持的视频 URL，请重新检查。"
+
+#: video_xblock/video_xblock.py:341
+msgid "Failed to fetch default transcripts."
+msgstr "无法获取默认字幕。"
+
+#: video_xblock/video_xblock.py:786
+msgid "Failed to convert file."
+msgstr "文件转换失败。"
+
+#: video_xblock/video_xblock.py:805
+msgid "Upload completed"
+msgstr "上传完成"
+
+#: video_xblock/video_xblock.py:835
+msgid "Couldn't upload transcript text."
+msgstr "无法上传字幕文本。"
