@@ -76,7 +76,7 @@ class VideoXBlock(
         default=_('Video'),
         display_name=_('Component Display Name'),
         help=_('The name students see. This name appears in the course ribbon and as a header for the video.'),
-        scope=Scope.content,
+        scope=Scope.settings,
     )
 
     href = String(
@@ -86,7 +86,7 @@ class VideoXBlock(
             "Video URL of the video page. E.g. https://example.wistia.com/medias/12345abcde<br/>"
             "FileId for Tencent Player E.g. 5285890799710670616"
         ),
-        scope=Scope.content
+        scope=Scope.settings
     )
 
     download_video_allowed = Boolean(
@@ -433,7 +433,8 @@ class VideoXBlock(
             Rendered html string as a Response (webob.Response).
         """
         player = self.get_player()
-        is_brightcove = str(self.player_name) == PlayerName.BRIGHTCOVE
+        player_name = self.get_player_name()
+        is_brightcove = str(player_name) == PlayerName.BRIGHTCOVE
         save_state_url = self.runtime.handler_url(self, 'save_player_state')
         transcripts = render_resource(
             'static/html/transcripts.html',
@@ -471,6 +472,16 @@ class VideoXBlock(
         self.runtime.publish(self, event_type, data)
         return {'result': 'success'}
 
+    def get_player_name(self):
+        value = self.fields['player_name'].default
+        for player_name, player_class in BaseVideoPlayer.load_classes():
+            if player_name == PlayerName.DUMMY:
+                continue
+            if player_class.match(self.href):
+                value = player_name
+                break
+        return value
+
     def clean_studio_edits(self, data):
         """
         Given POST data dictionary 'data', clean the data before validating it.
@@ -497,7 +508,8 @@ class VideoXBlock(
         Returns:
             Current player object (instance of a platform-specific player class).
         """
-        player = BaseVideoPlayer.load_class(self.player_name)
+        player_name = self.get_player_name()
+        player = BaseVideoPlayer.load_class(player_name)
         return player(self)
 
     def _get_field_help(self, field_name, field):
