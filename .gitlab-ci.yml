@@ -1,0 +1,7 @@
+---
+
+stages:
+  - sast
+
+include:
+  - component: $CI_SERVER_FQDN/DevOps/components/sast@~latest
