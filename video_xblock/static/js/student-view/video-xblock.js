@@ -19,6 +19,7 @@ function VideoXBlockStudentViewInit(runtime, element) {
     var xblockElement = typeof(element[0]) !== 'undefined' ? element[0] : element;
     var stateHandlerUrl = runtime.handlerUrl(xblockElement, 'save_player_state');
     var eventHandlerUrl = runtime.handlerUrl(xblockElement, 'publish_event');
+    var progressHandlerUrl = runtime.handlerUrl(xblockElement, 'update_progress');
     var downloadTranscriptHandlerUrl = runtime.handlerUrl(xblockElement, 'download_transcript');
     var usageId = (
         xblockElement.attributes['data-usage-id'] ||  // Open edX runtime
@@ -29,19 +30,38 @@ function VideoXBlockStudentViewInit(runtime, element) {
         window.videoXBlockState.handlers || {
             saveState: {},
             analytics: {},
-            downloadTranscriptChanged: {}
+            downloadTranscriptChanged: {},
+            updateProgress: {}
         };
     handlers.saveState[usageId] = stateHandlerUrl;
     handlers.analytics[usageId] = eventHandlerUrl;
+    handlers.updateProgress[usageId] = progressHandlerUrl;
+    /** Update the watch progress display below the video */
+    // function updateProgressDisplay(watchProgress) {
+    //     var pct = Math.round(watchProgress * 100);
+    //     // usageId may be the full usage key (e.g. block-v1:...+block@HASH) or just the short HASH.
+    //     // The progress bar element uses only the short block hash as its id suffix.
+    //     var blockId = usageId.indexOf('+block@') !== -1 ? usageId.split('+block@').pop() : usageId;
+    //     var progressEl = document.getElementById('video-watch-progress-' + blockId);
+    //     if (!progressEl) { return; }
+    //     var bar = progressEl.querySelector('.video-watch-progress-bar');
+    //     var label = progressEl.querySelector('.video-watch-progress-value');
+    //     if (bar) { bar.style.width = pct + '%'; }
+    //     if (label) { label.textContent = pct + '%'; }
+    // }
+
     /** Send data to server by POSTing it to appropriate VideoXBlock handler */
-    function sendData(handlerUrl, data) {
+    function sendData(handlerUrl, data, isProgressUpdate) {
         $.ajax({
             type: 'POST',
             url: handlerUrl,
             data: JSON.stringify(data)
         })
-        .done(function() {
+        .done(function(response) {
             console.log('Data processed successfully.');  // eslint-disable-line no-console
+            // if (isProgressUpdate && response && typeof response.watch_progress !== 'undefined') {
+            //     updateProgressDisplay(response.watch_progress);
+            // }
         })
         .fail(function() {
             console.log('Failed to process data');  // eslint-disable-line no-console
@@ -78,10 +98,18 @@ function VideoXBlockStudentViewInit(runtime, element) {
                 // eslint-disable-next-line no-use-before-define
                 updateTranscriptDownloadUrl(event.data.downloadTranscriptUrl);
             }
+            // Real-time client-side progress bar update (no server call)
+            if (event.data.action === 'progressUpdate') {
+                var info = event.data.info;
+                if (info && info.duration > 0) {
+                    updateProgressDisplay(info.current_time / info.duration);
+                }
+                return;
+            }
             var action = handlers[event.data.action];
             var url = action[event.data.xblockUsageId] || action[event.data.xblockFullUsageId];  // eslint-disable-line vars-on-top
             if (url) {
-                sendData(url, event.data.info);
+                sendData(url, event.data.info, event.data.action === 'updateProgress');
             }
         } catch (err) {
             console.log(err);  // eslint-disable-line no-console

@@ -79,6 +79,7 @@ var PlayerState = function(player, playerState) {
                     action: 'saveState',
                     info: newState,
                     xblockUsageId: xblockUsageId,
+                    xblockFullUsageId: getXblockFullUsageId(),
                     downloadTranscriptUrl: transcriptUrl || '#'
                 },
                 document.location.protocol + '//' + document.location.host
@@ -100,7 +101,24 @@ var PlayerState = function(player, playerState) {
 
     setInitialState(playerState);
 
+    /** Post real-time currentTime/duration to parent so the progress bar updates every tick */
+    var sendRealtimeProgress = function() {
+        var currentTime = player.currentTime();
+        var duration = player.duration();
+        if (duration > 0) {
+            parent.postMessage(
+                {
+                    action: 'progressUpdate',
+                    xblockUsageId: xblockUsageId,
+                    info: { current_time: currentTime, duration: duration }
+                },
+                document.location.protocol + '//' + document.location.host
+            );
+        }
+    };
+
     player.on('timeupdate', saveProgressToLocalStore);
+    player.on('timeupdate', sendRealtimeProgress);
     player.on('volumechange', saveState);
     player.on('ratechange', saveState);
     player.on('play', saveState);
@@ -109,6 +127,68 @@ var PlayerState = function(player, playerState) {
     player.on('transcriptstatechanged', saveState);
     player.on('captionstatechanged', saveState);
     player.on('languagechange', saveState);
+
+    /**
+     * Send a watch-progress ping to the parent frame every 5 seconds while playing.
+     * The parent frame forwards it to the `update_progress` XBlock handler.
+     */
+    var PROGRESS_PING_INTERVAL_MS = 5000;
+    var progressInterval = null;
+
+    var sendProgressPing = function() {
+        var playerObj = player;
+        var currentTime = playerObj.currentTime();
+        var duration = playerObj.duration();
+        if (duration > 0) {
+            parent.postMessage(
+                {
+                    action: 'updateProgress',
+                    xblockUsageId: xblockUsageId,
+                    xblockFullUsageId: getXblockFullUsageId(),
+                    info: {
+                        current_time: currentTime,
+                        duration: duration
+                    }
+                },
+                document.location.protocol + '//' + document.location.host
+            );
+        }
+    };
+
+    player.on('play', function() {
+        if (!progressInterval) {
+            progressInterval = setInterval(sendProgressPing, PROGRESS_PING_INTERVAL_MS);
+        }
+    });
+
+    player.on('pause', function() {
+        // Send one final ping on pause so progress is not lost between intervals
+        sendProgressPing();
+        clearInterval(progressInterval);
+        progressInterval = null;
+    });
+
+    player.on('ended', function() {
+        // Send a ping with duration as current_time to ensure 100% progress is recorded,
+        // since currentTime() may already be 0 if the player loops immediately after ending.
+        var duration = player.duration();
+        if (duration > 0) {
+            parent.postMessage(
+                {
+                    action: 'updateProgress',
+                    xblockUsageId: xblockUsageId,
+                    xblockFullUsageId: getXblockFullUsageId(),
+                    info: {
+                        current_time: duration,
+                        duration: duration
+                    }
+                },
+                document.location.protocol + '//' + document.location.host
+            );
+        }
+        clearInterval(progressInterval);
+        progressInterval = null;
+    });
 };
 
 domReady(function() {

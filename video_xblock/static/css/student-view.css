@@ -82,3 +82,49 @@
 .dropdown:hover .dropdown-content {
     display: block;
 }
+
+/* Watch progress bar */
+/* 
+.video-watch-progress {
+    margin: 10px 0 6px;
+    font-size: 13px;
+    color: #555;
+}
+
+.video-watch-progress-bar-wrap {
+    background: #e0e0e0;
+    border-radius: 4px;
+    height: 8px;
+    width: 100%;
+    overflow: visible;
+    margin-bottom: 5px;
+    position: relative;
+}
+
+.video-watch-progress-bar {
+    background: #0075b4;
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.2s linear;
+    min-width: 0;
+    max-width: 100%;
+}
+
+
+.video-watch-progress-threshold {
+    position: absolute;
+    top: -3px;
+    width: 2px;
+    height: 14px;
+    background: #e8a800;
+    border-radius: 1px;
+    transform: translateX(-50%);
+}
+
+.video-watch-progress-label {
+    display: inline-block;
+}
+
+.video-watch-progress-value {
+    font-weight: bold;
+} */

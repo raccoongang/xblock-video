@@ -513,7 +513,10 @@ body {
 }
 
 .video-js-vimeo .vjs-big-play-button,
-.video-js-vimeo .vjs-control-bar {
+.video-js-vimeo .vjs-control-bar,
+.video-js-vimeo.vjs-has-started .vjs-control-bar,
+.video-js-vimeo.vjs-paused .vjs-control-bar,
+.video-js-vimeo.vjs-playing .vjs-control-bar {
     display: none !important;
 }
 

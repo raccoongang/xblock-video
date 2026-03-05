@@ -22,7 +22,7 @@ class VimeoApiClientError(ApiClientError):
     Vimeo specific api client errors.
     """
 
-    default_msg = _('Vimeo API error.')
+    default_msg = _("Vimeo API error.")
 
 
 class VimeoApiClient(BaseApiClient):
@@ -37,7 +37,7 @@ class VimeoApiClient(BaseApiClient):
         """
         Initialize Vimeo API client.
         """
-        self.access_token = token or ''
+        self.access_token = token or ""
 
     def get(self, url, headers=None, can_retry=False):
         """
@@ -51,8 +51,8 @@ class VimeoApiClient(BaseApiClient):
             Response in python native data format.
         """
         headers_ = {
-            'Authorization': 'Bearer {}'.format(self.access_token),
-            'Accept': 'application/json'
+            "Authorization": "Bearer {}".format(self.access_token),
+            "Accept": "application/json",
         }
         if headers is not None:
             headers_.update(headers)
@@ -66,7 +66,7 @@ class VimeoApiClient(BaseApiClient):
         """
         Issue REST POST request to a given URL. Can throw ApiClientError or its subclass.
         """
-        raise VimeoApiClientError(_('Advanced API operations not allowed for now.'))
+        raise VimeoApiClientError(_("Advanced API operations not allowed for now."))
 
 
 class VimeoPlayer(BaseVideoPlayer):
@@ -76,9 +76,9 @@ class VimeoPlayer(BaseVideoPlayer):
 
     # Regex is taken from http://regexr.com/3a2p0
     # Reference: https://vimeo.com/153979733
-    url_re = re.compile(r'https?:\/\/(.+)?(vimeo.com)\/(?P<media_id>.*)')
+    url_re = re.compile(r"https?:\/\/(.+)?(vimeo.com)\/(?P<media_id>.*)")
 
-    metadata_fields = ['access_token']
+    metadata_fields = ["access_token"]
     default_transcripts_in_vtt = True
 
     # Current Vimeo api for requesting transcripts.
@@ -90,26 +90,24 @@ class VimeoPlayer(BaseVideoPlayer):
     # Docs on captions: https://developer.vimeo.com/api/endpoints/videos#/%7Bvideo_id%7D/texttracks
     # Docs on auth: https://developer.vimeo.com/api/authentication
     captions_api = {
-        'url': 'https://api.vimeo.com/videos/{media_id}/texttracks',
-        'authorised_request_header': {
-            'Authorization': 'Bearer {access_token}'
-        },
-        'response': {
-            'total': '{transcripts_count}',
-            'data': [
+        "url": "https://api.vimeo.com/videos/{media_id}/texttracks",
+        "authorised_request_header": {"Authorization": "Bearer {access_token}"},
+        "response": {
+            "total": "{transcripts_count}",
+            "data": [
                 {
-                    'uri': '/texttracks/{transcript_id}',
-                    'active': 'true',
-                    'type': 'subtitles',
-                    'language': 'en',  # no language_label translated in English may be fetched from API
-                    'link': 'https://{link_to_vtt_file}',
-                    'link_expires_time': 1497954324,
-                    'hls_link': 'https://{link_to_vtt_file_with_hls}',
-                    'hls_link_expires_time': 1497954324,
-                    'name': '{captions_file_name.vtt}'
+                    "uri": "/texttracks/{transcript_id}",
+                    "active": "true",
+                    "type": "subtitles",
+                    "language": "en",  # no language_label translated in English may be fetched from API
+                    "link": "https://{link_to_vtt_file}",
+                    "link_expires_time": 1497954324,
+                    "hls_link": "https://{link_to_vtt_file_with_hls}",
+                    "hls_link_expires_time": 1497954324,
+                    "name": "{captions_file_name.vtt}",
                 }
-            ]
-        }
+            ],
+        },
     }
 
     def __init__(self, xblock):
@@ -135,17 +133,17 @@ class VimeoPlayer(BaseVideoPlayer):
         """
         fields_list = super(VimeoPlayer, self).trans_fields
         # Add `token` after `default_transcripts`
-        fields_list.append('token')
+        fields_list.append("token")
         return fields_list
 
     fields_help = {
-        'href': _('URL of the video page. E.g. https://vimeo.com/987654321'),
-        'token': _(
-            'You can generate a Vimeo access token via <b>Application console\'s Authentication section</b> by '
+        "href": _("URL of the video page. E.g. https://vimeo.com/987654321"),
+        "token": _(
+            "You can generate a Vimeo access token via <b>Application console's Authentication section</b> by "
             '<a href="https://developer.vimeo.com/apps/new" '
             'target="_blank">creating new app</a>. Please ensure appropriate operations '
             'scope ("private") has been set for access token.'
-        )
+        ),
     }
 
     def media_id(self, href):
@@ -154,21 +152,19 @@ class VimeoPlayer(BaseVideoPlayer):
 
         E.g. https://example.wistia.com/medias/12345abcde -> 12345abcde
         """
-        return self.url_re.search(href).group('media_id')
+        return self.url_re.search(href).group("media_id")
 
     def get_frag(self, **context):
         """
         Return a Fragment required to render video player on the client side.
         """
-        context['data_setup'] = json.dumps(VimeoPlayer.player_data_setup(context))
+        context["data_setup"] = json.dumps(VimeoPlayer.player_data_setup(context))
 
         frag = super(VimeoPlayer, self).get_frag(**context)
-        frag.add_content(
-            self.render_resource('static/html/vimeo.html', **context)
-        )
+        frag.add_content(self.render_resource("static/html/vimeo.html", **context))
         js_files = [
-            'static/vendor/js/Vimeo.js',
-            'static/vendor/js/videojs-offset.min.js'
+            "static/vendor/js/Vimeo.js",
+            "static/vendor/js/videojs-offset.min.js",
         ]
 
         for js_file in js_files:
@@ -182,16 +178,13 @@ class VimeoPlayer(BaseVideoPlayer):
         Vimeo Player data setup.
         """
         result = BaseVideoPlayer.player_data_setup(context)
-        del result["playbackRates"]
-        del result["plugins"]["videoJSSpeedHandler"]
-        result.update({
-            "techOrder": ["vimeo"],
-            "sources": [{
-                "type": "video/vimeo",
-                "src": context['url']
-            }],
-            "vimeo": {"iv_load_policy": 1},
-        })
+        result.update(
+            {
+                "techOrder": ["vimeo"],
+                "sources": [{"type": "video/vimeo", "src": context["url"]}],
+                "vimeo": {"iv_load_policy": 1},
+            }
+        )
         return result
 
     def get_default_transcripts(self, **kwargs):
@@ -215,25 +208,27 @@ class VimeoPlayer(BaseVideoPlayer):
             message (str): Message for a user with details on default transcripts fetching outcomes.
         """
         if not self.api_client.access_token:
-            raise VimeoApiClientError(_('No API credentials provided.'))
+            raise VimeoApiClientError(_("No API credentials provided."))
 
-        video_id = kwargs.get('video_id')
-        url = self.captions_api['url'].format(media_id=video_id)
-        message = _('Default transcripts successfully fetched from a video platform.')
+        video_id = kwargs.get("video_id")
+        url = self.captions_api["url"].format(media_id=video_id)
+        message = _("Default transcripts successfully fetched from a video platform.")
         default_transcripts = []
         # Fetch available transcripts' languages and urls.
         try:
             json_data = self.api_client.get(url)
         except VimeoApiClientError:
-            message = _('No timed transcript may be fetched from a video platform.<br>')
+            message = _("No timed transcript may be fetched from a video platform.<br>")
             return default_transcripts, message
 
         if not json_data:
-            message = _('There are no default transcripts for the video on the video platform.')
+            message = _(
+                "There are no default transcripts for the video on the video platform."
+            )
             return default_transcripts, message
 
         # Populate default_transcripts
-        transcripts_data = json_data.get('data')
+        transcripts_data = json_data.get("data")
         try:
             default_transcripts = self.parse_vimeo_texttracks(transcripts_data)
             return default_transcripts, message
@@ -255,13 +250,15 @@ class VimeoPlayer(BaseVideoPlayer):
             try:
                 lang_code = t_data["language"]
                 lang_label = self.get_transcript_language_parameters(lang_code)[1]
-                default_transcripts.append({
-                    'lang': lang_code,
-                    'label': lang_label,
-                    'url': t_data["link"],
-                })
+                default_transcripts.append(
+                    {
+                        "lang": lang_code,
+                        "label": lang_label,
+                        "url": t_data["link"],
+                    }
+                )
             except KeyError:
-                raise VimeoApiClientError(_('Transcripts API has been changed.'))
+                raise VimeoApiClientError(_("Transcripts API has been changed."))
         log.debug("Parsed Vimeo transcripts: " + str(default_transcripts))
         return default_transcripts
 

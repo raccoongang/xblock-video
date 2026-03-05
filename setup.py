@@ -11,12 +11,11 @@ def get_version(*file_paths):
     """
     filename = os.path.join(os.path.dirname(__file__), *file_paths)
     version_file = open(filename).read()
-    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
-                              version_file, re.M)
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
 
     if version_match:
         return version_match.group(1)
-    raise RuntimeError('Unable to find version string.')
+    raise RuntimeError("Unable to find version string.")
 
 
 def package_data(pkg, roots):
@@ -35,40 +34,40 @@ def package_data(pkg, roots):
     return {pkg: data}
 
 
-VERSION = get_version('video_xblock', '__init__.py')
-DESCRIPTION = 'Video XBlock to embed videos hosted on different video platforms into your courseware'
+VERSION = get_version("video_xblock", "__init__.py")
+DESCRIPTION = "Video XBlock to embed videos hosted on different video platforms into your courseware"
 
 
 setup(
-    name='video-xblock',
+    name="video-xblock",
     version=VERSION,
     description=DESCRIPTION,
-    license='GPL v3',
+    license="GPL v3",
     packages=[
-        'video_xblock',
+        "video_xblock",
     ],
     install_requires=[
-        'pycaption==2.1.0',
-        'requests>=2.9.1,<3.0.0',
-        'babelfish>=0.6.0',
-        'Xblock>=4.0.1,<5.0.0',
+        "pycaption==2.1.0",
+        "requests>=2.9.1,<3.0.0",
+        "babelfish>=0.6.0",
+        "Xblock>=4.0.1,<6.0.0",
     ],
     entry_points={
-        'xblock.v1': [
-            'video_xblock = video_xblock:VideoXBlock',
+        "xblock.v1": [
+            "video_xblock = video_xblock:VideoXBlock",
         ],
-        'video_xblock.v1': [
-            'tencent-player = video_xblock.backends.tencent:TencentPlayer',
-            'youtube-player = video_xblock.backends.youtube:YoutubePlayer',
-            'wistia-player = video_xblock.backends.wistia:WistiaPlayer',
-            'brightcove-player = video_xblock.backends.brightcove:BrightcovePlayer',
-            'dummy-player = video_xblock.backends.dummy:DummyPlayer',
-            'vimeo-player = video_xblock.backends.vimeo:VimeoPlayer',
-            'html5-player = video_xblock.backends.html5:Html5Player',
-        ]
+        "video_xblock.v1": [
+            "tencent-player = video_xblock.backends.tencent:TencentPlayer",
+            "youtube-player = video_xblock.backends.youtube:YoutubePlayer",
+            "wistia-player = video_xblock.backends.wistia:WistiaPlayer",
+            "brightcove-player = video_xblock.backends.brightcove:BrightcovePlayer",
+            "dummy-player = video_xblock.backends.dummy:DummyPlayer",
+            "vimeo-player = video_xblock.backends.vimeo:VimeoPlayer",
+            "html5-player = video_xblock.backends.html5:Html5Player",
+        ],
     },
-    package_data=package_data("video_xblock", [
-        "static", "public", "locale", "translations",
-        "backends", "workbench"
-    ]),
+    package_data=package_data(
+        "video_xblock",
+        ["static", "public", "locale", "translations", "backends", "workbench"],
+    ),
 )
