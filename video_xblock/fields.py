@@ -9,7 +9,7 @@ https://github.com/edx/edx-platform/blob/open-release/eucalyptus.master/common/l
 import datetime
 import time
 
-from xblock.fields import JSONField
+from xblock.fields import JSONField, String
 
 
 class RelativeTime(JSONField):
@@ -126,3 +126,30 @@ class RelativeTime(JSONField):
             return value
 
         return self.from_json(value)
+
+
+class AssetHrefField(String):
+    """
+    Resolves the video URL on-the-fly from the Asset model when asset_id is set.
+
+    Falls back to the stored field value when asset_id is absent or the lookup fails.
+    """
+
+    def read_from(self, xblock):
+        if href := xblock.get_asset_href():
+            return href
+        return super().read_from(xblock)
+
+
+class AssetNameField(String):
+    """
+    Resolves the asset name on-the-fly from the Asset model when asset_id is set.
+
+    Falls back to the stored field value when asset_id is absent or the lookup fails.
+    """
+
+    def read_from(self, xblock):
+        asset = xblock.get_asset()
+        if asset:
+            return asset.name
+        return super().read_from(xblock)

@@ -32,7 +32,7 @@ from . import __version__
 from .backends.base import BaseVideoPlayer
 from .constants import PlayerName, TranscriptSource
 from .exceptions import ApiClientError
-from .fields import RelativeTime
+from .fields import AssetHrefField, AssetNameField, RelativeTime
 from .mixins import (
     ContentStoreMixin,
     LocationMixin,
@@ -76,17 +76,31 @@ class VideoXBlock(
         default=_('Video'),
         display_name=_('Component Display Name'),
         help=_('The name students see. This name appears in the course ribbon and as a header for the video.'),
-        scope=Scope.content,
+        scope=Scope.settings,
     )
 
-    href = String(
+    href = AssetHrefField(
         default='',
         display_name=_('Video URL or FileId'),
         help=_(
             "Video URL of the video page. E.g. https://example.wistia.com/medias/12345abcde<br/>"
             "FileId for Tencent Player E.g. 5285890799710670616"
         ),
-        scope=Scope.content
+        scope=Scope.settings
+    )
+
+    asset_id = String(
+        default='',
+        display_name=_('Asset ID'),
+        help=_('UUID asset identifier for the video.'),
+        scope=Scope.settings
+    )
+
+    asset_name = AssetNameField(
+        default='',
+        display_name=_('Asset Name'),
+        help=_('Name of the asset resolved from the assets library.'),
+        scope=Scope.settings
     )
 
     download_video_allowed = Boolean(
@@ -324,7 +338,7 @@ class VideoXBlock(
         """
         log.debug("Default transcripts updating...")
         # Prepare parameters necessary to make requests to API.
-        video_id = player.media_id(self.href)
+        video_id = player.media_id(self.get_asset_href())
         kwargs = {'video_id': video_id}
         for k in self.metadata:
             kwargs[k] = self.metadata[k]
@@ -433,15 +447,17 @@ class VideoXBlock(
             Rendered html string as a Response (webob.Response).
         """
         player = self.get_player()
-        is_brightcove = str(self.player_name) == PlayerName.BRIGHTCOVE
+        player_name = self.get_player_name()
+        is_brightcove = str(player_name) == PlayerName.BRIGHTCOVE
         save_state_url = self.runtime.handler_url(self, 'save_player_state')
         transcripts = render_resource(
             'static/html/transcripts.html',
             transcripts=list(self.route_transcripts())
         ).strip()
+        href = self.get_asset_href()
         return player.get_player_html(
-            url=self.href, account_id=self.account_id, player_id=self.player_id,
-            video_id=player.media_id(self.href),
+            url=href, account_id=self.account_id, player_id=self.player_id,
+            video_id=player.media_id(href),
             video_player_id='video_player_{}'.format(self.block_id),
             save_state_url=save_state_url,
             player_state=self.player_state,
@@ -471,6 +487,48 @@ class VideoXBlock(
         self.runtime.publish(self, event_type, data)
         return {'result': 'success'}
 
+    def get_asset(self):
+        """
+        Return the Asset instance for the XBlock's asset_id, or None if unavailable.
+        """
+        asset_id = self.asset_id
+        if not asset_id:
+            return None
+        try:
+            from jigsaw_extensions.assets_library.models import Asset  # pylint: disable=import-outside-toplevel  # type: ignore[import]
+
+            return Asset.objects.get(id=asset_id)
+        except Exception:  # pylint: disable=broad-except
+            log.exception("Failed to fetch Asset with id=%s", asset_id)
+            return None
+
+    def get_asset_href(self):
+        """
+        Return the video href resolved from the asset, falling back to the direct href field.
+        """
+        asset = self.get_asset()
+        if asset:
+            return asset.external_link or asset.source_file.url
+        return self.href
+
+    def get_player_name(self):
+        """
+        Detect and return the player name matching the current video href.
+
+        Iterates over registered player classes and returns the name of the first
+        one that matches the asset href. Defaults to the field's default value
+        if no player matches.
+        """
+        value = self.fields['player_name'].default
+        href = self.get_asset_href()
+        for player_name, player_class in BaseVideoPlayer.load_classes():
+            if player_name == PlayerName.DUMMY:
+                continue
+            if player_class.match(href):
+                value = player_name
+                break
+        return value
+
     def clean_studio_edits(self, data):
         """
         Given POST data dictionary 'data', clean the data before validating it.
@@ -497,7 +555,8 @@ class VideoXBlock(
         Returns:
             Current player object (instance of a platform-specific player class).
         """
-        player = BaseVideoPlayer.load_class(self.player_name)
+        player_name = self.get_player_name()
+        player = BaseVideoPlayer.load_class(player_name)
         return player(self)
 
     def _get_field_help(self, field_name, field):
@@ -821,7 +880,7 @@ class VideoXBlock(
         """
         log.debug("Uploading default transcript with data: {}".format(data))
         player = self.get_player()
-        video_id = player.media_id(self.href)
+        video_id = player.media_id(self.get_asset_href())
         lang_code = str(data.get(u'lang'))
         lang_label = str(data.get(u'label'))
         source = str(data.get(u'source', ''))
