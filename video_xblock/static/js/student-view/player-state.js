@@ -39,7 +39,9 @@ var PlayerState = function(player, playerState) {
             }
         }
         if (stateCurrentTime > 0) {
-            player.currentTime(stateCurrentTime);
+            player.one('play', function() {
+                player.currentTime(stateCurrentTime);
+            });
         }
         player.volume(state.volume);
         player.muted(state.muted);
