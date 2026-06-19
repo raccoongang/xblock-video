@@ -2,9 +2,12 @@
  * Javascript for VideoXBlock.student_view()
  * @param runtime Runtime object.
  * @param element xblock's html element. Or object which contains html block we needed as element[0].
+ * @param initArgs Init arguments passed from the backend. `publishEvents` is false for public_view.
  */
-function VideoXBlockStudentViewInit(runtime, element) {
+function VideoXBlockStudentViewInit(runtime, element, initArgs) {
     'use strict';
+
+    var publishEvents = !initArgs || initArgs.publishEvents !== false;
 
     let baseColor = getComputedStyle(document.documentElement).getPropertyValue('--base-color');
     let iframes = document.querySelectorAll('.video-iframe');
@@ -32,7 +35,9 @@ function VideoXBlockStudentViewInit(runtime, element) {
             downloadTranscriptChanged: {}
         };
     handlers.saveState[usageId] = stateHandlerUrl;
-    handlers.analytics[usageId] = eventHandlerUrl;
+    if (publishEvents) {
+        handlers.analytics[usageId] = eventHandlerUrl;
+    }
     /** Send data to server by POSTing it to appropriate VideoXBlock handler */
     function sendData(handlerUrl, data) {
         $.ajax({

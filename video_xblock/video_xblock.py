@@ -297,10 +297,13 @@ class VideoXBlock(
         if statici18n_js_url:
             frag.add_javascript(resource_string(statici18n_js_url))
 
-    def student_view(self, _context=None):
+    def student_view(self, context=None):
         """
         The primary view of the `VideoXBlock`, shown to students when viewing courses.
         """
+        # `public_view` reuses this view but must not publish analytics events,
+        # since there is no authenticated user behind a public (anonymous) request.
+        publish_events = not (context and context.get('public_view'))
         player_url = self.runtime.handler_url(self, 'render_player')
         download_transcript_handler_url = self.runtime.handler_url(self, 'download_transcript')
         transcript_download_link = self.get_transcript_download_link()
@@ -329,8 +332,19 @@ class VideoXBlock(
         self.add_i18n_resource(frag)
         frag.add_javascript(resource_string("static/js/student-view/video-xblock.js"))
         frag.add_css(resource_string("static/css/student-view.css"))
-        frag.initialize_js('VideoXBlockStudentViewInit')
+        frag.initialize_js('VideoXBlockStudentViewInit', {'publishEvents': publish_events})
         return frag
+
+    def public_view(self, context=None):
+        """
+        The public (anonymous) view of the `VideoXBlock`.
+
+        Renders the same player as `student_view` but disables analytics event
+        publishing, as there is no authenticated user for a public request.
+        """
+        context = context or {}
+        context['public_view'] = True
+        return self.student_view(context)
 
     def _update_default_transcripts(self, player, transcripts):
         """
