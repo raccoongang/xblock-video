@@ -74,9 +74,13 @@ class VimeoPlayer(BaseVideoPlayer):
     VimeoPlayer is used for videos hosted on vimeo.com.
     """
 
-    # Regex is taken from http://regexr.com/3a2p0
-    # Reference: https://vimeo.com/153979733
-    url_re = re.compile(r'https?:\/\/(.+)?(vimeo.com)\/(?P<media_id>.*)')
+    # Accepts both the share form (vimeo.com/<id>) and the player/embed form
+    # (player.vimeo.com/video/<id>), which learners commonly copy from Vimeo
+    url_re = re.compile(
+        r'https?:\/\/(.+)?(vimeo\.com)\/'
+        r'(channels\/\w+\/|groups\/\w+\/videos\/|video\/)?'
+        r'(?P<media_id>\d+)'
+    )
 
     metadata_fields = ['access_token']
     default_transcripts_in_vtt = True

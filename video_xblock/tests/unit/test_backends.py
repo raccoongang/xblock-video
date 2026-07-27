@@ -266,7 +266,8 @@ class TestCustomBackends(VideoXBlockTestBase):
             'https://wi.st/medias/HRrr784kH8932Z'
         ],
         [  # Vimeo
-            'https://vimeo.com/202889234'
+            'https://vimeo.com/202889234',
+            'https://player.vimeo.com/video/202889234',
         ],
         [  # Html5
             'https://example.com/sample.mp4'
