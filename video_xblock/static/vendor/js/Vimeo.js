@@ -375,11 +375,12 @@ THE SOFTWARE. */
       videoId: null
     };
 
-    var regex = /^.*(vimeo\.com\/)((channels\/[A-z]+\/)|(groups\/[A-z]+\/videos\/))?([0-9]+)/;
+    // `video/` covers the player/embed form: player.vimeo.com/video/<id>
+    var regex = /^.*(vimeo\.com\/)((channels\/[A-z]+\/)|(groups\/[A-z]+\/videos\/)|(video\/))?([0-9]+)/;
     var match = url.match(regex);
 
     if (match) {
-      result.videoId = match[5];
+      result.videoId = match[6];
     }
 
     return result;
