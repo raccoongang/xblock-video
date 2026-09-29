@@ -5,6 +5,11 @@ from enum import Enum
 
 DEFAULT_LANG = 'en'
 
+# The assets library's stable per-asset URL, resolved to a freshly signed storage URL per request.
+# Duplicated rather than imported: this package must stay installable without the jigsaw-extensions
+# plugin, and the URL is part of the HTTP contract between the two.
+ASSET_FILE_URL_PREFIX = '/assets-library/asset/'
+
 
 class Status(Enum):
     """

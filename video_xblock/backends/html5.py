@@ -5,6 +5,7 @@ import json
 import re
 
 from video_xblock import BaseVideoPlayer
+from video_xblock.constants import ASSET_FILE_URL_PREFIX
 
 
 class Html5Player(BaseVideoPlayer):
@@ -28,6 +29,13 @@ class Html5Player(BaseVideoPlayer):
 
     exclude_advanced_fields = ('default_transcripts', 'download_video_url')
 
+    @classmethod
+    def match(cls, href):
+        """
+        Check if the href is a direct video file URL or an asset library file.
+        """
+        return href.startswith(ASSET_FILE_URL_PREFIX) or super().match(href)
+
     # Html API for requesting transcripts.
     captions_api = {}
 
@@ -47,8 +55,15 @@ class Html5Player(BaseVideoPlayer):
     def get_type(self, href):
         """
         Get file extension for video.js type property.
+
+        An asset library file URL carries no extension, so its type comes from the asset;
+        a URL without a known extension (e.g. a deleted asset's) leaves it to video.js.
         """
-        return "video/" + self.url_re.search(href).group('extension')
+        asset = self.xblock.get_asset()
+        if asset and asset.file_url:
+            return asset.mime_type
+        match = self.url_re.search(href)
+        return "video/" + match.group('extension') if match else None
 
     def get_frag(self, **context):
         """

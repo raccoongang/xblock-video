@@ -130,26 +130,31 @@ class RelativeTime(JSONField):
 
 class AssetHrefField(String):
     """
-    Resolves the video URL on-the-fly from the Asset model when asset_id is set.
+    Resolves the video URL from the asset library whenever ``asset_id`` is set.
 
-    Falls back to the stored field value when asset_id is absent or the lookup fails.
+    Overrides ``__get__`` rather than ``read_from``: ``Field.read_from`` is defined as a call to
+    ``__get__``, not the other way round, so resolving in ``read_from`` left plain attribute
+    access (``self.href``, which the players and templates use) reading the stored value and
+    never consulting the asset at all.
     """
 
-    def read_from(self, xblock):
-        if href := xblock.get_asset_href():
-            return href
-        return super().read_from(xblock)
+    def __get__(self, xblock, xblock_class):
+        if xblock is None:
+            return self
+        return xblock.get_asset_url() or super().__get__(xblock, xblock_class)
 
 
 class AssetNameField(String):
     """
-    Resolves the asset name on-the-fly from the Asset model when asset_id is set.
+    Resolves the asset name from the asset library whenever ``asset_id`` is set.
 
-    Falls back to the stored field value when asset_id is absent or the lookup fails.
+    Same reasoning as ``AssetHrefField``: the hook has to be ``__get__``.
     """
 
-    def read_from(self, xblock):
+    def __get__(self, xblock, xblock_class):
+        if xblock is None:
+            return self
         asset = xblock.get_asset()
-        if asset:
+        if asset is not None:
             return asset.name
-        return super().read_from(xblock)
+        return super().__get__(xblock, xblock_class)

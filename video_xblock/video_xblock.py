@@ -28,6 +28,11 @@ from xblock.utils.resources import ResourceLoader
 from xblock.utils.studio_editable import StudioEditableXBlockMixin
 from xmodule.contentstore.django import contentstore
 
+try:
+    from jigsaw_extensions.assets_library import api as assets_library_api
+except ImportError:  # the XBlock also runs without jigsaw-extensions-plugin
+    assets_library_api = None
+
 from . import __version__
 from .backends.base import BaseVideoPlayer
 from .constants import PlayerName, TranscriptSource
@@ -503,26 +508,32 @@ class VideoXBlock(
 
     def get_asset(self):
         """
-        Return the Asset instance for the XBlock's asset_id, or None if unavailable.
+        Return the asset library's ``AssetInfo`` for the XBlock's asset_id, or None if unavailable.
         """
-        asset_id = self.asset_id
-        if not asset_id:
+        if not self.asset_id or assets_library_api is None:
             return None
-        try:
-            from jigsaw_extensions.assets_library.models import Asset  # pylint: disable=import-outside-toplevel  # type: ignore[import]
+        return assets_library_api.get_asset_info(self.asset_id)
 
-            return Asset.objects.get(id=asset_id)
-        except Exception:  # pylint: disable=broad-except
-            log.exception("Failed to fetch Asset with id=%s", asset_id)
+    def get_asset_url(self):
+        """
+        Return the asset's own URL, or None when there is no asset behind this block.
+
+        A file resolves to the stable ``/assets-library/asset/<id>/`` rather than the presigned
+        storage URL, which expires. Only the asset is consulted — never ``self.href`` — because
+        ``AssetHrefField.__get__`` calls this, and reading ``href`` here would recurse.
+        """
+        asset = self.get_asset()
+        if asset is None:
             return None
+        return asset.external_link or asset.file_url
 
     def get_asset_href(self):
         """
-        Return the video href resolved from the asset, falling back to the direct href field.
+        Return the video href.
+
+        Kept for the callers that already use it; ``href`` resolves through the asset on its own
+        now (see ``AssetHrefField``), so this is simply that field.
         """
-        asset = self.get_asset()
-        if asset:
-            return asset.external_link or asset.source_file.url
         return self.href
 
     def get_player_name(self):
